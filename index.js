@@ -1,4 +1,5 @@
 const validateToken = require('./utils').validateToken;
+const cors = require('cors');
 
 require('dotenv').config();
 
@@ -11,11 +12,13 @@ const User = require('./models').User;
 const app = express();
 const port = process.env.PORT || 4000;
 
+app.use(cors());
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 
 app.use('/api/user', validateToken, require('./crud')(User));
-app.post('/api/login', require('./auth/login'));
+app.use('/api', require('./auth/authRouter'));
 
 
 

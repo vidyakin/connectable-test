@@ -16,10 +16,9 @@
 <script>
   import {SET_SHOW_IMAGE_HEADER} from "../../store/shower/mutations.type";
   import {mapGetters} from "vuex";
-  import {LOGIN} from "../../store/auth/actions.type";
 
   export default {
-    name: "AppHeader",
+    name: "AppLogin",
     data() {
       return {
         current: 1,
@@ -35,21 +34,13 @@
       login() {
         this.$gAuth.signIn()
           .then(GoogleUser => {
-            const userInfo = GoogleUser.getBasicProfile();
-            const user = {
-              googleID: GoogleUser.getId(),
-              googleToken: GoogleUser.getAuthResponse().access_token,
-              firstName: userInfo.wea,
-              lastName: userInfo.ofa,
-              email: userInfo.U3,
-
-            };
-            this.$store.dispatch(LOGIN, user);
             // On success do something, refer to https://developers.google.com/api-client-library/javascript/reference/referencedocs#googleusergetid
-            console.log(userInfo)
+            console.log('user', GoogleUser)
             // GoogleUser.getId() : Get the user's unique ID string.
             // GoogleUser.getBasicProfile() : Get the user's basic profile information.
             // GoogleUser.getAuthResponse() : Get the response object from the user's auth session. access_token and so on
+            const isSignIn = this.$gAuth.isAuthorized
+            console.log(isSignIn);
           })
       },
     },

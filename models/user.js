@@ -10,15 +10,19 @@ const Schema = mongoose.Schema;
 const userSchema = new Schema({
     username: {
         type: 'String',
-        required: true,
         trim: true,
-        unique: true
     },
     password: {
         type: 'String',
-        required: true,
         trim: true,
-    }
+    },
+    email: String,
+    googleToken: String,
+    firstName: String,
+    lastName: String,
+    googleId: Number,
+
+
 });
 
 userSchema.pre('save', function (next) {
