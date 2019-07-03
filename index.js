@@ -17,8 +17,10 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 
-app.use('/api/user', validateToken, require('./crud')(User));
+
+app.use('/api/user/me', validateToken, require('./auth/authRouter'));
 app.use('/api', require('./auth/authRouter'));
+app.use('/api/user', validateToken, require('./crud')(User));
 
 
 

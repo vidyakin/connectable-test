@@ -28,7 +28,7 @@ Vue.config.productionTip = false;
 
 setAuthInterceptor();
 Vue.axios.defaults.baseURL = 'http://localhost:4000';
-setAuthToken(localStorage.getItem('authorization'));
+setAuthToken(localStorage.getItem('token'));
 
 new Vue({
   router,

@@ -3,7 +3,8 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 module.exports = (req, res) => {
-  const {username, password, googleToken} = req.body;
+  const {username, password, googleId} = req.body;
+  console.log(req.body);
   if (username && password) {
     let result = {};
     let status = 200;
@@ -39,13 +40,14 @@ module.exports = (req, res) => {
       }
     });
   }
-  else if (googleToken) {
+  else if (googleId) {
     let result = {};
     let status = 200;
-    User.findOne({googleToken}, (err, user) => {
+    User.findOne({googleId: googleId}, (err, user) => {
+      console.log(user);
       if (!err && user) {
         status = 200;
-        const payload = {user: user.name};
+        const payload = {user: user.googleId};
         const secret = process.env.JWT_SECRET;
         result.token = jwt.sign(payload, secret);
         result.status = status;
@@ -54,9 +56,8 @@ module.exports = (req, res) => {
       } else {
         req.body.password = 'nopass';
         User.create(req.body, (err, newUser) => {
-          console.log(err);
           status = 200;
-          const payload = {user: newUser.name};
+          const payload = {user: newUser.googleId};
           const secret = process.env.JWT_SECRET;
           result.token = jwt.sign(payload, secret);
           result.status = status;

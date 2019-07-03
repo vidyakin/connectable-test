@@ -15,6 +15,7 @@ import Vue from 'vue';
 import HelloWorld from '@/components/HelloWorld.vue'; // @ is an alias to /src
 import AppNavbar from '@/components/common/Navbar'
 import AppHeader from '@/components/common/Header'
+import {GET_INFO_ABOUT_USER} from "@/store/user/actions.type";
 
 export default Vue.extend({
   name: 'home',
@@ -22,6 +23,12 @@ export default Vue.extend({
     HelloWorld,
     AppNavbar,
     AppHeader
+  },
+  beforeMount() {
+    if (localStorage.getItem('token')) {
+      this.$store.dispatch(GET_INFO_ABOUT_USER);
+
+    }
   },
 });
 </script>

@@ -1,14 +1,12 @@
 const jwt = require('jsonwebtoken');
 
-module.exports = {
-    validateToken: (req, res, next) => {
+module.exports.validateToken = (req, res, next) => {
         const authorizationHeader = req.headers.authorization;
         let result;
         if (authorizationHeader) {
             const token = req.headers.authorization.split(' ')[1]; // Bearer <token>
             try {
                 result = jwt.verify(token, process.env.JWT_SECRET);
-
                 req.decoded = result;
                 next();
             } catch (err) {
@@ -21,5 +19,4 @@ module.exports = {
             };
             res.status(401).send(result);
         }
-    }
 };

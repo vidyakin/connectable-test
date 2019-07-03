@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { SET_USER } from '@/store/auth/mutations.type';
+import { SET_USER } from '@/store/user/mutations.type';
 import  router  from '../../router';
 import store from '../../store';
 
