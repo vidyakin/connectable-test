@@ -1,16 +1,12 @@
-<template>
-  <div>
-    <div class="header" v-if="showHeaderImage">
-      <div src="https://smallbiztrends.com/wp-content/uploads/2018/03/shutterstock_705804559.jpg" alt=""
-           class="header-image">
-        <a-icon
-          type="close"
-          @click="closeImage"
-        />
-      </div>
+<template class="comment-input">
+  <a-input class="input" placeholder="Сообщение...">
+    <div slot="addonAfter" class="comment-input-action">
+      <a-icon type="link"></a-icon>
+      <a-upload>
+        <a-icon type="video-camera"></a-icon>
+      </a-upload>
     </div>
-    <app-login-bar/>
-  </div>
+  </a-input>
 </template>
 
 <script>
@@ -20,7 +16,7 @@
   import AppLoginBar from './LoginBar'
 
   export default {
-    name: "AppHeader",
+    name: "AppCommentInput",
     components: {
       AppLoginBar,
     },
@@ -42,28 +38,30 @@
 
 <style lang="scss">
 
-  .header {
+  .input {
+    border-color: white;
+    border-radius: 0.25rem;
+    height: 3.125rem;
+    margin: 1.25rem 3.125rem;
+    box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.04);
+    width: calc(100% - 6.25rem)!important;
 
-    &-image {
-      width: 100%;
-      height: 10rem;
-      background-image: url(https://smallbiztrends.com/wp-content/uploads/2018/03/shutterstock_705804559.jpg);
-      text-align: right;
-
-      .anticon {
-
-        color: white!important;
-        background: #3b86ff;
-        border-radius: 20rem;
-
-        &:hover {
-          cursor: pointer;
-        }
-        
-      }
-
+    .ant-input {
+      border-color: white !important;
+      height: 3.125rem;
     }
 
+    .ant-input-group-addon {
+      border-color: white !important;
+      background-color: white;
+      padding: 0;
+    }
+
+    .anticon {
+      margin-right: 0.5rem !important;
+      cursor: pointer;
+    }
   }
+
 
 </style>

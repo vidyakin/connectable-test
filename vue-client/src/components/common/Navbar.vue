@@ -15,7 +15,7 @@
         Компания
       </a-menu-item>
       <a-menu-item key="2" disabled>
-        Адрессная книга
+        Адресная книга
       </a-menu-item>
       <a-menu-item key="3" disabled>
         Пользователь
