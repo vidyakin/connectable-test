@@ -14,5 +14,6 @@ const jokesSchema = new Schema({
 const index = {};
 index.Jokes = mongoose.model('jokes', jokesSchema);
 index.User = require('./user');
+index.Post = require('./post');
 
 module.exports = index;

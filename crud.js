@@ -1,6 +1,6 @@
 const express = require('express');
 
-module.exports = (Collection) => {
+module.exports = (Collection, options) => {
 
     const create = (req, res) => {
         let result = {};
@@ -22,7 +22,7 @@ module.exports = (Collection) => {
 
 
     const readMany = (req, res) => {
-        let query = res.locals.query || {};
+        let query = req.body.filter || {};
         let result = {};
         let status = 201;
         Collection.find(query, (e, data) => {

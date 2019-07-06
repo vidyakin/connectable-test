@@ -8,6 +8,18 @@
   @import url('https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700,800&display=swap&subset=cyrillic,cyrillic-ext,greek,greek-ext,latin-ext,vietnamese');
   @import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,800&display=swap');
 
+  *::-webkit-scrollbar {
+    height: 6px;
+    width: 6px;
+  }
+  *::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.0);
+  }
+  *::-webkit-scrollbar-thumb {
+    background-color: #a3a0fb;
+    border-radius: 3px;
+  }
+
   * {
     font-family: 'Source Sans Pro', sans-serif, serif !important;
   }

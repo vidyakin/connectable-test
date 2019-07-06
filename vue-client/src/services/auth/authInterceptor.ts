@@ -7,6 +7,7 @@ export const setAuthInterceptor = () => {
   axios.interceptors.response.use((response) => {
     return response;
   }, (error) => {
+    console.log(error);
     if (error.response.status === 401) {
       localStorage.removeItem('authorization');
       store.commit(SET_USER, null);
