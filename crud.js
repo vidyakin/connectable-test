@@ -22,7 +22,8 @@ module.exports = (Collection, serializer, options) => {
 
 
     const readMany = (req, res) => {
-        let query = req.body.filter || {};
+        let query = req.query.filter || {};
+        query = JSON.parse(query);
         let result = {};
         let status = 201;
         Collection.find(query, async (e, data) => {

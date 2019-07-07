@@ -1,9 +1,6 @@
 <template>
-  <div class="company">
-    <app-comment-input v-model="content" @pressEnter="sendMessage" :parent="{type: 'company', id: '0'}"/>
-    <div class="company-name">
-      Компания
-    </div>
+  <div class="profile">
+    <app-comment-input v-model="content" @pressEnter="sendMessage" :parent="{type: 'user', id: user && user._id}"/>
     <app-post v-for="post in posts" :post="post"/>
   </div>
 </template>
@@ -32,26 +29,25 @@
       }
     },
     beforeMount() {
-      this.$store.dispatch(GET_POSTS, {filter: {parent: {type: 'company', id: '0'}}})
+      if (this.user) this.$store.dispatch(GET_POSTS, {filter: {parent: {type: 'user', id: this.user._id}}});
+    },
+    watch: {
+      user(currentUser) {
+        this.$store.dispatch(GET_POSTS, {filter: {parent: {type: 'user', id: currentUser._id}}})
+      }
     },
     computed: {
-      ...mapGetters(['posts']),
+      ...mapGetters(['posts', 'user']),
     }
   });
 </script>
 
 <style lang="scss">
 
-  .company {
+  .profile {
     background-color: #f0f0f7;
     height: calc(100vh - 3.125rem);
     overflow: auto;
-    &-name {
-      font-size: 1.5rem;
-      color: #43425d;
-      text-align: left;
-      margin-left: 3.125rem;
-    }
 
   }
 

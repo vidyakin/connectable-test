@@ -17,7 +17,7 @@
       <a-menu-item key="2" disabled>
         Адресная книга
       </a-menu-item>
-      <a-menu-item key="3" disabled>
+      <a-menu-item key="profile" >
         Пользователь
       </a-menu-item>
       <a-menu-item key="4" disabled>

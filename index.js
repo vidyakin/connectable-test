@@ -19,11 +19,14 @@ const app = express();
 const port = process.env.PORT || 4000;
 
 app.use(cors());
-app.use(fileUpload());
+app.use(fileUpload({
+  limits: {fileSize: 50 * 1024 * 1024},
+}));
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 
+app.use(express.static('static'));
 
 app.use('/api/user/me', validateToken, require('./auth/authRouter'));
 app.use('/api', require('./auth/authRouter'));
@@ -33,17 +36,17 @@ app.use('/api/like', validateToken, require('./crud')(Like, serializers.serializ
 app.use('/api/comment', validateToken, require('./crud')(Comment, serializers.serializer));
 
 app.post('/upload', (req, res, next) => {
-  console.log(req);
-  let imageFile = req.files.file;
-
-  imageFile.mv(`${__dirname}/public/${req.body.filename}.jpg`, function(err) {
+  let imageFile = req.files.files;
+  console.log(imageFile);
+  const fileName = `/public/${Date.now()}${imageFile.name}`;
+  imageFile.mv(`${__dirname}/static${fileName}`, function (err) {
     if (err) {
       return res.status(500).send(err);
     }
 
-    res.json({file: `public/${req.body.filename}.jpg`});
+    res.json({file: {type: imageFile.mimetype.split('/')[0], src: `${process.env.DEFAULT_URL}/${fileName}`}});
   });
 
-})
+});
 
 app.listen(port, () => console.log(`[Server]: Listening on port ${port}`));

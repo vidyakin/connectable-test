@@ -1,7 +1,7 @@
 import {SET_SHOW_IMAGE_HEADER} from "@/store/shower/mutations.type";
 import {GET_POSTS, SEND_COMMENT, SEND_LIKE, SEND_NEW_POST} from "@/store/post/actions.type";
 import {getPosts, sendComment, sendLike, sendNewPost} from "@/services/post.service";
-import {ADD_LIKE_FOR_POST, ADD_POST, SET_POSTS} from "@/store/post/mutations.type";
+import {ADD_COMMENT_FOR_POST, ADD_LIKE_FOR_POST, ADD_POST, SET_POSTS} from "@/store/post/mutations.type";
 
 interface State {
   posts: any[],
@@ -36,6 +36,14 @@ const mutations = {
     state.posts = [...state.posts.slice(0, postIndex),
       {...state.posts[postIndex],
         likes: [...state.posts[postIndex].likes, like]
+      },
+      ...state.posts.slice(postIndex + 1)];
+  },
+  [ADD_COMMENT_FOR_POST](state: State, comment: any) {
+    const postIndex = state.posts.findIndex(post => post._id === comment.parent.id);
+    state.posts = [...state.posts.slice(0, postIndex),
+      {...state.posts[postIndex],
+        comments: [...state.posts[postIndex].comments, comment]
       },
       ...state.posts.slice(postIndex + 1)];
   },

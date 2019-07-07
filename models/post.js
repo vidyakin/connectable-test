@@ -8,7 +8,7 @@ const postSchema = new Schema({
   parent: Object,
   message: String,
   author: Object,
-  attachment: [{type: String, url: String}],
+  attachment: Array,
   created: {
     type: Date,
     default: Date.now(),

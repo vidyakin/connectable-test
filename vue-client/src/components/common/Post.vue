@@ -15,7 +15,10 @@
     </div>
     <div class="post-wrapper-content">
       {{ post && post.message }}
-
+      <img :src="post && post.attachment && post.attachment[0].src" alt="" height="260" v-if="post.attachment[0].type === 'image'">
+      <video alt="" height="260" controls v-if="post.attachment[0].type === 'video'">
+        <source :src="post && post.attachment && post.attachment[0].src" type="video/mp4">
+      </video>
       <div class="post-wrapper-content-likes">
         <div class="post-wrapper-content-likes-authors" v-if="post.likes && post.likes.length > 0">
           <a-icon type="like"></a-icon>
@@ -90,7 +93,8 @@
           author: this.user,
           message: this.commentContent,
         };
-        this.$store.dispatch(SEND_COMMENT, comment);
+        this.$store.dispatch(SEND_COMMENT, comment)
+          .then(() => this.commentContent = '');
       },
     },
     props: {
