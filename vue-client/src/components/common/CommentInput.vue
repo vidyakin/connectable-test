@@ -49,11 +49,11 @@
 <style lang="scss">
 
   .input {
-    border-color: white;
-    border-radius: 0.25rem;
-    height: 3.125rem;
-    margin: 1.25rem 3.125rem;
-    box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.04);
+    border-color: white!important;
+    border-radius: 0.25rem!important;
+    height: 3.125rem!important;
+    margin: 1.25rem 3.125rem!important;
+    box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.04)!important;
     width: calc(100% - 6.25rem) !important;
 
     .ant-input {

@@ -1,6 +1,6 @@
 const express = require('express');
 
-module.exports = (Collection, options) => {
+module.exports = (Collection, serializer, options) => {
 
     const create = (req, res) => {
         let result = {};
@@ -25,14 +25,14 @@ module.exports = (Collection, options) => {
         let query = req.body.filter || {};
         let result = {};
         let status = 201;
-        Collection.find(query, (e, data) => {
+        Collection.find(query, async (e, data) => {
             if (e) {
                 status = 500;
                 result.status = status;
                 result.error = e;
             } else {
                 result.status = status;
-                result.result = data;
+                result.result = await serializer(data);
             }
             res.status(status).send(result);
         });

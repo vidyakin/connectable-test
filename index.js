@@ -1,5 +1,8 @@
 const validateToken = require('./utils').validateToken;
 const cors = require('cors');
+const fileUpload = require('express-fileupload');
+
+const serializers = require('./serializers');
 
 require('dotenv').config();
 
@@ -8,12 +11,15 @@ const bodyParser = require('body-parser');
 
 const User = require('./models').User;
 const Post = require('./models').Post;
+const Like = require('./models').Like;
+const Comment = require('./models').Comment;
 
 
 const app = express();
 const port = process.env.PORT || 4000;
 
 app.use(cors());
+app.use(fileUpload());
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
@@ -21,8 +27,10 @@ app.use(bodyParser.urlencoded({extended: true}));
 
 app.use('/api/user/me', validateToken, require('./auth/authRouter'));
 app.use('/api', require('./auth/authRouter'));
-app.use('/api/user', validateToken, require('./crud')(User));
-app.use('/api/post', validateToken, require('./crud')(Post));
+app.use('/api/user', validateToken, require('./crud')(User, serializers.serializer));
+app.use('/api/post', validateToken, require('./crud')(Post, serializers.postSerializer));
+app.use('/api/like', validateToken, require('./crud')(Like, serializers.serializer));
+app.use('/api/comment', validateToken, require('./crud')(Comment, serializers.serializer));
 
 
 

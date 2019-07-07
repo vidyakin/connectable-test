@@ -15,5 +15,7 @@ const index = {};
 index.Jokes = mongoose.model('jokes', jokesSchema);
 index.User = require('./user');
 index.Post = require('./post');
+index.Like = require('./like');
+index.Comment = require('./comment');
 
 module.exports = index;
