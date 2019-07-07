@@ -1,13 +1,15 @@
 import Vue from "vue";
 import {LOGIN} from "@/store/user/actions.type";
 import {SET_USER} from "@/store/user/mutations.type";
+import {setAuthToken} from "@/services/auth/setAuthToken";
 
 export const login = (context: any, user: any) => {
   return Vue.axios.post('/api/login', user)
     .then(response => {
       localStorage.setItem('authorization', 'true');
-      localStorage.setItem('token', `Bearer ${response.data.token}`)
-      context.commit(SET_USER, response.data.result)
+      localStorage.setItem('token', `Bearer ${response.data.token}`);
+      context.commit(SET_USER, response.data.result);
+      setAuthToken(`Bearer ${response.data.token}`);
     })
 };
 

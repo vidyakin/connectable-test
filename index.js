@@ -32,6 +32,18 @@ app.use('/api/post', validateToken, require('./crud')(Post, serializers.postSeri
 app.use('/api/like', validateToken, require('./crud')(Like, serializers.serializer));
 app.use('/api/comment', validateToken, require('./crud')(Comment, serializers.serializer));
 
+app.post('/upload', (req, res, next) => {
+  console.log(req);
+  let imageFile = req.files.file;
 
+  imageFile.mv(`${__dirname}/public/${req.body.filename}.jpg`, function(err) {
+    if (err) {
+      return res.status(500).send(err);
+    }
+
+    res.json({file: `public/${req.body.filename}.jpg`});
+  });
+
+})
 
 app.listen(port, () => console.log(`[Server]: Listening on port ${port}`));
