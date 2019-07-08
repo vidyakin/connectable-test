@@ -64,16 +64,27 @@ module.exports = (Collection, serializer, options) => {
         let result = {};
         let status = 201;
 
-        Collection.update({_id: req.params._id}, {$set: changedEntry}, (e, data) => {
+        Collection.updateOne({_id: req.params._id}, changedEntry, (e, data) => {
             if (e) {
                 status = 500;
                 result.status = status;
                 result.error = e;
+                res.status(status).send(result);
             } else {
                 result.status = status;
-                result.result = data;
+                Collection.findById(req.params._id, (e, data) => {
+                    if (e) {
+                        status = 500;
+                        result.status = status;
+                        result.error = e;
+                    }
+                    else {
+                        result.status = 200;
+                        result.result = data;
+                    }
+                    return res.status(status).send(result);
+                });
             }
-            res.status(status).send(result);
         });
     };
 

@@ -1,8 +1,8 @@
 <template class="comment-input">
   <a-input class="input" placeholder="Сообщение..." v-model="current" @pressEnter="send">
     <div slot="addonAfter" class="comment-input-action">
-      <a-icon type="link"></a-icon>
-      <a-upload>
+      <a-icon type="link" @click="handleUpload"></a-icon>
+      <a-upload :multiple="false" :fileList="fileList" :beforeUpload="beforeUpload" :handleRemove="handleRemove">
         <a-icon type="video-camera"></a-icon>
       </a-upload>
     </div>
@@ -13,6 +13,7 @@
   import {mapGetters} from "vuex";
   import AppLoginBar from './LoginBar'
   import {SEND_NEW_POST} from "../../store/post/actions.type";
+  import Vue from "vue";
 
   export default {
     name: "AppCommentInput",
@@ -22,6 +23,7 @@
     data() {
       return {
         current: '',
+        fileList: [],
       }
     },
     computed: {
@@ -34,11 +36,36 @@
             message: this.current,
             parent: this.parent,
             author: this.user,
-            attachment: []
+            attachment: [],
+            formData: this.handleUpload(),
           })
         }
         this.current = '';
       },
+      handleRemove(file) {
+        const index = this.fileList.indexOf(file);
+        const newFileList = this.fileList.slice();
+        newFileList.splice(index, 1);
+        this.fileList = newFileList
+      },
+      beforeUpload(file) {
+        this.fileList = [file];
+        return false;
+      },
+      handleUpload() {
+        const {fileList} = this;
+        if (fileList.length > 0) {
+          const formData = new FormData();
+          fileList.forEach((file) => {
+            formData.append('files', file);
+          });
+          this.fileList = [];
+          return formData;
+        } else {
+          return null;
+        }
+
+      }
     },
     props: {
       parent: Object,
@@ -49,11 +76,11 @@
 <style lang="scss">
 
   .input {
-    border-color: white!important;
-    border-radius: 0.25rem!important;
-    height: 3.125rem!important;
-    margin: 1.25rem 3.125rem!important;
-    box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.04)!important;
+    border-color: white !important;
+    border-radius: 0.25rem !important;
+    height: 3.125rem !important;
+    margin: 1.25rem 3.125rem !important;
+    box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.04) !important;
     width: calc(100% - 6.25rem) !important;
 
     .ant-input {
@@ -62,7 +89,7 @@
 
       &:focus {
         border-color: white !important;
-        box-shadow: 0 0 0 0 white!important;
+        box-shadow: 0 0 0 0 white !important;
       }
 
     }

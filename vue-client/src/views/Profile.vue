@@ -1,6 +1,7 @@
 <template>
   <div class="profile">
-    <app-comment-input v-model="content" @pressEnter="sendMessage" :parent="{type: 'user', id: user && user._id}"/>
+    <app-user-info></app-user-info>
+    <app-comment-input :parent="{type: 'user', id: user && user._id}"/>
     <app-post v-for="post in posts" :post="post"/>
   </div>
 </template>
@@ -9,6 +10,7 @@
   import Vue from 'vue';
   import AppCommentInput from '../components/common/CommentInput'
   import AppPost from '../components/common/Post'
+  import AppUserInfo from '../components/common/UserInfo'
   import {GET_POSTS} from "../store/post/actions.type";
   import {mapGetters} from "vuex";
 
@@ -22,18 +24,15 @@
     components: {
       AppCommentInput,
       AppPost,
+      AppUserInfo,
     },
-    methods: {
-      sendMessage() {
-        console.log(this.newPostMessage);
-      }
-    },
+    methods: {},
     beforeMount() {
       if (this.user) this.$store.dispatch(GET_POSTS, {filter: {parent: {type: 'user', id: this.user._id}}});
     },
     watch: {
       user(currentUser) {
-        this.$store.dispatch(GET_POSTS, {filter: {parent: {type: 'user', id: currentUser._id}}})
+        if (currentUser) this.$store.dispatch(GET_POSTS, {filter: {parent: {type: 'user', id: currentUser._id}}})
       }
     },
     computed: {

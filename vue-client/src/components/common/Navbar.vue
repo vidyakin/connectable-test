@@ -17,7 +17,7 @@
       <a-menu-item key="2" disabled>
         Адресная книга
       </a-menu-item>
-      <a-menu-item key="profile" >
+      <a-menu-item :key="user && `profile/${user._id}`" >
         Пользователь
       </a-menu-item>
       <a-menu-item key="4" disabled>
@@ -39,6 +39,8 @@
 </template>
 
 <script>
+  import {mapGetters} from "vuex";
+
   export default {
     name: "Navbar",
     data() {
@@ -48,9 +50,11 @@
     },
     methods: {
       goToPage(e) {
-        this.$router.push({name: e.key});
-        console.log(e);
+        this.$router.push({path: e.key});
       },
+    },
+    computed: {
+      ...mapGetters(['user',]),
     },
   }
 </script>

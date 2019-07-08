@@ -1,22 +1,27 @@
 <template>
-  <div class="user-info">
-
-    <div class="comment-wrapper-avatar">
-      <a-avatar :src="comment.author.googleImage"></a-avatar>
+  <div class="user-info-wrapper">
+    <app-user-edit-drawer :close="closeEditDrawer" :visible="editDrawerVisible"></app-user-edit-drawer>
+    <div class="user-info-avatar">
+      <a-avatar :src="user && user.googleImage"></a-avatar>
     </div>
 
-    <div class="comment-wrapper-content">
-      <div class="comment-wrapper-content-text">
-        <div class="comment-wrapper-content-text-author">
-          {{ comment.author.firstName }} {{ comment.author.lastName }}
-        </div>
-        <div class="comment-wrapper-content-text-message">
-          {{ comment.message }}
-        </div>
+    <div class="user-info-content">
+      <div class="user-info-content-name">
+        {{user && user.firstName}} {{user && user.lastName}}
       </div>
-      <div class="comment-wrapper-content-time">
-        <span>Нравится</span> <span>Ответить</span>{{ comment.created }}
+      <div class="user-info-content-positions">
+        {{user && user.positions && user.positions.join(', ')}}
       </div>
+      <div class="user-info-content-telephone">
+        {{user && user.phone}}
+      </div>
+      <div class="user-info-content-email">
+        {{user && user.email}}
+      </div>
+    </div>
+
+    <div class="user-info-edit">
+      <a-button icon="edit" @click="editDrawerVisible = true"></a-button>
     </div>
 
   </div>
@@ -25,84 +30,95 @@
 <script>
   import {mapGetters} from "vuex";
   import AppLoginBar from './LoginBar'
+  import AppUserEditDrawer from '../drawers/UserEditDrawer'
   import {SEND_NEW_POST} from "../../store/post/actions.type";
 
   export default {
-    name: "AppCommentInput",
+    name: "AppUserInfo",
     components: {
       AppLoginBar,
+      AppUserEditDrawer,
     },
     data() {
       return {
         current: '',
+        editDrawerVisible: false,
       }
     },
     computed: {
-      ...mapGetters(['showHeaderImage', 'user']),
+      ...mapGetters(['user']),
     },
-    methods: {},
-    props: {
-      parent: Object,
-      comment: Object,
-    }
+    methods: {
+      closeEditDrawer() {
+        this.editDrawerVisible = false;
+      }
+    },
   }
 </script>
 
 <style lang="scss">
-  .comment-wrapper {
 
+  .user-info-wrapper {
+    border-color: white;
+    border-radius: 0.25rem;
+    margin: 1.25rem 3.125rem;
+    box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.04);
+    width: calc(100% - 6.25rem) !important;
+    background-color: white;
+    text-align: left;
+    padding: 1.25rem;
     display: flex;
-    margin-top: 0.75rem;
 
-    &-avatar {
-      margin-right: 0.625rem;
-      height: 2rem;
+    .user-info-avatar {
+      .ant-avatar {
+        height: 4.5rem;
+        width: 4.5rem;
+      }
     }
 
-    &-content {
-
-      &-time {
+    .user-info-content {
+      padding-left: 1.5rem;
+      width: calc(100% - 5.5rem);
+      &-name {
+        height: 1.5rem;
+        font-size: 1.2rem;
+        font-weight: bold;
+        font-style: normal;
+        font-stretch: normal;
+        letter-spacing: normal;
+        text-align: left;
         color: #4d4f5c;
-        font-size: 0.625rem;
-        padding-left: 0.5rem;
-
-        span {
-          margin-right: 0.5rem;
-
-          &:hover {
-
-            cursor: pointer;
-
-          }
-
-        }
       }
-
-      &-text {
-        background-color: #f5f6fa;
-        border-radius: 4rem;
-        display: flex;
-        height: 2rem;
-        line-height: 2rem;
-
-        &-author {
-          margin-right: 1.125rem;
-          font-size: 0.75rem;
-          font-weight: bold;
-          color: #949494,;
-          padding-left: 0.5rem
-        }
-
-        &-message {
-          font-size: 0.75rem;
-          font-weight: normal;
-          color: #000000
-        }
-
+      &-positions {
+        height: 1.2rem;
+        opacity: 0.5;
+        font-size: 1rem;
+        font-weight: normal;
+        font-style: normal;
+        font-stretch: normal;
+        line-height: 1.67;
+        letter-spacing: normal;
+        text-align: left;
+        color: #43425d;
+      }
+      &-email, &-telephone {
+        height: 1.2rem;
+        font-size: 1rem;
+        font-weight: normal;
+        font-style: normal;
+        font-stretch: normal;
+        line-height: 1.67;
+        letter-spacing: normal;
+        text-align: left;
+        color: #43425d;
       }
 
     }
-
-
+    .user-info-edit {
+      .ant-btn {
+        border: 0;
+      }
   }
+  }
+
 </style>
