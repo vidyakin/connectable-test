@@ -4,7 +4,6 @@ const jwt = require('jsonwebtoken');
 
 module.exports = (req, res) => {
   const {username, password, googleId} = req.body;
-  console.log(req.body);
   if (username && password) {
     let result = {};
     let status = 200;
@@ -52,6 +51,9 @@ module.exports = (req, res) => {
         result.token = jwt.sign(payload, secret);
         result.status = status;
         result.result = user;
+        User.findOneAndUpdate({_id: user._id}, {googleToken: req.body.googleToken}, (err, data) => {
+          console.log(data);
+        })
         res.status(status).send(result);
       } else {
         req.body.password = 'nopass';

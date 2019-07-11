@@ -13,6 +13,7 @@ const User = require('./models').User;
 const Post = require('./models').Post;
 const Like = require('./models').Like;
 const Comment = require('./models').Comment;
+const Event = require('./models').Event;
 
 
 const app = express();
@@ -34,6 +35,7 @@ app.use('/api/user', validateToken, require('./crud')(User, serializers.serializ
 app.use('/api/post', validateToken, require('./crud')(Post, serializers.postSerializer));
 app.use('/api/like', validateToken, require('./crud')(Like, serializers.serializer));
 app.use('/api/comment', validateToken, require('./crud')(Comment, serializers.serializer));
+app.use('/api/event', validateToken, require('./crud')(Event, serializers.serializer));
 
 app.post('/upload', (req, res, next) => {
   let imageFile = req.files.files;

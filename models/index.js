@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const Schema = mongoose.Schema;
-mongoose.connect('mongodb://user:secret1@ds147842.mlab.com:47842/lex-db', {useNewUrlParser: true});
+mongoose.connect('mongodb://user:secret1@ds133621.mlab.com:33621/aleseyko', {useNewUrlParser: true});
 
 
 const jokesSchema = new Schema({
@@ -17,5 +17,6 @@ index.User = require('./user');
 index.Post = require('./post');
 index.Like = require('./like');
 index.Comment = require('./comment');
+index.Event = require('./event');
 
 module.exports = index;

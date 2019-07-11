@@ -23,6 +23,7 @@ module.exports = (Collection, serializer, options) => {
 
     const readMany = (req, res) => {
         let query = req.query.filter || {};
+        console.log(query);
         query = JSON.parse(query);
         let result = {};
         let status = 201;
@@ -93,7 +94,7 @@ module.exports = (Collection, serializer, options) => {
         let result = {};
         let status = 201;
 
-        Collection.remove({_id: req.params._id}, (e) => {
+        Collection.deleteOne({_id: req.params._id}, (e) => {
             if (e) {
                 status = 500;
                 result.status = status;

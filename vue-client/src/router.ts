@@ -3,6 +3,7 @@ import Router from 'vue-router';
 import Home from './views/Home.vue';
 import AppCompany from './views/Company.vue';
 import AppProfile from './views/Profile.vue';
+import AppCalendar from './views/Calendar.vue';
 
 Vue.use(Router);
 
@@ -21,9 +22,14 @@ export default new Router({
           component: AppCompany,
         },
         {
-          path: '/profile',
+          path: '/profile/:_id',
           name: 'profile',
           component: AppProfile,
+        },
+        {
+          path: '/calendar/',
+          name: 'calendar',
+          component: AppCalendar,
         },
       ]
     },
