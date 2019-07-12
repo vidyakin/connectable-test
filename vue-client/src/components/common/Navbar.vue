@@ -10,20 +10,20 @@
       <a-menu-item key="" class="header">
         connectable
       </a-menu-item>
-      <a-menu-item key="company">
+      <a-menu-item key="/company">
         <a-icon type="home"/>
         Компания
       </a-menu-item>
       <a-menu-item key="2" disabled>
         Адресная книга
       </a-menu-item>
-      <a-menu-item :key="user && `profile/${user._id}`" >
+      <a-menu-item :key="user && `/profile/${user._id}`" >
         Пользователь
       </a-menu-item>
       <a-menu-item key="4" disabled>
         Группы
       </a-menu-item>
-      <a-menu-item key="5" disabled>
+      <a-menu-item key="/calendar">
         Календарь
       </a-menu-item>
       <a-menu-item key="6" disabled>

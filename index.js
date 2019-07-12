@@ -34,7 +34,7 @@ app.use('/api', require('./auth/authRouter'));
 app.use('/api/user', validateToken, require('./crud')(User, serializers.serializer));
 app.use('/api/post', validateToken, require('./crud')(Post, serializers.postSerializer));
 app.use('/api/like', validateToken, require('./crud')(Like, serializers.serializer));
-app.use('/api/comment', validateToken, require('./crud')(Comment, serializers.serializer));
+app.use('/api/comment', validateToken, require('./crud')(Comment, serializers.commentSerializer));
 app.use('/api/event', validateToken, require('./crud')(Event, serializers.serializer));
 
 app.post('/upload', (req, res, next) => {

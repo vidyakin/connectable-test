@@ -48,7 +48,6 @@ eventSchema.pre('save', function (next) {
 });
 
 eventSchema.pre('deleteOne', { query: true, document: true }, function(next) {
-  console.log(this._conditions._id)
   this.findOne({_id: this._conditions._id}).catch(e => {})
     .then(event => {
       user.findOne({_id: event.userId}).catch(err => console.log(err)).then(data => {

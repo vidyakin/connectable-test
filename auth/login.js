@@ -43,7 +43,6 @@ module.exports = (req, res) => {
     let result = {};
     let status = 200;
     User.findOne({googleId: googleId}, (err, user) => {
-      console.log(user);
       if (!err && user) {
         status = 200;
         const payload = {user: user.googleId};
@@ -52,7 +51,6 @@ module.exports = (req, res) => {
         result.status = status;
         result.result = user;
         User.findOneAndUpdate({_id: user._id}, {googleToken: req.body.googleToken}, (err, data) => {
-          console.log(data);
         })
         res.status(status).send(result);
       } else {
