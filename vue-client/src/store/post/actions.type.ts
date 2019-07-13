@@ -5,3 +5,4 @@ export const DELETE_POST = 'DELETE_POST';
 
 export const SEND_LIKE = 'SEND_LIKE';
 export const SEND_COMMENT = 'SEND_COMMENT';
+export const REPOST = 'REPOST';

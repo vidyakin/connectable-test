@@ -1,8 +1,15 @@
 import Vue from "vue";
-import {ADD_COMMENT_FOR_POST, ADD_LIKE_FOR_POST, ADD_POST, SET_POSTS} from "@/store/post/mutations.type";
+import {
+  ADD_ANSWER_FOR_COMMENT,
+  ADD_COMMENT_FOR_POST,
+  ADD_LIKE_FOR_COMMENT,
+  ADD_LIKE_FOR_POST,
+  ADD_POST,
+  REMOVE_POST,
+  SET_POSTS
+} from "@/store/post/mutations.type";
 
 export const sendNewPost = (context: any, post: any) => {
-  console.log(post.formData)
   if (post.formData) {
     return Vue.axios
       .post('http://localhost:4000/upload', post.formData)
@@ -15,8 +22,7 @@ export const sendNewPost = (context: any, post: any) => {
             context.commit(ADD_POST, response.data.result);
           })
       })
-  }
-  else {
+  } else {
     return Vue.axios
       .post('api/post', post)
       .then((response: any) => {
@@ -25,6 +31,13 @@ export const sendNewPost = (context: any, post: any) => {
   }
 
 
+};
+
+export const repost = (context: any, post: any) => {
+  return Vue.axios
+    .post('api/post', post)
+    .then((response: any) => {
+    })
 };
 
 export const getPosts = (context: any, parent: any) => {
@@ -43,14 +56,25 @@ export const sendLike = (context: any, like: any) => {
       if (newLike.parent.type === 'post') {
         context.commit(ADD_LIKE_FOR_POST, newLike);
       }
+      if (newLike.parent.type === 'comment') {
+        context.commit(ADD_LIKE_FOR_COMMENT, newLike);
+      }
     })
 };
 
-export const sendComment = (context: any, like: any) => {
+export const sendComment = (context: any, comment: any) => {
   return Vue.axios
-    .post('api/comment', like)
+    .post('api/comment', comment)
     .then((response: any) => {
       const newComment = response.data.result;
       if (newComment.parent.type === 'post') context.commit(ADD_COMMENT_FOR_POST, newComment);
+      if (newComment.parent.type === 'comment') context.commit(ADD_ANSWER_FOR_COMMENT, newComment);
+    })
+};
+export const deletePost = (context: any, postId: number) => {
+  return Vue.axios
+    .delete('api/post/' + postId)
+    .then((response: any) => {
+      context.commit(REMOVE_POST, response.data.result);
     })
 };

@@ -34,6 +34,18 @@ export default Vue.extend({
 </script>
 
 <style lang="scss">
+  .open-action-button {
+    background-color: transparent!important;
+    border: 0!important;
+  }
+
+  .action-popup-content{
+    .anticon {
+      margin: 0 1rem!important;
+      cursor: pointer!important;
+    }
+  }
+
   .home {
     display: flex;
     justify-content: flex-end;

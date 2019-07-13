@@ -1,7 +1,16 @@
 import {SET_SHOW_IMAGE_HEADER} from "@/store/shower/mutations.type";
-import {GET_POSTS, SEND_COMMENT, SEND_LIKE, SEND_NEW_POST} from "@/store/post/actions.type";
-import {getPosts, sendComment, sendLike, sendNewPost} from "@/services/post.service";
-import {ADD_COMMENT_FOR_POST, ADD_LIKE_FOR_POST, ADD_POST, SET_POSTS} from "@/store/post/mutations.type";
+import {DELETE_POST, GET_POSTS, REPOST, SEND_COMMENT, SEND_LIKE, SEND_NEW_POST} from "@/store/post/actions.type";
+import {deletePost, getPosts, repost, sendComment, sendLike, sendNewPost} from "@/services/post.service";
+import {
+  ADD_ANSWER_FOR_COMMENT,
+  ADD_COMMENT_FOR_POST,
+  ADD_LIKE_FOR_COMMENT,
+  ADD_LIKE_FOR_POST,
+  ADD_POST,
+  REMOVE_POST,
+  SET_POSTS
+} from "@/store/post/mutations.type";
+import {DELETE_EVENT} from "@/store/user/actions.type";
 
 interface State {
   posts: any[],
@@ -22,6 +31,8 @@ const actions = {
   [GET_POSTS]: getPosts,
   [SEND_LIKE]: sendLike,
   [SEND_COMMENT]: sendComment,
+  [DELETE_POST]: deletePost,
+  [REPOST]: repost,
 };
 
 const mutations = {
@@ -34,18 +45,70 @@ const mutations = {
   [ADD_LIKE_FOR_POST](state: State, like: any) {
     const postIndex = state.posts.findIndex(post => post._id === like.parent.id);
     state.posts = [...state.posts.slice(0, postIndex),
-      {...state.posts[postIndex],
+      {
+        ...state.posts[postIndex],
         likes: [...state.posts[postIndex].likes, like]
+      },
+      ...state.posts.slice(postIndex + 1)];
+  },
+  [ADD_LIKE_FOR_COMMENT](state: State, like: any) {
+    let commentIndex: any;
+    const postIndex = state.posts.findIndex(post => {
+      commentIndex = post.comments.findIndex((comment: any) => comment._id === like.parent.id);
+      return commentIndex !== -1;
+    });
+    state.posts = [...state.posts.slice(0, postIndex),
+      {
+        ...state.posts[postIndex],
+        comments: [
+          ...state.posts[postIndex].comments.slice(0, commentIndex),
+          {
+            ...state.posts[postIndex].comments[commentIndex],
+            likes: [...state.posts[postIndex].comments[commentIndex].likes, like],
+          },
+          ...state.posts[postIndex].comments.slice(commentIndex + 1),
+        ]
       },
       ...state.posts.slice(postIndex + 1)];
   },
   [ADD_COMMENT_FOR_POST](state: State, comment: any) {
     const postIndex = state.posts.findIndex(post => post._id === comment.parent.id);
     state.posts = [...state.posts.slice(0, postIndex),
-      {...state.posts[postIndex],
+      {
+        ...state.posts[postIndex],
         comments: [...state.posts[postIndex].comments, comment]
       },
       ...state.posts.slice(postIndex + 1)];
+  },
+
+  [ADD_ANSWER_FOR_COMMENT](state: State, answer: any) {
+    let commentIndex: any;
+    const postIndex = state.posts.findIndex(post => {
+      commentIndex = post.comments.findIndex((comment: any) => comment._id === answer.parent.id);
+      return commentIndex !== -1;
+    });
+    state.posts = [...state.posts.slice(0, postIndex),
+      {
+        ...state.posts[postIndex],
+        comments: [
+          ...state.posts[postIndex].comments.slice(0, commentIndex),
+          {
+            ...state.posts[postIndex].comments[commentIndex],
+            answers: [...state.posts[postIndex].comments[commentIndex].answers, answer],
+          },
+          ...state.posts[postIndex].comments.slice(commentIndex + 1),
+        ]
+      },
+      ...state.posts.slice(postIndex + 1)];
+  },
+  [REMOVE_POST](state: State, postId: any) {
+    if (state.posts) {
+      const index = state.posts!.findIndex(({_id}) => _id === postId);
+      state.posts = [
+        ...state.posts!.slice(0, index),
+        ...state.posts!.slice(index + 1),
+      ]
+    }
   },
 };
 

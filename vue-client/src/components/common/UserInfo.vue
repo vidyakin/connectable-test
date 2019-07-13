@@ -3,6 +3,7 @@
     <app-user-edit-drawer :close="closeEditDrawer" :visible="editDrawerVisible"></app-user-edit-drawer>
     <div class="user-info-avatar">
       <a-avatar :src="user && user.googleImage"></a-avatar>
+      <a-button>Подписаться</a-button>
     </div>
 
     <div class="user-info-content">
@@ -70,9 +71,11 @@
     display: flex;
 
     .user-info-avatar {
+      text-align: center;
       .ant-avatar {
         height: 4.5rem;
         width: 4.5rem;
+        margin-bottom: 0.75rem;
       }
     }
 
@@ -90,6 +93,10 @@
         color: #4d4f5c;
       }
       &-positions {
+        &:hover {
+          cursor: pointer;
+          opacity: 1;
+        }
         height: 1.2rem;
         opacity: 0.5;
         font-size: 1rem;
