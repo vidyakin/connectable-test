@@ -13,8 +13,8 @@
 <script lang="ts">
 import Vue from 'vue';
 import HelloWorld from '@/components/HelloWorld.vue'; // @ is an alias to /src
-import AppNavbar from '@/components/common/Navbar'
-import AppHeader from '@/components/common/Header'
+import AppNavbar from '../components/common/Navbar.vue'
+import AppHeader from '../components/common/Header.vue'
 import {GET_INFO_ABOUT_USER} from "@/store/user/actions.type";
 
 export default Vue.extend({
