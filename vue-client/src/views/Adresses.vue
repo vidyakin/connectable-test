@@ -1,53 +1,140 @@
 <template>
-  <div class="company">
-
-  </div>
+  <a-table v-if="users" :columns="columns" :dataSource="data" @change="onChange" :pagination="false">
+    <div slot="name" slot-scope="text" class="table-row-name">
+      <a-avatar :src="text.googleImage"></a-avatar>
+      {{text.firstName}} {{text.lastName}}
+    </div>
+  </a-table>
 </template>
-
 <script>
-  import Vue from 'vue';
-  import AppCommentInput from '../components/common/CommentInput'
-  import AppPost from '../components/common/Post'
-  import {GET_POSTS} from "../store/post/actions.type";
+  import {GET_USERS} from "../store/user/actions.type";
   import {mapGetters} from "vuex";
 
-  export default Vue.extend({
-    name: 'AppAdresses',
+  const columns = [{
+    title: 'Сотрудник',
+    dataIndex: 'name',
+    scopedSlots: {customRender: 'name'}
+  }, {
+    title: 'Должность',
+    dataIndex: 'positions',
+    filters: [{
+      text: 'Менеджер',
+      value: 'Менеджер',
+    }, {
+      text: 'Лидер отдела продаж',
+      value: 'Лидер отдела продаж',
+    }],
+    filterMultiple: true,
+    onFilter: (value, record) => record.positions.indexOf(value) !== -1,
+  }, {
+    title: 'Телефон',
+    dataIndex: 'phone',
+  }, {
+    title: 'Почта',
+    dataIndex: 'email',
+  }
+  ];
+
+  const data = [{
+    key: '1',
+    name: 'John Brown',
+    age: 32,
+    address: 'New York No. 1 Lake Park',
+  }, {
+    key: '2',
+    name: 'Jim Green',
+    age: 42,
+    address: 'London No. 1 Lake Park',
+  }, {
+    key: '3',
+    name: 'Joe Black',
+    age: 32,
+    address: 'Sidney No. 1 Lake Park',
+  }, {
+    key: '4',
+    name: 'Jim Red',
+    age: 32,
+    address: 'London No. 2 Lake Park',
+  }];
+
+  function onChange(pagination, filters, sorter) {
+    console.log('params', pagination, filters, sorter);
+  }
+
+
+  export default {
+    name: 'AppAddress',
     data() {
       return {
-        content: '',
-      };
-    },
-    components: {
-      AppCommentInput,
-      AppPost,
-    },
-    methods: {
-      sendMessage() {
-        console.log(this.newPostMessage);
+        data: [],
+        columns,
       }
     },
-    beforeMount() {
-      this.$store.dispatch(GET_POSTS, {filter: {parent: {type: 'company', id: '0'}}})
+    methods: {
+      onChange,
     },
     computed: {
-      ...mapGetters(['posts']),
+      ...mapGetters(['users']),
+    },
+    beforeMount() {
+      this.$store.dispatch(GET_USERS);
+    },
+    watch: {
+      users(users) {
+        this.data = users.map(e => {
+          const {googleImage, firstName, lastName, positions, phone, email} = e;
+          const row = {};
+          row.name = {googleImage, firstName, lastName};
+          row.positions = positions.join(', ');
+          row.phone = phone;
+          row.email = email;
+          row.key = e._id;
+          return row;
+        });
+        console.log(this.data);
+      }
     }
-  });
+  }
 </script>
 
 <style lang="scss">
+  .table-row-name {
+    font-size: 13px;
+    font-weight: bold;
+    font-style: normal;
+    font-stretch: normal;
+    line-height: 1.85;
+    letter-spacing: normal;
+    text-align: left;
+    color: #4d565c;
+  }
 
-  .company {
-    background-color: #f0f0f7;
-    height: calc(100vh - 3.125rem);
-    overflow: auto;
-    &-name {
-      font-size: 1.5rem;
+  .ant-dropdown-menu-item-selected {
+
+    background-color: white!important;
+    span {
       color: #43425d;
-      text-align: left;
-      margin-left: 3.125rem;
+      background-color: white;
     }
+
+    .ant-checkbox-checked {
+
+      .ant-checkbox-inner {
+        background-color: white;
+        border-color: #a3a0fb;
+
+        &:focus {
+          box-shadow: 0px;
+        }
+
+        &:after {
+          border-color: #a3a0fb;
+        }
+      }
+
+    }
+
+
 
   }
 

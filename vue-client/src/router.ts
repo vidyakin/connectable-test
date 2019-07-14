@@ -4,6 +4,7 @@ import Home from './views/Home.vue';
 import AppCompany from './views/Company.vue';
 import AppProfile from './views/Profile.vue';
 import AppCalendar from './views/Calendar.vue';
+import AppAddress from './views/Adresses.vue';
 
 Vue.use(Router);
 
@@ -30,6 +31,11 @@ export default new Router({
           path: '/calendar/',
           name: 'calendar',
           component: AppCalendar,
+        },
+        {
+          path: '/addressBook/',
+          name: 'addressBook',
+          component: AppAddress,
         },
       ]
     },

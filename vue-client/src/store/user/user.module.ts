@@ -1,15 +1,15 @@
 import {SET_SHOW_IMAGE_HEADER} from "@/store/shower/mutations.type";
-import {ADD_EVENT, SET_EVENTS, SET_USER, UPDATE_USER} from "@/store/user/mutations.type";
+import {ADD_EVENT, SET_EVENTS, SET_USER, SET_USERS, UPDATE_USER} from "@/store/user/mutations.type";
 import {
   CREATE_EVENT, DELETE_EVENT,
   GET_EVENTS,
-  GET_INFO_ABOUT_USER,
+  GET_INFO_ABOUT_USER, GET_USERS,
   LOGIN,
   LOGIN_WITH_GOOGLE,
   UPDATE_USER_INFO
 } from "@/store/user/actions.type";
 import {getInfoAboutUser, login, loginWithGoogle} from "@/services/auth/auth.service";
-import {createEvent, deleteEvent, editUser, getEvents} from "@/services/user.service";
+import {createEvent, deleteEvent, editUser, getEvents, getUsers} from "@/services/user.service";
 
 interface State {
   user: any | null,
@@ -34,6 +34,9 @@ const getters = {
   },
   events(state: State) {
     return state.events;
+  },
+  users(state: State) {
+    return state.users;
   }
 };
 
@@ -84,6 +87,9 @@ const mutations = {
       ]
     }
   },
+  [SET_USERS](state: State, users: any[]) {
+    state.users = users;
+  }
 };
 
 const actions = {
@@ -94,6 +100,7 @@ const actions = {
   [CREATE_EVENT]: createEvent,
   [GET_EVENTS]: getEvents,
   [DELETE_EVENT]: deleteEvent,
+  [GET_USERS]: getUsers,
 
 
 };

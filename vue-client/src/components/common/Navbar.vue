@@ -14,7 +14,7 @@
         <a-icon type="home"/>
         Компания
       </a-menu-item>
-      <a-menu-item key="2" disabled>
+      <a-menu-item key="/addressBook">
         Адресная книга
       </a-menu-item>
       <a-menu-item :key="user && `/profile/${user._id}`" >

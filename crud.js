@@ -22,7 +22,7 @@ module.exports = (Collection, serializer, options) => {
 
 
     const readMany = (req, res) => {
-        let query = req.query.filter || {};
+        let query = req.query.filter || '{}';
         query = JSON.parse(query);
         let result = {};
         let status = 201;
