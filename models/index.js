@@ -18,5 +18,6 @@ index.Post = require('./post');
 index.Like = require('./like');
 index.Comment = require('./comment');
 index.Event = require('./event');
+index.Group = require('./group');
 
 module.exports = index;

@@ -1,10 +1,24 @@
 <template>
-  <a-table v-if="users" :columns="columns" :dataSource="data" @change="onChange" :pagination="false">
-    <div slot="name" slot-scope="text" class="table-row-name">
-      <a-avatar :src="text.googleImage"></a-avatar>
-      {{text.firstName}} {{text.lastName}}
+  <div class="address">
+    <div class="address-header">
+      <div class="address-header-name">
+        Адресная книга
+      </div>
+      <div class="address-header-search">
+        <a-input  v-model="searchText">
+          <a-icon type="search" slot="prefix"></a-icon>
+        </a-input>
+      </div>
     </div>
-  </a-table>
+    <div class="address-body">
+      <a-table v-if="users" :columns="columns" :dataSource="data" @change="onChange" :pagination="false">
+        <div slot="name" slot-scope="text" class="table-row-name">
+          <a-avatar :src="text.googleImage"></a-avatar>
+          {{text.firstName}} {{text.lastName}}
+        </div>
+      </a-table>
+    </div>
+  </div>
 </template>
 <script>
   import {GET_USERS} from "../store/user/actions.type";
@@ -68,10 +82,14 @@
       return {
         data: [],
         columns,
+        searchText: '',
       }
     },
     methods: {
       onChange,
+      pressEnter() {
+        console.log(this.searchText);
+      }
     },
     computed: {
       ...mapGetters(['users']),
@@ -91,13 +109,58 @@
           row.key = e._id;
           return row;
         });
-        console.log(this.data);
-      }
+        this.fullData = [...this.data]
+      },
+      searchText(text) {
+        this.data = this.fullData.filter(el => {
+          return el.name.firstName.indexOf(text) !== -1
+            || el.name.lastName.indexOf(text) !== -1
+            || (el.name.firstName + ' ' + el.name.lastName).indexOf(text) !== -1
+            || (el.name.lastName + ' ' + el.name.firstName).indexOf(text) !== -1;
+        })
+      },
     }
   }
 </script>
 
 <style lang="scss">
+
+  .address {
+    height: calc(100vh - 3.125rem);
+    overflow: auto;
+    background-color: #f0f0f7;
+
+    &-header {
+      display: flex;
+      margin: 1.5rem 3.125rem 1rem 3.125rem;
+      justify-content: space-between;
+
+      &-name {
+        height: 31px;
+        font-size: 24px;
+        font-weight: normal;
+        font-style: normal;
+        font-stretch: normal;
+        line-height: 1.67;
+        letter-spacing: normal;
+        text-align: left;
+        color: #43425d;
+      }
+
+      .ant-input {
+        background-color: #f0f0f7!important;
+        border-radius: 5rem;
+      }
+
+    }
+
+    &-body {
+      margin: 1.5rem 3.125rem 1rem 3.125rem;
+      background-color: white;
+    }
+
+  }
+
   .table-row-name {
     font-size: 13px;
     font-weight: bold;

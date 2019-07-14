@@ -14,6 +14,7 @@ const Post = require('./models').Post;
 const Like = require('./models').Like;
 const Comment = require('./models').Comment;
 const Event = require('./models').Event;
+const Group = require('./models').Group;
 
 
 const app = express();
@@ -32,6 +33,7 @@ app.use(express.static('static'));
 app.use('/api/user/me', validateToken, require('./auth/authRouter'));
 app.use('/api', require('./auth/authRouter'));
 app.use('/api/user', validateToken, require('./crud')(User, serializers.serializer));
+app.use('/api/group', validateToken, require('./crud')(Group, serializers.serializer));
 app.use('/api/post', validateToken, require('./crud')(Post, serializers.postSerializer));
 app.use('/api/like', validateToken, require('./crud')(Like, serializers.serializer));
 app.use('/api/comment', validateToken, require('./crud')(Comment, serializers.commentSerializer));
