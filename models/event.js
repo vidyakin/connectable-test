@@ -58,7 +58,6 @@ eventSchema.pre('deleteOne', { query: true, document: true }, function(next) {
           .delete('https://www.googleapis.com/calendar/v3/calendars/primary/events/' + event.googleEventId,
             {headers: headers})
           .catch(e => {
-            console.log(e.response)
             next();
           })
           .then((data) => {

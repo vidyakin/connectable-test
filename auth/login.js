@@ -56,7 +56,7 @@ module.exports = (req, res) => {
       } else {
         req.body.password = 'nopass';
         User.create(req.body, (err, newUser) => {
-          status = 200;
+          status = 201;
           const payload = {user: newUser.googleId};
           const secret = process.env.JWT_SECRET;
           result.token = jwt.sign(payload, secret);
