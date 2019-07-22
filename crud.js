@@ -6,14 +6,14 @@ module.exports = (Collection, serializer, options) => {
         let result = {};
         let status = 201;
         const newEntry = req.body;
-        Collection.create(newEntry, (e, data) => {
+        Collection.create(newEntry, async (e, data) => {
             if (e) {
                 status = 500;
                 result.status = status;
                 result.error = e;
             } else {
                 result.status = status;
-                result.result = data;
+                result.result = await serializer(data);
             }
             res.status(status).send(result);
         });
@@ -46,14 +46,14 @@ module.exports = (Collection, serializer, options) => {
         let result = {};
         let status = 201;
 
-        Collection.findById(_id, (e, data) => {
+        Collection.findById(_id, async (e, data) => {
             if (e) {
                 status = 500;
                 result.status = status;
                 result.error = e;
             } else {
                 result.status = status;
-                result.result = data;
+                result.result = await serializer(data);
             }
             res.status(status).send(result);
         });

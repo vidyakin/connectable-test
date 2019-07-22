@@ -3,6 +3,7 @@ const cors = require('cors');
 const fileUpload = require('express-fileupload');
 
 const serializers = require('./serializers');
+const groupSerializer = require('./groupSerializer').groupSerializer;
 
 require('dotenv').config();
 
@@ -33,7 +34,7 @@ app.use(express.static('static'));
 app.use('/api/user/me', validateToken, require('./auth/authRouter'));
 app.use('/api', require('./auth/authRouter'));
 app.use('/api/user', validateToken, require('./crud')(User, serializers.serializer));
-app.use('/api/group', validateToken, require('./crud')(Group, serializers.serializer));
+app.use('/api/group', validateToken, require('./crud')(Group, groupSerializer));
 app.use('/api/post', validateToken, require('./crud')(Post, serializers.postSerializer));
 app.use('/api/like', validateToken, require('./crud')(Like, serializers.serializer));
 app.use('/api/comment', validateToken, require('./crud')(Comment, serializers.commentSerializer));
