@@ -37,7 +37,6 @@ eventSchema.pre('save', function (next) {
       .post('https://www.googleapis.com/calendar/v3/calendars/primary/events',
         event, {headers: headers})
       .catch(e => {
-        console.log(e.response);
         next();
       })
       .then((data) => {

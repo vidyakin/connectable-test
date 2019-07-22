@@ -73,7 +73,7 @@ module.exports = (Collection, serializer, options) => {
                 res.status(status).send(result);
             } else {
                 result.status = status;
-                Collection.findById(req.params._id, (e, data) => {
+                Collection.findById(req.params._id, async (e, data) => {
                     if (e) {
                         status = 500;
                         result.status = status;
@@ -81,7 +81,7 @@ module.exports = (Collection, serializer, options) => {
                     }
                     else {
                         result.status = 200;
-                        result.result = data;
+                        result.result = await serializer(data);
                     }
                     return res.status(status).send(result);
                 });

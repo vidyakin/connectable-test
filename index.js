@@ -42,7 +42,6 @@ app.use('/api/event', validateToken, require('./crud')(Event, serializers.serial
 
 app.post('/upload', (req, res, next) => {
   let imageFile = req.files.files;
-  console.log(imageFile);
   const fileName = `/public/${Date.now()}${imageFile.name}`;
   imageFile.mv(`${__dirname}/static${fileName}`, function (err) {
     if (err) {

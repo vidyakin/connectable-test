@@ -17,7 +17,6 @@ const groupSchema = new Schema({
 });
 
 groupSchema.pre('save', function (next) {
-    console.log(this);
     groupParticipant.create({groupId: this._id, participantId: this.creatorId});
     next();
 });
