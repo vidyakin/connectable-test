@@ -41,6 +41,7 @@ export const repost = (context: any, post: any) => {
 };
 
 export const getPosts = (context: any, parent: any) => {
+  context.commit(SET_POSTS, []);
   return Vue.axios
     .get('api/post', {params: parent})
     .then((response: any) => {

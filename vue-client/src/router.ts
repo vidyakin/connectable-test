@@ -5,6 +5,8 @@ import AppCompany from './views/Company.vue';
 import AppProfile from './views/Profile.vue';
 import AppCalendar from './views/Calendar.vue';
 import AppAddress from './views/Adresses.vue';
+import AppGroups from './views/Groups.vue';
+import AppGroup from './views/Group.vue';
 
 Vue.use(Router);
 
@@ -36,6 +38,16 @@ export default new Router({
           path: '/addressBook/',
           name: 'addressBook',
           component: AppAddress,
+        },
+        {
+          path: '/groups/',
+          name: 'groups',
+          component: AppGroups,
+        },
+        {
+          path: '/group/:_id',
+          name: 'group',
+          component: AppGroup,
         },
       ]
     },

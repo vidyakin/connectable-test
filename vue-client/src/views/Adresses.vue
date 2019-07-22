@@ -11,7 +11,7 @@
       </div>
     </div>
     <div class="address-body">
-      <a-table v-if="users" :columns="columns" :dataSource="data" @change="onChange" :pagination="false">
+      <a-table v-if="users" :columns="columns" :dataSource="data" @change="onChange" :pagination="false" size="small">
         <div slot="name" slot-scope="text" class="table-row-name">
           <a-avatar :src="text.googleImage"></a-avatar>
           {{text.firstName}} {{text.lastName}}

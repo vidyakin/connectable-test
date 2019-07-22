@@ -20,7 +20,7 @@
       <a-menu-item :key="user && `/profile/${user._id}`" >
         Пользователь
       </a-menu-item>
-      <a-menu-item key="4" disabled>
+      <a-menu-item key="/groups">
         Группы
       </a-menu-item>
       <a-menu-item key="/calendar">

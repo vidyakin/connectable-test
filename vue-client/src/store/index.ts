@@ -3,6 +3,7 @@ import Vuex from 'vuex';
 import shower from './shower/shower.module';
 import auth from './user/user.module';
 import post from './post/post.module';
+import group from './group/group.module';
 
 Vue.use(Vuex);
 export default new Vuex.Store({
@@ -10,5 +11,6 @@ export default new Vuex.Store({
     shower,
     auth,
     post,
+    group,
   },
 });
