@@ -16,7 +16,7 @@
       </div>
       <div class="comment-wrapper-content-time">
         <span @click="like(comment._id, 'comment')" v-if="comment.likes.findIndex(e => e.author._id === user._id) ===  -1">Нравится</span>
-        <span @click="answering = true">Ответить</span>{{ comment.created }}
+        <span @click="answering = true">Ответить</span>{{ getMomentTime(comment.created) }}
       </div>
       <span v-if="comment.answers.length > 0 && !showAnswer" class="show-answers" @click="() => showAnswer=true">Показать {{comment.answers.length}} ответ</span>
       <span v-if="showAnswer" class="show-answers" @click="() => showAnswer=false">Скрыть</span>
@@ -35,7 +35,7 @@
           </div>
           <div class="comment-wrapper-content-time">
             <span @click="like(answer._id, 'answer')" v-if="answer.likes.findIndex(e => e.author._id === user._id) ===  -1">Нравится</span>
-            {{ answer.created }}
+            {{getMomentTime(answer.created) }}
           </div>
         </div>
         <div class="comment-wrapper-likes">
@@ -75,6 +75,7 @@
   import {mapGetters} from "vuex";
   import AppLoginBar from './LoginBar'
   import {SEND_COMMENT, SEND_LIKE, SEND_NEW_POST} from "../../store/post/actions.type";
+  import moment from "moment";
 
   export default {
     name: "AppCommentInput",
@@ -93,6 +94,9 @@
       ...mapGetters(['showHeaderImage', 'user']),
     },
     methods: {
+      getMomentTime(time) {
+        return moment(time).fromNow(true);
+      },
       sendComment(id, type) {
         const comment = {
           parent: {type: 'comment', id: id},

@@ -10,7 +10,7 @@
             {{ post.author.firstName + ' ' + post.author.lastName }}
           </div>
           <div class="post-wrapper-header-time">
-            {{ post && post.created }}
+            {{ post && getMomentTime(post.created) }}
           </div>
         </div>
       </div>
@@ -79,6 +79,7 @@
   import AppLoginBar from './LoginBar'
   import AppComment from './Comment'
   import {DELETE_POST, REPOST, SEND_COMMENT, SEND_LIKE, SEND_NEW_POST} from "../../store/post/actions.type";
+  import moment from "moment";
 
   export default {
     name: "AppPost",
@@ -100,6 +101,9 @@
     methods: {
       commented() {
         this.commenting = true;
+      },
+      getMomentTime(time) {
+        return moment(time).fromNow(true);
       },
       like(postId) {
         const like = {

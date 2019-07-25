@@ -11,27 +11,32 @@
         connectable
       </a-menu-item>
       <a-menu-item key="/company">
-        <a-icon type="home"/>
+        <img src="@/assets/Icons/company.svg" alt="">
         Компания
       </a-menu-item>
       <a-menu-item key="/addressBook">
+        <img src="@/assets/Icons/Adress book.svg" alt="">
         Адресная книга
       </a-menu-item>
       <a-menu-item :key="user && `/profile/${user._id}`" >
+        <img src="@/assets/Icons/user.svg" alt="">
         Пользователь
       </a-menu-item>
       <a-menu-item key="/groups">
+        <img src="@/assets/Icons/Groups.svg" alt="">
         Группы
       </a-menu-item>
       <a-menu-item key="/calendar">
+        <img src="@/assets/Icons/calendar.svg" alt="">
         Календарь
       </a-menu-item>
       <a-menu-item key="6" disabled>
+        <img src="@/assets/Icons/Structure.svg" alt="">
         Структура
       </a-menu-item>
 
       <a-menu-item key="7" class="footer" disabled>
-        <a-icon type="setting"/>
+        <img src="@/assets/Icons/setting.svg" alt="">
         Настройки
       </a-menu-item>
     </a-menu>
@@ -64,6 +69,7 @@
   .navbar {
 
     height: 100%;
+    width: 12.5rem!important;
 
 
     .ant-menu {
@@ -73,7 +79,11 @@
         height: 2.5rem;
         font-size: 1rem;
         text-align: left;
-        padding-left: 0.3rem;
+        padding-left: 1.5rem;
+        img {
+          margin-right: 0.5rem;
+        }
+
       }
 
       .footer{

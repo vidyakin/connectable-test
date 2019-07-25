@@ -174,6 +174,10 @@
     text-align: left;
     color: #4d565c;
 
+    &:hover {
+      cursor: pointer;
+    }
+
     .ant-avatar {
       margin-right: 0.5rem;
     }
