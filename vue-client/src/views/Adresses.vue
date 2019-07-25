@@ -12,7 +12,7 @@
     </div>
     <div class="address-body">
       <a-table v-if="users" :columns="columns" :dataSource="data" @change="onChange" :pagination="false" size="small">
-        <div slot="name" slot-scope="text" class="table-row-name">
+        <div slot="name" slot-scope="text" class="table-row-name" @click="goTo(text.id)">
           <a-avatar :src="text.googleImage"></a-avatar>
           {{text.firstName}} {{text.lastName}}
         </div>
@@ -89,7 +89,10 @@
       onChange,
       pressEnter() {
         console.log(this.searchText);
-      }
+      },
+      goTo(id) {
+        this.$router.push({name: 'profile', params: {_id: id}})
+      },
     },
     computed: {
       ...mapGetters(['users']),
@@ -102,7 +105,7 @@
         this.data = users.map(e => {
           const {googleImage, firstName, lastName, positions, phone, email} = e;
           const row = {};
-          row.name = {googleImage, firstName, lastName};
+          row.name = {googleImage, firstName, lastName, id: e._id};
           row.positions = positions.join(', ');
           row.phone = phone;
           row.email = email;

@@ -5,3 +5,5 @@ export const ADD_EVENT = 'ADD_EVENT';
 export const REMOVE_EVENT = 'REMOVE_EVENT';
 
 export const SET_USERS = 'SET_USERS';
+
+export const SET_CURRENT_USER = 'SET_CURRENT_USER';

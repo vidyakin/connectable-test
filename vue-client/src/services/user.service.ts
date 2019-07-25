@@ -1,6 +1,6 @@
 import Vue from "vue";
 import {ADD_COMMENT_FOR_POST, ADD_LIKE_FOR_POST, ADD_POST, SET_POSTS} from "@/store/post/mutations.type";
-import {ADD_EVENT, SET_EVENTS, SET_USERS, UPDATE_USER} from "@/store/user/mutations.type";
+import {ADD_EVENT, SET_CURRENT_USER, SET_EVENTS, SET_USERS, UPDATE_USER} from "@/store/user/mutations.type";
 import {DELETE_EVENT} from "@/store/user/actions.type";
 
 
@@ -44,5 +44,13 @@ export const getUsers = (context: any) => {
     .get(`api/user/`, )
     .then((response: any) => {
       context.commit(SET_USERS, response.data.result);
+    })
+};
+
+export const getUser = (context: any, userId: number) => {
+  return Vue.axios
+    .get(`api/user/${userId}`)
+    .then((response: any) => {
+      context.commit(SET_CURRENT_USER, response.data.result);
     })
 };

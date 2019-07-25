@@ -2,22 +2,22 @@
   <div class="user-info-wrapper">
     <app-user-edit-drawer :close="closeEditDrawer" :visible="editDrawerVisible"></app-user-edit-drawer>
     <div class="user-info-avatar">
-      <a-avatar :src="user && user.googleImage"></a-avatar>
+      <a-avatar :src="currentUser && currentUser.googleImage"></a-avatar>
       <a-button>Подписаться</a-button>
     </div>
 
     <div class="user-info-content">
       <div class="user-info-content-name">
-        {{user && user.firstName}} {{user && user.lastName}}
+        {{currentUser && currentUser.firstName}} {{currentUser && currentUser.lastName}}
       </div>
       <div class="user-info-content-positions">
-        {{user && user.positions && user.positions.join(', ')}}
+        {{currentUser && currentUser.positions && currentUser.positions.join(', ')}}
       </div>
       <div class="user-info-content-telephone">
-        {{user && user.phone}}
+        {{currentUser && currentUser.phone}}
       </div>
       <div class="user-info-content-email">
-        {{user && user.email}}
+        {{currentUser && currentUser.email}}
       </div>
     </div>
 
@@ -47,7 +47,7 @@
       }
     },
     computed: {
-      ...mapGetters(['user']),
+      ...mapGetters(['currentUser']),
     },
     methods: {
       closeEditDrawer() {

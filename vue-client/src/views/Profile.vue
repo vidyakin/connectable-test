@@ -1,7 +1,7 @@
 <template>
   <div class="profile">
     <app-user-info></app-user-info>
-    <app-comment-input :parent="{type: 'user', id: user && user._id}"/>
+    <app-comment-input :parent="{type: 'user', id: user && currentUser._id}"/>
     <app-post v-for="post in posts" :post="post"/>
   </div>
 </template>
@@ -13,6 +13,7 @@
   import AppUserInfo from '../components/common/UserInfo'
   import {GET_POSTS} from "../store/post/actions.type";
   import {mapGetters} from "vuex";
+  import {GET_USER} from "../store/user/actions.type";
 
   export default Vue.extend({
     name: 'AppCompany',
@@ -28,15 +29,21 @@
     },
     methods: {},
     beforeMount() {
-      if (this.user) this.$store.dispatch(GET_POSTS, {filter: {parent: {type: 'user', id: this.user._id}}});
-    },
-    watch: {
-      user(currentUser) {
-        if (currentUser) this.$store.dispatch(GET_POSTS, {filter: {parent: {type: 'user', id: currentUser._id}}})
-      }
+      this.$store.dispatch(GET_USER, this.$route.params._id)
+        .then(() => {
+          this.$store.dispatch(GET_POSTS, {filter: {parent: {type: 'user', id: this.currentUser._id}}});
+        });
     },
     computed: {
-      ...mapGetters(['posts', 'user']),
+      ...mapGetters(['posts', 'user', 'currentUser']),
+    },
+    watch: {
+      '$route'(val) {
+        this.$store.dispatch(GET_USER, val.params._id)
+          .then(() => {
+            this.$store.dispatch(GET_POSTS, {filter: {parent: {type: 'user', id: this.currentUser._id}}});
+          });
+      }
     }
   });
 </script>
