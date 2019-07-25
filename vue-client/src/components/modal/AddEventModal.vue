@@ -48,7 +48,7 @@
       </svg>
     </div>
     <div class="action">
-      <a-button @click="createEvent">Созать событие</a-button>
+      <a-button @click="createEvent">Создать событие</a-button>
     </div>
   </a-modal>
 </template>

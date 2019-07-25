@@ -149,7 +149,6 @@
       },
       getEventsForNextMonth() {
         return this.events && this.events.filter(event => {
-          console.log(moment(event.date).isSame(moment().add(1, 'M'), 'month'));
           return moment(event.date).isSame(moment().add(1, 'M'), 'month')
         })
       },
