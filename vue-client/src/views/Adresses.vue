@@ -170,6 +170,11 @@
     letter-spacing: normal;
     text-align: left;
     color: #4d565c;
+
+    .ant-avatar {
+      margin-right: 0.5rem;
+    }
+
   }
 
   .ant-dropdown-menu-item-selected {
