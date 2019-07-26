@@ -15,6 +15,10 @@ const postSchema = new Schema({
   },
   likes: Array,
   comments: Array,
+  edited: {
+    type: Boolean,
+    default: false,
+  }
 });
 
 module.exports = mongoose.model('Post', postSchema);
