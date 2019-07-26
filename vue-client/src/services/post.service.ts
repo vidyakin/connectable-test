@@ -12,7 +12,7 @@ import {
 export const sendNewPost = (context: any, post: any) => {
   if (post.formData) {
     return Vue.axios
-      .post('/upload', post.formData)
+      .post('api/upload', post.formData)
       .then(response => {
         post.attachment = [response.data.file];
         delete post.formData;
@@ -35,7 +35,7 @@ export const sendNewPost = (context: any, post: any) => {
 export const editPost = (context: any, post: any) => {
   if (post.formData) {
     return Vue.axios
-      .post('/upload', post.formData)
+      .post('api/upload', post.formData)
       .then(response => {
         post.attachment = [response.data.file];
         delete post.formData;
