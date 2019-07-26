@@ -34,7 +34,9 @@
             </div>
           </div>
           <div class="comment-wrapper-content-time">
-            <span @click="like(answer._id, 'answer')" v-if="answer.likes.findIndex(e => e.author._id === user._id) ===  -1">Нравится</span>
+            <span @click="like(answer._id, 'answer')"
+                  v-if="answer.likes.findIndex(e => e.author._id === user._id) ===  -1"
+            >Нравится</span>
             {{getMomentTime(answer.created) }}
           </div>
         </div>
@@ -74,7 +76,7 @@
 <script>
   import {mapGetters} from "vuex";
   import AppLoginBar from './LoginBar'
-  import {SEND_COMMENT, SEND_LIKE, SEND_NEW_POST} from "../../store/post/actions.type";
+  import {GET_POSTS, SEND_COMMENT, SEND_LIKE, SEND_NEW_POST} from "../../store/post/actions.type";
   import moment from "moment";
 
   export default {
@@ -111,7 +113,7 @@
           parent: {type: type, id: id},
           author: this.user,
         };
-        this.$store.dispatch(SEND_LIKE, like);
+        this.$store.dispatch(SEND_LIKE, like)
       },
       deleteComment(id) {
         const like = {

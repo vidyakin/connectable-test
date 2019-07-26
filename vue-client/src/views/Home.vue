@@ -2,6 +2,7 @@
   <div class="home">
     <app-navbar/>
     <div class="content">
+      <app-post-edit-drawer/>
       <div class="header">
         <app-header/>
       </div>
@@ -15,29 +16,19 @@ import Vue from 'vue';
 import HelloWorld from '@/components/HelloWorld.vue'; // @ is an alias to /src
 import AppNavbar from '../components/common/Navbar.vue'
 import AppHeader from '../components/common/Header.vue'
+import AppPostEditDrawer from '../components/drawers/PostEditDrawer.vue'
 import {GET_INFO_ABOUT_USER} from "@/store/user/actions.type";
 import moment from "moment";
-
-function num2str(n, text_forms) {
-  n = Math.abs(n) % 100; var n1 = n % 10;
-  if (n > 10 && n < 20) { return text_forms[2]; }
-  if (n1 > 1 && n1 < 5) { return text_forms[1]; }
-  if (n1 == 1) { return text_forms[0]; }
-  return text_forms[2];
-}
 
 export default Vue.extend({
   name: 'home',
   components: {
     HelloWorld,
     AppNavbar,
-    AppHeader
+    AppHeader,
+    AppPostEditDrawer,
   },
   methods: {
-    getDays(a) {
-      console.log(a);
-      return "day";
-    }
   }
   ,
   beforeMount() {
@@ -48,10 +39,10 @@ export default Vue.extend({
       relativeTime: {
         future: 'in %s',
         past: '%s ago',
-        s: 'a few sec',
-        ss: '%ds',
-        m: 'a min',
-        mm: '%d min',
+        s: 'несколько секунд',
+        ss: '%dсекунд',
+        m: 'минуту',
+        mm: '%d минут',
         h: '1 час',
         hh: '%dчасов',
         d: 'день',

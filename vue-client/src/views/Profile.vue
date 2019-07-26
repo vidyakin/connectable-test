@@ -1,7 +1,7 @@
 <template>
   <div class="profile">
     <app-user-info></app-user-info>
-    <app-comment-input :parent="{type: 'user', id: user && currentUser._id}"/>
+    <app-comment-input :parent="{type: 'user', id: currentUser && currentUser._id}"/>
     <app-post v-for="post in posts" :post="post"/>
   </div>
 </template>

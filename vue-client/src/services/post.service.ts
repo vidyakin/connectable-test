@@ -4,7 +4,7 @@ import {
   ADD_COMMENT_FOR_POST,
   ADD_LIKE_FOR_COMMENT,
   ADD_LIKE_FOR_POST,
-  ADD_POST,
+  ADD_POST, CHANGE_POST,
   REMOVE_POST,
   SET_POSTS
 } from "@/store/post/mutations.type";
@@ -27,6 +27,29 @@ export const sendNewPost = (context: any, post: any) => {
       .post('api/post', post)
       .then((response: any) => {
         context.commit(ADD_POST, response.data.result);
+      })
+  }
+
+
+};
+export const editPost = (context: any, post: any) => {
+  if (post.formData) {
+    return Vue.axios
+      .post('/upload', post.formData)
+      .then(response => {
+        post.attachment = [response.data.file];
+        delete post.formData;
+        Vue.axios
+          .put('api/post/' + post._id, post)
+          .then((response: any) => {
+            context.commit(CHANGE_POST, response.data.result);
+          })
+      })
+  } else {
+    return Vue.axios
+      .put('api/post/' + post._id, post)
+      .then((response: any) => {
+        context.commit(CHANGE_POST, response.data.result);
       })
   }
 

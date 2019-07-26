@@ -1,29 +1,47 @@
 import {SET_SHOW_IMAGE_HEADER} from "@/store/shower/mutations.type";
-import {DELETE_POST, GET_POSTS, REPOST, SEND_COMMENT, SEND_LIKE, SEND_NEW_POST} from "@/store/post/actions.type";
-import {deletePost, getPosts, repost, sendComment, sendLike, sendNewPost} from "@/services/post.service";
+import {
+  DELETE_POST,
+  EDIT_POST,
+  GET_POSTS,
+  REPOST,
+  SEND_COMMENT,
+  SEND_LIKE,
+  SEND_NEW_POST
+} from "@/store/post/actions.type";
+import {deletePost, editPost, getPosts, repost, sendComment, sendLike, sendNewPost} from "@/services/post.service";
 import {
   ADD_ANSWER_FOR_COMMENT,
   ADD_COMMENT_FOR_POST,
   ADD_LIKE_FOR_COMMENT,
   ADD_LIKE_FOR_POST,
-  ADD_POST,
-  REMOVE_POST,
+  ADD_POST, CHANGE_POST,
+  REMOVE_POST, SET_EDIT_POST_VISIBLE, SET_POST_FOR_EDITING,
   SET_POSTS
 } from "@/store/post/mutations.type";
 import {DELETE_EVENT} from "@/store/user/actions.type";
 
 interface State {
   posts: any[],
+  postForEditing: any,
+  editPostVisible: boolean,
 };
 
 const store: State = {
   posts: [],
+  postForEditing: null,
+  editPostVisible: false,
 };
 
 const getters = {
   posts(state: State) {
     return state.posts;
-  }
+  },
+  postForEditing(state: State) {
+    return state.postForEditing;
+  },
+  editPostVisible(state: State) {
+    return state.editPostVisible;
+  },
 };
 
 const actions = {
@@ -33,6 +51,7 @@ const actions = {
   [SEND_COMMENT]: sendComment,
   [DELETE_POST]: deletePost,
   [REPOST]: repost,
+  [EDIT_POST]: editPost,
 };
 
 const mutations = {
@@ -109,6 +128,22 @@ const mutations = {
         ...state.posts!.slice(index + 1),
       ]
     }
+  },
+  [CHANGE_POST](state: State, post: any) {
+    if (state.posts) {
+      const index = state.posts!.findIndex(({_id}) => _id === post._id);
+      state.posts = [
+        ...state.posts!.slice(0, index),
+        post,
+        ...state.posts!.slice(index + 1),
+      ]
+    }
+  },
+  [SET_POST_FOR_EDITING](state: State, post: any) {
+    state.postForEditing = post;
+  },
+  [SET_EDIT_POST_VISIBLE](state: State, visible: any) {
+    state.editPostVisible = visible;
   },
 };
 

@@ -11,6 +11,7 @@
           </div>
           <div class="post-wrapper-header-time">
             {{ post && getMomentTime(post.created) }}
+            <span v-if="post && post.edited">Отредактировано</span>
           </div>
         </div>
       </div>
@@ -56,7 +57,7 @@
       </div>
     </div>
     <div>
-      <a-popover title="Действия с событием" trigger="click" overlayClassName="action-popup-content">
+      <a-popover title="Действия с постом" trigger="click" overlayClassName="action-popup-content">
         <template slot="content">
           <a-tooltip title="Удалить">
             <a-icon type="delete" @click="deletePost"></a-icon>
@@ -65,7 +66,7 @@
             <a-icon type="share-alt" @click="repost"></a-icon>
           </a-tooltip>
           <a-tooltip title="Редактировать">
-            <a-icon type="edit" @click=""></a-icon>
+            <a-icon type="edit" @click="editPost"></a-icon>
           </a-tooltip>
         </template>
         <a-button icon="menu" class="open-action-button"></a-button>
@@ -80,6 +81,7 @@
   import AppComment from './Comment'
   import {DELETE_POST, REPOST, SEND_COMMENT, SEND_LIKE, SEND_NEW_POST} from "../../store/post/actions.type";
   import moment from "moment";
+  import {SET_EDIT_POST_VISIBLE, SET_POST_FOR_EDITING} from "../../store/post/mutations.type";
 
   export default {
     name: "AppPost",
@@ -125,6 +127,10 @@
       },
       deletePost() {
         this.$store.dispatch(DELETE_POST, this.post._id)
+      },
+      editPost() {
+        this.$store.commit(SET_POST_FOR_EDITING, this.post);
+        this.$store.commit(SET_EDIT_POST_VISIBLE, true);
       },
       seeAllComment() {
         this.allComment = true;
