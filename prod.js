@@ -1,6 +1,11 @@
 const https = require("https"),
 fs = require("fs");
 
+const options = {
+  key: fs.readFileSync("/app/ssl_certificates/connectable_pro.key;"),
+  cert: fs.readFileSync("/app/ssl_certificates/connectable_pro_ssl.pem;")
+};
+
 const validateToken = require('./utils').validateToken;
 const cors = require('cors');
 const fileUpload = require('express-fileupload');
@@ -56,4 +61,4 @@ app.post('/upload', (req, res, next) => {
 
 });
 
-app.listen(port, () => console.log(`[Server]: Listening on port ${port}`));
+https.createServer(options, app).listen(4000);
