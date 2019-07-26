@@ -40,7 +40,7 @@ app.use('/api/like', validateToken, require('./crud')(Like, serializers.serializ
 app.use('/api/comment', validateToken, require('./crud')(Comment, serializers.commentSerializer));
 app.use('/api/event', validateToken, require('./crud')(Event, serializers.serializer));
 
-app.post('/upload', (req, res, next) => {
+app.post('api/upload', (req, res, next) => {
   let imageFile = req.files.files;
   const fileName = `/public/${Date.now()}${imageFile.name}`;
   imageFile.mv(`${__dirname}/static${fileName}`, function (err) {
