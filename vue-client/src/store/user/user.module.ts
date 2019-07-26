@@ -5,10 +5,10 @@ import {
   GET_EVENTS,
   GET_INFO_ABOUT_USER, GET_USER, GET_USERS,
   LOGIN,
-  LOGIN_WITH_GOOGLE,
+  LOGIN_WITH_GOOGLE, LOGOUT,
   UPDATE_USER_INFO
 } from "@/store/user/actions.type";
-import {getInfoAboutUser, login, loginWithGoogle} from "@/services/auth/auth.service";
+import {getInfoAboutUser, login, loginWithGoogle, logout} from "@/services/auth/auth.service";
 import {createEvent, deleteEvent, editUser, getEvents, getUser, getUsers} from "@/services/user.service";
 
 interface State {
@@ -106,6 +106,7 @@ const actions = {
   [DELETE_EVENT]: deleteEvent,
   [GET_USERS]: getUsers,
   [GET_USER]: getUser,
+  [LOGOUT]: logout,
 
 
 };

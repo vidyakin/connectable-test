@@ -12,7 +12,7 @@ import {
 export const sendNewPost = (context: any, post: any) => {
   if (post.formData) {
     return Vue.axios
-      .post('http://localhost:4000/upload', post.formData)
+      .post('/upload', post.formData)
       .then(response => {
         post.attachment = [response.data.file];
         delete post.formData;

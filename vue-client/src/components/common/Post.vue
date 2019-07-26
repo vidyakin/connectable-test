@@ -36,7 +36,7 @@
 
       </div>
       <div class="post-wrapper-footer">
-        <span v-if="post.likes.findIndex(e => e.author._id === user._id) > -1">Вам нравится</span>
+        <span v-if="user && post.likes.findIndex(e => e.author._id === user._id) > -1">Вам нравится</span>
         <a-button icon="like" @click="like(post._id)" v-else>Нравится</a-button>
         <a-button icon="message" @click="commented">Комментировать</a-button>
       </div>

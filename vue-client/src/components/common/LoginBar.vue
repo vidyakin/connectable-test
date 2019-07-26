@@ -1,13 +1,18 @@
 <template>
   <div class="user-bar">
     <div class="login" v-if="!user">
-      <a-button @click="login">Login</a-button>
+      <a-button @click="login">Войти</a-button>
     </div>
     <div class="user-info" v-if="user">
       <div class="user-info-name">
         {{ user.firstName }}
       </div>
-      <a-icon type="down"></a-icon>
+      <a-popover trigger="click" placement="bottom" overlayClassName="user-info-popover">
+        <div slot="content">
+          <a-button @click="logout">Выйти</a-button>
+        </div>
+        <a-icon type="down" class="user-info-popover-btn"></a-icon>
+      </a-popover>
       <a-avatar :src="user.googleImage" />
     </div>
   </div>
@@ -16,7 +21,7 @@
 <script>
   import {SET_SHOW_IMAGE_HEADER} from "../../store/shower/mutations.type";
   import {mapGetters} from "vuex";
-  import {LOGIN, LOGIN_WITH_GOOGLE} from "../../store/user/actions.type";
+  import {LOGIN, LOGIN_WITH_GOOGLE, LOGOUT} from "../../store/user/actions.type";
 
   export default {
     name: "AppLoginBar",
@@ -35,11 +40,34 @@
       login() {
         this.$store.dispatch(LOGIN_WITH_GOOGLE, this.$gAuth)
       },
+      logout() {
+        this.$store.dispatch(LOGOUT);
+        this.$router.push({name: 'company'})
+      },
     },
   }
 </script>
 
 <style lang="scss">
+  .user-info-popover {
+
+    .ant-btn {
+      border: 0;
+    }
+
+    .ant-popover-arrow {
+      display: none;
+    }
+
+  }
+
+  .user-info-popover-btn {
+
+    &:hover {
+      cursor: pointer;
+    }
+
+  }
 
   .user-bar {
 

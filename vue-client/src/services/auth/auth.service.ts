@@ -13,6 +13,12 @@ export const login = (context: any, user: any) => {
     })
 };
 
+export const logout = (context: any) => {
+  localStorage.removeItem('authorization');
+  localStorage.removeItem('token');
+  context.commit(SET_USER, null);
+}
+
 export const loginWithGoogle = (context: any, $gAuth: any) => {
 
   $gAuth.signIn()
