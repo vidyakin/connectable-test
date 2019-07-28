@@ -10,6 +10,10 @@ const gPSchema = new Schema({
     type: Date,
     default: Date.now(),
   },
+  approved: {
+    type: Boolean,
+    default: true,
+  }
 });
 
 

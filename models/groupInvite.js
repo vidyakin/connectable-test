@@ -3,18 +3,15 @@ const mongoose = require('mongoose');
 // schema maps to a collection
 const Schema = mongoose.Schema;
 
-const gPSchema = new Schema({
-  participantId: String,
+const gISchema = new Schema({
+  userId: String,
   groupId: String,
   created: {
     type: Date,
     default: Date.now(),
   },
-  approved: {
-    type: Boolean,
-    default: true,
-  }
+  group: Object,
 });
 
 
-module.exports = mongoose.model('GroupParticipant', gPSchema);
+module.exports = mongoose.model('GroupInvite', gISchema);

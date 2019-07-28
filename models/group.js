@@ -14,6 +14,7 @@ const groupSchema = new Schema({
     },
     creatorId: String,
     participants: Array,
+    requests: Array,
 });
 
 groupSchema.pre('save', function (next) {

@@ -1,8 +1,8 @@
-const User = require('../models/user');
+const Group = require('../models/group');
 
 module.exports.findById = async (id) => {
   return new Promise((resolve, rejected) => {
-    User.findById(id, (err, data) => {
+    Group.findById(id, (err, data) => {
       if (err) {
         rejected(err)
       } else {
@@ -12,19 +12,3 @@ module.exports.findById = async (id) => {
   })
 };
 
-
-
-
-module.exports.findUsersByIds = async (userIds) => {
-  return new Promise((resolve, rejected) => {
-    const result = [];
-    Promise.all(userIds.map(async(id) => {
-        result.push(await this.findById(id));
-    })).then(() => {
-      resolve(result);
-    })
-      .catch(e => {
-        rejected(e);
-      });
-  })
-}

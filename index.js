@@ -4,6 +4,7 @@ const fileUpload = require('express-fileupload');
 
 const serializers = require('./serializers');
 const groupSerializer = require('./groupSerializer').groupSerializer;
+const inviteSerializer = require('./inviteSerializer').inviteSerializer;
 
 require('dotenv').config();
 
@@ -16,6 +17,8 @@ const Like = require('./models').Like;
 const Comment = require('./models').Comment;
 const Event = require('./models').Event;
 const Group = require('./models').Group;
+const GroupParticipant = require('./models').GroupParticipant;
+const GroupInvite = require('./models').GroupInvite;
 
 
 const app = express();
@@ -39,8 +42,10 @@ app.use('/api/post', validateToken, require('./crud')(Post, serializers.postSeri
 app.use('/api/like', validateToken, require('./crud')(Like, serializers.serializer));
 app.use('/api/comment', validateToken, require('./crud')(Comment, serializers.commentSerializer));
 app.use('/api/event', validateToken, require('./crud')(Event, serializers.serializer));
+app.use('/api/groupParticipant', validateToken, require('./crud')(GroupParticipant, serializers.serializer));
+app.use('/api/groupInvite', validateToken, require('./crud')(GroupInvite, inviteSerializer));
 
-app.post('api/upload', (req, res, next) => {
+app.post('/api/upload', (req, res, next) => {
   let imageFile = req.files.files;
   const fileName = `/public/${Date.now()}${imageFile.name}`;
   imageFile.mv(`${__dirname}/static${fileName}`, function (err) {
@@ -52,5 +57,67 @@ app.post('api/upload', (req, res, next) => {
   });
 
 });
+
+app.get('/api/checkParticipant/:participantId/group/:groupId', (req, res, next) => {
+  const {participantId, groupId} = req.params;
+  GroupParticipant.findOne({participantId, groupId, approved: false}, (e, data) => {
+    if (e) {
+      res.status(500).send();
+    } else {
+      res.send(data !== null);
+    }
+
+  })
+});
+
+app.post('/api/approveParticipant/:participantId/group/:groupId', (req, res, next) => {
+  const {participantId, groupId} = req.params;
+  GroupParticipant.updateMany({participantId, groupId}, {approved: true}, (e, data) => {
+    if (e) {
+      res.status(500).send();
+    } else {
+      res.status(200).send();
+    }
+
+  })
+});
+
+app.post('/api/approveInvite/:inviteId', (req, res, next) => {
+  const {inviteId} = req.params;
+  GroupInvite.findByIdAndDelete(inviteId, (e, data) => {
+    if (e) {
+      res.status(500).send();
+    } else {
+      GroupParticipant.create({participantId: data.userId, groupId: data.groupId}, (err, data) => {
+        res.status(200).send();
+      })
+    }
+
+  })
+});
+app.post('/api/cancelInvite/:inviteId', (req, res, next) => {
+  const {inviteId} = req.params;
+  GroupInvite.findByIdAndDelete(inviteId, (e, data) => {
+    if (e) {
+      res.status(500).send();
+    } else {
+      res.status(200).send();
+    }
+
+  })
+});
+
+app.delete('/api/deleteParticipant/:participantId/group/:groupId', (req, res, next) => {
+  const {participantId, groupId} = req.params;
+  GroupParticipant.deleteMany({participantId, groupId}, (e, data) => {
+    if (e) {
+      res.status(500).send();
+    } else {
+      res.status(200).send();
+    }
+
+  })
+});
+
 
 app.listen(port, () => console.log(`[Server]: Listening on port ${port}`));

@@ -20,5 +20,6 @@ index.Comment = require('./comment');
 index.Event = require('./event');
 index.Group = require('./group');
 index.GroupParticipant = require('./groupParticipant');
+index.GroupInvite = require('./groupInvite');
 
 module.exports = index;

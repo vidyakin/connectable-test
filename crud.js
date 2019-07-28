@@ -1,7 +1,8 @@
 const express = require('express');
+const mail = require('./email/index');
+
 
 module.exports = (Collection, serializer, options) => {
-
     const create = (req, res) => {
         let result = {};
         let status = 201;
@@ -12,6 +13,9 @@ module.exports = (Collection, serializer, options) => {
                 result.status = status;
                 result.error = e;
             } else {
+                if (Collection.collection.collectionName === 'groupinvites') {
+                    mail.sendInvite(data.userId, `https://connectable.pro/invite/${data._id}`)
+                }
                 result.status = status;
                 result.result = await serializer(data);
             }
@@ -34,7 +38,6 @@ module.exports = (Collection, serializer, options) => {
             } else {
                 result.status = status;
                 result.result = await serializer(data);
-                console.log(result.result);
             }
             res.status(status).send(result);
         });
