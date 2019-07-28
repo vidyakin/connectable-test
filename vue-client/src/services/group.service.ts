@@ -1,8 +1,13 @@
 import Vue from "vue";
-import {ADD_COMMENT_FOR_POST, ADD_LIKE_FOR_POST, ADD_POST, SET_POSTS} from "@/store/post/mutations.type";
-import {ADD_EVENT, SET_EVENTS, SET_USERS, UPDATE_USER} from "@/store/user/mutations.type";
-import {DELETE_EVENT} from "@/store/user/actions.type";
-import {ADD_GROUP, REMOVE_GROUP, SET_CURRENT_GROUP, SET_GROUPS, UPDATE_GROUP} from "@/store/group/mutations.type";
+import {
+  ADD_GROUP,
+  REMOVE_GROUP,
+  SET_CURRENT_GROUP,
+  SET_GROUPS, SET_INVITE,
+  SET_PARTICIPANTS_REQUEST,
+  UPDATE_GROUP
+} from "@/store/group/mutations.type";
+import {GET_CURRENT_GROUP} from "@/store/group/actions.type";
 
 export const createGroup = (context: any, group: any) => {
   return Vue.axios
@@ -16,6 +21,7 @@ export const getGroups = (context: any, userId: any) => {
   return Vue.axios
     .get(`api/group/`,)
     .then((response: any) => {
+      console.log(response.data.result);
       context.commit(SET_GROUPS, response.data.result);
     })
 };
@@ -42,4 +48,62 @@ export const editGroup = (context: any, group: any) => {
     .then((response: any) => {
       context.commit(UPDATE_GROUP, response.data.result);
     })
+};
+
+
+export const createParticipant = (context: any, participant: any) => {
+  return Vue.axios
+    .post(`api/groupParticipant/`, participant)
+    .then((response: any) => {
+      context.dispatch(GET_CURRENT_GROUP, participant.groupId)
+    })
+};
+
+export const getParticipantsRequest = (context: any, props: any) => {
+  return Vue.axios
+    .get(`api/checkParticipant/${props.participantId}/group/${props.groupId}`)
+    .then((response: any) => {
+      context.commit(SET_PARTICIPANTS_REQUEST, response.data)
+    })
+};
+
+export const approveParticipantsRequest = (context: any, props: any) => {
+  return Vue.axios
+    .post(`api/approveParticipant/${props.participantId}/group/${props.groupId}`)
+    .then((response: any) => {
+      context.dispatch(GET_CURRENT_GROUP, props.groupId)
+    })
+};
+
+export const deleteParticipant = (context: any, props: any) => {
+  return Vue.axios
+    .delete(`api/deleteParticipant/${props.participantId}/group/${props.groupId}`)
+    .then((response: any) => {
+      context.dispatch(GET_CURRENT_GROUP, props.groupId)
+    })
+};
+
+export const createInvite = (context: any, props: any) => {
+  return Vue.axios
+    .post(`api/groupInvite`, props)
+    .then((response: any) => {
+    })
+};
+
+export const getInvite = (context: any, id: string) => {
+  return Vue.axios
+    .get(`api/groupInvite/${id}`)
+    .then((response: any) => {
+      context.commit(SET_INVITE, response.data.result);
+    })
+};
+
+export const approveInvite = (context: any, id: string) => {
+  return Vue.axios
+    .post(`api/approveInvite/${id}`)
+};
+
+export const cancelInvite = (context: any, id: string) => {
+  return Vue.axios
+    .post(`api/cancelInvite/${id}`)
 };

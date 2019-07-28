@@ -1,14 +1,12 @@
 import Vue from 'vue';
 import Router from 'vue-router';
 import Home from './views/Home.vue';
-import AppCompany from './views/Company.vue';
-import AppProfile from './views/Profile.vue';
-import AppCalendar from './views/Calendar.vue';
-import AppAddress from './views/Adresses.vue';
-import AppGroups from './views/Groups.vue';
-import AppGroup from './views/Group.vue';
 
 Vue.use(Router);
+
+const view = (name: string) => {
+  return () => import(`./views/${name}.vue`)
+};
 
 export default new Router({
   mode: 'history',
@@ -22,32 +20,37 @@ export default new Router({
         {
           path: '/company',
           name: 'company',
-          component: AppCompany,
+          component: view('Company'),
         },
         {
           path: '/profile/:_id',
           name: 'profile',
-          component: AppProfile,
+          component: view('Profile'),
         },
         {
           path: '/calendar/',
           name: 'calendar',
-          component: AppCalendar,
+          component: view('Calendar'),
         },
         {
           path: '/addressBook/',
           name: 'addressBook',
-          component: AppAddress,
+          component: view('Address'),
         },
         {
           path: '/groups/',
           name: 'groups',
-          component: AppGroups,
+          component: view('Groups'),
         },
         {
           path: '/group/:_id',
           name: 'group',
-          component: AppGroup,
+          component: view('Group'),
+        },
+        {
+          path: '/invite/:_id',
+          name: 'invite',
+          component: view('Invite'),
         },
       ]
     },

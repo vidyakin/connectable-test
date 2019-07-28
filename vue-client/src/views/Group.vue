@@ -1,6 +1,8 @@
 <template>
   <div class="group-view">
     <app-group-edit-drawer :visible="editVisible" :close="closeEdit"/>
+    <app-requests-drawer :visible="requestVisible" :close="closeRequests" v-if="currentGroup && currentGroup.type === 1"/>
+    <app-invite-drawer :visible="requestVisible" :close="closeRequests" v-if="currentGroup && currentGroup.type === 2"/>
     <div class="groups-header">
       <div class="groups-header-name">
         Группы
@@ -18,15 +20,25 @@
             </div>
           </div>
           <div class="group-body-info-header-action">
-            <a-popover title="Действия с группой" trigger="click" overlayClassName="group-header-action-popup-content">
+            <a-popover title="Действия с группой"
+                       trigger="click"
+                       overlayClassName="group-header-action-popup-content"
+                       v-if="currentGroup && currentGroup.creatorId === user._id"
+            >
               <template slot="content">
-                <a-popconfirm title="Подтверите удаление？" okText="Подтверждаю" cancelText="Отмена" @confirm="deleteGroup">
+                <a-popconfirm title="Подтверите удаление" okText="Подтверждаю" cancelText="Отмена"
+                              @confirm="deleteGroup">
                   <a-tooltip title="Удалить">
                     <a-button icon="delete"></a-button>
                   </a-tooltip>
                 </a-popconfirm>
                 <a-tooltip title="Редактировать">
                   <a-button icon="edit" @click="editGroup"></a-button>
+                </a-tooltip>
+                <a-tooltip title="Заявки">
+                  <a-badge :count="currentGroup && currentGroup.requests.length">
+                    <a-button icon="team" @click="openRequests"></a-button>
+                  </a-badge>
                 </a-tooltip>
               </template>
               <a-button icon="menu" class="open-action-button"></a-button>
@@ -36,9 +48,29 @@
         <div class="group-body-info-description">
           {{currentGroup && currentGroup.description}}
         </div>
+        <template>
+          <a-button type="primary" @click="createParticipant"
+                    v-if="currentGroup && currentGroup.type === 0 && currentGroup.participants &&
+                    currentGroup.participants.findIndex(({_id}) =>_id === user._id) === -1">
+            Вступить
+          </a-button>
+          <a-button type="primary" @click="createParticipantsRequest"
+                    v-if="currentGroup && currentGroup.type === 1 && currentGroup.participants &&
+                    currentGroup.participants.findIndex(({_id}) =>_id === user._id) === -1
+ && !participantsRequest">
+            Подать заявку
+          </a-button>
+          <a-button @click="deleteParticipant"
+                    v-if="currentGroup && currentGroup.type === 1 && currentGroup.participants &&
+                    currentGroup.participants.findIndex(({_id}) =>_id === user._id) === -1
+                    && participantsRequest">
+            Отменить заявку
+          </a-button>
+        </template>
       </div>
       <div class="group-body-participants">
-        <div class="group-body-participants-participant" v-for="participant in currentGroup && currentGroup.participants">
+        <div class="group-body-participants-participant"
+             v-for="participant in currentGroup && currentGroup.participants">
           <a-avatar :src="participant.googleImage"></a-avatar>
           <div class="group-body-participants-participant-info">
             <div class="group-body-participants-participant-info-name">
@@ -51,8 +83,13 @@
         </div>
       </div>
     </div>
-    <app-comment-input :parent="{type: 'group', id: currentGroup && currentGroup._id}"/>
-    <app-post v-for="post in posts" :post="post"/>
+    <template
+      v-if="(currentGroup && currentGroup.type === 0 )||
+       currentGroup.participants.findIndex(({_id}) => _id === user._id) !== -1"
+    >
+      <app-comment-input :parent="{type: 'group', id: currentGroup && currentGroup._id}"/>
+      <app-post v-for="post in posts" :post="post"/>
+    </template>
   </div>
 </template>
 <script>
@@ -61,23 +98,40 @@
   import {GET_POSTS} from "../store/post/actions.type";
   import AppCommentInput from "../components/common/CommentInput";
   import AppPost from "../components/common/Post";
-  import {DELETE_GROUP, GET_CURRENT_GROUP} from "../store/group/actions.type";
+  import {
+    CREATE_PARTICIPANT,
+    DELETE_GROUP, DELETE_PARTICIPANT,
+    GET_CURRENT_GROUP,
+    GET_PARTICIPANTS_REQUEST
+  } from "../store/group/actions.type";
   import AppGroupEditDrawer from "../components/drawers/GroupEditDrawer";
+  import AppRequestsDrawer from "../components/drawers/RequestsDrawer";
+  import AppInviteDrawer from "../components/drawers/InviteDrawer";
 
   export default {
     components: {
       AppCommentInput,
       AppPost,
-      AppGroupEditDrawer
+      AppGroupEditDrawer,
+      AppRequestsDrawer,
+      AppInviteDrawer,
     },
     data() {
       return {
         editVisible: false,
+        requestVisible: false,
+
       }
     },
     methods: {
       editGroup() {
         this.openEdit();
+      },
+      openRequests() {
+        this.requestVisible = true;
+      },
+      closeRequests() {
+        this.requestVisible = false;
       },
       deleteGroup() {
         this.$store.dispatch(DELETE_GROUP, this.currentGroup._id)
@@ -91,20 +145,62 @@
       openEdit() {
         this.editVisible = true;
       },
+      createParticipant() {
+        this.$store.dispatch(CREATE_PARTICIPANT, {participantId: this.user._id, groupId: this.currentGroup._id});
+      },
+      deleteParticipant() {
+        this.$store.dispatch(DELETE_PARTICIPANT, {
+          participantId: this.user._id,
+          groupId: this.currentGroup._id
+        })
+          .then(() =>  this.checkParticipants());
+      },
+      createParticipantsRequest() {
+        this.$store.dispatch(CREATE_PARTICIPANT, {
+          participantId: this.user._id,
+          groupId: this.currentGroup._id,
+          approved: false
+        })
+          .then(() => this.checkParticipants());
+      },
+      checkParticipants() {
+        this.$store.dispatch(GET_PARTICIPANTS_REQUEST, {
+          groupId: this.currentGroup._id,
+          participantId: this.user._id
+        });
+      }
     },
     beforeMount() {
       this.$store.dispatch(GET_CURRENT_GROUP, this.$route.params._id)
         .then(() => {
+          this.checkParticipants();
           this.$store.dispatch(GET_POSTS, {filter: {parent: {type: 'group', id: this.currentGroup._id}}});
         });
     },
     computed: {
-      ...mapGetters(['posts', 'currentGroup']),
+      ...mapGetters(['posts', 'currentGroup', 'user']),
     }
   }
 </script>
 
 <style lang="scss">
+  .groups-header {
+    display: flex;
+    margin: 1.5rem 3.125rem 1rem 3.125rem;
+    justify-content: space-between;
+
+    &-name {
+      height: 31px;
+      font-size: 24px;
+      font-weight: normal;
+      font-style: normal;
+      font-stretch: normal;
+      line-height: 1.67;
+      letter-spacing: normal;
+      text-align: left;
+      color: #43425d;
+    }
+  }
 
   .group-view {
     height: calc(100vh - 3.125rem);
