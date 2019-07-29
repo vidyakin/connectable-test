@@ -4,6 +4,7 @@ const fileUpload = require('express-fileupload');
 
 const serializers = require('./serializers');
 const groupSerializer = require('./groupSerializer').groupSerializer;
+const projectSerializer = require('./projectSerializer').projectSerializer;
 const inviteSerializer = require('./inviteSerializer').inviteSerializer;
 
 require('dotenv').config();
@@ -19,6 +20,8 @@ const Event = require('./models').Event;
 const Group = require('./models').Group;
 const GroupParticipant = require('./models').GroupParticipant;
 const GroupInvite = require('./models').GroupInvite;
+const ProjectParticipant = require('./models').ProjectParticipant;
+const Project = require('./models').Project;
 
 
 const app = express();
@@ -44,6 +47,9 @@ app.use('/api/comment', validateToken, require('./crud')(Comment, serializers.co
 app.use('/api/event', validateToken, require('./crud')(Event, serializers.serializer));
 app.use('/api/groupParticipant', validateToken, require('./crud')(GroupParticipant, serializers.serializer));
 app.use('/api/groupInvite', validateToken, require('./crud')(GroupInvite, inviteSerializer));
+app.use('/api/projectParticipant', validateToken, require('./crud')(ProjectParticipant, serializers.serializer));
+app.use('/api/project', validateToken, require('./crud')(Project, projectSerializer));
+
 
 app.post('/api/upload', (req, res, next) => {
   let imageFile = req.files.files;
@@ -53,7 +59,7 @@ app.post('/api/upload', (req, res, next) => {
       return res.status(500).send(err);
     }
 
-    res.json({file: {type: imageFile.mimetype.split('/')[0], src: `${process.env.DEFAULT_URL}/${fileName}`}});
+    res.json({file: {type: imageFile.mimetype.split('/')[0], src: `${process.env.DEFAULT_URL}${fileName}`}});
   });
 
 });

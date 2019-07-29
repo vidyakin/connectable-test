@@ -52,6 +52,16 @@ export default new Router({
           name: 'invite',
           component: view('Invite'),
         },
+        {
+          path: '/structure',
+          name: 'structure',
+          component: view('Structure'),
+        },
+        {
+          path: '/project/:_id',
+          name: 'project',
+          component: view('Project'),
+        },
       ]
     },
     {

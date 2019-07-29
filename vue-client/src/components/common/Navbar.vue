@@ -30,7 +30,7 @@
         <img src="@/assets/Icons/calendar.svg" alt="">
         Календарь
       </a-menu-item>
-      <a-menu-item key="6" disabled>
+      <a-menu-item key="/structure">
         <img src="@/assets/Icons/Structure.svg" alt="">
         Структура
       </a-menu-item>

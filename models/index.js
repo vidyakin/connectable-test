@@ -19,7 +19,9 @@ index.Like = require('./like');
 index.Comment = require('./comment');
 index.Event = require('./event');
 index.Group = require('./group');
+index.Project = require('./project');
 index.GroupParticipant = require('./groupParticipant');
+index.ProjectParticipant = require('./projectParticipant');
 index.GroupInvite = require('./groupInvite');
 
 module.exports = index;
