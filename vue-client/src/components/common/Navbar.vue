@@ -120,7 +120,10 @@
         img {
           margin-right: 0.5rem;
         }
-
+      }
+      .ant-menu-item-selected {
+        background-color: rgba(0, 0, 0, 0.1)!important;
+        border-left: 5px solid #a3a0fb!important;
       }
 
       .footer{
