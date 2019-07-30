@@ -77,6 +77,11 @@ export default Vue.extend({
 
     .content {
       width: calc(100vw - 12.5rem);
+
+      @media (max-width: 1024px) {
+        width: calc(100vw - 4rem);
+      }
+
     }
 
   }

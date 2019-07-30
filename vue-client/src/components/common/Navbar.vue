@@ -6,6 +6,7 @@
       :theme="'dark'"
       :selectedKeys="[2,3]"
       @click="goToPage"
+      v-if="$mq==='desktop'"
     >
       <a-menu-item key="" class="header">
         connectable
@@ -39,6 +40,39 @@
         <img src="@/assets/Icons/setting.svg" alt="">
         Настройки
       </a-menu-item>
+    </a-menu><a-menu
+      style="width: 4rem; height: 100%"
+      mode="inline"
+      :theme="'dark'"
+      :selectedKeys="[this.$route.path]"
+      @click="goToPage"
+      v-if="$mq==='tablet'"
+    >
+      <a-menu-item key="" class="header">
+        logo
+      </a-menu-item>
+      <a-menu-item key="/company">
+        <img src="@/assets/Icons/company.svg" alt="">
+      </a-menu-item>
+      <a-menu-item key="/addressBook">
+        <img src="@/assets/Icons/Adress book.svg" alt="">
+      </a-menu-item>
+      <a-menu-item :key="user && `/profile/${user._id}`" >
+        <img src="@/assets/Icons/user.svg" alt="">
+      </a-menu-item>
+      <a-menu-item key="/groups">
+        <img src="@/assets/Icons/Groups.svg" alt="">
+      </a-menu-item>
+      <a-menu-item key="/calendar">
+        <img src="@/assets/Icons/calendar.svg" alt="">
+      </a-menu-item>
+      <a-menu-item key="/structure">
+        <img src="@/assets/Icons/Structure.svg" alt="">
+      </a-menu-item>
+
+      <a-menu-item key="7" class="footer" disabled>
+        <img src="@/assets/Icons/setting.svg" alt="">
+      </a-menu-item>
     </a-menu>
   </div>
 </template>
@@ -70,6 +104,9 @@
 
     height: 100%;
     width: 12.5rem!important;
+    @media (max-width: 1024px) {
+      width: 4rem!important;
+    }
 
 
     .ant-menu {

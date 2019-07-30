@@ -8,6 +8,9 @@ import 'ant-design-vue/dist/antd.css';
 import VuexAxios from 'vue-axios';
 import axios from 'axios';
 
+// @ts-ignore
+import VueMq from 'vue-mq';
+
 import {setAuthInterceptor} from "@/services/auth/authInterceptor";
 import {setAuthToken} from "@/services/auth/setAuthToken";
 import GAuth from 'vue-google-oauth2'
@@ -29,6 +32,14 @@ Vue.config.productionTip = false;
 setAuthInterceptor();
 Vue.axios.defaults.baseURL = 'http://localhost:4000';
 setAuthToken(localStorage.getItem('token'));
+
+Vue.use(VueMq, {
+  breakpoints: {
+    mobile: 414,
+    tablet: 1024,
+    desktop: Infinity,
+  },
+});
 
 new Vue({
   router,
