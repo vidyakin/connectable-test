@@ -22,7 +22,7 @@ const store: State = {
   user: null,
   currentUser: null,
   users: null,
-  events: null,
+  events: [],
 };
 
 const getters = {

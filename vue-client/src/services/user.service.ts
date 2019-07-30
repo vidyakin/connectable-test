@@ -26,7 +26,6 @@ export const getEvents = (context: any, userId: any) => {
     .get(`api/event/`, {params: {filter: {userId: userId}}})
     .then((response: any) => {
       context.commit(SET_EVENTS, response.data.result);
-      console.log(response.data.result);
     })
 };
 
