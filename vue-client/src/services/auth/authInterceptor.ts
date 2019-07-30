@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { SET_USER } from '@/store/user/mutations.type';
-import  router  from '../../router';
+import  { router }  from '../../router';
 import store from '../../store';
 
 export const setAuthInterceptor = () => {
