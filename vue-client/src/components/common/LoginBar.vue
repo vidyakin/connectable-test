@@ -4,9 +4,7 @@
       <a-button @click="login">Войти</a-button>
     </div>
     <div class="user-info" v-if="user">
-      <div class="user-info-name">
-        {{ user.firstName }}
-      </div>
+      <div class="user-info-name">{{ user.firstName }}</div>
       <a-popover trigger="click" placement="bottom" overlayClassName="user-info-popover">
         <div slot="content">
           <a-button @click="logout">Выйти</a-button>
@@ -19,99 +17,93 @@
 </template>
 
 <script>
-  import {SET_SHOW_IMAGE_HEADER} from "../../store/shower/mutations.type";
-  import {mapGetters} from "vuex";
-  import {LOGIN, LOGIN_WITH_GOOGLE, LOGOUT} from "../../store/user/actions.type";
+import { SET_SHOW_IMAGE_HEADER } from '../../store/shower/mutations.type';
+import { mapGetters } from 'vuex';
+import {
+  LOGIN,
+  LOGIN_WITH_GOOGLE,
+  LOGOUT,
+} from '../../store/user/actions.type';
 
-  export default {
-    name: "AppLoginBar",
-    data() {
-      return {
-        current: 1,
-      }
+export default {
+  name: 'AppLoginBar',
+  data() {
+    return {
+      current: 1,
+    };
+  },
+  computed: {
+    ...mapGetters(['user']),
+  },
+  methods: {
+    closeImage() {
+      this.$store.commit(SET_SHOW_IMAGE_HEADER, false);
     },
-    computed: {
-      ...mapGetters(['user']),
+    login() {
+      this.$store.dispatch(LOGIN_WITH_GOOGLE, this.$gAuth);
     },
-    methods: {
-      closeImage() {
-        this.$store.commit(SET_SHOW_IMAGE_HEADER, false)
-      },
-      login() {
-        this.$store.dispatch(LOGIN_WITH_GOOGLE, this.$gAuth)
-      },
-      logout() {
-        this.$store.dispatch(LOGOUT);
-        this.$router.push({name: 'company'})
-      },
+    logout() {
+      this.$store.dispatch(LOGOUT);
+      this.$router.push({ name: 'company' });
     },
-  }
+  },
+};
 </script>
 
 <style lang="scss">
-  .user-info-popover {
+.user-info-popover {
+  .ant-btn {
+    border: 0;
+  }
+
+  .ant-popover-arrow {
+    display: none;
+  }
+}
+
+.user-info-popover-btn {
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+.user-bar {
+  height: 3.125rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.04);
+
+  .login {
+    margin-right: 0.5rem;
+    display: flex;
+    justify-content: flex-end;
 
     .ant-btn {
       border: 0;
     }
-
-    .ant-popover-arrow {
-      display: none;
-    }
-
   }
 
-  .user-info-popover-btn {
-
-    &:hover {
-      cursor: pointer;
-    }
-
-  }
-
-  .user-bar {
-
-    height: 3.125rem;
+  .user-info {
     display: flex;
-    flex-direction: column;
-    justify-content: center;
-    box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.04);
+    justify-content: flex-end;
+    margin-right: 0.5rem;
 
-    .login {
-      margin-right: 0.5rem;
-      display: flex;
-      justify-content: flex-end;
-
-      .ant-btn {
-        border: 0;
-      }
-
+    &-name {
+      line-height: 3.125rem;
     }
 
-    .user-info {
-      display: flex;
-      justify-content: flex-end;
+    i {
+      line-height: 3.125rem;
       margin-right: 0.5rem;
-
-      &-name {
-        line-height: 3.125rem;
-      }
-
-      i {
-        line-height: 3.125rem;
-        margin-right: 0.5rem;
-        margin-left: 0.5rem;
-      }
-
-      .ant-avatar {
-        margin-top: 0.375rem;
-        width: 2.375rem;
-        height: 2.375rem;
-
-      }
-
+      margin-left: 0.5rem;
     }
 
+    .ant-avatar {
+      margin-top: 0.375rem;
+      width: 2.375rem;
+      height: 2.375rem;
+    }
   }
-
+}
 </style>

@@ -1,33 +1,42 @@
 <template>
   <div class="group-view">
-    <app-group-edit-drawer :visible="editVisible" :close="closeEdit"/>
-    <app-requests-drawer :visible="requestVisible" :close="closeRequests" v-if="currentGroup && currentGroup.type === 1"/>
-    <app-invite-drawer :visible="requestVisible" :close="closeRequests" v-if="currentGroup && currentGroup.type === 2"/>
+    <app-group-edit-drawer :visible="editVisible" :close="closeEdit" />
+    <app-requests-drawer
+      :visible="requestVisible"
+      :close="closeRequests"
+      v-if="currentGroup && currentGroup.type === 1"
+    />
+    <app-invite-drawer
+      :visible="requestVisible"
+      :close="closeRequests"
+      v-if="currentGroup && currentGroup.type === 2"
+    />
     <div class="groups-header">
-      <div class="groups-header-name">
-        Группы
-      </div>
+      <div class="groups-header-name">Группы</div>
     </div>
     <div class="group-body">
       <div class="group-body-info">
         <div class="group-body-info-header">
           <div class="group-body-info-header-content">
-            <div class="group-body-info-header-content-name">
-              {{currentGroup && currentGroup.name}}
-            </div>
-            <div class="group-body-info-header-content-participants">
-              {{currentGroup && currentGroup.participants.length}} участников
-            </div>
+            <div class="group-body-info-header-content-name">{{currentGroup && currentGroup.name}}</div>
+            <div
+              class="group-body-info-header-content-participants"
+            >{{currentGroup && currentGroup.participants.length}} участников</div>
           </div>
           <div class="group-body-info-header-action">
-            <a-popover title="Действия с группой"
-                       trigger="click"
-                       overlayClassName="group-header-action-popup-content"
-                       v-if="currentGroup && currentGroup.creatorId === user._id"
+            <a-popover
+              title="Действия с группой"
+              trigger="click"
+              overlayClassName="group-header-action-popup-content"
+              v-if="currentGroup && currentGroup.creatorId === user._id"
             >
               <template slot="content">
-                <a-popconfirm title="Подтверите удаление" okText="Подтверждаю" cancelText="Отмена"
-                              @confirm="deleteGroup">
+                <a-popconfirm
+                  title="Подтверите удаление"
+                  okText="Подтверждаю"
+                  cancelText="Отмена"
+                  @confirm="deleteGroup"
+                >
                   <a-tooltip title="Удалить">
                     <a-button icon="delete"></a-button>
                   </a-tooltip>
@@ -45,40 +54,43 @@
             </a-popover>
           </div>
         </div>
-        <div class="group-body-info-description">
-          {{currentGroup && currentGroup.description}}
-        </div>
+        <div class="group-body-info-description">{{currentGroup && currentGroup.description}}</div>
         <template>
-          <a-button type="primary" @click="createParticipant"
-                    v-if="currentGroup && currentGroup.type === 0 && currentGroup.participants &&
-                    currentGroup.participants.findIndex(({_id}) =>_id === user._id) === -1">
-            Вступить
-          </a-button>
-          <a-button type="primary" @click="createParticipantsRequest"
-                    v-if="currentGroup && currentGroup.type === 1 && currentGroup.participants &&
+          <a-button
+            type="primary"
+            @click="createParticipant"
+            v-if="currentGroup && currentGroup.type === 0 && currentGroup.participants &&
+                    currentGroup.participants.findIndex(({_id}) =>_id === user._id) === -1"
+          >Вступить</a-button>
+          <a-button
+            type="primary"
+            @click="createParticipantsRequest"
+            v-if="currentGroup && currentGroup.type === 1 && currentGroup.participants &&
                     currentGroup.participants.findIndex(({_id}) =>_id === user._id) === -1
- && !participantsRequest">
-            Подать заявку
-          </a-button>
-          <a-button @click="deleteParticipant"
-                    v-if="currentGroup && currentGroup.type === 1 && currentGroup.participants &&
+ && !participantsRequest"
+          >Подать заявку</a-button>
+          <a-button
+            @click="deleteParticipant"
+            v-if="currentGroup && currentGroup.type === 1 && currentGroup.participants &&
                     currentGroup.participants.findIndex(({_id}) =>_id === user._id) === -1
-                    && participantsRequest">
-            Отменить заявку
-          </a-button>
+                    && participantsRequest"
+          >Отменить заявку</a-button>
         </template>
       </div>
       <div class="group-body-participants">
-        <div class="group-body-participants-participant"
-             v-for="participant in currentGroup && currentGroup.participants">
+        <div
+          class="group-body-participants-participant"
+          v-for="(participant, index) in currentGroup && currentGroup.participants"
+          :key="index"
+        >
           <a-avatar :src="participant.googleImage"></a-avatar>
           <div class="group-body-participants-participant-info">
-            <div class="group-body-participants-participant-info-name">
-              {{participant.firstName + " " + participant.lastName}}
-            </div>
-            <div class="group-body-participants-participant-info-positions">
-              {{participant.positions.join(', ')}}
-            </div>
+            <div
+              class="group-body-participants-participant-info-name"
+            >{{participant.firstName + " " + participant.lastName}}</div>
+            <div
+              class="group-body-participants-participant-info-positions"
+            >{{participant.positions.join(', ')}}</div>
           </div>
         </div>
       </div>
@@ -87,104 +99,136 @@
       v-if="(currentGroup && currentGroup.type === 0 )||
        currentGroup.participants.findIndex(({_id}) => _id === user._id) !== -1"
     >
-      <app-comment-input :parent="{type: 'group', id: currentGroup && currentGroup._id}"/>
-      <app-post v-for="post in posts" :post="post"/>
+      <app-comment-input :parent="{type: 'group', id: currentGroup && currentGroup._id}" />
+      <app-post v-for="(post, index) in posts" :post="post" :key="index" />
     </template>
   </div>
 </template>
 <script>
+import { mapGetters } from 'vuex';
+import { GET_POSTS } from '../store/post/actions.type';
+import AppCommentInput from '../components/common/CommentInput';
+import AppPost from '../components/common/Post';
+import {
+  CREATE_PARTICIPANT,
+  DELETE_GROUP,
+  DELETE_PARTICIPANT,
+  GET_CURRENT_GROUP,
+  GET_PARTICIPANTS_REQUEST,
+} from '../store/group/actions.type';
+import AppGroupEditDrawer from '../components/drawers/GroupEditDrawer';
+import AppRequestsDrawer from '../components/drawers/RequestsDrawer';
+import AppInviteDrawer from '../components/drawers/InviteDrawer';
 
-  import {mapGetters} from "vuex";
-  import {GET_POSTS} from "../store/post/actions.type";
-  import AppCommentInput from "../components/common/CommentInput";
-  import AppPost from "../components/common/Post";
-  import {
-    CREATE_PARTICIPANT,
-    DELETE_GROUP, DELETE_PARTICIPANT,
-    GET_CURRENT_GROUP,
-    GET_PARTICIPANTS_REQUEST
-  } from "../store/group/actions.type";
-  import AppGroupEditDrawer from "../components/drawers/GroupEditDrawer";
-  import AppRequestsDrawer from "../components/drawers/RequestsDrawer";
-  import AppInviteDrawer from "../components/drawers/InviteDrawer";
-
-  export default {
-    components: {
-      AppCommentInput,
-      AppPost,
-      AppGroupEditDrawer,
-      AppRequestsDrawer,
-      AppInviteDrawer,
+export default {
+  components: {
+    AppCommentInput,
+    AppPost,
+    AppGroupEditDrawer,
+    AppRequestsDrawer,
+    AppInviteDrawer,
+  },
+  data() {
+    return {
+      editVisible: false,
+      requestVisible: false,
+    };
+  },
+  methods: {
+    editGroup() {
+      this.openEdit();
     },
-    data() {
-      return {
-        editVisible: false,
-        requestVisible: false,
-
-      }
+    openRequests() {
+      this.requestVisible = true;
     },
-    methods: {
-      editGroup() {
-        this.openEdit();
-      },
-      openRequests() {
-        this.requestVisible = true;
-      },
-      closeRequests() {
-        this.requestVisible = false;
-      },
-      deleteGroup() {
-        this.$store.dispatch(DELETE_GROUP, this.currentGroup._id)
-          .then(() => {
-            this.$router.push({name: 'groups'})
-          })
-      },
-      closeEdit() {
-        this.editVisible = false;
-      },
-      openEdit() {
-        this.editVisible = true;
-      },
-      createParticipant() {
-        this.$store.dispatch(CREATE_PARTICIPANT, {participantId: this.user._id, groupId: this.currentGroup._id});
-      },
-      deleteParticipant() {
-        this.$store.dispatch(DELETE_PARTICIPANT, {
-          participantId: this.user._id,
-          groupId: this.currentGroup._id
-        })
-          .then(() =>  this.checkParticipants());
-      },
-      createParticipantsRequest() {
-        this.$store.dispatch(CREATE_PARTICIPANT, {
+    closeRequests() {
+      this.requestVisible = false;
+    },
+    deleteGroup() {
+      this.$store.dispatch(DELETE_GROUP, this.currentGroup._id).then(() => {
+        this.$router.push({ name: 'groups' });
+      });
+    },
+    closeEdit() {
+      this.editVisible = false;
+    },
+    openEdit() {
+      this.editVisible = true;
+    },
+    createParticipant() {
+      this.$store.dispatch(CREATE_PARTICIPANT, {
+        participantId: this.user._id,
+        groupId: this.currentGroup._id,
+      });
+    },
+    deleteParticipant() {
+      this.$store
+        .dispatch(DELETE_PARTICIPANT, {
           participantId: this.user._id,
           groupId: this.currentGroup._id,
-          approved: false
         })
-          .then(() => this.checkParticipants());
-      },
-      checkParticipants() {
-        this.$store.dispatch(GET_PARTICIPANTS_REQUEST, {
+        .then(() => this.checkParticipants());
+    },
+    createParticipantsRequest() {
+      this.$store
+        .dispatch(CREATE_PARTICIPANT, {
+          participantId: this.user._id,
           groupId: this.currentGroup._id,
-          participantId: this.user._id
-        });
-      }
+          approved: false,
+        })
+        .then(() => this.checkParticipants());
     },
-    beforeMount() {
-      this.$store.dispatch(GET_CURRENT_GROUP, this.$route.params._id)
-        .then(() => {
-          this.checkParticipants();
-          this.$store.dispatch(GET_POSTS, {filter: {parent: {type: 'group', id: this.currentGroup._id}}});
-        });
+    checkParticipants() {
+      this.$store.dispatch(GET_PARTICIPANTS_REQUEST, {
+        groupId: this.currentGroup._id,
+        participantId: this.user._id,
+      });
     },
-    computed: {
-      ...mapGetters(['posts', 'currentGroup', 'user']),
-    }
-  }
+  },
+  beforeMount() {
+    this.$store.dispatch(GET_CURRENT_GROUP, this.$route.params._id).then(() => {
+      this.checkParticipants();
+      this.$store.dispatch(GET_POSTS, {
+        filter: {
+          parent: {
+            type: 'group',
+            id: this.currentGroup._id,
+          },
+        },
+      });
+    });
+  },
+  computed: {
+    ...mapGetters(['posts', 'currentGroup', 'user']),
+  },
+};
 </script>
 
 <style lang="scss">
-  .groups-header {
+.groups-header {
+  display: flex;
+  margin: 1.5rem 3.125rem 1rem 3.125rem;
+  justify-content: space-between;
+
+  &-name {
+    height: 31px;
+    font-size: 24px;
+    font-weight: normal;
+    font-style: normal;
+    font-stretch: normal;
+    line-height: 1.67;
+    letter-spacing: normal;
+    text-align: left;
+    color: #43425d;
+  }
+}
+
+.group-view {
+  height: calc(100vh - 3.125rem);
+  overflow: auto;
+  background-color: #f0f0f7;
+
+  &-header {
     display: flex;
     margin: 1.5rem 3.125rem 1rem 3.125rem;
     justify-content: space-between;
@@ -202,144 +246,116 @@
     }
   }
 
-  .group-view {
-    height: calc(100vh - 3.125rem);
-    overflow: auto;
-    background-color: #f0f0f7;
+  .group-body {
+    margin: 1.5rem 3.125rem 1rem 3.125rem;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
 
-    &-header {
-      display: flex;
-      margin: 1.5rem 3.125rem 1rem 3.125rem;
-      justify-content: space-between;
+    &-info {
+      min-width: 15rem;
+      width: calc(100% - 17rem);
+      background-color: white;
+      height: 19rem;
+      border-radius: 0.25rem;
+      padding: 1rem;
 
-      &-name {
-        height: 31px;
-        font-size: 24px;
+      box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.15);
+
+      &-header {
+        display: flex;
+        justify-content: space-between;
+
+        &-content {
+          &-name {
+            height: 23px;
+            font-size: 18px;
+            font-weight: bold;
+            font-style: normal;
+            font-stretch: normal;
+            line-height: 0.72;
+            letter-spacing: normal;
+            text-align: left;
+            color: #4d4f5c;
+          }
+
+          &-participants {
+            height: 15px;
+            opacity: 0.5;
+            font-size: 12px;
+            font-weight: normal;
+            font-style: normal;
+            font-stretch: normal;
+            line-height: 2.08;
+            letter-spacing: normal;
+            text-align: left;
+            color: #43425d;
+          }
+        }
+
+        &-action {
+          .ant-btn {
+            padding: 0;
+          }
+        }
+      }
+
+      &-description {
+        margin-top: 1.5rem;
+
+        font-size: 13px;
         font-weight: normal;
         font-style: normal;
         font-stretch: normal;
-        line-height: 1.67;
+        line-height: 1.54;
         letter-spacing: normal;
         text-align: left;
-        color: #43425d;
+        color: #000000;
       }
     }
 
-    .group-body {
-      margin: 1.5rem 3.125rem 1rem 3.125rem;
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
+    &-participants {
+      min-width: 15rem;
+      width: 15rem;
+      background-color: white;
+      height: 19rem;
+      border-radius: 0.25rem;
+      padding: 1rem;
 
-      &-info {
-        min-width: 15rem;
-        width: calc(100% - 17rem);
-        background-color: white;
-        height: 19rem;
-        border-radius: 0.25rem;
-        padding: 1rem;
+      box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.15);
 
-        box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.15);
+      &-participant {
+        display: flex;
 
-        &-header {
-          display: flex;
-          justify-content: space-between;
+        &-info {
+          margin-left: 0.5rem;
 
-          &-content {
-            &-name {
-              height: 23px;
-              font-size: 18px;
-              font-weight: bold;
-              font-style: normal;
-              font-stretch: normal;
-              line-height: 0.72;
-              letter-spacing: normal;
-              text-align: left;
-              color: #4d4f5c;
-            }
-
-            &-participants {
-              height: 15px;
-              opacity: 0.5;
-              font-size: 12px;
-              font-weight: normal;
-              font-style: normal;
-              font-stretch: normal;
-              line-height: 2.08;
-              letter-spacing: normal;
-              text-align: left;
-              color: #43425d;
-            }
+          &-name {
+            height: 17px;
+            font-size: 13px;
+            font-weight: bold;
+            font-style: normal;
+            font-stretch: normal;
+            line-height: 1.85;
+            letter-spacing: normal;
+            text-align: left;
+            color: #4d565c;
           }
 
-          &-action {
-            .ant-btn {
-              padding: 0;
-            }
+          &-positions {
+            height: 14px;
+            font-size: 11px;
+            font-weight: normal;
+            font-style: normal;
+            font-stretch: normal;
+            line-height: 1.18;
+            letter-spacing: normal;
+            text-align: left;
+            color: #808495;
           }
         }
-
-        &-description {
-          margin-top: 1.5rem;
-
-          font-size: 13px;
-          font-weight: normal;
-          font-style: normal;
-          font-stretch: normal;
-          line-height: 1.54;
-          letter-spacing: normal;
-          text-align: left;
-          color: #000000;
-        }
-      }
-
-      &-participants {
-        min-width: 15rem;
-        width: 15rem;
-        background-color: white;
-        height: 19rem;
-        border-radius: 0.25rem;
-        padding: 1rem;
-
-        box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.15);
-
-        &-participant {
-          display: flex;
-
-          &-info {
-            margin-left: 0.5rem;
-
-            &-name {
-              height: 17px;
-              font-size: 13px;
-              font-weight: bold;
-              font-style: normal;
-              font-stretch: normal;
-              line-height: 1.85;
-              letter-spacing: normal;
-              text-align: left;
-              color: #4d565c;
-            }
-
-            &-positions {
-              height: 14px;
-              font-size: 11px;
-              font-weight: normal;
-              font-style: normal;
-              font-stretch: normal;
-              line-height: 1.18;
-              letter-spacing: normal;
-              text-align: left;
-              color: #808495;
-            }
-          }
-
-        }
-
       }
     }
-
   }
-
-
+}
 </style>

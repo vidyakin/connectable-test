@@ -11,13 +11,13 @@ import axios from 'axios';
 // @ts-ignore
 import VueMq from 'vue-mq';
 
-import {setAuthInterceptor} from "@/services/auth/authInterceptor";
-import {setAuthToken} from "@/services/auth/setAuthToken";
-import GAuth from 'vue-google-oauth2'
+import {setAuthInterceptor} from '@/services/auth/authInterceptor';
+import {setAuthToken} from '@/services/auth/setAuthToken';
+import GAuth from 'vue-google-oauth2';
 const gauthOption = {
   clientId: '303964737986-rrtn3uic2fecmflemndjd8a1v4pjn76g.apps.googleusercontent.com',
   scope: 'profile email https://www.googleapis.com/auth/calendar',
-  prompt: 'select_account'
+  prompt: 'select_account',
 };
 Vue.use(GAuth, gauthOption);
 

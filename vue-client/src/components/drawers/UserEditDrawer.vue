@@ -19,8 +19,8 @@
             { required: true, message: 'Please input first name', }
             ]
           }]"
-            class="secondary form-input">
-          </app-input>
+            class="secondary form-input"
+          ></app-input>
         </a-form-item>
         <a-form-item>
           <app-input
@@ -32,8 +32,8 @@
             { required: true, message: 'Please input last name', }
             ]
           }]"
-            class="secondary form-input">
-          </app-input>
+            class="secondary form-input"
+          ></app-input>
         </a-form-item>
         <a-form-item>
           <app-input
@@ -45,8 +45,8 @@
             { required: true, message: 'Please input last name', }
             ]
           }]"
-            class="secondary form-input">
-          </app-input>
+            class="secondary form-input"
+          ></app-input>
         </a-form-item>
       </div>
       <div class="form-row">
@@ -60,8 +60,8 @@
             { required: true, message: 'Please input username', }
             ]
           }]"
-            class="secondary form-input">
-          </app-input>
+            class="secondary form-input"
+          ></app-input>
         </a-form-item>
         <a-form-item>
           <app-input
@@ -75,8 +75,8 @@
               required: true, message: 'Please input E-mail!',
             }]
           }]"
-            class="secondary form-input">
-          </app-input>
+            class="secondary form-input"
+          ></app-input>
         </a-form-item>
         <a-form-item>
           <app-input
@@ -88,8 +88,8 @@
               required: true, message: 'Please input E-mail!',
             }]
           }]"
-            class="secondary form-input">
-          </app-input>
+            class="secondary form-input"
+          ></app-input>
         </a-form-item>
       </div>
       <a-form-item class="edit-user-button-wrapper">
@@ -102,64 +102,68 @@
 </template>
 
 <script>
-  import {mapGetters} from "vuex";
-  import AppInput from '../common/Input'
-  import {UPDATE_USER_INFO} from "../../store/user/actions.type";
-  export default {
-    name: "AppUserEditDrawer",
-    data() {
-      return {
-        current: '',
-        editButtonSpinning: false,
-      }
+import { mapGetters } from 'vuex';
+import AppInput from '../common/Input';
+import { UPDATE_USER_INFO } from '../../store/user/actions.type';
+export default {
+  name: 'AppUserEditDrawer',
+  data() {
+    return {
+      current: '',
+      editButtonSpinning: false,
+    };
+  },
+  components: {
+    AppInput,
+  },
+  computed: {
+    ...mapGetters(['currentUser']),
+  },
+  methods: {
+    onClose() {
+      this.close();
     },
-    components: {
-      AppInput,
+    editUserInfo(e) {
+      e.preventDefault();
+      this.form.validateFieldsAndScroll((err, formFields) => {
+        if (!err) {
+          this.editButtonSpinning = true;
+          this.$store
+            .dispatch(UPDATE_USER_INFO, {
+              ...formFields,
+              _id: this.currentUser._id,
+              positions: formFields.positions.split(','),
+            })
+            .finally(() => {
+              this.editButtonSpinning = false;
+              this.onClose();
+            });
+        }
+      });
     },
-    computed: {
-      ...mapGetters(['currentUser']),
-    },
-    methods: {
-      onClose() {
-        this.close();
-      },
-      editUserInfo(e) {
-        e.preventDefault();
-        this.form.validateFieldsAndScroll((err, formFields) => {
-          if (!err) {
-            this.editButtonSpinning = true;
-            this.$store.dispatch(UPDATE_USER_INFO, { ...formFields, _id: this.currentUser._id, positions: formFields.positions.split(',') })
-              .finally(() => {
-                this.editButtonSpinning = false;
-                this.onClose();
-              });
-          }
-        });
-      }
-    },
-    props: {
-      close: Function,
-      visible: Boolean,
-    },
-    beforeCreate() {
-      this.form = this.$form.createForm(this);
-    },
-  }
+  },
+  props: {
+    close: Function,
+    visible: Boolean,
+  },
+  beforeCreate() {
+    this.form = this.$form.createForm(this);
+  },
+};
 </script>
 
 <style lang="scss">
-  .user-edit-drawer {
-
-    .ant-drawer-content-wrapper {
-      width: 20rem !important;
-      overflow: auto;
-      height: 100vh;
-      @media(max-width: 500px) {
-        width: 100% !important;
-      }
-    }
-    .edit-user-button-wrapper {
-      text-align: center;
+.user-edit-drawer {
+  .ant-drawer-content-wrapper {
+    width: 20rem !important;
+    overflow: auto;
+    height: 100vh;
+    @media (max-width: 500px) {
+      width: 100% !important;
     }
   }
+  .edit-user-button-wrapper {
+    text-align: center;
+  }
+}
 </style>

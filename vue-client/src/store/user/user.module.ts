@@ -1,22 +1,22 @@
-import {SET_SHOW_IMAGE_HEADER} from "@/store/shower/mutations.type";
-import {ADD_EVENT, SET_CURRENT_USER, SET_EVENTS, SET_USER, SET_USERS, UPDATE_USER} from "@/store/user/mutations.type";
+import {SET_SHOW_IMAGE_HEADER} from '@/store/shower/mutations.type';
+import {ADD_EVENT, SET_CURRENT_USER, SET_EVENTS, SET_USER, SET_USERS, UPDATE_USER} from '@/store/user/mutations.type';
 import {
   CREATE_EVENT, DELETE_EVENT,
   GET_EVENTS,
   GET_INFO_ABOUT_USER, GET_USER, GET_USERS,
   LOGIN,
   LOGIN_WITH_GOOGLE, LOGOUT,
-  UPDATE_USER_INFO
-} from "@/store/user/actions.type";
-import {getInfoAboutUser, login, loginWithGoogle, logout} from "@/services/auth/auth.service";
-import {createEvent, deleteEvent, editUser, getEvents, getUser, getUsers} from "@/services/user.service";
+  UPDATE_USER_INFO,
+} from '@/store/user/actions.type';
+import {getInfoAboutUser, login, loginWithGoogle, logout} from '@/services/auth/auth.service';
+import {createEvent, deleteEvent, editUser, getEvents, getUser, getUsers} from '@/services/user.service';
 
 interface State {
-  user: any | null,
-  currentUser: any | null,
-  users: any[] | null,
-  events: any[] | null
-};
+  user: any | null;
+  currentUser: any | null;
+  users: any[] | null;
+  events: any[] | null;
+}
 
 const store: State = {
   user: null,
@@ -37,7 +37,7 @@ const getters = {
   },
   users(state: State) {
     return state.users;
-  }
+  },
 };
 
 const mutations = {
@@ -55,7 +55,7 @@ const mutations = {
         ...state.users!.slice(0, userIndex),
         user,
         ...state.users!.slice(userIndex + 1),
-      ]
+      ];
     }
   },
   [UPDATE_USER](state: State, user: any) {
@@ -69,7 +69,7 @@ const mutations = {
         ...state.users!.slice(0, userIndex),
         user,
         ...state.users!.slice(userIndex + 1),
-      ]
+      ];
     }
   },
   [SET_EVENTS](state: State, events: any[]) {
@@ -84,7 +84,7 @@ const mutations = {
       state.events = [
         ...state.events!.slice(0, index),
         ...state.events!.slice(index + 1),
-      ]
+      ];
     }
   },
   [SET_USERS](state: State, users: any[]) {

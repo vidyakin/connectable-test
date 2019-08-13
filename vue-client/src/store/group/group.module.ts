@@ -6,8 +6,8 @@ import {
   DELETE_GROUP, DELETE_PARTICIPANT,
   EDIT_GROUP,
   GET_CURRENT_GROUP,
-  GET_GROUPS, GET_INVITE, GET_PARTICIPANTS_REQUEST
-} from "@/store/group/actions.type";
+  GET_GROUPS, GET_INVITE, GET_PARTICIPANTS_REQUEST,
+} from '@/store/group/actions.type';
 import {
   approveInvite,
   approveParticipantsRequest, cancelInvite,
@@ -16,23 +16,23 @@ import {
   deleteGroup, deleteParticipant,
   editGroup,
   getCurrentGroup,
-  getGroups, getInvite, getParticipantsRequest
-} from "@/services/group.service";
+  getGroups, getInvite, getParticipantsRequest,
+} from '@/services/group.service';
 import {
   ADD_GROUP,
   REMOVE_GROUP,
   SET_CURRENT_GROUP,
   SET_GROUPS, SET_INVITE,
   SET_PARTICIPANTS_REQUEST,
-  UPDATE_GROUP
-} from "@/store/group/mutations.type";
+  UPDATE_GROUP,
+} from '@/store/group/mutations.type';
 
 interface State {
-  groups: any[],
-  currentGroup: any,
-  participantsRequest: boolean | null
+  groups: any[];
+  currentGroup: any;
+  participantsRequest: boolean | null;
   invite: any | null;
-};
+}
 
 const store: State = {
   groups: [],
@@ -89,7 +89,7 @@ const mutations = {
       state.groups = [
         ...state.groups.slice(0, index),
         ...state.groups.slice(index + 1),
-      ]
+      ];
     }
   },
   [UPDATE_GROUP](state: State, group: any) {
@@ -100,7 +100,7 @@ const mutations = {
         ...state.groups.slice(0, index),
         group,
         ...state.groups.slice(index + 1),
-      ]
+      ];
     }
   },
   [SET_PARTICIPANTS_REQUEST](state: State, req: boolean) {

@@ -29,12 +29,12 @@
 </template>
 
 <script>
-  import {mapGetters} from "vuex";
-  import {GET_USERS} from "../../store/user/actions.type";
-  import {APPROVE_PARTICIPANTS_REQUEST, CREATE_INVITE} from "../../store/group/actions.type";
+  import {mapGetters} from 'vuex';
+  import {GET_USERS} from '../../store/user/actions.type';
+  import {APPROVE_PARTICIPANTS_REQUEST, CREATE_INVITE} from '../../store/group/actions.type';
 
   export default {
-    name: "AppInviteDrawer",
+    name: 'AppInviteDrawer',
     data() {
       return {
         current: '',
@@ -42,7 +42,7 @@
         type: 1,
         data: [],
         value: [],
-      }
+      };
     },
     components: {},
     computed: {
@@ -60,25 +60,25 @@
             || el.lastName.toLowerCase().indexOf(text) !== -1
             || (el.firstName + ' ' + el.lastName).toLowerCase().indexOf(text) !== -1
             || (el.lastName + ' ' + el.firstName).toLowerCase().indexOf(text) !== -1;
-        })
+        });
       },
       handleChange(value) {
         Object.assign(this, {
           value,
           data: [],
-        })
+        });
       },
       sendInvite() {
         this.buttonSpinning = true;
         Promise.all(this.value.map(userId => {
-            this.$store.dispatch(CREATE_INVITE, {userId: userId.key, groupId: this.currentGroup._id})
-          }
+            this.$store.dispatch(CREATE_INVITE, {userId: userId.key, groupId: this.currentGroup._id});
+          },
         ))
           .finally(() => {
             this.buttonSpinning = false;
             this.onClose();
           });
-      }
+      },
     },
     props: {
       close: Function,
@@ -86,8 +86,8 @@
     },
     mounted() {
       this.$store.dispatch(GET_USERS);
-    }
-  }
+    },
+  };
 </script>
 
 <style lang="scss">

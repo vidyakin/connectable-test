@@ -2,7 +2,12 @@
   <a-input class="input" placeholder="Сообщение..." v-model="current" @pressEnter="send">
     <div slot="addonAfter" class="comment-input-action">
       <a-icon type="link" @click="handleUpload"></a-icon>
-      <a-upload :multiple="false" :fileList="fileList" :beforeUpload="beforeUpload" :handleRemove="handleRemove">
+      <a-upload
+        :multiple="false"
+        :fileList="fileList"
+        :beforeUpload="beforeUpload"
+        :handleRemove="handleRemove"
+      >
         <a-icon type="video-camera"></a-icon>
       </a-upload>
     </div>
@@ -10,101 +15,96 @@
 </template>
 
 <script>
-  import {mapGetters} from "vuex";
-  import AppLoginBar from './LoginBar'
-  import {SEND_NEW_POST} from "../../store/post/actions.type";
-  import Vue from "vue";
+import { mapGetters } from 'vuex';
+import AppLoginBar from './LoginBar';
+import { SEND_NEW_POST } from '../../store/post/actions.type';
+import Vue from 'vue';
 
-  export default {
-    name: "AppCommentInput",
-    components: {
-      AppLoginBar,
+export default {
+  name: 'AppCommentInput',
+  components: {
+    AppLoginBar,
+  },
+  data() {
+    return {
+      current: '',
+      fileList: [],
+    };
+  },
+  computed: {
+    ...mapGetters(['showHeaderImage', 'user']),
+  },
+  methods: {
+    send() {
+      if (this.current !== '') {
+        this.$store.dispatch(SEND_NEW_POST, {
+          message: this.current,
+          parent: this.parent,
+          author: this.user,
+          attachment: [],
+          formData: this.handleUpload(),
+        });
+      }
+      this.current = '';
     },
-    data() {
-      return {
-        current: '',
-        fileList: [],
+    handleRemove(file) {
+      const index = this.fileList.indexOf(file);
+      const newFileList = this.fileList.slice();
+      newFileList.splice(index, 1);
+      this.fileList = newFileList;
+    },
+    beforeUpload(file) {
+      this.fileList = [file];
+      return false;
+    },
+    handleUpload() {
+      const { fileList } = this;
+      if (fileList.length > 0) {
+        const formData = new FormData();
+        fileList.forEach(file => {
+          formData.append('files', file);
+        });
+        this.fileList = [];
+        return formData;
+      } else {
+        return null;
       }
     },
-    computed: {
-      ...mapGetters(['showHeaderImage', 'user']),
-    },
-    methods: {
-      send() {
-        if (this.current !== '') {
-          this.$store.dispatch(SEND_NEW_POST, {
-            message: this.current,
-            parent: this.parent,
-            author: this.user,
-            attachment: [],
-            formData: this.handleUpload(),
-          })
-        }
-        this.current = '';
-      },
-      handleRemove(file) {
-        const index = this.fileList.indexOf(file);
-        const newFileList = this.fileList.slice();
-        newFileList.splice(index, 1);
-        this.fileList = newFileList
-      },
-      beforeUpload(file) {
-        this.fileList = [file];
-        return false;
-      },
-      handleUpload() {
-        const {fileList} = this;
-        if (fileList.length > 0) {
-          const formData = new FormData();
-          fileList.forEach((file) => {
-            formData.append('files', file);
-          });
-          this.fileList = [];
-          return formData;
-        } else {
-          return null;
-        }
-
-      }
-    },
-    props: {
-      parent: Object,
-    }
-  }
+  },
+  props: {
+    parent: Object,
+  },
+};
 </script>
 
 <style lang="scss">
+.input {
+  border-color: white !important;
+  border-radius: 0.25rem !important;
+  height: 3.125rem !important;
+  margin: 1.25rem 3.125rem !important;
+  box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.04) !important;
+  width: calc(100% - 6.25rem) !important;
 
-  .input {
+  .ant-input {
     border-color: white !important;
-    border-radius: 0.25rem !important;
-    height: 3.125rem !important;
-    margin: 1.25rem 3.125rem !important;
-    box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.04) !important;
-    width: calc(100% - 6.25rem) !important;
+    height: 3.125rem;
 
-    .ant-input {
+    &:focus {
       border-color: white !important;
-      height: 3.125rem;
-
-      &:focus {
-        border-color: white !important;
-        box-shadow: 0 0 0 0 white !important;
-      }
-
-    }
-
-    .ant-input-group-addon {
-      border-color: white !important;
-      background-color: white;
-      padding: 0;
-    }
-
-    .anticon {
-      margin-right: 0.5rem !important;
-      cursor: pointer;
+      box-shadow: 0 0 0 0 white !important;
     }
   }
 
+  .ant-input-group-addon {
+    border-color: white !important;
+    background-color: white;
+    padding: 0;
+  }
 
+  .anticon {
+    margin-right: 0.5rem !important;
+    cursor: pointer;
+  }
+}
 </style>

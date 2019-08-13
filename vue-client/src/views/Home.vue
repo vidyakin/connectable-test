@@ -1,12 +1,12 @@
 <template>
   <div class="home">
-    <app-navbar/>
+    <app-navbar />
     <div class="content">
-      <app-post-edit-drawer/>
+      <app-post-edit-drawer />
       <div class="header">
-        <app-header/>
+        <app-header />
       </div>
-      <router-view/>
+      <router-view />
     </div>
   </div>
 </template>
@@ -14,11 +14,11 @@
 <script lang="ts">
 import Vue from 'vue';
 import HelloWorld from '@/components/HelloWorld.vue'; // @ is an alias to /src
-import AppNavbar from '../components/common/Navbar.vue'
-import AppHeader from '../components/common/Header.vue'
-import AppPostEditDrawer from '../components/drawers/PostEditDrawer.vue'
-import {GET_INFO_ABOUT_USER} from "@/store/user/actions.type";
-import moment from "moment";
+import AppNavbar from '../components/common/Navbar.vue';
+import AppHeader from '../components/common/Header.vue';
+import AppPostEditDrawer from '../components/drawers/PostEditDrawer.vue';
+import { GET_INFO_ABOUT_USER } from '@/store/user/actions.type';
+import moment from 'moment';
 
 export default Vue.extend({
   name: 'home',
@@ -28,9 +28,7 @@ export default Vue.extend({
     AppHeader,
     AppPostEditDrawer,
   },
-  methods: {
-  }
-  ,
+  methods: {},
   beforeMount() {
     if (localStorage.getItem('token')) {
       this.$store.dispatch(GET_INFO_ABOUT_USER);
@@ -46,7 +44,7 @@ export default Vue.extend({
         h: '1 час',
         hh: '%dчасов',
         d: 'день',
-        dd:`%d дня`,
+        dd: `%d дня`,
         M: 'месяц',
         MM: '%d месяцев',
         y: 'год',
@@ -58,31 +56,29 @@ export default Vue.extend({
 </script>
 
 <style lang="scss">
-  .open-action-button {
-    background-color: transparent!important;
-    border: 0!important;
-  }
+.open-action-button {
+  background-color: transparent !important;
+  border: 0 !important;
+}
 
-  .action-popup-content{
-    .anticon {
-      margin: 0 1rem!important;
-      cursor: pointer!important;
+.action-popup-content {
+  .anticon {
+    margin: 0 1rem !important;
+    cursor: pointer !important;
+  }
+}
+
+.home {
+  display: flex;
+  justify-content: flex-end;
+  height: 100vh;
+
+  .content {
+    width: calc(100vw - 12.5rem);
+
+    @media (max-width: 1024px) {
+      width: calc(100vw - 4rem);
     }
   }
-
-  .home {
-    display: flex;
-    justify-content: flex-end;
-    height: 100vh;
-
-    .content {
-      width: calc(100vw - 12.5rem);
-
-      @media (max-width: 1024px) {
-        width: calc(100vw - 4rem);
-      }
-
-    }
-
-  }
+}
 </style>

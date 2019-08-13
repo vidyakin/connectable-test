@@ -5,7 +5,7 @@ import Home from './views/Home.vue';
 Vue.use(Router);
 
 const view = (name: string) => {
-  return () => import(`./views/${name}.vue`)
+  return () => import(`./views/${name}.vue`);
 };
 
 export const router =  new Router({
@@ -62,7 +62,7 @@ export const router =  new Router({
           name: 'project',
           component: view('Project'),
         },
-      ]
+      ],
     },
     {
       path: '/about',

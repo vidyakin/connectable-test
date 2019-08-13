@@ -1,8 +1,8 @@
-import {SET_SHOW_IMAGE_HEADER} from "@/store/shower/mutations.type";
+import {SET_SHOW_IMAGE_HEADER} from '@/store/shower/mutations.type';
 
 interface State {
-  showHeaderImage: Boolean,
-};
+  showHeaderImage: boolean;
+}
 
 const store: State = {
   showHeaderImage: true,
@@ -11,13 +11,13 @@ const store: State = {
 const getters = {
   showHeaderImage(state: State) {
     return state.showHeaderImage;
-  }
+  },
 };
 
 const mutations = {
-  [SET_SHOW_IMAGE_HEADER](state: State, show: Boolean) {
+  [SET_SHOW_IMAGE_HEADER](state: State, show: boolean) {
     state.showHeaderImage = show;
-  }
+  },
 };
 
 export default {

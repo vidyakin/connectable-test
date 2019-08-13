@@ -1,4 +1,4 @@
-# vue-client
+# ts-project
 
 ## Project setup
 ```

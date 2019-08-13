@@ -19,10 +19,10 @@
 </template>
 <script>
 
-  import AppCreateProject from "../components/drawers/CreateProject";
-  import {mapGetters} from "vuex";
-  import {GET_GROUPS} from "../store/group/actions.type";
-  import AppProjects from "../views/Projects";
+  import AppCreateProject from '../components/drawers/CreateProject';
+  import {mapGetters} from 'vuex';
+  import {GET_GROUPS} from '../store/group/actions.type';
+  import AppProjects from '../views/Projects';
 
   export default {
     components: {
@@ -32,7 +32,7 @@
     data() {
       return {
         createVisible: false,
-      }
+      };
     },
     methods: {
       closeCreate() {
@@ -46,9 +46,9 @@
       this.$store.dispatch(GET_GROUPS);
     },
     computed: {
-      ...mapGetters(['groups'])
-    }
-  }
+      ...mapGetters(['groups']),
+    },
+  };
 </script>
 
 <style lang="scss">
