@@ -13,7 +13,7 @@
         >
           <template slot="content">
             <a-tooltip title="Удалить">
-              <a-button icon="delete" @click="deleteGroup"></a-button>
+              <a-button icon="delete" @click="deleteProject"></a-button>
             </a-tooltip>
           </template>
           <a-button icon="menu" class="open-action-button"></a-button>
@@ -38,6 +38,9 @@
 
 <script>
 import { mapGetters } from 'vuex';
+import {
+  DELETE_PROJECT,
+} from '@/store/project/actions.type';
 
 export default {
   name: 'AppProject',
@@ -45,8 +48,8 @@ export default {
     project: Object,
   },
   methods: {
-    deleteGroup() {
-      this.$store.dispatch(DELETE_GROUP, this.group._id);
+    deleteProject() {
+      this.$store.dispatch(DELETE_PROJECT, this.project._id);
     },
     redirectToGroup() {
       this.$router.push({ name: 'project', params: { _id: this.project._id } });

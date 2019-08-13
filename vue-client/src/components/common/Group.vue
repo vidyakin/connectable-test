@@ -36,6 +36,9 @@
 
 <script>
 import { mapGetters } from 'vuex';
+import {
+  DELETE_GROUP,
+} from '@/store/group/actions.type';
 
 export default {
   name: 'AppGroup',
