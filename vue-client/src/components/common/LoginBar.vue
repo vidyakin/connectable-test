@@ -11,7 +11,7 @@
             <a-icon type="logout" />Выйти
           </a-menu-item>
         </a-menu>
-        <a-button class="logout">
+        <a-button class="logout" >
            {{ user.firstName }} <a-icon type="down" />
         </a-button>
       </a-dropdown>
