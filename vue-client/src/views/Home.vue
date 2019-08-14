@@ -13,7 +13,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import HelloWorld from '@/components/HelloWorld.vue'; // @ is an alias to /src
+// @ is an alias to /src
 import AppNavbar from '../components/common/Navbar.vue';
 import AppHeader from '../components/common/Header.vue';
 import AppPostEditDrawer from '../components/drawers/PostEditDrawer.vue';
@@ -23,7 +23,6 @@ import moment from 'moment';
 export default Vue.extend({
   name: 'home',
   components: {
-    HelloWorld,
     AppNavbar,
     AppHeader,
     AppPostEditDrawer,
