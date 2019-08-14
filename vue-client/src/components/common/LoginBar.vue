@@ -4,13 +4,18 @@
       <a-button @click="login">Войти</a-button>
     </div>
     <div class="user-info" v-if="user">
-      <div class="user-info-name">{{ user.firstName }}</div>
-      <a-popover trigger="click" placement="bottom" overlayClassName="user-info-popover">
-        <div slot="content">
-          <a-button @click="logout">Выйти</a-button>
-        </div>
-        <a-icon type="down" class="user-info-popover-btn"></a-icon>
-      </a-popover>
+      
+      <a-dropdown>
+        <a-menu slot="overlay" >
+          <a-menu-item key="logout" @click="logout">
+            <a-icon type="logout" />Выйти
+          </a-menu-item>
+        </a-menu>
+        <a-button class="logout" >
+           {{ user.firstName }} <a-icon type="down" />
+        </a-button>
+      </a-dropdown>
+
       <a-avatar :src="user.googleImage" />
     </div>
   </div>
@@ -84,6 +89,11 @@ export default {
     }
   }
 
+  .logout {
+    border: none;
+    padding: 2px;
+    height: auto;
+  }
   .user-info {
     display: flex;
     justify-content: flex-end;
