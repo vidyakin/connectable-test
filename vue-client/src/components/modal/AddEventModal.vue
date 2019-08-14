@@ -54,10 +54,10 @@
 </template>
 
 <script>
-  import {mapGetters} from "vuex";
-  import AppInput from '../common/Input'
-  import moment from 'moment'
-  import {CREATE_EVENT, UPDATE_USER_INFO} from "../../store/user/actions.type";
+  import {mapGetters} from 'vuex';
+  import AppInput from '../common/Input';
+  import moment from 'moment';
+  import {CREATE_EVENT, UPDATE_USER_INFO} from '../../store/user/actions.type';
 
   export default {
     data() {
@@ -79,7 +79,7 @@
         time: moment.relTime,
         comment: '',
         duration: '',
-      }
+      };
     },
     methods: {
       setCurrentColor(color) {
@@ -113,8 +113,8 @@
     props: {
       visible: Boolean,
       close: Function,
-    }
-  }
+    },
+  };
 </script>
 
 <style lang="scss">

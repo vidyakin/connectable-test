@@ -18,8 +18,8 @@
             { required: true, message: 'Название не может быть пустым!', }
             ]
           }]"
-            class="secondary form-input">
-          </app-input>
+            class="secondary form-input"
+          ></app-input>
         </a-form-item>
         <div class="label">Описание</div>
         <a-form-item>
@@ -30,8 +30,8 @@
             { required: true, message: 'Описание не может быть пустым!', }
             ]
           }]"
-            class="secondary form-input">
-          </a-textarea>
+            class="secondary form-input"
+          ></a-textarea>
         </a-form-item>
         <div class="label">Тип</div>
         <a-select @change="handleChange">
@@ -50,84 +50,88 @@
 </template>
 
 <script>
-  import {mapGetters} from "vuex";
-  import AppInput from '../common/Input'
-  import {UPDATE_USER_INFO} from "../../store/user/actions.type";
-  import ATextarea from "ant-design-vue/es/input/TextArea";
-  import {CREATE_GROUP} from "../../store/group/actions.type";
-  export default {
-    name: "AppUserEditDrawer",
-    data() {
-      return {
-        current: '',
-        createButtonSpinning: false,
-        type: 1,
-      }
+import { mapGetters } from 'vuex';
+import AppInput from '../common/Input';
+import { UPDATE_USER_INFO } from '../../store/user/actions.type';
+import ATextarea from 'ant-design-vue/es/input/TextArea';
+import { CREATE_GROUP } from '../../store/group/actions.type';
+export default {
+  name: 'AppUserEditDrawer',
+  data() {
+    return {
+      current: '',
+      createButtonSpinning: false,
+      type: 1,
+    };
+  },
+  components: {
+    ATextarea,
+    AppInput,
+  },
+  computed: {
+    ...mapGetters(['user']),
+  },
+  methods: {
+    onClose() {
+      this.close();
     },
-    components: {
-      ATextarea,
-      AppInput,
+    createGroup(e) {
+      e.preventDefault();
+      this.form.validateFieldsAndScroll((err, formFields) => {
+        if (!err) {
+          this.createButtonSpinning = true;
+          this.$store
+            .dispatch(CREATE_GROUP, {
+              ...formFields,
+              type: this.type,
+              creatorId: this.user._id,
+            })
+            .finally(() => {
+              this.createButtonSpinning = false;
+              this.onClose();
+            });
+        }
+      });
     },
-    computed: {
-      ...mapGetters(['user']),
+    handleChange(e) {
+      this.type = e;
     },
-    methods: {
-      onClose() {
-        this.close();
-      },
-      createGroup(e) {
-        e.preventDefault();
-        this.form.validateFieldsAndScroll((err, formFields) => {
-          if (!err) {
-            this.createButtonSpinning = true;
-            this.$store.dispatch(CREATE_GROUP, { ...formFields, type: this.type, creatorId: this.user._id})
-              .finally(() => {
-                this.createButtonSpinning = false;
-                this.onClose();
-              });
-          }
-        });
-      },
-      handleChange(e) {
-        this.type = e;
-      }
-    },
-    props: {
-      close: Function,
-      visible: Boolean,
-    },
-    beforeCreate() {
-      this.form = this.$form.createForm(this);
-    },
-  }
+  },
+  props: {
+    close: Function,
+    visible: Boolean,
+  },
+  beforeCreate() {
+    this.form = this.$form.createForm(this);
+  },
+};
 </script>
 
 <style lang="scss">
-  .create-group-drawer {
-    .form {
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      height: 100%;
+.create-group-drawer {
+  .form {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+  }
+
+  .ant-drawer-content-wrapper {
+    width: 20rem !important;
+    overflow: auto;
+    height: 100vh;
+
+    .ant-drawer-body {
+      height: calc(100% - 3.5rem);
     }
 
-    .ant-drawer-content-wrapper {
-      width: 20rem !important;
-      overflow: auto;
-      height: 100vh;
-
-      .ant-drawer-body {
-        height: calc(100% - 3.5rem);
-      }
-
-
-      @media(max-width: 500px) {
-        width: 100% !important;
-      }
-    }
-    .create-group-button-wrapper {
-      margin-top: 0.5rem;
-      text-align: center;
+    @media (max-width: 500px) {
+      width: 100% !important;
     }
   }
+  .create-group-button-wrapper {
+    margin-top: 0.5rem;
+    text-align: center;
+  }
+}
 </style>

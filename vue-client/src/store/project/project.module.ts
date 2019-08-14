@@ -6,8 +6,8 @@ import {
   DELETE_GROUP, DELETE_PARTICIPANT,
   EDIT_GROUP,
   GET_CURRENT_GROUP,
-  GET_GROUPS, GET_INVITE, GET_PARTICIPANTS_REQUEST
-} from "@/store/group/actions.type";
+  GET_GROUPS, GET_INVITE, GET_PARTICIPANTS_REQUEST,
+} from '@/store/group/actions.type';
 import {
   approveInvite,
   approveParticipantsRequest, cancelInvite,
@@ -16,37 +16,37 @@ import {
   deleteGroup, deleteParticipant,
   editGroup,
   getCurrentGroup,
-  getGroups, getInvite, getParticipantsRequest
-} from "@/services/group.service";
+  getGroups, getInvite, getParticipantsRequest,
+} from '@/services/group.service';
 import {
   ADD_GROUP,
   REMOVE_GROUP,
   SET_CURRENT_GROUP,
   SET_GROUPS, SET_INVITE,
   SET_PARTICIPANTS_REQUEST,
-  UPDATE_GROUP
-} from "@/store/group/mutations.type";
+  UPDATE_GROUP,
+} from '@/store/group/mutations.type';
 import {
   CREATE_PROJECT, CREATE_PROJECT_PARTICIPANT,
   DELETE_PROJECT,
   EDIT_PROJECT,
   GET_CURRENT_PROJECT,
-  GET_PROJECTS
-} from "@/store/project/actions.type";
-import {ADD_PROJECT, REMOVE_PROJECT, SET_CURRENT_PROJECT, SET_PROJECTS} from "@/store/project/mutations.type";
+  GET_PROJECTS,
+} from '@/store/project/actions.type';
+import {ADD_PROJECT, REMOVE_PROJECT, SET_CURRENT_PROJECT, SET_PROJECTS} from '@/store/project/mutations.type';
 import {
   createProject,
   createProjectParticipant,
   deleteProject,
   editProject,
   getCurrentProject,
-  getProjects
-} from "@/services/project.service";
+  getProjects,
+} from '@/services/project.service';
 
 interface State {
-  projects: any[],
-  currentProject: any,
-};
+  projects: any[];
+  currentProject: any;
+}
 
 const store: State = {
   projects: [],
@@ -55,15 +55,15 @@ const store: State = {
 
 const getters = {
   projects(state: State) {
-    return state.projects.map(e => {
+    return state.projects.map((e) => {
       e.participants = [...e.participants.sort((a: any, b: any) => {
         if (a._id === e.creatorId) {
-          return -1
+          return -1;
         }
         if (b._id ===  e.creatorId) {
-          return 1
+          return 1;
         }
-        return 0
+        return 0;
       })];
       return e;
     });
@@ -98,7 +98,7 @@ const mutations = {
       state.projects = [
         ...state.projects.slice(0, index),
         ...state.projects.slice(index + 1),
-      ]
+      ];
     }
   },
   [UPDATE_GROUP](state: State, project: any) {
@@ -109,7 +109,7 @@ const mutations = {
         ...state.projects.slice(0, index),
         project,
         ...state.projects.slice(index + 1),
-      ]
+      ];
     }
   },
 };

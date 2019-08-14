@@ -2,21 +2,19 @@
   <div class="calendar">
     <app-add-event-modal :visible="createVisible" :close="createClose"></app-add-event-modal>
     <div class="calendar-header">
-      <div class="calendar-name">
-        Календарь
-      </div>
-      <a-button @click="createOpen">
-        Создать событие
-      </a-button>
+      <div class="calendar-name">Календарь</div>
+      <a-button @click="createOpen">Создать событие</a-button>
     </div>
     <div class="calendar-body">
       <a-calendar v-model="currentDay">
         <template slot="dateCellRender" slot-scope="value">
           <div>
-            <div class="event-wrapper"
-                 v-if="getEventsForDay(value)"
-                 :style="{'background-color' : getEventsForDay(value).color,
-                 'border-color':getEventsForDay(value).color}">
+            <div
+              class="event-wrapper"
+              v-if="getEventsForDay(value)"
+              :style="{'background-color' : getEventsForDay(value).color,
+                 'border-color':getEventsForDay(value).color}"
+            >
               <div class="event-name">
                 {{getEventsForDay(value).name}}
                 {{getEventsForDay(value).time}}
@@ -28,22 +26,14 @@
     </div>
     <div class="months-events">
       <div class="month-event">
-        <div class="month-name">
-          {{getMonthName()}}
-        </div>
+        <div class="month-name">{{getMonthName()}}</div>
         <div class="event" v-for="event in getEventsForThisMonth()">
           <div class="event-date">
-            <div class="event-date-day">
-              {{getDayFromDate(event.date).day}}
-            </div>
-            <div class="event-date-weekday">
-              {{getDayFromDate(event.date).weekday}}
-            </div>
+            <div class="event-date-day">{{getDayFromDate(event.date).day}}</div>
+            <div class="event-date-weekday">{{getDayFromDate(event.date).weekday}}</div>
           </div>
           <div class="event-name">
-            <div>
-              {{event.name}}, {{event.comment}}
-            </div>
+            <div>{{event.name}}, {{event.comment}}</div>
             <div class="event-time">{{event.time}}</div>
           </div>
           <div class="event-action">
@@ -57,22 +47,14 @@
         </div>
       </div>
       <div class="month-event">
-        <div class="month-name">
-          {{getNextMonthName()}}
-        </div>
+        <div class="month-name">{{getNextMonthName()}}</div>
         <div class="event" v-for="event in getEventsForNextMonth()">
           <div class="event-date">
-            <div class="event-date-day">
-              {{getDayFromDate(event.date).day}}
-            </div>
-            <div class="event-date-weekday">
-              {{getDayFromDate(event.date).weekday}}
-            </div>
+            <div class="event-date-day">{{getDayFromDate(event.date).day}}</div>
+            <div class="event-date-weekday">{{getDayFromDate(event.date).weekday}}</div>
           </div>
           <div class="event-name">
-            <div>
-              {{event.name}}, {{event.comment}}
-            </div>
+            <div>{{event.name}}, {{event.comment}}</div>
             <div class="event-time">{{event.time}}</div>
           </div>
           <div class="event-action">
@@ -87,227 +69,237 @@
       </div>
     </div>
   </div>
-
 </template>
 
 <script>
-  import Vue from 'vue';
-  import moment from 'moment'
-  import 'moment/locale/ru';
-  import AppAddEventModal from '../components/modal/AddEventModal'
-  import {DELETE_EVENT, GET_EVENTS} from "../store/user/actions.type";
-  import {mapGetters} from "vuex";
+import Vue from 'vue';
+import moment from 'moment';
+import 'moment/locale/ru';
+import AppAddEventModal from '../components/modal/AddEventModal.vue';
+import { DELETE_EVENT, GET_EVENTS } from '../store/user/actions.type';
+import { mapGetters } from 'vuex';
 
-
-  export default Vue.extend({
-    data() {
+export default Vue.extend({
+  data() {
+    return {
+      currentDay: moment(),
+      createVisible: false,
+      months: [
+        'Январь',
+        'Февраль',
+        'Март',
+        'Апрель',
+        'Май',
+        'Июнь',
+        'Июль',
+        'Август',
+        'Сентябрь',
+        'Октябрь',
+        'Ноябрь',
+        'Декабрь',
+      ],
+      weekday: ['ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ', 'ВС'],
+    };
+  },
+  beforeCreate() {
+    moment.locale('ru');
+    if (this.user) {
+      this.$store.dispatch(GET_EVENTS, this.user.id);
+    }
+  },
+  components: {
+    AppAddEventModal,
+  },
+  computed: {
+    ...mapGetters(['user', 'events']),
+  },
+  watch: {
+    user(user) {
+      if (user) {
+        this.$store.dispatch(GET_EVENTS, user.id);
+      }
+    },
+  },
+  methods: {
+    createClose() {
+      this.createVisible = false;
+    },
+    createOpen() {
+      this.createVisible = true;
+    },
+    getEventsForDay(day) {
+      return (
+        this.events &&
+        this.events.find(event => {
+          return moment(event.date).isSame(day, 'day');
+        })
+      );
+    },
+    getMonthName() {
+      return this.months[moment().month()];
+    },
+    getEventsForThisMonth() {
+      return (
+        this.events &&
+        this.events.filter(event => {
+          return moment(event.date).isSame(moment(), 'month');
+        })
+      );
+    },
+    getNextMonthName() {
+      return this.months[moment().month() + 1];
+    },
+    getEventsForNextMonth() {
+      return (
+        this.events &&
+        this.events.filter( (event) => {
+          return moment(event.date).isSame(moment().add(1, 'M'), 'month');
+        })
+      );
+    },
+    getDayFromDate(date) {
       return {
-        currentDay: moment(),
-        createVisible: false,
-        months: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
-          'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь',],
-        weekday: ['ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ', 'ВС',]
-      }
+        weekday: this.weekday[moment(date).isoWeekday() - 1],
+        day: moment(date).date(),
+      };
     },
-    beforeCreate() {
-      moment.locale('ru');
-      if (this.user) this.$store.dispatch(GET_EVENTS, this.user.id);
+    deleteEvent(id) {
+      this.$store.dispatch(DELETE_EVENT, id);
     },
-    components: {
-      AppAddEventModal
-    },
-    computed: {
-      ...mapGetters(['user', 'events'])
-    },
-    watch: {
-      user(user) {
-        if (user) this.$store.dispatch(GET_EVENTS, user.id);
-      }
-    },
-    methods: {
-      createClose() {
-        this.createVisible = false;
-      },
-      createOpen() {
-        this.createVisible = true;
-      },
-      getEventsForDay(day) {
-        return this.events && this.events.find(event => {
-          return moment(event.date).isSame(day, 'day')
-        });
-      },
-      getMonthName() {
-        return this.months[moment().month()]
-      },
-      getEventsForThisMonth() {
-        return this.events && this.events.filter(event => {
-          return moment(event.date).isSame(moment(), 'month')
-        })
-      },
-      getNextMonthName() {
-        return this.months[moment().month() + 1]
-      },
-      getEventsForNextMonth() {
-        return this.events && this.events.filter(event => {
-          return moment(event.date).isSame(moment().add(1, 'M'), 'month')
-        })
-      },
-      getDayFromDate(date) {
-        return {weekday: this.weekday[moment(date).isoWeekday() - 1], day: moment(date).date()};
-      },
-      deleteEvent(id) {
-        this.$store.dispatch(DELETE_EVENT, id);
-      }
-    },
-  });
+  },
+});
 </script>
 
 <style lang="scss">
+.months-events {
+  display: flex;
+  margin: 0 3.5rem;
 
-  .months-events {
+  .month-name {
+    height: 32px;
+    font-size: 25px;
+    font-weight: bold;
+    font-style: normal;
+    font-stretch: normal;
+    line-height: 0.96;
+    letter-spacing: normal;
+    color: #000000;
+  }
+
+  .event-time {
+    height: 14px;
+    font-size: 11px;
+    font-weight: normal;
+    font-style: normal;
+    font-stretch: normal;
+    line-height: 1.18;
+    letter-spacing: normal;
+    text-align: left;
+    color: #808495;
+    margin-top: 0.5rem;
+  }
+}
+
+.calendar {
+  background-color: #f0f0f7;
+  height: calc(100vh - 3.125rem);
+  overflow: auto;
+
+  &-header {
     display: flex;
-    margin: 0 3.5rem;
+    margin-top: 1.5rem;
+    margin-left: 3.125rem;
+    margin-right: 3.125rem;
+    justify-content: space-between;
 
-    .month-name {
-      height: 32px;
-      font-size: 25px;
-      font-weight: bold;
-      font-style: normal;
-      font-stretch: normal;
-      line-height: 0.96;
-      letter-spacing: normal;
-      color: #000000;
-    }
-
-    .event-time {
-      height: 14px;
-      font-size: 11px;
-      font-weight: normal;
-      font-style: normal;
-      font-stretch: normal;
-      line-height: 1.18;
-      letter-spacing: normal;
-      text-align: left;
-      color: #808495;
-      margin-top: 0.5rem;
-    }
-
-  }
-
-  .calendar {
-    background-color: #f0f0f7;
-    height: calc(100vh - 3.125rem);
-    overflow: auto;
-
-    &-header {
-      display: flex;
-      margin-top: 1.5rem;
-      margin-left: 3.125rem;
-      margin-right: 3.125rem;
-      justify-content: space-between;
-
-      .ant-btn {
-        border-radius: 4px;
-        background-color: #3b86ff;
-        color: #ffffff;
-      }
-
-    }
-
-    &-name {
-      font-size: 1.5rem;
-      color: #43425d;
-      text-align: left;
-    }
-
-    .calendar-body {
-      background-color: white;
-      margin: 1.5rem 3.5rem 0 3.5rem;
-
-      .event-wrapper {
-        margin-top: 50%;
-        border-radius: 0.25rem;
-        border: 1px solid;
-
-        .event-name {
-          font-size: 0.75rem;
-          color: white;
-
-
-        }
-
-      }
-
-    }
-
-  }
-
-  ;
-
-  .month-event {
-    flex: 1;
-    margin-right: 2rem;
-    .event {
-      display: flex;
-      height: 80px;
+    .ant-btn {
       border-radius: 4px;
-      background-color: #f5f6fa;
-      margin-bottom: 10px;
-      padding: 1rem 1.5rem;
+      background-color: #3b86ff;
+      color: #ffffff;
+    }
+  }
 
-      &-date {
+  &-name {
+    font-size: 1.5rem;
+    color: #43425d;
+    text-align: left;
+  }
 
-        &-weekday {
+  .calendar-body {
+    background-color: white;
+    margin: 1.5rem 3.5rem 0 3.5rem;
 
-          width: 16px;
-          height: 18px;
-          font-size: 14px;
-          font-weight: normal;
-          font-style: normal;
-          font-stretch: normal;
-          line-height: 0.93;
-          letter-spacing: normal;
-          text-align: left;
-          color: #808495;
-        }
+    .event-wrapper {
+      margin-top: 50%;
+      border-radius: 0.25rem;
+      border: 1px solid;
 
-        &-day {
-          width: 25px;
-          height: 31px;
-          font-size: 24px;
-          font-weight: bold;
-          font-style: normal;
-          font-stretch: normal;
-          line-height: 1;
-          letter-spacing: normal;
-          text-align: left;
-          color: #000000;
-        }
+      .event-name {
+        font-size: 0.75rem;
+        color: white;
+      }
+    }
+  }
+}
 
+.month-event {
+  flex: 1;
+  margin-right: 2rem;
+  .event {
+    display: flex;
+    height: 80px;
+    border-radius: 4px;
+    background-color: #f5f6fa;
+    margin-bottom: 10px;
+    padding: 1rem 1.5rem;
+
+    &-date {
+      &-weekday {
+        width: 16px;
+        height: 18px;
+        font-size: 14px;
+        font-weight: normal;
+        font-style: normal;
+        font-stretch: normal;
+        line-height: 0.93;
+        letter-spacing: normal;
+        text-align: left;
+        color: #808495;
       }
 
-      &-name {
-        height: 35px;
-        font-size: 13px;
+      &-day {
+        width: 25px;
+        height: 31px;
+        font-size: 24px;
         font-weight: bold;
         font-style: normal;
         font-stretch: normal;
-        line-height: 1.38;
+        line-height: 1;
         letter-spacing: normal;
         text-align: left;
-        color: #4d565c;
-        margin-left: 2rem;
-        width: calc(100% - 5rem)
+        color: #000000;
       }
-
-      &-action {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-      }
-
     }
 
-  }
+    &-name {
+      height: 35px;
+      font-size: 13px;
+      font-weight: bold;
+      font-style: normal;
+      font-stretch: normal;
+      line-height: 1.38;
+      letter-spacing: normal;
+      text-align: left;
+      color: #4d565c;
+      margin-left: 2rem;
+      width: calc(100% - 5rem);
+    }
 
+    &-action {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+  }
+}
 </style>
