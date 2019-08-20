@@ -1,0 +1,17 @@
+FROM node:10
+
+WORKDIR /app
+
+ARG dbuser
+ARG dbpass
+ARG domain
+ARG DEFAULT_URL
+ARG DB_URL
+
+COPY package*.json ./
+RUN npm install
+
+COPY . .
+
+EXPOSE 4000
+CMD [ "node", "index.js" ]
