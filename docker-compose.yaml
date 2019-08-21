@@ -14,8 +14,8 @@ services:
       - mongodb
     command: bash -c "node deploy_scripts/nodejs_init/wait_for_mongo.js && node index.js"
     volumes:
-      - $PWD/static:/app/static
-      - $PWD/deploy_scripts/nodejs_init:/app/nodejs_init
+      - ./static:/app/static
+      - ./deploy_scripts/nodejs_init:/app/nodejs_init
     ports:
         - "4000:4000"
     env_file: .env
@@ -27,8 +27,8 @@ services:
       MONGO_LOG_DIR: /var/log
     env_file: .env
     volumes:
-      - $PWD/data/db:/data/db
-      - $PWD/deploy_scripts/mongo_init:/docker-entrypoint-initdb.d
+      - ./data/db:/data/db
+      - ./deploy_scripts/mongo_init:/docker-entrypoint-initdb.d
     ports:
         - 27017:27017
   connfrontend:
