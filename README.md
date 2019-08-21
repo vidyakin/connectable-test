@@ -3,11 +3,13 @@
 ### Dockerized version 1.0
 
 ------
-##Local Dev Env with docker-compose:
+## Local Dev Env with docker-compose:
 
-connfrontend - Vue.js container service name
-connbackend - Node.js container service name
-mongodb - MongoDB container service name
+- **connfrontend** - Vue.js container service name
+- **connbackend** - Node.js container service name
+- **mongodb** - MongoDB container service name
+
+### Default URL is http://localhost:8080
 
 
 #### Deploy full app (FrontEnd + BackEnd + MongoDB)
