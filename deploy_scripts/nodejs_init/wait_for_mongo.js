@@ -16,7 +16,7 @@ async function doMagic() {
   catch{
    i++;
    console.log(`Retrying MongoDB connection ${i} of 10`)
-   await sleep(1000)
+   await sleep(2000)
    await doMagic();
   }
  }
