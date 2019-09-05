@@ -124,6 +124,123 @@ app.delete('/api/deleteParticipant/:participantId/group/:groupId', (req, res, ne
 
   })
 });
+//register form
+const mongoose = require('mongoose');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
+mongoose.connect(process.env.DB_URL, {useNewUrlParser: true});
+var db=mongoose.connection;
+db.on('error', console.log.bind(console, "connection error"));
+db.once('open', function(callback){ 
+    console.log("connection succeeded"); 
+});
+//register page
+app.post('/api/register', function(req,res){
+    let firstName = req.body.firstName,
+        lastname = req.body.lastName,
+        email = req.body.email,
+        password = req.body.password,
+        data = {
+            "firstName": firstName,
+            "lastName":lastname,
+            "email":email,
+            "password":password
+        };
+    let result = {};
+    let status = 200;
 
+    User.findOne({email}, (err, user) => {
+        if (!err && user) {
+            bcrypt.compare(password, user.password).then(match => {
+                if (match) {
+                    status = 202;
+                    result.email = user.email;
+                    result.status = status;
+                    res.status(status).send(result);
+                } else {
+                    status = 401;
+                    result.status = status;
+                    result.error = `Authentication error`;
+                }
+
+                res.status(status).send(result);
+            }).catch(err => {
+                status = 500;
+                result.status = status;
+                result.error = err;
+                res.status(status).send(result);
+            });
+        } else {
+            bcrypt.hash(password, 10, function (err, hash) {
+                if (err) {
+                    console.log('Error hashing password for user', email);
+                    next(err);
+                }
+                else {
+                    data.password = hash;
+                    db.collection('users').insertOne(data,function(err, collection){
+                        if (err) return res.status(500).send("There was a problem registering the user.");
+                    });
+                }
+            });
+
+            status = 200;
+            const payload = {user: email};
+            const secret = process.env.JWT_SECRET;
+            const token = jwt.sign(payload, secret);
+
+            result.token = token;
+            result.status = status;
+            result.result = user;
+
+            res.status(status).send(result);
+        }
+    });
+
+});
+//login page
+app.post('/api/loginPage', function(req,res){
+
+    let email =req.body.email,
+        password = req.body.password,
+        result = {},
+        status = 200,
+        invalidFields = {};
+
+    User.findOne({email}, (err, user) => {
+        if (!err && user) {
+            bcrypt.compare(password, user.password).then(match => { console.log(match);
+                if (match) {
+                    status = 200;
+                    const payload = {user: user.email};
+                    const secret = process.env.JWT_SECRET;
+                    const token = jwt.sign(payload, secret);
+
+                    result.token = token;
+                    result.status = status;
+                    result.result = user;
+                } else {
+                    status = 202;
+                    result.status = status;
+                    result.error = `Authentication error`;
+                    result.password = password;
+                }
+
+                res.status(status).send(result);
+            }).catch(err => {
+                status = 500;
+                result.status = status;
+                result.error = err;
+                res.status(status).send(result);
+            });
+        } else {
+            status = 202;
+            result.status = status;
+            result.error = `Authentication error`;
+            result.email = email;
+            res.status(status).send(result);
+        }
+    });
+});
 
 app.listen(port, () => console.log(`[Server]: Listening on port ${port}`));

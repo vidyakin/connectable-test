@@ -11,7 +11,7 @@ export const setAuthInterceptor = () => {
     if (error.response.status === 401) {
       localStorage.removeItem('authorization');
       store.commit(SET_USER, null);
-      router.push('/sign-in');
+      router.push('/login');
     }
     return Promise.reject(error);
   });

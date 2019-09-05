@@ -21,6 +21,7 @@
         <img src="@/assets/Icons/user.svg" alt />
         Пользователь
       </a-menu-item>
+
       <a-menu-item key="/groups">
         <img src="@/assets/Icons/Groups.svg" alt />
         Группы
@@ -34,10 +35,11 @@
         Структура
       </a-menu-item>
 
-      <a-menu-item key="7" class="footer" disabled>
+      <a-menu-item key="/settings" class="footer" >
         <img src="@/assets/Icons/setting.svg" alt />
         Настройки
       </a-menu-item>
+
     </a-menu>
     <a-menu
       style="width: 4rem; height: 100%"
@@ -67,9 +69,10 @@
         <img src="@/assets/Icons/Structure.svg" alt />
       </a-menu-item>
 
-      <a-menu-item key="7" class="footer" disabled>
+      <a-menu-item key="/settings" class="footer" >
         <img src="@/assets/Icons/setting.svg" alt />
       </a-menu-item>
+
     </a-menu>
   </div>
 </template>

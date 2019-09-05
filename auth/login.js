@@ -39,7 +39,7 @@ module.exports = (req, res) => {
       }
     });
   }
-  else if (googleId) {
+  else if (googleId) { 
     let result = {};
     let status = 200;
     User.findOne({googleId: googleId}, (err, user) => {

@@ -16,6 +16,7 @@ export const login = (context: any, user: any) => {
 export const logout = (context: any) => {
   localStorage.removeItem('authorization');
   localStorage.removeItem('token');
+    localStorage.removeItem('CurrentUserData');
   context.commit(SET_USER, null);
 };
 

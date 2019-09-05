@@ -1,7 +1,19 @@
 import Vue from 'vue';
 import {ADD_COMMENT_FOR_POST, ADD_LIKE_FOR_POST, ADD_POST, SET_POSTS} from '@/store/post/mutations.type';
-import {ADD_EVENT, SET_CURRENT_USER, SET_EVENTS, SET_USERS, UPDATE_USER} from '@/store/user/mutations.type';
+import {
+    ADD_EVENT,
+    SET_CURRENT_USER,
+    SET_EVENTS,
+    SET_USER,
+    SET_USERS,
+    UPDATE_USER,
+    IS_LOGGED_IN,
+    CURRENT_USER_DATA,
+    ERROR_REGISTER,
+    ERROR_LOGIN
+} from '@/store/user/mutations.type';
 import {DELETE_EVENT} from '@/store/user/actions.type';
+import {setAuthToken} from "@/services/auth/setAuthToken";
 
 
 export const editUser = (context: any, user: any) => {
@@ -52,4 +64,50 @@ export const getUser = (context: any, userId: number) => {
     .then((response: any) => {
       context.commit(SET_CURRENT_USER, response.data.result);
     });
+};
+
+export const insertNewUser = (context: any, dataUser : any) => { 
+  return Vue.axios
+    .post(`api/register`, dataUser).then((response: any) => {
+        if(response.data.status == 200) {
+            context.commit(ERROR_REGISTER, '');
+            localStorage.setItem('authorization', 'true');
+            localStorage.setItem('token', response.data.token);
+            localStorage.setItem('CurrentUserData', response.data.result.firstName);
+            context.commit(IS_LOGGED_IN, response.data.token);
+            context.commit(CURRENT_USER_DATA, response.data.result);
+            setAuthToken(response.data.token);
+        }
+        else if(response.data.status == 202) {
+            context.commit(ERROR_REGISTER, response.data.email);
+        }
+
+      }).catch(err => {
+          console.log(err);
+          localStorage.removeItem('authorization');
+          localStorage.removeItem('token');
+          localStorage.removeItem('CurrentUserData');
+      })
+};
+export const checkUserInfo = (context: any, dataUser : any) => {
+    return Vue.axios
+        .post(`api/loginPage`, dataUser).then((response: any) => {
+            console.log(response.data);
+            if(response.data.status == 200) {
+                context.commit(ERROR_LOGIN, '');
+                context.commit(IS_LOGGED_IN, response.data.token);
+                context.commit(CURRENT_USER_DATA, response.data.result);
+                localStorage.setItem('CurrentUserData', response.data.result.firstName);
+                localStorage.setItem('authorization', 'true');
+                localStorage.setItem('token', response.data.token);
+                setAuthToken(response.data.token);
+            }
+            else if(response.data.status == 202) {
+                context.commit(ERROR_LOGIN, response.data);
+            }
+        }).catch(err => {
+            localStorage.removeItem('authorization');
+            localStorage.removeItem('token');
+            localStorage.removeItem('CurrentUserData');
+        });
 };
