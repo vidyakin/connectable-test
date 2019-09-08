@@ -177,8 +177,12 @@ export default {
       background-color: #f5f6fa;
       border-radius: 4rem;
       display: flex;
-      height: 2rem;
+      /*height: 2rem;*/
       line-height: 2rem;
+
+      @media (max-width: 767px) {
+        border-radius: 10px;
+      }
 
       &-author {
         margin-right: 1.125rem;
@@ -192,8 +196,8 @@ export default {
         font-size: 0.75rem;
         font-weight: normal;
         color: #000000;
-        padding-right: 20px;
-        width: 200px;
+        /*padding-right: 20px;*/
+        /*width: 200px;*/
       }
     }
   }

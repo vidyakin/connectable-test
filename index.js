@@ -135,6 +135,7 @@ db.once('open', function(callback){
     console.log("connection succeeded"); 
 });
 //register page
+const mail = require('./email/index');
 app.post('/api/register', function(req,res){
     let firstName = req.body.firstName,
         lastname = req.body.lastName,
@@ -181,6 +182,7 @@ app.post('/api/register', function(req,res){
                     db.collection('users').insertOne(data,function(err, collection){
                         if (err) return res.status(500).send("There was a problem registering the user.");
                     });
+                    mail.NewUser(email, `https://connectable.pro/login/`, {email:email, password:password})
                 }
             });
 
@@ -191,9 +193,10 @@ app.post('/api/register', function(req,res){
 
             result.token = token;
             result.status = status;
-            result.result = user;
+            //result.result = user;
 
             res.status(status).send(result);
+
         }
     });
 
@@ -242,5 +245,8 @@ app.post('/api/loginPage', function(req,res){
         }
     });
 });
+//Section Structure
+app.post('/api/structure', (req, res) => {
 
+});
 app.listen(port, () => console.log(`[Server]: Listening on port ${port}`));

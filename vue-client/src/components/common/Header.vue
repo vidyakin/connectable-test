@@ -35,6 +35,7 @@ export default {
   methods: {
     closeImage() {
       this.$store.commit(SET_SHOW_IMAGE_HEADER, false);
+      document.body.classList.add('is-hide-img-header');
     },
   },
 };
@@ -49,6 +50,9 @@ export default {
     text-align: right;
 
     .anticon {
+      position: relative;
+      top: 10px;
+      right: 10px;
       color: white !important;
       background: #3b86ff;
       border-radius: 20rem;

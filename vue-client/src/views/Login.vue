@@ -1,27 +1,33 @@
-<template>    
+<template>
+
   <div class="c-login">
+    <app-success-register />
     <div class="container">
-      <form class="u-form" @submit.prevent="handleSubmit">
-        <fieldset>
-            <legend>Авторизоваться</legend>
-            <div class="form-group">
-                <label for="email">Email</label>
-                <input type="text" v-model="user.email" id="email" name="email" class="form-control" :class="{ 'is-invalid': submitted && !user.email }" />
-                <div v-show="submitted && !user.email" class="invalid-feedback">Это поле обязательно</div>
-                <div v-show="submitted && user.email && error.email" class="invalid-feedback">Пользователь с таким email не зарегистрирован</div>
+        <div class="row">
+            <div class="col-sm-8 offset-sm-2">
+              <form class="u-form" @submit.prevent="handleSubmit">
+                <fieldset>
+                    <legend>Авторизоваться</legend>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="text" v-model="user.email" id="email" name="email" class="form-control" :class="{ 'is-invalid': submitted && !user.email }" />
+                        <div v-show="submitted && !user.email" class="invalid-feedback">Это поле обязательно</div>
+                        <div v-show="submitted && user.email && error.email" class="invalid-feedback">Пользователь с таким email не зарегистрирован</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Пароль</label>
+                        <input type="password" v-model="user.password" id="password" name="password" class="form-control" :class="{ 'is-invalid': submitted && !user.password }" />
+                        <div v-show="submitted && !user.password" class="invalid-feedback">Это поле обязательно</div>
+                        <div v-show="submitted && user.password && error.password" class="invalid-feedback">Пароль неверный</div>
+                    </div>
+                    <div class="form-group">
+                        <button class="btn btn-primary">Авторизоваться</button>
+                        <router-link to="/register" class="btn btn-link">Регистрация</router-link>
+                    </div>
+                </fieldset>
+              </form>
             </div>
-            <div class="form-group">
-                <label for="password">Пароль</label>
-                <input type="password" v-model="user.password" id="password" name="password" class="form-control" :class="{ 'is-invalid': submitted && !user.password }" />
-                <div v-show="submitted && !user.password" class="invalid-feedback">Это поле обязательно</div>
-                <div v-show="submitted && user.password && error.password" class="invalid-feedback">Пароль неверный</div>
-            </div>
-            <div class="form-group">
-                <button class="btn btn-primary">Авторизоваться</button>
-                <router-link to="/register" class="btn btn-link">Регистрация</router-link>
-            </div>
-        </fieldset>
-      </form>
+        </div>
     </div>
   </div>
 </template>
@@ -29,7 +35,11 @@
 <script>
 import Vue from 'vue';
 import { CHECK_USER_INFO } from '../store/user/actions.type';
+import {
+    SUCCESS_REGISTER
+} from '@/store/user/mutations.type';
 import store from '../store';
+import AppSuccessRegister from '../components/notification/SuccessRegister.vue';
 export default Vue.extend({
     data () {
         return {
@@ -43,6 +53,9 @@ export default Vue.extend({
                 password: false
             }
         }
+    },
+    components: {
+        AppSuccessRegister
     },
     methods: {
         handleSubmit (e) {

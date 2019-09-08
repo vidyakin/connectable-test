@@ -61,9 +61,19 @@ export default Vue.extend({
 </script>
 
 <style lang="scss">
+.is-hide-img-header{
+  .profile {
+    height: calc(100vh - 50px);
+  }
+}
 .profile {
+  padding: 30px;
   background-color: #f0f0f7;
-  height: calc(100vh - 3.125rem);
+  height: calc(100vh - 210px);
   overflow: auto;
+
+  @media (max-width: 767px) {
+    padding: 20px 15px;
+  }
 }
 </style>

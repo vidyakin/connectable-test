@@ -35,7 +35,7 @@ setAuthToken(localStorage.getItem('token'));
 
 Vue.use(VueMq, {
   breakpoints: {
-    mobile: 414,
+    mobile: 320,
     tablet: 1024,
     desktop: Infinity,
   },

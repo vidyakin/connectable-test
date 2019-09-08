@@ -21,7 +21,6 @@
         <img src="@/assets/Icons/user.svg" alt />
         Пользователь
       </a-menu-item>
-
       <a-menu-item key="/groups">
         <img src="@/assets/Icons/Groups.svg" alt />
         Группы
@@ -34,13 +33,12 @@
         <img src="@/assets/Icons/Structure.svg" alt />
         Структура
       </a-menu-item>
-
       <a-menu-item key="/settings" class="footer" >
         <img src="@/assets/Icons/setting.svg" alt />
         Настройки
       </a-menu-item>
-
     </a-menu>
+
     <a-menu
       style="width: 4rem; height: 100%"
       mode="inline"
@@ -68,11 +66,9 @@
       <a-menu-item key="/structure">
         <img src="@/assets/Icons/Structure.svg" alt />
       </a-menu-item>
-
       <a-menu-item key="/settings" class="footer" >
         <img src="@/assets/Icons/setting.svg" alt />
       </a-menu-item>
-
     </a-menu>
   </div>
 </template>
@@ -100,6 +96,7 @@ export default {
 
 <style lang="scss">
 .navbar {
+  padding: 0;
   height: 100%;
   width: 12.5rem !important;
   @media (max-width: 1024px) {
@@ -114,6 +111,12 @@ export default {
       font-size: 1rem;
       text-align: left;
       padding-left: 1.5rem;
+      @media (max-width: 1024px) {
+        padding-left: 10px!important;
+        padding-right: 10px;
+        text-align: center;
+        border-left: 5px solid transparent !important;
+      }
       img {
         margin-right: 0.5rem;
       }

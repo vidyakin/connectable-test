@@ -9,7 +9,8 @@ import {
   IS_LOGGED_IN,
   CURRENT_USER_DATA,
   ERROR_REGISTER,
-  ERROR_LOGIN
+  ERROR_LOGIN,
+  SUCCESS_REGISTER
 } from '@/store/user/mutations.type';
 import {
   CREATE_EVENT, DELETE_EVENT,
@@ -33,6 +34,7 @@ interface State {
   currentUserData: any | null;
   errorRegister: any | null;
   errorLogin: any | null;
+  successMessage: any | null;
 }
 
 const store: State = {
@@ -43,7 +45,8 @@ const store: State = {
   isLoggedIn: null,
   currentUserData: null,
   errorRegister: null,
-  errorLogin: null
+  errorLogin: null,
+  successMessage: null
 };
 
 const getters = {
@@ -70,6 +73,9 @@ const getters = {
   },
   errorLogin(state: State) {
     return state.errorLogin;
+  },
+  successMessage(state: State) {
+    return state.successMessage;
   }
 };
 
@@ -137,7 +143,10 @@ const mutations = {
   },
   [ERROR_LOGIN](state: State, errorLogin: any) {
     state.errorLogin = errorLogin;
-  }
+  },
+  [SUCCESS_REGISTER](state: State, successMessage: any) {
+    state.successMessage = successMessage;
+  },
 };
 
 const actions = {

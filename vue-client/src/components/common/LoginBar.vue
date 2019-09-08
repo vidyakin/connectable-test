@@ -2,7 +2,7 @@
   <div class="user-bar">
 
     <div class="user-info" v-if="this.currentUser">
-      
+
       <a-dropdown>
         <a-menu slot="overlay" >
           <a-menu-item key="logout" @click="logout">
@@ -85,13 +85,13 @@ export default {
 
   .logout {
     border: none;
-    padding: 2px;
+    padding: 0;
     height: auto;
   }
   .user-info {
     display: flex;
     justify-content: flex-end;
-    margin-right: 0.5rem;
+    margin-right: 30px;
 
     &-name {
       line-height: 3.125rem;

@@ -146,6 +146,11 @@ export default {
 </script>
 
 <style lang="scss">
+.is-hide-img-header{
+  .address {
+    height: calc(100vh - 50px);
+  }
+}
 .address {
   height: calc(100vh - 3.125rem);
   overflow: auto;
@@ -157,12 +162,11 @@ export default {
     justify-content: space-between;
 
     &-name {
-      height: 31px;
       font-size: 24px;
       font-weight: normal;
       font-style: normal;
       font-stretch: normal;
-      line-height: 1.67;
+      line-height: 32px;
       letter-spacing: normal;
       text-align: left;
       color: #43425d;

@@ -222,12 +222,16 @@ export default {
   justify-content: space-between;
   border-color: white;
   border-radius: 0.25rem;
-  margin: 1.25rem 3.125rem;
+  margin: 30px 0;
   box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.04);
-  width: calc(100% - 6.25rem) !important;
+  width: 100% !important;
   background-color: white;
   text-align: left;
   padding: 1.25rem;
+
+  &:last-child{
+    margin-bottom: 0;
+  }
 
   &-body {
     width: calc(100% - 1rem);

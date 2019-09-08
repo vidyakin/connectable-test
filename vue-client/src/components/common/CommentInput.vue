@@ -80,11 +80,11 @@ export default {
 <style lang="scss">
 .input {
   border-color: white !important;
-  border-radius: 0.25rem !important;
-  height: 3.125rem !important;
-  margin: 1.25rem 3.125rem !important;
+  border-radius: 25px !important;
+  height: 50px !important;
+  margin: 0 0 30px !important;
   box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.04) !important;
-  width: calc(100% - 6.25rem) !important;
+  width: 100% !important;
 
   .ant-input {
     border-color: white !important;

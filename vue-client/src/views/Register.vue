@@ -1,37 +1,41 @@
 <template>
   <div class="c-register">
-  	<div class="container">
-    	<form class="u-form" @submit.prevent="handleSubmit">
-    		<fieldset>
-	  			<legend>Регистрация</legend>
-	        <div class="form-group">
-	            <label for="firstName">Имя</label>
-	            <input type="text" v-model="user.firstName" name="firstName" class="form-control" :class="{ 'is-invalid': submitted && !user.firstName }" />
-               <div v-show="submitted && !user.firstName" class="invalid-feedback">Это поле обязательно</div>
-	        </div>
-	        <div class="form-group">
-	            <label for="lastName">Фамилия</label>
-	            <input type="text" v-model="user.lastName" name="lastName" class="form-control" :class="{ 'is-invalid': submitted && !user.lastName }" />
-               <div v-show="submitted && !user.lastName" class="invalid-feedback">Это поле обязательно</div>
-	        </div>
-          <div class="form-group">
-              <label for="email">Email</label>
-              <input type="text" v-model="user.email" id="email" name="email" class="form-control" :class="{ 'is-invalid': submitted && !user.email }" />
-               <div v-show="submitted && !user.email" class="invalid-feedback">Это поле обязательно</div>
-			  <div v-show="submitted && error && user.email" class="invalid-feedback">Пользователь с этим email уже зарегистрирован</div>
-          </div>
-	        <div class="form-group">
-	            <label for="password">Пароль</label>
-	            <input type="password" v-model="user.password" name="password" class="form-control" :class="{ 'is-invalid': submitted && !user.password }" />
-               <div v-show="submitted && !user.password" class="invalid-feedback">Это поле обязательно</div>
-	        </div>
-	        <div class="form-group">
-	            <button class="btn btn-primary">Регистрация</button>
-	            <router-link to="/login" class="btn btn-link">Авторизоваться</router-link>
-	        </div>
-	      </fieldset>
-    	</form>
-  	</div>    	
+	  <div class="container">
+		  <div class="row">
+			  <div class="col-sm-8 offset-sm-2">
+					<form class="u-form" @submit.prevent="handleSubmit">
+						<fieldset>
+							<legend>Регистрация</legend>
+						<div class="form-group">
+							<label for="firstName">Имя</label>
+							<input type="text" v-model="user.firstName" name="firstName" class="form-control" :class="{ 'is-invalid': submitted && !user.firstName }" />
+						   <div v-show="submitted && !user.firstName" class="invalid-feedback">Это поле обязательно</div>
+						</div>
+						<div class="form-group">
+							<label for="lastName">Фамилия</label>
+							<input type="text" v-model="user.lastName" name="lastName" class="form-control" :class="{ 'is-invalid': submitted && !user.lastName }" />
+						   <div v-show="submitted && !user.lastName" class="invalid-feedback">Это поле обязательно</div>
+						</div>
+					  <div class="form-group">
+						  <label for="email">Email</label>
+						  <input type="text" v-model="user.email" id="email" name="email" class="form-control" :class="{ 'is-invalid': submitted && !user.email }" />
+						   <div v-show="submitted && !user.email" class="invalid-feedback">Это поле обязательно</div>
+						  <div v-show="submitted && error && user.email" class="invalid-feedback">Пользователь с этим email уже зарегистрирован</div>
+					  </div>
+						<div class="form-group">
+							<label for="password">Пароль</label>
+							<input type="password" v-model="user.password" name="password" class="form-control" :class="{ 'is-invalid': submitted && !user.password }" />
+						   <div v-show="submitted && !user.password" class="invalid-feedback">Это поле обязательно</div>
+						</div>
+						<div class="form-group">
+							<button class="btn btn-primary">Регистрация</button>
+							<router-link to="/login" class="btn btn-link">Авторизоваться</router-link>
+						</div>
+					  </fieldset>
+					</form>
+			  </div>
+		  </div>
+	  </div>
   </div>
 </template>
 

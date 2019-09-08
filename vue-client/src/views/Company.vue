@@ -50,15 +50,27 @@ export default Vue.extend({
 </script>
 
 <style lang="scss">
+.is-hide-img-header{
+  .company {
+    height: calc(100vh - 50px);
+  }
+}
 .company {
+  padding: 30px;
   background-color: #f0f0f7;
-  height: calc(100vh - 3.125rem);
+  height: calc(100vh - 210px);
   overflow: auto;
+
+  @media (max-width: 767px) {
+    padding: 20px 15px;
+  }
+
   &-name {
     font-size: 1.5rem;
+    line-height: 32px;
     color: #43425d;
     text-align: left;
-    margin-left: 3.125rem;
+    margin-bottom: 30px;
   }
 }
 </style>

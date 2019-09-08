@@ -10,7 +10,8 @@ import {
     IS_LOGGED_IN,
     CURRENT_USER_DATA,
     ERROR_REGISTER,
-    ERROR_LOGIN
+    ERROR_LOGIN,
+    SUCCESS_REGISTER
 } from '@/store/user/mutations.type';
 import {DELETE_EVENT} from '@/store/user/actions.type';
 import {setAuthToken} from "@/services/auth/setAuthToken";
@@ -28,6 +29,7 @@ export const createEvent = (context: any, event: any) => {
   return Vue.axios
     .post(`api/event/`, event)
     .then((response: any) => {
+        console.log(response);
       context.commit(ADD_EVENT, response.data.result);
       console.log(response.data.result);
     });
@@ -71,12 +73,8 @@ export const insertNewUser = (context: any, dataUser : any) => {
     .post(`api/register`, dataUser).then((response: any) => {
         if(response.data.status == 200) {
             context.commit(ERROR_REGISTER, '');
-            localStorage.setItem('authorization', 'true');
-            localStorage.setItem('token', response.data.token);
-            localStorage.setItem('CurrentUserData', response.data.result.firstName);
-            context.commit(IS_LOGGED_IN, response.data.token);
-            context.commit(CURRENT_USER_DATA, response.data.result);
-            setAuthToken(response.data.token);
+            context.commit(SUCCESS_REGISTER, 'Регистрация прошла успешно');
+            console.log(response.data);
         }
         else if(response.data.status == 202) {
             context.commit(ERROR_REGISTER, response.data.email);

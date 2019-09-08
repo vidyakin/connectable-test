@@ -29,4 +29,12 @@ module.exports.sendInvite = async(to, url) => {
     text: `Здравствуйте, вас приглашают в закрытую группу, принять или отклонить приглашение вы можете по ссылке ${url}`, // plain text body
   });
  };
+module.exports.NewUser = async(to, url, dataUser) => {
+    transporter.sendMail({
+        from: '"Connectable" <mail@connectable.pro>', // sender address
+        to: dataUser.email, // list of receivers
+        subject: "Регистрация нового пользователя", // Subject line
+        text: `Новый пользователь был зарегистрирован. Email: ${dataUser.email} Password:${dataUser.password} . Для входа на сайт перейдите по ссылке: ${url}`, // plain text body
+    });
+};
 
