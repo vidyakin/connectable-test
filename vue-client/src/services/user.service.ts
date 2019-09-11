@@ -11,7 +11,7 @@ import {
     CURRENT_USER_DATA,
     ERROR_REGISTER,
     ERROR_LOGIN,
-    SUCCESS_REGISTER
+    SUCCESS_REGISTER, SET_USER_DATA
 } from '@/store/user/mutations.type';
 import {DELETE_EVENT} from '@/store/user/actions.type';
 import {setAuthToken} from "@/services/auth/setAuthToken";
@@ -74,7 +74,7 @@ export const insertNewUser = (context: any, dataUser : any) => {
         if(response.data.status == 200) {
             context.commit(ERROR_REGISTER, '');
             context.commit(SUCCESS_REGISTER, 'Регистрация прошла успешно');
-            console.log(response.data);
+
         }
         else if(response.data.status == 202) {
             context.commit(ERROR_REGISTER, response.data.email);
@@ -90,12 +90,13 @@ export const insertNewUser = (context: any, dataUser : any) => {
 export const checkUserInfo = (context: any, dataUser : any) => {
     return Vue.axios
         .post(`api/loginPage`, dataUser).then((response: any) => {
-            console.log(response.data);
+
             if(response.data.status == 200) {
                 context.commit(ERROR_LOGIN, '');
                 context.commit(IS_LOGGED_IN, response.data.token);
-                context.commit(CURRENT_USER_DATA, response.data.result);
-                localStorage.setItem('CurrentUserData', response.data.result.firstName);
+                //context.commit(CURRENT_USER_DATA, response.data.result);
+                context.commit(SET_USER_DATA, response.data);
+                //localStorage.setItem('CurrentUserData', response.data.result.firstName);
                 localStorage.setItem('authorization', 'true');
                 localStorage.setItem('token', response.data.token);
                 setAuthToken(response.data.token);

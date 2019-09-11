@@ -189,7 +189,9 @@ app.post('/api/register', function(req,res){
             status = 200;
             const payload = {user: email};
             const secret = process.env.JWT_SECRET;
-            const token = jwt.sign(payload, secret);
+            const token = jwt.sign(payload, secret, {
+                expiresIn: 86400 // expires in 24 hours
+            });
 
             result.token = token;
             result.status = status;
@@ -212,16 +214,19 @@ app.post('/api/loginPage', function(req,res){
 
     User.findOne({email}, (err, user) => {
         if (!err && user) {
-            bcrypt.compare(password, user.password).then(match => { console.log(match);
+            bcrypt.compare(password, user.password).then(match => {
                 if (match) {
                     status = 200;
-                    const payload = {user: user.email};
+                    user.password = '';
+                    const payload = {user: user};
                     const secret = process.env.JWT_SECRET;
-                    const token = jwt.sign(payload, secret);
+                    const token = jwt.sign(payload, secret, {
+                        expiresIn: 86400 // expires in 24 hours
+                    });
 
                     result.token = token;
                     result.status = status;
-                    result.result = user;
+                    result.user = user;
                 } else {
                     status = 202;
                     result.status = status;
@@ -246,7 +251,10 @@ app.post('/api/loginPage', function(req,res){
     });
 });
 //Section Structure
-app.post('/api/structure', (req, res) => {
+/*app.post('/api/structure', (req, res) => {
 
-});
+});*/
+
+
+
 app.listen(port, () => console.log(`[Server]: Listening on port ${port}`));

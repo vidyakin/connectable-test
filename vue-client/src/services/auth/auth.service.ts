@@ -1,8 +1,8 @@
 import Vue from 'vue';
 import {LOGIN} from '@/store/user/actions.type';
-import {SET_USER} from '@/store/user/mutations.type';
+import {SET_USER, SET_USER_DATA} from '@/store/user/mutations.type';
 import {setAuthToken} from '@/services/auth/setAuthToken';
-
+import store from '../../store';
 export const login = (context: any, user: any) => {
   return Vue.axios.post('/api/login', user)
     .then((response) => {
@@ -14,10 +14,10 @@ export const login = (context: any, user: any) => {
 };
 
 export const logout = (context: any) => {
-  localStorage.removeItem('authorization');
-  localStorage.removeItem('token');
-    localStorage.removeItem('CurrentUserData');
-  context.commit(SET_USER, null);
+    localStorage.removeItem('authorization');
+    localStorage.removeItem('token');
+    context.commit(SET_USER, null);
+    context.commit(SET_USER_DATA, null);
 };
 
 export const loginWithGoogle = (context: any, $gAuth: any) => {
@@ -42,4 +42,8 @@ export const getInfoAboutUser = (context: any) => {
     .then((response) => {
       context.commit(SET_USER, response.data);
     });
+};
+export const getInfoUser = (token : any) => {
+    var playload = JSON.parse(atob(token.split('.')[1]));
+    return store.commit(SET_USER_DATA, playload);
 };

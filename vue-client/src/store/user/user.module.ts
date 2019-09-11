@@ -10,7 +10,8 @@ import {
   CURRENT_USER_DATA,
   ERROR_REGISTER,
   ERROR_LOGIN,
-  SUCCESS_REGISTER
+  SUCCESS_REGISTER,
+  SET_USER_DATA
 } from '@/store/user/mutations.type';
 import {
   CREATE_EVENT, DELETE_EVENT,
@@ -35,6 +36,7 @@ interface State {
   errorRegister: any | null;
   errorLogin: any | null;
   successMessage: any | null;
+  userData: any | null;
 }
 
 const store: State = {
@@ -46,7 +48,8 @@ const store: State = {
   currentUserData: null,
   errorRegister: null,
   errorLogin: null,
-  successMessage: null
+  successMessage: null,
+  userData: null,
 };
 
 const getters = {
@@ -76,7 +79,11 @@ const getters = {
   },
   successMessage(state: State) {
     return state.successMessage;
-  }
+  },
+  userData(state: State) {
+    return state.userData;
+  },
+
 };
 
 const mutations = {
@@ -147,6 +154,10 @@ const mutations = {
   [SUCCESS_REGISTER](state: State, successMessage: any) {
     state.successMessage = successMessage;
   },
+  [SET_USER_DATA](state: State, userData: any) {
+    state.userData = userData;
+  },
+
 };
 
 const actions = {

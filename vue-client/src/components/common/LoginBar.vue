@@ -1,7 +1,7 @@
 <template>
   <div class="user-bar">
 
-    <div class="user-info" v-if="this.currentUser">
+    <div class="user-info" v-if="userData.user">
 
       <a-dropdown>
         <a-menu slot="overlay" >
@@ -10,7 +10,7 @@
           </a-menu-item>
         </a-menu>
         <a-button class="logout" >
-           {{ this.currentUser }} <a-icon type="down" />
+           {{ userData.user.firstName }} <a-icon type="down" />
         </a-button>
       </a-dropdown>
 
@@ -31,11 +31,10 @@ export default {
   data() {
     return {
       current: 1,
-      currentUser:localStorage.getItem('CurrentUserData'),
     };
   },
   computed: {
-    ...mapGetters(['currentUserData']),
+    ...mapGetters(['userData']),
   },
   methods: {
     closeImage() {
