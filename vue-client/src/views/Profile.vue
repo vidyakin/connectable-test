@@ -1,7 +1,7 @@
 <template>
   <div class="profile">
     <app-user-info></app-user-info>
-    <app-comment-input :parent="{type: 'user', id: currentUser && currentUser._id}" />
+    <app-comment-input :parent="{type: 'user', id: userData && userData.result._id}" />
     <app-post v-for="(post, index) in posts" :post="post" :key="index" />
   </div>
 </template>
@@ -34,14 +34,14 @@ export default Vue.extend({
         filter: {
           parent: {
             type: 'user',
-            id: this.currentUser._id,
+            id: this.userData.result._id,
           },
         },
       });
     });
   },
   computed: {
-    ...mapGetters(['posts', 'user', 'currentUser']),
+    ...mapGetters(['posts', 'user', 'currentUser', 'userData']),
   },
   watch: {
     $route(val) {
@@ -50,7 +50,7 @@ export default Vue.extend({
           filter: {
             parent: {
               type: 'user',
-              id: this.currentUser._id,
+              id: this.userData.result._id,
             },
           },
         });

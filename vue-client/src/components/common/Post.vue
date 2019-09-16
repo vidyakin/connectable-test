@@ -130,7 +130,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(['showHeaderImage', 'user']),
+    ...mapGetters(['showHeaderImage', 'user', 'currentUser', 'userData']),
   },
   methods: {
     commented() {
@@ -142,14 +142,14 @@ export default {
     like(postId) {
       const like = {
         parent: { type: 'post', id: postId },
-        author: this.user,
+        author: this.currentUser,
       };
       this.$store.dispatch(SEND_LIKE, like);
     },
     sendComment(postId) {
       const comment = {
         parent: { type: 'post', id: postId },
-        author: this.user,
+        author: this.currentUser,
         message: this.commentContent,
       };
       this.$store.dispatch(SEND_COMMENT, comment).then(() => {
@@ -176,7 +176,7 @@ export default {
         ...rePost,
         likes: [],
         comments: [],
-        parent: { type: 'user', id: this.user._id },
+        parent: { type: 'user', id: this.currentUser._id },
       });
     },
   },

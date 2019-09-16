@@ -110,7 +110,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(['showHeaderImage', 'user']),
+    ...mapGetters(['showHeaderImage', 'user', 'userData', 'currentUser']),
   },
   methods: {
     getMomentTime(time) {
@@ -119,7 +119,7 @@ export default {
     sendComment(id, type) {
       const comment = {
         parent: { type: 'comment', id },
-        author: this.user,
+        author: this.currentUser,
         message: this.commentContent,
       };
       this.$store
@@ -129,14 +129,14 @@ export default {
     like(id, type) {
       const like = {
         parent: { type, id },
-        author: this.user,
+        author: this.currentUser,
       };
       this.$store.dispatch(SEND_LIKE, like);
     },
     deleteComment(id) {
       const like = {
         parent: { type, id },
-        author: this.user,
+        author: this.currentUser,
       };
       this.$store.dispatch(DELETE_COMMENT, id);
     },

@@ -145,7 +145,8 @@ app.post('/api/register', function(req,res){
             "firstName": firstName,
             "lastName":lastname,
             "email":email,
-            "password":password
+            "password":password,
+            "username": firstName,
         };
     let result = {};
     let status = 200;
@@ -218,7 +219,7 @@ app.post('/api/loginPage', function(req,res){
                 if (match) {
                     status = 200;
                     user.password = '';
-                    const payload = {user: user};
+                    const payload = {result: user};
                     const secret = process.env.JWT_SECRET;
                     const token = jwt.sign(payload, secret, {
                         expiresIn: 86400 // expires in 24 hours
@@ -226,7 +227,7 @@ app.post('/api/loginPage', function(req,res){
 
                     result.token = token;
                     result.status = status;
-                    result.user = user;
+                    result.result = user;
                 } else {
                     status = 202;
                     result.status = status;

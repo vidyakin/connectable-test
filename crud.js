@@ -1,6 +1,6 @@
 const express = require('express');
 const mail = require('./email/index');
-
+const jwt = require('jsonwebtoken');
 
 module.exports = (Collection, serializer, options) => {
     const create = (req, res) => {
@@ -84,7 +84,16 @@ module.exports = (Collection, serializer, options) => {
                     }
                     else {
                         result.status = 200;
+                        data.password = '';
+                        const payload = {result: data};
+                        const secret = process.env.JWT_SECRET;
+                        const token = jwt.sign(payload, secret, {
+                            expiresIn: 86400 // expires in 24 hours
+                        });
+                        result.token = token;
                         result.result = await serializer(data);
+
+                        console.log(result.result);
                     }
                     return res.status(status).send(result);
                 });

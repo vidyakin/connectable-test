@@ -8,7 +8,7 @@
       @click="goToPage"
       v-if="$mq==='desktop'"
     >
-      <a-menu-item key class="header">connectable</a-menu-item>
+      <a-menu-item key="/" class="header">connectable</a-menu-item>
       <a-menu-item key="/company">
         <img src="@/assets/Icons/company.svg" alt />
         Компания
@@ -17,7 +17,7 @@
         <img src="@/assets/Icons/Adress book.svg" alt />
         Адресная книга
       </a-menu-item>
-      <a-menu-item :key="user && `/profile/${user._id}`">
+      <a-menu-item :key="userData && `/profile/${userData.result._id}`">
         <img src="@/assets/Icons/user.svg" alt />
         Пользователь
       </a-menu-item>
@@ -47,14 +47,14 @@
       @click="goToPage"
       v-if="$mq==='tablet'"
     >
-      <a-menu-item key class="header">logo</a-menu-item>
+      <a-menu-item key="/" class="header">logo</a-menu-item>
       <a-menu-item key="/company">
         <img src="@/assets/Icons/company.svg" alt />
       </a-menu-item>
       <a-menu-item key="/addressBook">
         <img src="@/assets/Icons/Adress book.svg" alt />
       </a-menu-item>
-      <a-menu-item :key="user && `/profile/${user._id}`">
+      <a-menu-item :key="userData && `/profile/${userData.result._id}`">
         <img src="@/assets/Icons/user.svg" alt />
       </a-menu-item>
       <a-menu-item key="/groups">
@@ -89,7 +89,7 @@ export default {
     },
   },
   computed: {
-    ...mapGetters(['user']),
+    ...mapGetters(['user','userData']),
   },
 };
 </script>

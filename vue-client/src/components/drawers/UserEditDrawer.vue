@@ -50,7 +50,7 @@
                 :defaultValue="currentUser && currentUser.positions.join(',')"
                 v-decorator="['positions', {initialValue:currentUser &&  currentUser.positions.join(','),
                 rules: [
-                { required: true, message: 'Please input last name', }
+                { required: false, message: 'Please input position', }
                 ]
               }]"
                 class="secondary form-input"
@@ -70,6 +70,7 @@
                 label="Имя пользователя"
                 placeholder="Имя пользователя"
                 :defaultValue="currentUser && currentUser.username"
+                :disabled=true
                 v-decorator="['username', {initialValue:currentUser &&  currentUser.username,
                 rules: [
                 { required: true, message: 'Please input username', }
@@ -106,7 +107,7 @@
                 :defaultValue="currentUser && currentUser.phone"
                 v-decorator="['phone', {initialValue:currentUser &&  currentUser.phone,
                 rules: [{
-                  required: true, message: 'Please input E-mail!',
+                  required: false, message: 'Please input Phone',
                 }]
               }]"
                 class="secondary form-input"

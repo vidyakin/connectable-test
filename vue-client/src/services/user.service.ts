@@ -11,7 +11,8 @@ import {
     CURRENT_USER_DATA,
     ERROR_REGISTER,
     ERROR_LOGIN,
-    SUCCESS_REGISTER, SET_USER_DATA
+    SUCCESS_REGISTER,
+    SET_USER_DATA
 } from '@/store/user/mutations.type';
 import {DELETE_EVENT} from '@/store/user/actions.type';
 import {setAuthToken} from "@/services/auth/setAuthToken";
@@ -21,7 +22,11 @@ export const editUser = (context: any, user: any) => {
   return Vue.axios
     .put(`api/user/${user._id}`, user)
     .then((response: any) => {
-      context.commit(UPDATE_USER, response.data.result);
+    console.log(response.data.result);
+    context.commit(UPDATE_USER, response.data.result);
+    context.commit(SET_USER_DATA, response.data);
+    localStorage.setItem('token', response.data.token);
+    setAuthToken(response.data.token);
     });
 };
 
@@ -94,7 +99,6 @@ export const checkUserInfo = (context: any, dataUser : any) => {
             if(response.data.status == 200) {
                 context.commit(ERROR_LOGIN, '');
                 context.commit(IS_LOGGED_IN, response.data.token);
-                //context.commit(CURRENT_USER_DATA, response.data.result);
                 context.commit(SET_USER_DATA, response.data);
                 //localStorage.setItem('CurrentUserData', response.data.result.firstName);
                 localStorage.setItem('authorization', 'true');

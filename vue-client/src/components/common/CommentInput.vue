@@ -32,7 +32,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(['showHeaderImage', 'user']),
+    ...mapGetters(['showHeaderImage', 'user', 'currentUser', 'userData']),
   },
   methods: {
     send() {
@@ -40,7 +40,7 @@ export default {
         this.$store.dispatch(SEND_NEW_POST, {
           message: this.current,
           parent: this.parent,
-          author: this.user,
+          author: this.currentUser,
           attachment: [],
           formData: this.handleUpload(),
         });

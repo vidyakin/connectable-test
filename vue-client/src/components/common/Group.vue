@@ -20,9 +20,9 @@
         </a-popover>
       </div>
     </div>
-    <div class="group-content">
+    <div class="group-content" v-if="group.participants">
       <div class="group-content-participant" v-for="participant in group.participants">
-        <a-avatar :src="participant.googleImage"></a-avatar>
+        <!--<a-avatar :src="participant.googleImage"></a-avatar>-->
         <div class="group-content-participant-info">
           <div
             class="group-content-participant-info-name"

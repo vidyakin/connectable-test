@@ -1,7 +1,7 @@
 <template>
   <div class="user-bar">
 
-    <div class="user-info" v-if="userData.user">
+    <div class="user-info" v-if="userData.result">
 
       <a-dropdown>
         <a-menu slot="overlay" >
@@ -10,7 +10,7 @@
           </a-menu-item>
         </a-menu>
         <a-button class="logout" >
-           {{ userData.user.firstName }} <a-icon type="down" />
+           {{ userData.result.firstName + ' ' + userData.result.lastName }} <a-icon type="down" />
         </a-button>
       </a-dropdown>
 
@@ -34,7 +34,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(['userData']),
+    ...mapGetters(['userData', 'currentUser']),
   },
   methods: {
     closeImage() {
