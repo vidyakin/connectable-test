@@ -67,23 +67,6 @@
           <div class="col-sm-12">
             <a-form-item>
               <app-input
-                label="Имя пользователя"
-                placeholder="Имя пользователя"
-                :defaultValue="currentUser && currentUser.username"
-                :disabled=true
-                v-decorator="['username', {initialValue:currentUser &&  currentUser.username,
-                rules: [
-                { required: true, message: 'Please input username', }
-                ]
-              }]"
-                class="secondary form-input"
-              ></app-input>
-            </a-form-item>
-          </div>
-
-          <div class="col-sm-12">
-            <a-form-item>
-              <app-input
                 label="Почта"
                 placeholder="example@email.com"
                 :defaultValue="currentUser && currentUser.email"

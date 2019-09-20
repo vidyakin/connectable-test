@@ -1,7 +1,7 @@
 <template>
   <div class="user-bar">
 
-    <div class="user-info" v-if="userData.result">
+    <div class="user-info" v-if="this.datauser.result">
 
       <a-dropdown>
         <a-menu slot="overlay" >
@@ -10,11 +10,12 @@
           </a-menu-item>
         </a-menu>
         <a-button class="logout" >
-           {{ userData.result.firstName + ' ' + userData.result.lastName }} <a-icon type="down" />
+          {{ (currentUser ? currentUser.firstName : this.datauser.result.firstName) + ' ' + (currentUser ? currentUser.lastName : this.datauser.result.lastName) }}
+            <a-icon type="down" />
         </a-button>
       </a-dropdown>
 
-      <!--<a-avatar :src="user.googleImage" />-->
+      <a-avatar :src="(this.datauser.result.googleImage ? this.datauser.result.googleImage : require('../../assets/no_image.png'))" />
     </div>
   </div>
 </template>
@@ -22,6 +23,7 @@
 <script>
 import { SET_SHOW_IMAGE_HEADER } from '../../store/shower/mutations.type';
 import { mapGetters } from 'vuex';
+import store from '../../store';
 import {
   LOGOUT,
 } from '../../store/user/actions.type';
@@ -31,10 +33,11 @@ export default {
   data() {
     return {
       current: 1,
+      datauser: (store.getters.user ? store.getters.user : store.getters.userData)
     };
   },
   computed: {
-    ...mapGetters(['userData', 'currentUser']),
+    ...mapGetters(['userData', 'user', 'currentUser']),
   },
   methods: {
     closeImage() {

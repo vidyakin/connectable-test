@@ -146,7 +146,6 @@ app.post('/api/register', function(req,res){
             "lastName":lastname,
             "email":email,
             "password":password,
-            "username": firstName,
         };
     let result = {};
     let status = 200;

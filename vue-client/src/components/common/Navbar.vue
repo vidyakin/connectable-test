@@ -17,7 +17,7 @@
         <img src="@/assets/Icons/Adress book.svg" alt />
         Адресная книга
       </a-menu-item>
-      <a-menu-item :key="userData && `/profile/${userData.result._id}`">
+      <a-menu-item :key="this.datauser && `/profile/${this.datauser.result._id}`">
         <img src="@/assets/Icons/user.svg" alt />
         Пользователь
       </a-menu-item>
@@ -54,7 +54,7 @@
       <a-menu-item key="/addressBook">
         <img src="@/assets/Icons/Adress book.svg" alt />
       </a-menu-item>
-      <a-menu-item :key="userData && `/profile/${userData.result._id}`">
+      <a-menu-item :key="this.datauser && `/profile/${this.datauser.result._id}`">
         <img src="@/assets/Icons/user.svg" alt />
       </a-menu-item>
       <a-menu-item key="/groups">
@@ -75,12 +75,13 @@
 
 <script>
 import { mapGetters } from 'vuex';
-
+import store from '../../store';
 export default {
   name: 'Navbar',
   data() {
     return {
       current: 1,
+      datauser: (store.getters.user ? store.getters.user : store.getters.userData)
     };
   },
   methods: {

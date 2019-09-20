@@ -23,8 +23,6 @@ const gauthOption = {
 };
 Vue.use(GAuth, gauthOption);
 
-
-
 Vue.use(VuexAxios, axios);
 Vue.use(Antd);
 

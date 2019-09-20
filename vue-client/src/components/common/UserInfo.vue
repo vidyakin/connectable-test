@@ -2,7 +2,7 @@
   <div class="user-info-wrapper">
     <app-user-edit-drawer :close="closeEditDrawer" :visible="editDrawerVisible"></app-user-edit-drawer>
     <div class="user-info-avatar">
-      <a-avatar :src="currentUser && currentUser.googleImage"></a-avatar>
+      <a-avatar :src=" (currentUser && currentUser.googleImage ? currentUser.googleImage : require('../../assets/no_image.png')) "></a-avatar>
       <a-button>Подписаться</a-button>
     </div>
 

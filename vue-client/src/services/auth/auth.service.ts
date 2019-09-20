@@ -3,13 +3,16 @@ import {LOGIN} from '@/store/user/actions.type';
 import {SET_USER, SET_USER_DATA} from '@/store/user/mutations.type';
 import {setAuthToken} from '@/services/auth/setAuthToken';
 import store from '../../store';
+import { router } from '../../router';
+
 export const login = (context: any, user: any) => {
   return Vue.axios.post('/api/login', user)
     .then((response) => {
       localStorage.setItem('authorization', 'true');
-      localStorage.setItem('token', `Bearer ${response.data.token}`);
-      context.commit(SET_USER, response.data.result);
-      setAuthToken(`Bearer ${response.data.token}`);
+      localStorage.setItem('token', `${response.data.token}`);
+      console.log(response.data.result);
+      context.commit(SET_USER, response.data);
+      setAuthToken(`${response.data.token}`);
     });
 };
 
@@ -33,7 +36,10 @@ export const loginWithGoogle = (context: any, $gAuth: any) => {
         email: userInfo.U3,
         googleImage: userInfo.Paa,
       };
-      context.dispatch(LOGIN, userForLogin);
+      context.dispatch(LOGIN, userForLogin).finally(() => {
+          router.push('/about');
+          //this.$router.push({ name: 'about' });
+        });
     });
 };
 
@@ -44,6 +50,11 @@ export const getInfoAboutUser = (context: any) => {
     });
 };
 export const getInfoUser = (token : any) => {
-    var playload = JSON.parse(atob(token.split('.')[1]));
+    var base64Url = token.split('.')[1];
+    var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    var jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+    var playload = JSON.parse(jsonPayload);
     return store.commit(SET_USER_DATA, playload);
 };

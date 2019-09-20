@@ -6,6 +6,7 @@
         <div class="row">
             <div class="col-sm-8 offset-sm-2">
               <form class="u-form" @submit.prevent="handleSubmit">
+
                 <fieldset>
                     <legend>Авторизоваться</legend>
                     <div class="form-group">
@@ -28,6 +29,7 @@
               </form>
             </div>
         </div>
+        <app-login-google />
     </div>
   </div>
 </template>
@@ -35,6 +37,7 @@
 <script>
 import Vue from 'vue';
 import { CHECK_USER_INFO } from '../store/user/actions.type';
+import AppLoginGoogle from '../components/common/LoginBarGoogle.vue';
 import {
     SUCCESS_REGISTER
 } from '@/store/user/mutations.type';
@@ -55,7 +58,8 @@ export default Vue.extend({
         }
     },
     components: {
-        AppSuccessRegister
+        AppSuccessRegister,
+        AppLoginGoogle
     },
     methods: {
         handleSubmit (e) {
