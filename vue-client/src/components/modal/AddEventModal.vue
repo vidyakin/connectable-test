@@ -58,7 +58,7 @@
   import AppInput from '../common/Input';
   import moment from 'moment';
   import {CREATE_EVENT, UPDATE_USER_INFO} from '../../store/user/actions.type';
-
+  import store from '../../store';
   export default {
     data() {
       return {
@@ -79,16 +79,20 @@
         time: moment.relTime,
         comment: '',
         duration: '',
+        userInfo: (store.getters.userData ? store.getters.userData : store.getters.user),
       };
     },
     methods: {
       setCurrentColor(color) {
         this.currentColor = color;
       },
+      moment: function () {
+        return moment();
+      },
       createEvent() {
-        const {name, date, time, duration, comment, currentColor} = this;
+        const {name, date, time, duration, comment, currentColor, userInfo} = this;
         const event = {name, date, time, duration, comment, color: currentColor.color};
-        event.userId = this.user._id;
+        event.userId = this.userInfo.result._id;
         this.$store.dispatch(CREATE_EVENT, event)
           .finally(() => {
             this.name = '';
@@ -108,7 +112,7 @@
       AppInput,
     },
     computed: {
-      ...mapGetters(['user']),
+      ...mapGetters(['user', 'userData']),
     },
     props: {
       visible: Boolean,

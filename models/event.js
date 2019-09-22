@@ -20,11 +20,12 @@ const eventSchema = new Schema({
   googleEventId: String,
 
 });
-
+/*Bearer*/
 eventSchema.pre('save', function (next) {
   user.findOne({_id: this.userId}).catch(err => console.log(err)).then(data => {
+    console.log('save : ' + data);
     const headers = {
-      'Authorization': `Bearer ${data.googleToken}`,
+      'Authorization': data.googleToken,
     };
     const event = {
       description: this.comment,
@@ -33,6 +34,7 @@ eventSchema.pre('save', function (next) {
           +this.time.split(':')[1] + +this.duration.split(':')[0]))},
       summary: this.name,
     };
+    console.log('event: ' + event);
     axios
       .post('https://www.googleapis.com/calendar/v3/calendars/primary/events',
         event, {headers: headers})
