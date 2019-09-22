@@ -110,7 +110,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(['showHeaderImage', 'user']),
+    ...mapGetters(['showHeaderImage', 'user', 'userData', 'currentUser']),
   },
   methods: {
     getMomentTime(time) {
@@ -119,7 +119,7 @@ export default {
     sendComment(id, type) {
       const comment = {
         parent: { type: 'comment', id },
-        author: this.user,
+        author: this.currentUser,
         message: this.commentContent,
       };
       this.$store
@@ -129,14 +129,14 @@ export default {
     like(id, type) {
       const like = {
         parent: { type, id },
-        author: this.user,
+        author: this.currentUser,
       };
       this.$store.dispatch(SEND_LIKE, like);
     },
     deleteComment(id) {
       const like = {
         parent: { type, id },
-        author: this.user,
+        author: this.currentUser,
       };
       this.$store.dispatch(DELETE_COMMENT, id);
     },
@@ -177,8 +177,12 @@ export default {
       background-color: #f5f6fa;
       border-radius: 4rem;
       display: flex;
-      height: 2rem;
+      /*height: 2rem;*/
       line-height: 2rem;
+
+      @media (max-width: 767px) {
+        border-radius: 10px;
+      }
 
       &-author {
         margin-right: 1.125rem;
@@ -192,8 +196,8 @@ export default {
         font-size: 0.75rem;
         font-weight: normal;
         color: #000000;
-        padding-right: 20px;
-        width: 200px;
+        /*padding-right: 20px;*/
+        /*width: 200px;*/
       }
     }
   }

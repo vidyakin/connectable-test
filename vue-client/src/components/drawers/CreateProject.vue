@@ -9,44 +9,54 @@
   >
     <a-form :form="form" class="form" @submit="createGroup">
       <div class="form-row">
-        <a-form-item>
-          <app-input
-            label="Названия"
-            placeholder="Названия"
-            v-decorator="['name', {
-            rules: [
-            { required: true, message: 'Название не может быть пустым!', }
-            ]
-          }]"
-            class="secondary form-input"
-          ></app-input>
-        </a-form-item>
-        <div class="label">Описание</div>
-        <a-form-item>
-          <a-textarea
-            placeholder="Описание"
-            v-decorator="['description', {
-            rules: [
-            { required: true, message: 'Описание не может быть пустым!', }
-            ]
-          }]"
-            class="secondary form-input"
-          ></a-textarea>
-        </a-form-item>
-        <div class="label">Участники</div>
-        <a-select
-          labelInValue
-          mode="multiple"
-          :value="value"
-          placeholder="Select users"
-          style="width: 100%"
-          :filterOption="false"
-          @search="search"
-          @change="handleChange"
-          :notFoundContent="'Пользователя не найдено'"
-        >
-          <a-select-option v-for="d in data" :key="d._id">{{d.firstName + ' ' + d.lastName}}</a-select-option>
-        </a-select>
+        <div class="row">
+          <div class="col-sm-12">
+            <a-form-item>
+              <app-input
+                label="Названия"
+                placeholder="Названия"
+                v-decorator="['name', {
+                rules: [
+                { required: true, message: 'Название не может быть пустым!', }
+                ]
+              }]"
+                class="secondary form-input"
+              ></app-input>
+            </a-form-item>
+          </div>
+
+          <div class="col-sm-12">
+            <div class="label">Описание</div>
+            <a-form-item>
+              <a-textarea
+                placeholder="Описание"
+                v-decorator="['description', {
+                rules: [
+                { required: true, message: 'Описание не может быть пустым!', }
+                ]
+              }]"
+                class="secondary form-input"
+              ></a-textarea>
+            </a-form-item>
+          </div>
+
+          <div class="col-sm-12">
+            <div class="label">Участники</div>
+            <a-select
+              labelInValue
+              mode="multiple"
+              :value="value"
+              placeholder="Select users"
+              style="width: 100%"
+              :filterOption="false"
+              @search="search"
+              @change="handleChange"
+              :notFoundContent="'Пользователя не найдено'"
+            >
+              <a-select-option v-for="d in data" :key="d._id">{{d.firstName + ' ' + d.lastName}}</a-select-option>
+            </a-select>
+          </div>
+        </div>
       </div>
       <a-form-item class="create-group-button-wrapper">
         <a-spin :spinning="createButtonSpinning">

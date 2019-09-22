@@ -8,7 +8,7 @@
       @click="goToPage"
       v-if="$mq==='desktop'"
     >
-      <a-menu-item key class="header">connectable</a-menu-item>
+      <a-menu-item key="/" class="header">connectable</a-menu-item>
       <a-menu-item key="/company">
         <img src="@/assets/Icons/company.svg" alt />
         Компания
@@ -17,7 +17,7 @@
         <img src="@/assets/Icons/Adress book.svg" alt />
         Адресная книга
       </a-menu-item>
-      <a-menu-item :key="user && `/profile/${user._id}`">
+      <a-menu-item :key="this.datauser && `/profile/${this.datauser.result._id}`">
         <img src="@/assets/Icons/user.svg" alt />
         Пользователь
       </a-menu-item>
@@ -33,12 +33,12 @@
         <img src="@/assets/Icons/Structure.svg" alt />
         Структура
       </a-menu-item>
-
-      <a-menu-item key="7" class="footer" disabled>
+      <a-menu-item key="/settings" class="footer" >
         <img src="@/assets/Icons/setting.svg" alt />
         Настройки
       </a-menu-item>
     </a-menu>
+
     <a-menu
       style="width: 4rem; height: 100%"
       mode="inline"
@@ -47,14 +47,14 @@
       @click="goToPage"
       v-if="$mq==='tablet'"
     >
-      <a-menu-item key class="header">logo</a-menu-item>
+      <a-menu-item key="/" class="header">logo</a-menu-item>
       <a-menu-item key="/company">
         <img src="@/assets/Icons/company.svg" alt />
       </a-menu-item>
       <a-menu-item key="/addressBook">
         <img src="@/assets/Icons/Adress book.svg" alt />
       </a-menu-item>
-      <a-menu-item :key="user && `/profile/${user._id}`">
+      <a-menu-item :key="this.datauser && `/profile/${this.datauser.result._id}`">
         <img src="@/assets/Icons/user.svg" alt />
       </a-menu-item>
       <a-menu-item key="/groups">
@@ -66,8 +66,7 @@
       <a-menu-item key="/structure">
         <img src="@/assets/Icons/Structure.svg" alt />
       </a-menu-item>
-
-      <a-menu-item key="7" class="footer" disabled>
+      <a-menu-item key="/settings" class="footer" >
         <img src="@/assets/Icons/setting.svg" alt />
       </a-menu-item>
     </a-menu>
@@ -76,12 +75,13 @@
 
 <script>
 import { mapGetters } from 'vuex';
-
+import store from '../../store';
 export default {
   name: 'Navbar',
   data() {
     return {
       current: 1,
+      datauser: (store.getters.user ? store.getters.user : store.getters.userData)
     };
   },
   methods: {
@@ -90,13 +90,14 @@ export default {
     },
   },
   computed: {
-    ...mapGetters(['user']),
+    ...mapGetters(['user','userData']),
   },
 };
 </script>
 
 <style lang="scss">
 .navbar {
+  padding: 0;
   height: 100%;
   width: 12.5rem !important;
   @media (max-width: 1024px) {
@@ -111,6 +112,12 @@ export default {
       font-size: 1rem;
       text-align: left;
       padding-left: 1.5rem;
+      @media (max-width: 1024px) {
+        padding-left: 10px!important;
+        padding-right: 10px;
+        text-align: center;
+        border-left: 5px solid transparent !important;
+      }
       img {
         margin-right: 0.5rem;
       }

@@ -1,10 +1,8 @@
 <template>
   <div class="user-bar">
-    <div class="login" v-if="!user">
-      <a-button @click="login">Войти</a-button>
-    </div>
-    <div class="user-info" v-if="user">
-      
+
+    <div class="user-info" v-if="this.datauser.result">
+
       <a-dropdown>
         <a-menu slot="overlay" >
           <a-menu-item key="logout" @click="logout">
@@ -12,11 +10,12 @@
           </a-menu-item>
         </a-menu>
         <a-button class="logout" >
-           {{ user.firstName }} <a-icon type="down" />
+          {{ (currentUser ? currentUser.firstName : this.datauser.result.firstName) + ' ' + (currentUser ? currentUser.lastName : this.datauser.result.lastName) }}
+            <a-icon type="down" />
         </a-button>
       </a-dropdown>
 
-      <a-avatar :src="user.googleImage" />
+      <a-avatar :src="(this.datauser.result.googleImage ? this.datauser.result.googleImage : require('../../assets/no_image.png'))" />
     </div>
   </div>
 </template>
@@ -24,9 +23,8 @@
 <script>
 import { SET_SHOW_IMAGE_HEADER } from '../../store/shower/mutations.type';
 import { mapGetters } from 'vuex';
+import store from '../../store';
 import {
-  LOGIN,
-  LOGIN_WITH_GOOGLE,
   LOGOUT,
 } from '../../store/user/actions.type';
 
@@ -35,21 +33,19 @@ export default {
   data() {
     return {
       current: 1,
+      datauser: (store.getters.user ? store.getters.user : store.getters.userData)
     };
   },
   computed: {
-    ...mapGetters(['user']),
+    ...mapGetters(['userData', 'user', 'currentUser']),
   },
   methods: {
     closeImage() {
       this.$store.commit(SET_SHOW_IMAGE_HEADER, false);
     },
-    login() {
-      this.$store.dispatch(LOGIN_WITH_GOOGLE, this.$gAuth);
-    },
     logout() {
       this.$store.dispatch(LOGOUT);
-      this.$router.push({ name: 'company' });
+      this.$router.push({ name: 'login' });
     },
   },
 };
@@ -91,13 +87,13 @@ export default {
 
   .logout {
     border: none;
-    padding: 2px;
+    padding: 0;
     height: auto;
   }
   .user-info {
     display: flex;
     justify-content: flex-end;
-    margin-right: 0.5rem;
+    margin-right: 30px;
 
     &-name {
       line-height: 3.125rem;

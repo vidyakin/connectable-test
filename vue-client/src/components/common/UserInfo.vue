@@ -2,7 +2,7 @@
   <div class="user-info-wrapper">
     <app-user-edit-drawer :close="closeEditDrawer" :visible="editDrawerVisible"></app-user-edit-drawer>
     <div class="user-info-avatar">
-      <a-avatar :src="currentUser && currentUser.googleImage"></a-avatar>
+      <a-avatar :src=" (currentUser && currentUser.googleImage ? currentUser.googleImage : require('../../assets/no_image.png')) "></a-avatar>
       <a-button>Подписаться</a-button>
     </div>
 
@@ -56,13 +56,18 @@ export default {
 .user-info-wrapper {
   border-color: white;
   border-radius: 0.25rem;
-  margin: 1.25rem 3.125rem;
+  margin: 0 0 30px;
   box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.04);
-  width: calc(100% - 6.25rem) !important;
+  width: 100% !important;
   background-color: white;
   text-align: left;
   padding: 1.25rem;
   display: flex;
+
+  @media (max-width: 767px) {
+    position: relative;
+    flex-wrap: wrap;
+  }
 
   .user-info-avatar {
     text-align: center;
@@ -76,6 +81,12 @@ export default {
   .user-info-content {
     padding-left: 1.5rem;
     width: calc(100% - 5.5rem);
+
+    @media (max-width: 767px) {
+      padding-left: 0;
+      width: 100%;
+    }
+
     &-name {
       height: 1.5rem;
       font-size: 1.2rem;
@@ -86,11 +97,17 @@ export default {
       text-align: left;
       color: #4d4f5c;
     }
+
     &-positions {
+      &:empty {
+        display: none;
+      }
+
       &:hover {
         cursor: pointer;
         opacity: 1;
       }
+
       height: 1.2rem;
       opacity: 0.5;
       font-size: 1rem;
@@ -113,9 +130,20 @@ export default {
       letter-spacing: normal;
       text-align: left;
       color: #43425d;
+
+      &:empty {
+        display: none;
+      }
     }
   }
   .user-info-edit {
+
+    @media (max-width: 767px) {
+      position: absolute;
+      top: 0;
+      right: 0;
+      z-index: 1;
+    }
     .ant-btn {
       border: 0;
     }

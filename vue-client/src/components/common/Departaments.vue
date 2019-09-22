@@ -26,11 +26,11 @@
         <div class="seo seo-1" @click="currentLenth">Департамент IT</div>
       </a-popover>
     </div>
-    <div class="row">
+    <div class="row content-center">
       <div class="seo">Отдел оффлайн маркетинга</div>
       <div class="seo">Отдел онлайн маркетинга</div>
     </div>
-    <div class="row">
+    <div class="row content-center">
       <div class="seo">Группа PPC</div>
       <div class="seo">Группа CEO</div>
       <div class="seo">Граппа Facebook</div>
@@ -134,13 +134,17 @@ export default {
 }
 .ant-avatar {
   margin-right: 20px;
+
+  @media (max-width: 767px) {
+    margin-right: 0;
+  }
 }
 .row {
   display: flex;
   align-items: center;
-  width: 100%;
   height: 130px;
   box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.04);
+  justify-content: center;
   &:nth-child(odd) {
     background-color: #f6f6fa;
   }

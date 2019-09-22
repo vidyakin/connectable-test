@@ -1,7 +1,7 @@
 <template>
   <div class="profile">
     <app-user-info></app-user-info>
-    <app-comment-input :parent="{type: 'user', id: currentUser && currentUser._id}" />
+    <app-comment-input :parent="{type: 'user', id: userData && userData.result._id}" />
     <app-post v-for="(post, index) in posts" :post="post" :key="index" />
   </div>
 </template>
@@ -34,14 +34,14 @@ export default Vue.extend({
         filter: {
           parent: {
             type: 'user',
-            id: this.currentUser._id,
+            id: this.userData.result._id,
           },
         },
       });
     });
   },
   computed: {
-    ...mapGetters(['posts', 'user', 'currentUser']),
+    ...mapGetters(['posts', 'user', 'currentUser', 'userData']),
   },
   watch: {
     $route(val) {
@@ -50,7 +50,7 @@ export default Vue.extend({
           filter: {
             parent: {
               type: 'user',
-              id: this.currentUser._id,
+              id: this.userData.result._id,
             },
           },
         });
@@ -61,9 +61,19 @@ export default Vue.extend({
 </script>
 
 <style lang="scss">
+.is-hide-img-header{
+  .profile {
+    height: calc(100vh - 50px);
+  }
+}
 .profile {
+  padding: 30px;
   background-color: #f0f0f7;
-  height: calc(100vh - 3.125rem);
+  height: calc(100vh - 210px);
   overflow: auto;
+
+  @media (max-width: 767px) {
+    padding: 20px 15px;
+  }
 }
 </style>

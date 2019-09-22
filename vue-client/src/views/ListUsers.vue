@@ -1,7 +1,8 @@
 <template>
+
   <div class="address">
     <div class="address-header">
-      <div class="address-header-name">Адресная книга</div>
+      <div class="address-header-name">Список пользователей</div>
       <div class="address-header-search">
         <a-input v-model="searchText">
           <a-icon type="search" slot="prefix"></a-icon>
@@ -151,24 +152,14 @@ export default {
   }
 }
 .address {
-  padding: 30px;
-  height: calc(100vh - 210px);
+  height: calc(100vh - 3.125rem);
   overflow: auto;
   background-color: #f0f0f7;
 
-  @media (max-width: 767px) {
-    padding: 20px 15px;
-  }
-
   &-header {
     display: flex;
-    margin: 0;
+    margin: 1.5rem 3.125rem 1rem 3.125rem;
     justify-content: space-between;
-    margin-bottom: 30px;
-
-    @media (max-width: 567px) {
-      flex-wrap: wrap;
-    }
 
     &-name {
       font-size: 24px;
@@ -179,17 +170,6 @@ export default {
       letter-spacing: normal;
       text-align: left;
       color: #43425d;
-
-      @media (max-width: 567px) {
-        flex: 1 0 100%;
-        margin-bottom: 15px;
-      }
-    }
-
-    &-search{
-      @media (max-width: 567px) {
-        flex: 1 0 100%;
-      }
     }
 
     .ant-input {
@@ -199,13 +179,8 @@ export default {
   }
 
   &-body {
-    margin: 30px 0;
+    margin: 1.5rem 3.125rem 1rem 3.125rem;
     background-color: white;
-    @media (max-width: 767px) {
-      width: 100%;
-      overflow-x: auto;
-      white-space: nowrap;
-    }
   }
 }
 
@@ -241,7 +216,7 @@ export default {
       border-color: #a3a0fb;
 
       &:focus {
-        box-shadow: none;
+        box-shadow: 0px;
       }
 
       &:after {

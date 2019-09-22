@@ -9,94 +9,103 @@
   >
     <a-form :form="form" class="form" @submit="editUserInfo">
       <div class="form-row">
-        <a-form-item>
-          <app-input
-            label="Имя"
-            placeholder="Имя"
-            :defaultValue="currentUser && currentUser.firstName"
-            v-decorator="['firstName', {initialValue:currentUser &&  currentUser.firstName,
-            rules: [
-            { required: true, message: 'Please input first name', }
-            ]
-          }]"
-            class="secondary form-input"
-          ></app-input>
-        </a-form-item>
-        <a-form-item>
-          <app-input
-            label="Фамилия"
-            placeholder="Фамилия"
-            :defaultValue="currentUser && currentUser.lastName"
-            v-decorator="['lastName', {initialValue:currentUser &&  currentUser.lastName,
-            rules: [
-            { required: true, message: 'Please input last name', }
-            ]
-          }]"
-            class="secondary form-input"
-          ></app-input>
-        </a-form-item>
-        <a-form-item>
-          <app-input
-            label="Должность"
-            placeholder="Менеджер"
-            :defaultValue="currentUser && currentUser.positions.join(',')"
-            v-decorator="['positions', {initialValue:currentUser &&  currentUser.positions.join(','),
-            rules: [
-            { required: true, message: 'Please input last name', }
-            ]
-          }]"
-            class="secondary form-input"
-          ></app-input>
-        </a-form-item>
+        <div class="row">
+          <div class="col-sm-12">
+            <a-form-item>
+              <app-input
+                label="Имя"
+                placeholder="Имя"
+                :defaultValue="currentUser && currentUser.firstName"
+                v-decorator="['firstName', {initialValue:currentUser &&  currentUser.firstName,
+                rules: [
+                { required: true, message: 'Please input first name', }
+                ]
+              }]"
+                class="secondary form-input"
+              ></app-input>
+            </a-form-item>
+          </div>
+
+          <div class="col-sm-12">
+            <a-form-item>
+              <app-input
+                label="Фамилия"
+                placeholder="Фамилия"
+                :defaultValue="currentUser && currentUser.lastName"
+                v-decorator="['lastName', {initialValue:currentUser &&  currentUser.lastName,
+                rules: [
+                { required: true, message: 'Please input last name', }
+                ]
+              }]"
+                class="secondary form-input"
+              ></app-input>
+            </a-form-item>
+          </div>
+
+          <div class="col-sm-12">
+            <a-form-item>
+              <app-input
+                label="Должность"
+                placeholder="Менеджер"
+                :defaultValue="currentUser && currentUser.positions.join(',')"
+                v-decorator="['positions', {initialValue:currentUser &&  currentUser.positions.join(','),
+                rules: [
+                { required: false, message: 'Please input position', }
+                ]
+              }]"
+                class="secondary form-input"
+              ></app-input>
+            </a-form-item>
+          </div>
+        </div>
       </div>
+
       <div class="form-row">
-        <a-form-item>
-          <app-input
-            label="Имя пользователя"
-            placeholder="Имя пользователя"
-            :defaultValue="currentUser && currentUser.username"
-            v-decorator="['username', {initialValue:currentUser &&  currentUser.username,
-            rules: [
-            { required: true, message: 'Please input username', }
-            ]
-          }]"
-            class="secondary form-input"
-          ></app-input>
-        </a-form-item>
-        <a-form-item>
-          <app-input
-            label="Почта"
-            placeholder="example@email.com"
-            :defaultValue="currentUser && currentUser.email"
-            v-decorator="['email', {initialValue:currentUser &&  currentUser.email,
-            rules: [{
-              type: 'email', message: 'The input is not valid E-mail!',
-            }, {
-              required: true, message: 'Please input E-mail!',
-            }]
-          }]"
-            class="secondary form-input"
-          ></app-input>
-        </a-form-item>
-        <a-form-item>
-          <app-input
-            label="Номер телефона"
-            placeholder="+380хххххxxxx"
-            :defaultValue="currentUser && currentUser.phone"
-            v-decorator="['phone', {initialValue:currentUser &&  currentUser.phone,
-            rules: [{
-              required: true, message: 'Please input E-mail!',
-            }]
-          }]"
-            class="secondary form-input"
-          ></app-input>
-        </a-form-item>
+
+        <div class="row">
+
+          <div class="col-sm-12">
+            <a-form-item>
+              <app-input
+                label="Почта"
+                placeholder="example@email.com"
+                :defaultValue="currentUser && currentUser.email"
+                v-decorator="['email', {initialValue:currentUser &&  currentUser.email,
+                rules: [{
+                  type: 'email', message: 'The input is not valid E-mail!',
+                }, {
+                  required: true, message: 'Please input E-mail!',
+                }]
+              }]"
+                class="secondary form-input"
+              ></app-input>
+            </a-form-item>
+          </div>
+
+          <div class="col-sm-12">
+            <a-form-item>
+              <app-input
+                label="Номер телефона"
+                placeholder="+380хххххxxxx"
+                :defaultValue="currentUser && currentUser.phone"
+                v-decorator="['phone', {initialValue:currentUser &&  currentUser.phone,
+                rules: [{
+                  required: false, message: 'Please input Phone',
+                }]
+              }]"
+                class="secondary form-input"
+              ></app-input>
+            </a-form-item>
+          </div>
+        </div>
       </div>
+
       <a-form-item class="edit-user-button-wrapper">
         <a-spin :spinning="editButtonSpinning">
           <a-button type="primary" html-type="submit">Сохранить</a-button>
         </a-spin>
       </a-form-item>
+
     </a-form>
   </a-drawer>
 </template>

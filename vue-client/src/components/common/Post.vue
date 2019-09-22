@@ -130,7 +130,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(['showHeaderImage', 'user']),
+    ...mapGetters(['showHeaderImage', 'user', 'currentUser', 'userData']),
   },
   methods: {
     commented() {
@@ -142,14 +142,14 @@ export default {
     like(postId) {
       const like = {
         parent: { type: 'post', id: postId },
-        author: this.user,
+        author: this.currentUser,
       };
       this.$store.dispatch(SEND_LIKE, like);
     },
     sendComment(postId) {
       const comment = {
         parent: { type: 'post', id: postId },
-        author: this.user,
+        author: this.currentUser,
         message: this.commentContent,
       };
       this.$store.dispatch(SEND_COMMENT, comment).then(() => {
@@ -176,7 +176,7 @@ export default {
         ...rePost,
         likes: [],
         comments: [],
-        parent: { type: 'user', id: this.user._id },
+        parent: { type: 'user', id: this.currentUser._id },
       });
     },
   },
@@ -222,12 +222,16 @@ export default {
   justify-content: space-between;
   border-color: white;
   border-radius: 0.25rem;
-  margin: 1.25rem 3.125rem;
+  margin: 30px 0;
   box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.04);
-  width: calc(100% - 6.25rem) !important;
+  width: 100% !important;
   background-color: white;
   text-align: left;
   padding: 1.25rem;
+
+  &:last-child{
+    margin-bottom: 0;
+  }
 
   &-body {
     width: calc(100% - 1rem);

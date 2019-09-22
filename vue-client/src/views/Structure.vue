@@ -66,31 +66,51 @@
 
 <style lang="scss">
 
+  .is-hide-img-header{
+    .structure {
+      height: calc(100vh - 50px);
+    }
+  }
+
   .structure {
-    height: calc(100vh - 3.125rem);
+    padding: 30px;
+    height: calc(100vh - 210px);
     overflow: auto;
     background-color: #f0f0f7;
+
+    @media (max-width: 767px) {
+      padding: 20px 15px;
+    }
+
     &-header {
       display: flex;
-      margin: 1.5rem 3.125rem 1rem 3.125rem;
+      margin: 0 0 30px;
       justify-content: space-between;
 
+      @media (max-width: 567px) {
+        flex-wrap: wrap;
+      }
+
       &-name {
-        height: 31px;
         font-size: 24px;
         font-weight: normal;
         font-style: normal;
         font-stretch: normal;
-        line-height: 1.67;
+        line-height: 32px;
         letter-spacing: normal;
         text-align: left;
         color: #43425d;
+
+        @media (max-width: 567px) {
+          flex: 1 0 100%;
+          margin-bottom: 15px;
+        }
       }
     }
 
     .ant-tabs {
       background-color: white;
-      margin: 1.5rem 3.125rem 1rem 3.125rem;
+      margin: 30px 0;
 
       .ant-tabs-nav-scroll {
         text-align: left;

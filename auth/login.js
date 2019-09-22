@@ -39,19 +39,21 @@ module.exports = (req, res) => {
       }
     });
   }
-  else if (googleId) {
+  else if (googleId) { 
     let result = {};
     let status = 200;
     User.findOne({googleId: googleId}, (err, user) => {
       if (!err && user) {
         status = 200;
-        const payload = {user: user.googleId};
+        user.password = '';
+        const payload = {result: user};
         const secret = process.env.JWT_SECRET;
         result.token = jwt.sign(payload, secret);
+
         result.status = status;
         result.result = user;
         User.findOneAndUpdate({_id: user._id}, {googleToken: req.body.googleToken}, (err, data) => {
-        })
+        });
         res.status(status).send(result);
       } else {
         req.body.password = 'nopass';

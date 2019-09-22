@@ -173,7 +173,12 @@ export default Vue.extend({
 <style lang="scss">
 .months-events {
   display: flex;
-  margin: 0 3.5rem;
+  margin: 30px 0;
+
+  @media (max-width: 567px) {
+    flex-wrap: wrap;
+    margin-bottom: 0;
+  }
 
   .month-name {
     height: 32px;
@@ -184,6 +189,10 @@ export default Vue.extend({
     line-height: 0.96;
     letter-spacing: normal;
     color: #000000;
+
+    @media (max-width: 567px) {
+      flex: 1 0 100%;
+    }
   }
 
   .event-time {
@@ -200,17 +209,29 @@ export default Vue.extend({
   }
 }
 
+.is-hide-img-header{
+  .calendar {
+    height: calc(100vh - 50px);
+  }
+}
 .calendar {
+  padding: 30px;
   background-color: #f0f0f7;
-  height: calc(100vh - 3.125rem);
+  height: calc(100vh - 210px);
   overflow: auto;
+
+  @media (max-width: 767px) {
+    padding: 20px 15px;
+  }
 
   &-header {
     display: flex;
-    margin-top: 1.5rem;
-    margin-left: 3.125rem;
-    margin-right: 3.125rem;
+    margin: 0 0 30px;
     justify-content: space-between;
+
+    @media (max-width: 567px) {
+      flex-wrap: wrap;
+    }
 
     .ant-btn {
       border-radius: 4px;
@@ -221,13 +242,26 @@ export default Vue.extend({
 
   &-name {
     font-size: 1.5rem;
+    line-height: 32px;
     color: #43425d;
     text-align: left;
+
+    @media (max-width: 567px) {
+      flex: 1 0 100%;
+      margin-bottom: 15px;
+    }
   }
 
   .calendar-body {
     background-color: white;
-    margin: 1.5rem 3.5rem 0 3.5rem;
+    margin: 30px 0;
+
+    @media (max-width: 767px) {
+      width: 100%;
+      padding: 15px;
+      white-space: nowrap;
+      overflow-x: auto;
+    }
 
     .event-wrapper {
       margin-top: 50%;
@@ -245,6 +279,12 @@ export default Vue.extend({
 .month-event {
   flex: 1;
   margin-right: 2rem;
+
+  @media (max-width: 567px) {
+    flex-wrap: wrap;
+    margin-right: 0;
+  }
+
   .event {
     display: flex;
     height: 80px;

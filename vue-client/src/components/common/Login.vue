@@ -18,7 +18,7 @@ import { SET_SHOW_IMAGE_HEADER } from '../../store/shower/mutations.type';
 import { mapGetters } from 'vuex';
 
 export default {
-  name: 'AppLogin',
+  name: 'AppLoginGoogle',
   data() {
     return {
       current: 1,
@@ -31,7 +31,7 @@ export default {
     closeImage() {
       this.$store.commit(SET_SHOW_IMAGE_HEADER, false);
     },
-    login() {
+    login() { console.log(1111);
       this.$gAuth.signIn().then(GoogleUser => {
         // On success do something, refer to:
         // https://developers.google.com/api-client-library/javascript/reference/referencedocs#googleusergetid

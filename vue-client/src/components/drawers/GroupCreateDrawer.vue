@@ -9,36 +9,46 @@
   >
     <a-form :form="form" class="form" @submit="createGroup">
       <div class="form-row">
-        <a-form-item>
-          <app-input
-            label="Названия"
-            placeholder="Названия"
-            v-decorator="['name', {
-            rules: [
-            { required: true, message: 'Название не может быть пустым!', }
-            ]
-          }]"
-            class="secondary form-input"
-          ></app-input>
-        </a-form-item>
-        <div class="label">Описание</div>
-        <a-form-item>
-          <a-textarea
-            placeholder="Описание"
-            v-decorator="['description', {
-            rules: [
-            { required: true, message: 'Описание не может быть пустым!', }
-            ]
-          }]"
-            class="secondary form-input"
-          ></a-textarea>
-        </a-form-item>
-        <div class="label">Тип</div>
-        <a-select @change="handleChange">
-          <a-select-option value="0">Открытая</a-select-option>
-          <a-select-option value="1">Закрытая</a-select-option>
-          <a-select-option value="2">Приватная</a-select-option>
-        </a-select>
+        <div class="row">
+          <div class="col-sm-12">
+            <a-form-item>
+              <app-input
+                label="Названия"
+                placeholder="Названия"
+                v-decorator="['name', {
+                rules: [
+                { required: true, message: 'Название не может быть пустым!', }
+                ]
+              }]"
+                class="secondary form-input"
+              ></app-input>
+            </a-form-item>
+          </div>
+
+          <div class="col-sm-12">
+            <div class="label">Описание</div>
+            <a-form-item>
+              <a-textarea
+                placeholder="Описание"
+                v-decorator="['description', {
+                rules: [
+                { required: true, message: 'Описание не может быть пустым!', }
+                ]
+              }]"
+                class="secondary form-input"
+              ></a-textarea>
+            </a-form-item>
+          </div>
+
+          <div class="col-sm-12">
+            <div class="label">Тип</div>
+            <a-select @change="handleChange">
+              <a-select-option value="0">Открытая</a-select-option>
+              <a-select-option value="1">Закрытая</a-select-option>
+              <a-select-option value="2">Приватная</a-select-option>
+            </a-select>
+          </div>
+        </div>
       </div>
       <a-form-item class="create-group-button-wrapper">
         <a-spin :spinning="createButtonSpinning">

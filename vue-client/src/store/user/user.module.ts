@@ -1,5 +1,18 @@
 import {SET_SHOW_IMAGE_HEADER} from '@/store/shower/mutations.type';
-import {ADD_EVENT, SET_CURRENT_USER, SET_EVENTS, SET_USER, SET_USERS, UPDATE_USER} from '@/store/user/mutations.type';
+import {
+  ADD_EVENT,
+  SET_CURRENT_USER,
+  SET_EVENTS,
+  SET_USER,
+  SET_USERS,
+  UPDATE_USER,
+  IS_LOGGED_IN,
+  CURRENT_USER_DATA,
+  ERROR_REGISTER,
+  ERROR_LOGIN,
+  SUCCESS_REGISTER,
+  SET_USER_DATA
+} from '@/store/user/mutations.type';
 import {
   CREATE_EVENT, DELETE_EVENT,
   GET_EVENTS,
@@ -7,15 +20,23 @@ import {
   LOGIN,
   LOGIN_WITH_GOOGLE, LOGOUT,
   UPDATE_USER_INFO,
+  INSERT_USER_INFO,
+  CHECK_USER_INFO,
 } from '@/store/user/actions.type';
 import {getInfoAboutUser, login, loginWithGoogle, logout} from '@/services/auth/auth.service';
-import {createEvent, deleteEvent, editUser, getEvents, getUser, getUsers} from '@/services/user.service';
+import {createEvent, deleteEvent, editUser, getEvents, getUser, getUsers, insertNewUser, checkUserInfo} from '@/services/user.service';
 
 interface State {
   user: any | null;
   currentUser: any | null;
   users: any[] | null;
   events: any[] | null;
+  isLoggedIn: any | null;
+  currentUserData: any | null;
+  errorRegister: any | null;
+  errorLogin: any | null;
+  successMessage: any | null;
+  userData: any | null;
 }
 
 const store: State = {
@@ -23,6 +44,12 @@ const store: State = {
   currentUser: null,
   users: null,
   events: [],
+  isLoggedIn: null,
+  currentUserData: null,
+  errorRegister: null,
+  errorLogin: null,
+  successMessage: null,
+  userData: null,
 };
 
 const getters = {
@@ -38,6 +65,25 @@ const getters = {
   users(state: State) {
     return state.users;
   },
+  isLoggedIn(state: State) {
+    return state.isLoggedIn;
+  },
+  currentUserData(state: State) {
+    return state.currentUserData;
+  },
+  errorRegister(state: State) {
+    return state.errorRegister;
+  },
+  errorLogin(state: State) {
+    return state.errorLogin;
+  },
+  successMessage(state: State) {
+    return state.successMessage;
+  },
+  userData(state: State) {
+    return state.userData;
+  },
+
 };
 
 const mutations = {
@@ -93,6 +139,24 @@ const mutations = {
   [SET_CURRENT_USER](state: State, user: any) {
     state.currentUser = user;
   },
+  [CURRENT_USER_DATA](state: State, currentUserData: any) {
+    state.currentUserData = currentUserData;
+  },
+  [IS_LOGGED_IN](state: State, isLoggedIn: any) {
+    state.isLoggedIn = isLoggedIn;
+  },
+  [ERROR_REGISTER](state: State, errorRegister: any) {
+    state.errorRegister = errorRegister;
+  },
+  [ERROR_LOGIN](state: State, errorLogin: any) {
+    state.errorLogin = errorLogin;
+  },
+  [SUCCESS_REGISTER](state: State, successMessage: any) {
+    state.successMessage = successMessage;
+  },
+  [SET_USER_DATA](state: State, userData: any) {
+    state.userData = userData;
+  },
 
 };
 
@@ -101,19 +165,19 @@ const actions = {
   [LOGIN_WITH_GOOGLE]: loginWithGoogle,
   [GET_INFO_ABOUT_USER]: getInfoAboutUser,
   [UPDATE_USER_INFO]: editUser,
+  [INSERT_USER_INFO]: insertNewUser,
   [CREATE_EVENT]: createEvent,
   [GET_EVENTS]: getEvents,
   [DELETE_EVENT]: deleteEvent,
   [GET_USERS]: getUsers,
   [GET_USER]: getUser,
   [LOGOUT]: logout,
-
-
+  [CHECK_USER_INFO]: checkUserInfo
 };
 
 export default {
   state: store,
   getters,
   actions,
-  mutations,
+  mutations
 };
