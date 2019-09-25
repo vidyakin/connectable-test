@@ -1,13 +1,16 @@
 const express = require('express');
 const mail = require('./email/index');
 const jwt = require('jsonwebtoken');
+var moment = require('moment');
 
 module.exports = (Collection, serializer, options) => {
+
     const create = (req, res) => {
         let result = {};
         let status = 201;
         const newEntry = req.body;
         Collection.create(newEntry, async (e, data) => {
+
             if (e) {
                 status = 500;
                 result.status = status;

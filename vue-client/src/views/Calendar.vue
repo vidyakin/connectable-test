@@ -2,7 +2,7 @@
   <div class="calendar">
     <app-add-event-modal :visible="createVisible" :close="createClose"></app-add-event-modal>
     <div class="calendar-header">
-      <div class="calendar-name">Календарь{{userData.result.firstName}}</div>
+      <div class="calendar-name">Календарь</div>
       <a-button @click="createOpen">Создать событие</a-button>
     </div>
     <div class="calendar-body">
@@ -105,8 +105,8 @@ export default Vue.extend({
   beforeCreate() {
     moment.locale('ru');
 
-    if (this.user) {
-      this.$store.dispatch(GET_EVENTS, this.user.id);
+    if (this.userInfo) {
+      this.$store.dispatch(GET_EVENTS, this.userInfo.id);
     }
   },
   components: {

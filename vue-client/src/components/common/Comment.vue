@@ -1,7 +1,7 @@
 <template>
   <div class="comment-wrapper">
     <div class="comment-wrapper-avatar">
-      <a-avatar :src="comment.author.googleImage"></a-avatar>
+      <a-avatar :src="(comment && comment.author.googleImage ? comment.author.googleImage : require('../../assets/no_image.png'))"></a-avatar>
     </div>
 
     <div class="comment-wrapper-content">
@@ -27,7 +27,7 @@
       <span v-if="showAnswer" class="show-answers" @click="() => showAnswer=false">Скрыть</span>
       <div v-if="showAnswer" class="comment-wrapper" v-for="answer in comment.answers">
         <div class="comment-wrapper-avatar">
-          <a-avatar :src="answer.author.googleImage"></a-avatar>
+          <a-avatar :src="(comment && comment.author.googleImage ? comment.author.googleImage : require('../../assets/no_image.png'))"></a-avatar>
         </div>
         <div class="comment-wrapper-content">
           <div class="comment-wrapper-content-text">
@@ -52,7 +52,7 @@
         </div>
       </div>
       <div class="post-comment-input" v-if="showAnswer || answering">
-        <a-avatar :src="user.googleImage"></a-avatar>
+        <a-avatar :src="(this.datauser.googleImage ? this.datauser.googleImage : require('../../assets/no_image.png'))"></a-avatar>
         <a-input
           class="comment-input"
           placeholder="Ответить..."
@@ -95,7 +95,7 @@ import {
   SEND_NEW_POST,
 } from '../../store/post/actions.type';
 import moment from 'moment';
-
+import store from '../../store';
 export default {
   name: 'AppCommentInput',
   components: {
@@ -107,6 +107,7 @@ export default {
       commentContent: '',
       answering: false,
       showAnswer: false,
+      datauser: (store.getters.userData.result ? store.getters.userData.result : store.getters.currentUser),
     };
   },
   computed: {
@@ -119,7 +120,7 @@ export default {
     sendComment(id, type) {
       const comment = {
         parent: { type: 'comment', id },
-        author: this.currentUser,
+        author: this.datauser,
         message: this.commentContent,
       };
       this.$store
@@ -129,14 +130,14 @@ export default {
     like(id, type) {
       const like = {
         parent: { type, id },
-        author: this.currentUser,
+        author: this.datauser,
       };
       this.$store.dispatch(SEND_LIKE, like);
     },
     deleteComment(id) {
       const like = {
         parent: { type, id },
-        author: this.currentUser,
+        author: this.datauser,
       };
       this.$store.dispatch(DELETE_COMMENT, id);
     },

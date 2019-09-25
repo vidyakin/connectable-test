@@ -30,7 +30,8 @@
     </div>
     <div class="event-name">
       <label>Продолжительность</label>
-      <a-input v-model="duration"></a-input>
+
+      <a-date-picker v-model="duration"></a-date-picker>
     </div>
     <div class="event-name">
       <label>Комментарий</label>
@@ -78,7 +79,7 @@
         date: moment(),
         time: moment.relTime,
         comment: '',
-        duration: '',
+        duration: moment(),
         userInfo: (store.getters.userData ? store.getters.userData : store.getters.user),
       };
     },
@@ -86,9 +87,7 @@
       setCurrentColor(color) {
         this.currentColor = color;
       },
-      moment: function () {
-        return moment();
-      },
+
       createEvent() {
         const {name, date, time, duration, comment, currentColor, userInfo} = this;
         const event = {name, date, time, duration, comment, color: currentColor.color};
@@ -99,7 +98,7 @@
             this.date = moment();
             this.time = moment.relTime;
             this.comment = '';
-            this.duration = '';
+            this.duration = moment();
             this.close();
           });
 

@@ -3,7 +3,7 @@
     <div class="post-wrapper-body">
       <div class="post-wrapper-header">
         <div class="post-wrapper-header-photo">
-          <a-avatar :src="post && post.author.googleImage"></a-avatar>
+          <a-avatar :src="(post && post.author.googleImage ? post.author.googleImage : require('../../assets/no_image.png'))"></a-avatar>
         </div>
         <div>
           <div class="post-wrapper-header-author">
@@ -70,7 +70,7 @@
         <app-comment v-if="allComment" v-for="comment in post.comments" :comment="comment"></app-comment>
       </div>
       <div class="post-comment-input" v-if="commenting">
-        <a-avatar :src="user && user.googleImage"></a-avatar>
+        <a-avatar :src="(this.datauser.googleImage ? this.datauser.googleImage : require('../../assets/no_image.png'))"></a-avatar>
         <a-input
           class="comment-input"
           placeholder="Комментарий..."
@@ -114,7 +114,7 @@ import {
   SET_EDIT_POST_VISIBLE,
   SET_POST_FOR_EDITING,
 } from '../../store/post/mutations.type';
-
+import store from '../../store';
 export default {
   name: 'AppPost',
   components: {
@@ -127,6 +127,7 @@ export default {
       commenting: false,
       commentContent: '',
       allComment: false,
+      datauser: (store.getters.userData.result ? store.getters.userData.result : store.getters.currentUser),
     };
   },
   computed: {
@@ -142,14 +143,14 @@ export default {
     like(postId) {
       const like = {
         parent: { type: 'post', id: postId },
-        author: this.currentUser,
+        author: this.datauser,
       };
       this.$store.dispatch(SEND_LIKE, like);
     },
     sendComment(postId) {
       const comment = {
         parent: { type: 'post', id: postId },
-        author: this.currentUser,
+        author: this.datauser,
         message: this.commentContent,
       };
       this.$store.dispatch(SEND_COMMENT, comment).then(() => {
@@ -176,7 +177,7 @@ export default {
         ...rePost,
         likes: [],
         comments: [],
-        parent: { type: 'user', id: this.currentUser._id },
+        parent: { type: 'user', id: this.datauser._id },
       });
     },
   },

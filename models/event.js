@@ -23,18 +23,17 @@ const eventSchema = new Schema({
 /*Bearer*/
 eventSchema.pre('save', function (next) {
   user.findOne({_id: this.userId}).catch(err => console.log(err)).then(data => {
-    console.log('save : ' + data);
+
     const headers = {
-      'Authorization': data.googleToken,
+      'Authorization': `Bearer ${data.googleToken}`,
     };
     const event = {
       description: this.comment,
       start: {'dateTime': new Date(this.date.setHours(this.time.split(':')[0], this.time.split(':')[1]))},
-      end: {'dateTime': new Date(this.date.setHours(+this.time.split(':')[0] + +this.duration.split(':')[0],
-          +this.time.split(':')[1] + +this.duration.split(':')[0]))},
+      end: {'dateTime': new Date(this.date.setHours(this.time.split(':')[0], this.time.split(':')[1]))},
       summary: this.name,
     };
-    console.log('event: ' + event);
+    console.log(event);
     axios
       .post('https://www.googleapis.com/calendar/v3/calendars/primary/events',
         event, {headers: headers})

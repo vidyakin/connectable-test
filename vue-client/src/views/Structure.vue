@@ -193,7 +193,7 @@
             </div>
           </div>
         </div>
-          <!--<AppDepantaments />-->
+          <AppDepantaments />
       </a-tab-pane>
       <a-tab-pane tab="Проекты" key="2">
         <app-projects/>
@@ -398,7 +398,7 @@
 
               &:hover{
                 color: #3b86ff;
-                box-shadow: none;
+
               }
             }
 
