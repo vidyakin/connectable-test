@@ -1,6 +1,7 @@
 const validateToken = require('./utils').validateToken;
 const cors = require('cors');
 const fileUpload = require('express-fileupload');
+var latinize = require('latinize');
 
 const serializers = require('./serializers');
 const groupSerializer = require('./groupSerializer').groupSerializer;
@@ -22,7 +23,7 @@ const GroupParticipant = require('./models').GroupParticipant;
 const GroupInvite = require('./models').GroupInvite;
 const ProjectParticipant = require('./models').ProjectParticipant;
 const Project = require('./models').Project;
-
+const Department = require('./models').Department;
 
 const app = express();
 const port = process.env.PORT || 4000;
@@ -49,7 +50,7 @@ app.use('/api/groupParticipant', validateToken, require('./crud')(GroupParticipa
 app.use('/api/groupInvite', validateToken, require('./crud')(GroupInvite, inviteSerializer));
 app.use('/api/projectParticipant', validateToken, require('./crud')(ProjectParticipant, serializers.serializer));
 app.use('/api/project', validateToken, require('./crud')(Project, projectSerializer));
-
+app.use('/api/project', validateToken, require('./crud')(Project, projectSerializer));
 
 app.post('/api/upload', (req, res, next) => {
   let imageFile = req.files.files;
@@ -251,9 +252,56 @@ app.post('/api/loginPage', function(req,res){
     });
 });
 //Section Structure
-/*app.post('/api/structure', (req, res) => {
+app.post('/api/department', (req, res) => {
+    let dataList =req.body,
+        depData = {
+            "name": dataList.name,
+            "parent":dataList.depVal,
+            "users": dataList.members,
+            "slug":latinize(dataList.name.toLowerCase().replace(/ /g,'_')),
+        },
+        slug = depData.slug,
+        level = '',
+        result = {},
+        status = 200;
+    if(depData.parent) {
+        let name = depData.parent.label;
+        Department.findOne({name}, (err, dep) => {
+            if (!err && dep) {
+                if(dep.level) {
+                    depData.level = dep.level;
+                    depData.level += 1;
+                }
+            }
+        });
+    }
+    else {
+        depData.level = 1;
+    }
+    Department.findOne({slug}, (err, department) => {
+        if (!err && !department) {
+            //console.log(depData);
+            db.collection('departments').insertOne(depData,function(err, collection){
+                if (err) return res.status(500).send("There was a problem registering the user.");
+            });
+        }
+        else {
+            console.log('розділ уже існує');
+        }
 
-});*/
+        //res.status(status).send(result);
+
+    });
+});
+//display all departments
+app.get('/api/department', (req, res) => {
+    let status = 200;
+    Department.find({}, (err, department) => {
+        if (!err && department) {
+            res.status(status).send(department);
+        }
+    });
+});
 
 
 

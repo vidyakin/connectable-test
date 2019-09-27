@@ -28,11 +28,11 @@
         </div>
       </div>
     </div>
-    <div class="event-name">
+    <!--<div class="event-name">
       <label>Продолжительность</label>
 
       <a-date-picker v-model="duration"></a-date-picker>
-    </div>
+    </div>-->
     <div class="event-name">
       <label>Комментарий</label>
       <a-input v-model="comment"></a-input>

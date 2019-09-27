@@ -1,12 +1,13 @@
 <template>
   <div class="structure">
     <app-create-project :visible="createVisible" :close="closeCreate"/>
+    <app-create-department :visible="departmentVisible" :close="closeDepartment"/>
     <div class="structure-header">
       <div class="structure-header-name">
         Структура
       </div>
       <div class="structure-header-search">
-        <a-button type="primary" v-if="test">Редактировать</a-button>
+        <a-button type="primary" v-if="test" @click="openDepartment">Добавить разделы</a-button>
         <a-button type="primary" v-else="!test" @click="openCreate">Создать проект</a-button>
       </div>
     </div>
@@ -193,7 +194,7 @@
             </div>
           </div>
         </div>
-          <AppDepantaments />
+          <!--<AppDepantaments />-->
       </a-tab-pane>
       <a-tab-pane tab="Проекты" key="2">
         <app-projects/>
@@ -204,6 +205,7 @@
 <script>
 
   import AppCreateProject from '../components/drawers/CreateProject';
+  import AppCreateDepartment from '../components/drawers/CreateDepartment';
   import {mapGetters} from 'vuex';
   import {GET_GROUPS} from '../store/group/actions.type';
   import AppProjects from '../views/Projects';
@@ -214,10 +216,12 @@
       AppCreateProject,
       AppProjects,
       AppDepantaments,
+      AppCreateDepartment,
     },
     data() {
       return {
         createVisible: false,
+        departmentVisible : false,
         test: true,
       };
     },
@@ -234,6 +238,12 @@
       },
       openCreate() {
         this.createVisible = true;
+      },
+      closeDepartment() {
+        this.departmentVisible = false;
+      },
+      openDepartment() {
+        this.departmentVisible = true;
       },
     },
     beforeCreate() {

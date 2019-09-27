@@ -33,7 +33,6 @@ eventSchema.pre('save', function (next) {
       end: {'dateTime': new Date(this.date.setHours(this.time.split(':')[0], this.time.split(':')[1]))},
       summary: this.name,
     };
-    console.log(event);
     axios
       .post('https://www.googleapis.com/calendar/v3/calendars/primary/events',
         event, {headers: headers})
