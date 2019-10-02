@@ -4,7 +4,6 @@ import {ADD_NEW_DEP} from '@/store/structure/actions.type';
 import {SET_USERS} from "@/store/user/mutations.type";
 
 export const putDepartmentsList = (context: any, depinfo : any) => {
-    console.log(depinfo);
     return Vue.axios
         .post(`api/department`, depinfo).then((response: any) => {
             console.log(response.data);

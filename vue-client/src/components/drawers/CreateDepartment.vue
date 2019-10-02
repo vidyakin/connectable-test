@@ -111,7 +111,7 @@
                             .finally(() => {
                                 this.createButtonSpinning = false;
                                 this.onClose();
-                                //this.$store.dispatch(GET_PROJECTS);
+                                this.$store.dispatch(GET_DEP);
                             });
                     }
                 });

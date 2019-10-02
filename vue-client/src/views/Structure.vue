@@ -16,182 +16,41 @@
       <a-tab-pane tab="Структура" key="1">
         <div class="c-structure">
 
-          <div class="c-structure__head">
-            <div class="c-structure__link">Главная</div>
+          <div class="c-structure__head" v-for="(dep, index) in departments" v-if="(dep.level == 1)" >
+            <div class="c-structure__link" >{{dep.name}}</div>
           </div>
 
-          <div class="c-structure__row">
+          <div class="c-structure__row" >
 
-            <div class="c-structure__item">
+            <div class="c-structure__item" v-for="(dep, index) in departments" v-if="(dep.level > 1 && dep.level < 3)">
 
-              <div class="c-structure__article">
-                <div class="c-structure__link">Раздел 1</div>
+              <div class="c-structure__article" v-if="(dep.level == 2)">
+                <div class="c-structure__link">{{dep.name}}</div>
               </div>
 
-              <div class="c-structure__child__row">
+              <div class="c-structure__child__row ">
 
-                <div class="c-structure__child__item">
+                <div class="c-structure__child__item" v-for="(dep_3, index) in departments" v-if="(dep_3.level == 3 && dep_3.parent.label == dep.name)">
 
                   <div class="c-structure__child__article">
-                    <div class="c-structure__link">Подраздел 1</div>
+                    <div class="c-structure__link">{{dep_3.name}}</div>
                   </div>
 
-                  <div class="c-structure__detail__row">
+                  <div class="c-structure__detail__row" v-for="(dep_4, index) in departments" v-if="(dep_4.level == 4 && dep_4.parent.label == dep_3.name)">
 
                     <div class="c-structure__detail__item">
 
                       <div class="c-structure__detail__article">
-                        <div class="c-structure__link">Статья 1</div>
+                        <div class="c-structure__link">{{dep_4.name}}</div>
                       </div>
                     </div>
 
-                    <div class="c-structure__detail__item">
-
-                      <div class="c-structure__detail__article">
-                        <div class="c-structure__link">Статья 2</div>
-                      </div>
-                    </div>
-
-                    <div class="c-structure__detail__item">
-
-                      <div class="c-structure__detail__article">
-                        <div class="c-structure__link">Статья 3</div>
-                      </div>
-                    </div>
                   </div>
                 </div>
 
-                <div class="c-structure__child__item">
-
-                  <div class="c-structure__child__article">
-                    <div class="c-structure__link">Подраздел 2</div>
-                  </div>
-
-                  <div class="c-structure__detail__row">
-
-                    <div class="c-structure__detail__item">
-
-                      <div class="c-structure__detail__article">
-                        <div class="c-structure__link">Статья 1</div>
-                      </div>
-                    </div>
-
-                    <div class="c-structure__detail__item">
-
-                      <div class="c-structure__detail__article">
-                        <div class="c-structure__link">Статья 2</div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
               </div>
             </div>
 
-            <div class="c-structure__item">
-
-              <div class="c-structure__article">
-                <div class="c-structure__link">Раздел 2</div>
-              </div>
-
-              <div class="c-structure__child__row">
-
-                <div class="c-structure__child__item">
-
-                  <div class="c-structure__child__article">
-                    <div class="c-structure__link">Подраздел 1</div>
-                  </div>
-
-                  <div class="c-structure__detail__row">
-
-                    <div class="c-structure__detail__item">
-
-                      <div class="c-structure__detail__article">
-                        <div class="c-structure__link">Статья 1</div>
-                      </div>
-                    </div>
-
-                    <div class="c-structure__detail__item">
-
-                      <div class="c-structure__detail__article">
-                        <div class="c-structure__link">Статья 2</div>
-                      </div>
-                    </div>
-
-                    <div class="c-structure__detail__item">
-
-                      <div class="c-structure__detail__article">
-                        <div class="c-structure__link">Статья 3</div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="c-structure__child__item">
-
-                  <div class="c-structure__child__article">
-                    <div class="c-structure__link">Подраздел 2</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="c-structure__item">
-
-              <div class="c-structure__article">
-                <div class="c-structure__link">Раздел 3</div>
-              </div>
-
-              <div class="c-structure__child__row">
-
-                <div class="c-structure__child__item">
-
-                  <div class="c-structure__child__article">
-                    <div class="c-structure__link">Подраздел 1</div>
-                  </div>
-
-                  <div class="c-structure__detail__row">
-
-                    <div class="c-structure__detail__item">
-
-                      <div class="c-structure__detail__article">
-                        <div class="c-structure__link">Статья 1</div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="c-structure__child__item">
-
-                  <div class="c-structure__child__article">
-                    <div class="c-structure__link">Подраздел 2</div>
-                  </div>
-
-                  <div class="c-structure__detail__row">
-
-                    <div class="c-structure__detail__item">
-
-                      <div class="c-structure__detail__article">
-                        <div class="c-structure__link">Статья 1</div>
-                      </div>
-                    </div>
-
-                    <div class="c-structure__detail__item">
-
-                      <div class="c-structure__detail__article">
-                        <div class="c-structure__link">Статья 2</div>
-                      </div>
-                    </div>
-
-                    <div class="c-structure__detail__item">
-
-                      <div class="c-structure__detail__article">
-                        <div class="c-structure__link">Статья 3</div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
           <!--<AppDepantaments />-->
@@ -207,7 +66,7 @@
   import AppCreateProject from '../components/drawers/CreateProject';
   import AppCreateDepartment from '../components/drawers/CreateDepartment';
   import {mapGetters} from 'vuex';
-  import {GET_GROUPS} from '../store/group/actions.type';
+  import {GET_DEP} from '../store/structure/actions.type';
   import AppProjects from '../views/Projects';
   import AppDepantaments from '../components/common/Departaments';
 
@@ -247,10 +106,10 @@
       },
     },
     beforeCreate() {
-      this.$store.dispatch(GET_GROUPS);
+      this.$store.dispatch(GET_DEP);
     },
     computed: {
-      ...mapGetters(['groups']),
+      ...mapGetters(['departments']),
     },
   };
 </script>
@@ -367,6 +226,9 @@
             margin-left: -50%;
             width: 100%;
             border: 1px solid #949494;
+          }
+          .c-structure__child__row:empty {
+            display: none;
           }
         }
 

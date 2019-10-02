@@ -24,6 +24,7 @@ const GroupInvite = require('./models').GroupInvite;
 const ProjectParticipant = require('./models').ProjectParticipant;
 const Project = require('./models').Project;
 const Department = require('./models').Department;
+const Notification = require('./models').Notification;
 
 const app = express();
 const port = process.env.PORT || 4000;
@@ -49,7 +50,6 @@ app.use('/api/event', validateToken, require('./crud')(Event, serializers.serial
 app.use('/api/groupParticipant', validateToken, require('./crud')(GroupParticipant, serializers.serializer));
 app.use('/api/groupInvite', validateToken, require('./crud')(GroupInvite, inviteSerializer));
 app.use('/api/projectParticipant', validateToken, require('./crud')(ProjectParticipant, serializers.serializer));
-app.use('/api/project', validateToken, require('./crud')(Project, projectSerializer));
 app.use('/api/project', validateToken, require('./crud')(Project, projectSerializer));
 
 app.post('/api/upload', (req, res, next) => {
@@ -252,7 +252,7 @@ app.post('/api/loginPage', function(req,res){
     });
 });
 //Section Structure
-app.post('/api/department', (req, res) => {
+app.post('/api/department', (req, res, next) => {
     let dataList =req.body,
         depData = {
             "name": dataList.name,
@@ -285,13 +285,17 @@ app.post('/api/department', (req, res) => {
                 if (err) return res.status(500).send("There was a problem registering the user.");
             });
         }
+    });
+    Department.find({}, (err, department) => {
+        if (!err && department) { console.log(department);
+            res.status(status).send(department);
+        }
         else {
-            console.log('розділ уже існує');
+            res.status(500).send('ERROR. No data in database');
         }
 
-        //res.status(status).send(result);
-
     });
+
 });
 //display all departments
 app.get('/api/department', (req, res) => {
@@ -302,7 +306,65 @@ app.get('/api/department', (req, res) => {
         }
     });
 });
+//put notifications
+app.post('/api/notification', (req, res, next) => {
+    let notifi =req.body,
+        status = 200,
+        result = '';
 
+    Notification.findOne({}, (err, resbd) => {
+        if(!err) {
+            if (!err && resbd) {
+                let arr_keys = Object.keys(resbd._doc),
+                    data = [],
+                    obj_result = {};
 
+                for (let i = 0; i < arr_keys.length; i++) {
+                    if(arr_keys[i] != '_id') {
+                        if(!Object.is(resbd[arr_keys[i]], notifi[arr_keys[i]])) {
+                            data[arr_keys[i]] = false;
+                        }
+                    }
+                }
+                let obj_data = Object.assign({}, data);
+                if(!Object.values(notifi).length) {
+                    obj_result = { $set: obj_data };
+                }
+                else {
+                    obj_result = { $set: obj_data, $set: notifi };
+                }
+                Notification.updateMany({},
+                    obj_result
+                ).then(result => {
+                    console.log(`Successfully update  items.`);
+                }).catch(err => console.error(`Failed to update items: ${err}`));
+
+            }
+            else if(!resbd) {
+                db.collection('notifications').insertOne(notifi,function(err, collection){
+                    if (err) return res.status(500).send("There was a problem registering the user.");
+                    else {
+                        console.log(`Successfully added  items.`);
+                    }
+                });
+            }
+            else {
+                console.error(`Failed to update items: ${err}`);
+            }
+        }
+    });
+
+    res.status(status).send(notifi);
+
+});
+//display status notification
+app.get('/api/notification', (req, res) => {
+    let status = 200;
+    Notification.find({}, (err, notifications) => {
+        if (!err && notifications) {
+            res.status(status).send(notifications);
+        }
+    });
+});
 
 app.listen(port, () => console.log(`[Server]: Listening on port ${port}`));

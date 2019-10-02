@@ -65,6 +65,7 @@ import AppInput from '../common/Input';
 import { UPDATE_USER_INFO } from '../../store/user/actions.type';
 import ATextarea from 'ant-design-vue/es/input/TextArea';
 import { CREATE_GROUP } from '../../store/group/actions.type';
+import store from '../../store';
 export default {
   name: 'AppUserEditDrawer',
   data() {
@@ -72,6 +73,7 @@ export default {
       current: '',
       createButtonSpinning: false,
       type: 1,
+      userinfo: (store.getters.userData.result ? store.getters.userData.result : store.getters.user.result),
     };
   },
   components: {
@@ -79,7 +81,7 @@ export default {
     AppInput,
   },
   computed: {
-    ...mapGetters(['user']),
+    ...mapGetters(['user', 'userData']),
   },
   methods: {
     onClose() {
@@ -94,7 +96,8 @@ export default {
             .dispatch(CREATE_GROUP, {
               ...formFields,
               type: this.type,
-              creatorId: this.user._id,
+              creatorId: this.userinfo._id,
+              userEmail: this.userinfo.email,
             })
             .finally(() => {
               this.createButtonSpinning = false;

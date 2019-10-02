@@ -79,7 +79,6 @@
         date: moment(),
         time: moment.relTime,
         comment: '',
-        duration: moment(),
         userInfo: (store.getters.userData ? store.getters.userData : store.getters.user),
       };
     },
@@ -89,16 +88,16 @@
       },
 
       createEvent() {
-        const {name, date, time, duration, comment, currentColor, userInfo} = this;
-        const event = {name, date, time, duration, comment, color: currentColor.color};
+        const {name, date, time, comment, currentColor, userInfo} = this;
+        const event = {name, date, time, comment, color: currentColor.color};
         event.userId = this.userInfo.result._id;
+        event.userEmail = this.userInfo.result.email;
         this.$store.dispatch(CREATE_EVENT, event)
           .finally(() => {
             this.name = '';
             this.date = moment();
             this.time = moment.relTime;
             this.comment = '';
-            this.duration = moment();
             this.close();
           });
 
