@@ -272,22 +272,30 @@ app.post('/api/department', (req, res, next) => {
                     depData.level = dep.level;
                     depData.level += 1;
                 }
+                Department.findOne({slug}, (error, department) => {
+                    if (!error && !department) {
+                        db.collection('departments').insertOne(depData,function(error, collection){
+                            if (error) return res.status(500).send("There was a problem registering the user.");
+                        });
+                    }
+                });
+            }
+
+        });
+    }
+   else {
+        depData.level = 1;
+        Department.findOne({slug}, (error, department) => {
+            if (!error && !department) {
+                //console.log(depData);
+                db.collection('departments').insertOne(depData,function(error, collection){
+                    if (error) return res.status(500).send("There was a problem registering the user.");
+                });
             }
         });
     }
-    else {
-        depData.level = 1;
-    }
-    Department.findOne({slug}, (err, department) => {
-        if (!err && !department) {
-            //console.log(depData);
-            db.collection('departments').insertOne(depData,function(err, collection){
-                if (err) return res.status(500).send("There was a problem registering the user.");
-            });
-        }
-    });
     Department.find({}, (err, department) => {
-        if (!err && department) { console.log(department);
+        if (!err && department) {
             res.status(status).send(department);
         }
         else {

@@ -17,7 +17,26 @@
         <div class="c-structure">
 
           <div class="c-structure__head" v-for="(dep, index) in departments" v-if="(dep.level == 1)" >
-            <div class="c-structure__link" >{{dep.name}}</div>
+            <a-popover placement="bottom" trigger="click" >
+              <template slot="content" >
+                <a-table
+                        v-if="dep.name"
+                        :columns="columns"
+                        :dataSource="userData(dep)"
+                        :pagination="false"
+
+                >
+                  <div slot="name" slot-scope="text" class="table-row-name" @click="goTo(text.id)">
+                    <a-avatar :src="(text.googleImage ? text.googleImage : require('../assets/no_image.png'))"></a-avatar>
+                    {{text.firstName}} {{text.lastName}}
+                  </div>
+
+                </a-table>
+                <div class="count" v-if="Object.size(dep.users)">{{Object.size(dep.users)}} - участников </div>
+              </template>
+              <div class="c-structure__link" @click="currentLenth">{{dep.name}}</div>
+            </a-popover>
+
           </div>
 
           <div class="c-structure__row" >
@@ -25,7 +44,26 @@
             <div class="c-structure__item" v-for="(dep, index) in departments" v-if="(dep.level > 1 && dep.level < 3)">
 
               <div class="c-structure__article" v-if="(dep.level == 2)">
-                <div class="c-structure__link">{{dep.name}}</div>
+                <a-popover placement="bottom" trigger="click" >
+                  <template slot="content" >
+                    <a-table
+                            v-if="dep.name"
+                            :columns="columns"
+                            :dataSource="userData(dep)"
+                            :pagination="false"
+
+                    >
+                      <div slot="name" slot-scope="text" class="table-row-name" @click="goTo(text.id)">
+                        <a-avatar :src="(text.googleImage ? text.googleImage : require('../assets/no_image.png'))"></a-avatar>
+                        {{text.firstName}} {{text.lastName}}
+                      </div>
+
+                    </a-table>
+                    <div class="count" v-if="Object.size(dep.users)">{{Object.size(dep.users)}} - участников </div>
+                  </template>
+                  <div class="c-structure__link" @click="currentLenth">{{dep.name}}</div>
+                </a-popover>
+
               </div>
 
               <div class="c-structure__child__row ">
@@ -33,7 +71,26 @@
                 <div class="c-structure__child__item" v-for="(dep_3, index) in departments" v-if="(dep_3.level == 3 && dep_3.parent.label == dep.name)">
 
                   <div class="c-structure__child__article">
-                    <div class="c-structure__link">{{dep_3.name}}</div>
+                    <a-popover placement="bottom" trigger="click">
+                      <template slot="content">
+                        <a-table
+                                v-if="dep_3.name"
+                                :columns="columns"
+                                :dataSource="userData(dep_3)"
+                                :pagination="false"
+
+                        >
+                          <div slot="name" slot-scope="text"  @click="goTo(text.id)">
+                            <a-avatar :src="(text.googleImage ? text.googleImage : require('../assets/no_image.png'))"></a-avatar>
+                            {{text.firstName}} {{text.lastName}}
+                          </div>
+
+                        </a-table>
+                        <div class="count" v-if="Object.size(dep_3.users)">{{Object.size(dep_3.users)}} - участников </div>
+                      </template>
+                      <div class="c-structure__link" @click="currentLenth">{{dep_3.name}}</div>
+                    </a-popover>
+
                   </div>
 
                   <div class="c-structure__detail__row" v-for="(dep_4, index) in departments" v-if="(dep_4.level == 4 && dep_4.parent.label == dep_3.name)">
@@ -41,7 +98,25 @@
                     <div class="c-structure__detail__item">
 
                       <div class="c-structure__detail__article">
-                        <div class="c-structure__link">{{dep_4.name}}</div>
+                        <a-popover placement="bottom" trigger="click">
+                          <template slot="content">
+                            <a-table
+                                    v-if="dep_4.name"
+                                    :columns="columns"
+                                    :dataSource="userData(dep_4)"
+                                    :pagination="false"
+
+                            >
+                              <div slot="name" slot-scope="text"  @click="goTo(text.id)">
+                                <a-avatar :src="(text.googleImage ? text.googleImage : require('../assets/no_image.png'))"></a-avatar>
+                                {{text.firstName}} {{text.lastName}}
+                              </div>
+
+                            </a-table>
+                            <div class="count" v-if="Object.size(dep_4.users)">{{Object.size(dep_4.users)}} - участников </div>
+                          </template>
+                          <div class="c-structure__link" @click="currentLenth">{{dep_4.name}}</div>
+                        </a-popover>
                       </div>
                     </div>
 
@@ -69,7 +144,29 @@
   import {GET_DEP} from '../store/structure/actions.type';
   import AppProjects from '../views/Projects';
   import AppDepantaments from '../components/common/Departaments';
+  const columns = [
+    {
+      title: '',
+      dataIndex: 'name',
+      scopedSlots: { customRender: 'name' },
+    },
 
+  ];
+  const rows = [
+    {
+      title: '',
+      dataIndex: 'name',
+      scopedSlots: { customRender: 'name' },
+    },
+
+  ];
+  Object.size = function(obj) {
+    var size = 0, key;
+    for (key in obj) {
+      if (obj.hasOwnProperty(key)) size++;
+    }
+    return size;
+  };
   export default {
     components: {
       AppCreateProject,
@@ -82,9 +179,35 @@
         createVisible: false,
         departmentVisible : false,
         test: true,
+        data: [],
+        dep_arr: [],
+        res_data: [],
+        columns,
+        userLength: '',
       };
     },
     methods: {
+      goTo(id) {
+        this.$router.push({ name: 'profile', params: { _id: id } });
+      },
+      userData(param) {
+        if( Object.size(param.users)) {
+          for (let i = 0; i < Object.size(param.users); i++) {
+            for (let j = 0; j < Object.size(this.data); j++) {
+
+              if (param.users[i].key == this.data[j].key) {
+                this.res_data[i] = this.data[j];
+              }
+            }
+          }
+          return this.res_data;
+        }
+      },
+      currentLenth() {
+        this.userLength = this.users.length;
+        //console.log(this.userLength);
+      },
+
       callback(key) {
         if (key === '2') {
           this.test = false;
@@ -109,7 +232,33 @@
       this.$store.dispatch(GET_DEP);
     },
     computed: {
-      ...mapGetters(['departments']),
+      ...mapGetters(['departments', 'users']),
+    },
+    watch: {
+      users(users) {
+        this.data = users.map(e => {
+          const { googleImage, firstName, lastName, positions, phone, email } = e;
+          const row = {};
+          row.name = { googleImage, firstName, lastName, id: e._id };
+          row.positions = positions.join(', ');
+          row.phone = phone;
+          row.email = email;
+          row.key = e._id;
+          return row;
+        });
+        this.fullData = [...this.data];
+      },
+      departments(departments) {
+        const row = [];
+        this.dep_arr = departments.map(e => {
+          if (Object.size(e.users)) {
+            for (let i= 0; i < Object.size(e.users); i++) {
+              row[i] = e.users[i].key;
+            }
+            return row;
+          }
+        });
+      },
     },
   };
 </script>
@@ -375,5 +524,7 @@
                       color: #ffffff;
                     }
                   }
-
+.ant-popover-inner-content:empty {
+  display: none;
+}
 </style>
