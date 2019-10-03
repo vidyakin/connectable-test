@@ -3,10 +3,12 @@
         <div class="setting-name">Настройки уведомлений</div>
 
         <a-form :form="form" class="u-form form" @submit="handleSubmit">
+
             <div class="content-wrap">
                 <div class="custom-control custom-checkbox mb-3">
                     <a-form-item class="wrap-field">
-                        <a-checkbox v-decorator="['addUser']" v-model="notification.addUser" >
+                        <a-checkbox v-decorator="['addUser']" :checked="settings.addUser"
+                                    @change="onChange" >
                             При добавлении юзера
                         </a-checkbox>
                     </a-form-item>
@@ -22,14 +24,16 @@
 
                 <div class="custom-control custom-checkbox mb-3">
                     <a-form-item class="wrap-field">
-                        <a-checkbox v-decorator="['publications']" v-model="notification.publications">
+                        <a-checkbox v-decorator="['publications']"  :checked="settings.publications"
+                                    @change="onChangePublications">
                             При публикации в разделе компания, в группах, в которых состоит юзер
                         </a-checkbox>
                     </a-form-item>
                 </div>
                 <div class="custom-control custom-checkbox mb-3">
                     <a-form-item class="wrap-field">
-                        <a-checkbox v-decorator="['eventCalendar']" v-model="notification.eventCalendar">
+                        <a-checkbox v-decorator="['eventCalendar']" :checked="settings.eventCalendar"
+                                    @change="onChangeCalendar">
                             При добавлении события в Календарь
                         </a-checkbox>
                     </a-form-item>
@@ -55,11 +59,11 @@
         data () {
             return {
                 settings: {
-                    addUser: store.getters.notification.addUser,
-                    publications: '',
-                    eventComment: '',
-                    eventCalendar: '',
-                    subscribe: '',
+                    addUser: false,
+                    publications: false,
+                    eventComment: false,
+                    eventCalendar: false,
+                    subscribe: false,
                 },
                 submitted: false,
                 error: false,
@@ -87,13 +91,32 @@
                 });
             },
             onChange (e) {
-                //notification.addUser = e.target.checked;
+                this.settings.addUser = e.target.checked;
+                this.addUser = e.target.checked;
             },
+
+            onChangeCalendar (e) {
+                this.settings.eventCalendar = e.target.checked;
+                this.eventCalendar = e.target.checked;
+            },
+            onChangePublications (e) {
+                this.settings.publications = e.target.checked;
+                this.publications = e.target.checked;
+            },
+
         },
         beforeCreate() {
             this.form = this.$form.createForm(this);
             this.$store.dispatch(GET_NOTIFICATION);
         },
+        watch: {
+            notification(notification) {
+                this.settings.addUser = notification.addUser;
+                this.settings.publications = notification.publications;
+                this.settings.eventComment = notification.eventComment;
+                this.settings.eventCalendar = notification.eventCalendar;
+            }
+        }
     });
 </script>
 <style lang="scss">
@@ -136,6 +159,9 @@
             }
 
         }
+    }
+    .form-group {
+        display: inline-block;
     }
 
 </style>

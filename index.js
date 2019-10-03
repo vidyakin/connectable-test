@@ -345,6 +345,7 @@ app.post('/api/notification', (req, res, next) => {
                     obj_result
                 ).then(result => {
                     console.log(`Successfully update  items.`);
+                    res.status(status).send(notifi);
                 }).catch(err => console.error(`Failed to update items: ${err}`));
 
             }
@@ -353,16 +354,18 @@ app.post('/api/notification', (req, res, next) => {
                     if (err) return res.status(500).send("There was a problem registering the user.");
                     else {
                         console.log(`Successfully added  items.`);
+                        res.status(status).send(notifi);
                     }
                 });
             }
             else {
                 console.error(`Failed to update items: ${err}`);
+                res.status(status).send(`Failed to update items: ${err}`);
             }
         }
     });
 
-    res.status(status).send(notifi);
+
 
 });
 //display status notification
