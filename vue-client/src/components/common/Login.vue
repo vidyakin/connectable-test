@@ -31,11 +31,11 @@ export default {
     closeImage() {
       this.$store.commit(SET_SHOW_IMAGE_HEADER, false);
     },
-    login() { console.log(1111);
+    login() {
       this.$gAuth.signIn().then(GoogleUser => {
         // On success do something, refer to:
         // https://developers.google.com/api-client-library/javascript/reference/referencedocs#googleusergetid
-        console.log('user', GoogleUser);
+
         // GoogleUser.getId() : Get the user's unique ID string.
         // GoogleUser.getBasicProfile() : Get the user's basic profile information.
         // GoogleUser.getAuthResponse() : Get the response object from the user's auth session. access_token and so on

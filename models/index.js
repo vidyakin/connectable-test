@@ -24,5 +24,6 @@ index.Project = require('./project');
 index.GroupParticipant = require('./groupParticipant');
 index.ProjectParticipant = require('./projectParticipant');
 index.GroupInvite = require('./groupInvite');
-
+index.Department = require('./department');
+index.Notification = require('./notification');
 module.exports = index;

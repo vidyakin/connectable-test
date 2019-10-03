@@ -20,17 +20,17 @@ const eventSchema = new Schema({
   googleEventId: String,
 
 });
-
+/*Bearer*/
 eventSchema.pre('save', function (next) {
   user.findOne({_id: this.userId}).catch(err => console.log(err)).then(data => {
+
     const headers = {
       'Authorization': `Bearer ${data.googleToken}`,
     };
     const event = {
       description: this.comment,
       start: {'dateTime': new Date(this.date.setHours(this.time.split(':')[0], this.time.split(':')[1]))},
-      end: {'dateTime': new Date(this.date.setHours(+this.time.split(':')[0] + +this.duration.split(':')[0],
-          +this.time.split(':')[1] + +this.duration.split(':')[0]))},
+      end: {'dateTime': new Date(this.date.setHours(this.time.split(':')[0], this.time.split(':')[1]))},
       summary: this.name,
     };
     axios

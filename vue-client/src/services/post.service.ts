@@ -92,6 +92,7 @@ export const sendComment = (context: any, comment: any) => {
     .post('api/comment', comment)
     .then((response: any) => {
       const newComment = response.data.result;
+
       if (newComment.parent.type === 'post') { context.commit(ADD_COMMENT_FOR_POST, newComment); }
       if (newComment.parent.type === 'comment') { context.commit(ADD_ANSWER_FOR_COMMENT, newComment); }
     });

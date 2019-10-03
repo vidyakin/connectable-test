@@ -31,12 +31,12 @@ export const editUser = (context: any, user: any) => {
 };
 
 export const createEvent = (context: any, event: any) => {
+    console.log(event);
   return Vue.axios
     .post(`api/event/`, event)
     .then((response: any) => {
-        console.log(response);
       context.commit(ADD_EVENT, response.data.result);
-      console.log(response.data.result);
+
     });
 };
 

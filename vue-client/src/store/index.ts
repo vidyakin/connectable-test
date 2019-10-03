@@ -5,6 +5,8 @@ import auth from './user/user.module';
 import post from './post/post.module';
 import group from './group/group.module';
 import project from './project/project.module';
+import structure from './structure/structure.module';
+import notification from './notification/notification.module';
 
 Vue.use(Vuex);
 export default new Vuex.Store({
@@ -13,6 +15,8 @@ export default new Vuex.Store({
     auth,
     post,
     group,
-    project
+    project,
+    structure,
+    notification,
   },
 });

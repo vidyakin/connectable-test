@@ -1,7 +1,7 @@
 <template>
   <div class="group-view">
     <div class="groups-header">
-      <div class="groups-header-name">Структура</div>
+      <div class="groups-header-name">Структура </div>
     </div>
     <div class="group-body">
       <div class="group-body-info">

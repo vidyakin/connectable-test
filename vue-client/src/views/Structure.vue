@@ -1,18 +1,134 @@
 <template>
   <div class="structure">
     <app-create-project :visible="createVisible" :close="closeCreate"/>
+    <app-create-department :visible="departmentVisible" :close="closeDepartment"/>
     <div class="structure-header">
       <div class="structure-header-name">
         Структура
       </div>
       <div class="structure-header-search">
-        <a-button type="primary" v-if="test">Редактировать</a-button>
+        <a-button type="primary" v-if="test" @click="openDepartment">Добавить разделы</a-button>
         <a-button type="primary" v-else="!test" @click="openCreate">Создать проект</a-button>
       </div>
     </div>
+
     <a-tabs defaultActiveKey="1" @change="callback">
       <a-tab-pane tab="Структура" key="1">
-          <AppDepantaments />
+        <div class="c-structure">
+
+          <div class="c-structure__head" v-for="(dep, index) in departments" v-if="(dep.level == 1)" >
+            <a-popover placement="bottom" trigger="click" >
+              <template slot="content" >
+                <a-table
+                        v-if="dep.name"
+                        :columns="columns"
+                        :dataSource="userData(dep)"
+                        :pagination="false"
+
+                >
+                  <div slot="name" slot-scope="text" class="table-row-name" @click="goTo(text.id)">
+                    <a-avatar :src="(text.googleImage ? text.googleImage : require('../assets/no_image.png'))"></a-avatar>
+                    {{text.firstName}} {{text.lastName}}
+                  </div>
+
+                </a-table>
+                <div class="count" v-if="Object.size(dep.users)">{{Object.size(dep.users)}} - участников </div>
+              </template>
+              <div class="c-structure__link" @click="currentLenth">{{dep.name}}</div>
+            </a-popover>
+
+          </div>
+
+          <div class="c-structure__row" >
+
+            <div class="c-structure__item" v-for="(dep, index) in departments" v-if="(dep.level > 1 && dep.level < 3)">
+
+              <div class="c-structure__article" v-if="(dep.level == 2)">
+                <a-popover placement="bottom" trigger="click" >
+                  <template slot="content" >
+                    <a-table
+                            v-if="dep.name"
+                            :columns="columns"
+                            :dataSource="userData(dep)"
+                            :pagination="false"
+
+                    >
+                      <div slot="name" slot-scope="text" class="table-row-name" @click="goTo(text.id)">
+                        <a-avatar :src="(text.googleImage ? text.googleImage : require('../assets/no_image.png'))"></a-avatar>
+                        {{text.firstName}} {{text.lastName}}
+                      </div>
+
+                    </a-table>
+                    <div class="count" v-if="Object.size(dep.users)">{{Object.size(dep.users)}} - участников </div>
+                  </template>
+                  <div class="c-structure__link" @click="currentLenth">{{dep.name}}</div>
+                </a-popover>
+
+              </div>
+
+              <div class="c-structure__child__row ">
+
+                <div class="c-structure__child__item" v-for="(dep_3, index) in departments" v-if="(dep_3.level == 3 && dep_3.parent.label == dep.name)">
+
+                  <div class="c-structure__child__article">
+                    <a-popover placement="bottom" trigger="click">
+                      <template slot="content">
+                        <a-table
+                                v-if="dep_3.name"
+                                :columns="columns"
+                                :dataSource="userData(dep_3)"
+                                :pagination="false"
+
+                        >
+                          <div slot="name" slot-scope="text"  @click="goTo(text.id)">
+                            <a-avatar :src="(text.googleImage ? text.googleImage : require('../assets/no_image.png'))"></a-avatar>
+                            {{text.firstName}} {{text.lastName}}
+                          </div>
+
+                        </a-table>
+                        <div class="count" v-if="Object.size(dep_3.users)">{{Object.size(dep_3.users)}} - участников </div>
+                      </template>
+                      <div class="c-structure__link" @click="currentLenth">{{dep_3.name}}</div>
+                    </a-popover>
+
+                  </div>
+
+                  <div class="c-structure__detail__row" v-for="(dep_4, index) in departments" v-if="(dep_4.level == 4 && dep_4.parent.label == dep_3.name)">
+
+                    <div class="c-structure__detail__item">
+
+                      <div class="c-structure__detail__article">
+                        <a-popover placement="bottom" trigger="click">
+                          <template slot="content">
+                            <a-table
+                                    v-if="dep_4.name"
+                                    :columns="columns"
+                                    :dataSource="userData(dep_4)"
+                                    :pagination="false"
+
+                            >
+                              <div slot="name" slot-scope="text"  @click="goTo(text.id)">
+                                <a-avatar :src="(text.googleImage ? text.googleImage : require('../assets/no_image.png'))"></a-avatar>
+                                {{text.firstName}} {{text.lastName}}
+                              </div>
+
+                            </a-table>
+                            <div class="count" v-if="Object.size(dep_4.users)">{{Object.size(dep_4.users)}} - участников </div>
+                          </template>
+                          <div class="c-structure__link" @click="currentLenth">{{dep_4.name}}</div>
+                        </a-popover>
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+          </div>
+        </div>
+          <!--<AppDepantaments />-->
       </a-tab-pane>
       <a-tab-pane tab="Проекты" key="2">
         <app-projects/>
@@ -23,24 +139,75 @@
 <script>
 
   import AppCreateProject from '../components/drawers/CreateProject';
+  import AppCreateDepartment from '../components/drawers/CreateDepartment';
   import {mapGetters} from 'vuex';
-  import {GET_GROUPS} from '../store/group/actions.type';
+  import {GET_DEP} from '../store/structure/actions.type';
   import AppProjects from '../views/Projects';
   import AppDepantaments from '../components/common/Departaments';
+  const columns = [
+    {
+      title: '',
+      dataIndex: 'name',
+      scopedSlots: { customRender: 'name' },
+    },
 
+  ];
+  const rows = [
+    {
+      title: '',
+      dataIndex: 'name',
+      scopedSlots: { customRender: 'name' },
+    },
+
+  ];
+  Object.size = function(obj) {
+    var size = 0, key;
+    for (key in obj) {
+      if (obj.hasOwnProperty(key)) size++;
+    }
+    return size;
+  };
   export default {
     components: {
       AppCreateProject,
       AppProjects,
       AppDepantaments,
+      AppCreateDepartment,
     },
     data() {
       return {
         createVisible: false,
+        departmentVisible : false,
         test: true,
+        data: [],
+        dep_arr: [],
+        res_data: [],
+        columns,
+        userLength: '',
       };
     },
     methods: {
+      goTo(id) {
+        this.$router.push({ name: 'profile', params: { _id: id } });
+      },
+      userData(param) {
+        if( Object.size(param.users)) {
+          for (let i = 0; i < Object.size(param.users); i++) {
+            for (let j = 0; j < Object.size(this.data); j++) {
+
+              if (param.users[i].key == this.data[j].key) {
+                this.res_data[i] = this.data[j];
+              }
+            }
+          }
+          return this.res_data;
+        }
+      },
+      currentLenth() {
+        this.userLength = this.users.length;
+        //console.log(this.userLength);
+      },
+
       callback(key) {
         if (key === '2') {
           this.test = false;
@@ -54,12 +221,44 @@
       openCreate() {
         this.createVisible = true;
       },
+      closeDepartment() {
+        this.departmentVisible = false;
+      },
+      openDepartment() {
+        this.departmentVisible = true;
+      },
     },
     beforeCreate() {
-      this.$store.dispatch(GET_GROUPS);
+      this.$store.dispatch(GET_DEP);
     },
     computed: {
-      ...mapGetters(['groups']),
+      ...mapGetters(['departments', 'users']),
+    },
+    watch: {
+      users(users) {
+        this.data = users.map(e => {
+          const { googleImage, firstName, lastName, positions, phone, email } = e;
+          const row = {};
+          row.name = { googleImage, firstName, lastName, id: e._id };
+          row.positions = positions.join(', ');
+          row.phone = phone;
+          row.email = email;
+          row.key = e._id;
+          return row;
+        });
+        this.fullData = [...this.data];
+      },
+      departments(departments) {
+        const row = [];
+        this.dep_arr = departments.map(e => {
+          if (Object.size(e.users)) {
+            for (let i= 0; i < Object.size(e.users); i++) {
+              row[i] = e.users[i].key;
+            }
+            return row;
+          }
+        });
+      },
     },
   };
 </script>
@@ -71,9 +270,12 @@
       height: calc(100vh - 50px);
     }
   }
-
+  .ant-tabs-tabpane {
+    overflow: auto;
+  }
   .structure {
     padding: 30px;
+
     height: calc(100vh - 210px);
     overflow: auto;
     background-color: #f0f0f7;
@@ -115,9 +317,214 @@
       .ant-tabs-nav-scroll {
         text-align: left;
       }
-
     }
-
   }
 
+  .c-structure{
+    min-width: 980px;
+    overflow-x: visible;
+  }
+
+  .c-structure__head{
+    margin-bottom: 20px;
+
+    .c-structure__link{
+      min-width: 200px;
+      color: #000000;
+      background-color: #d4d6dc;
+    }
+  }
+
+      .c-structure__row{
+        position: relative;
+        display: block;
+        width: 100%;
+        font-size: 0;
+
+        &:before{
+          content: '';
+          position: absolute;
+          top: -20px;
+          left: 50%;
+          margin-left: -1px;
+          width: 2px;
+          height: 20px;
+          border: 1px solid #949494;
+        }
+      }
+
+        .c-structure__item{
+          width: 33.33%;
+          position: relative;
+          padding: 20px 15px;
+          display: inline-block;
+          vertical-align: top;
+          text-align: center;
+
+          &:first-child{
+            &:before{
+              content: none;
+            }
+          }
+
+          &:before{
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            margin-left: -50%;
+            width: 100%;
+            border: 1px solid #949494;
+          }
+          .c-structure__child__row:empty {
+            display: none;
+          }
+        }
+
+          .c-structure__article{
+            position: relative;
+            display: block;
+            margin-bottom: 40px;
+
+            &:before{
+              content: '';
+              position: absolute;
+              top: -20px;
+              left: 50%;
+              margin-left: -1px;
+              width: 2px;
+              height: 100%;
+              border: 1px solid #949494;
+            }
+
+            .c-structure__link{
+              min-width: 200px;
+            }
+          }
+
+            .c-structure__link{
+              position: relative;
+              display: inline-block;
+              max-width: 100%;
+              padding: 15px 15px;
+              font-size: 16px;
+              line-height: 1.5;
+              font-weight: 700;
+              color: #949494;
+              box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.1);
+              background-color: #ffffff;
+              cursor: pointer;
+              z-index: 1;
+              transition: .3s ease;
+
+              &:hover{
+                color: #3b86ff;
+
+              }
+            }
+
+        .c-structure__child__row{
+          position: relative;
+          display: block;
+          width: 100%;
+          font-size: 0;
+
+          &:before{
+            content: '';
+            position: absolute;
+            top: -60px;
+            left: 50%;
+            margin-left: -1px;
+            width: 2px;
+            height: 40px;
+            border: 1px solid #949494;
+          }
+        }
+
+          .c-structure__child__item{
+            width: 50%;
+            position: relative;
+            padding: 0 5px;
+            display: inline-block;
+            vertical-align: top;
+
+            &:first-child{
+              &:before{
+                content: none;
+              }
+            }
+
+            &:before{
+              content: '';
+              position: absolute;
+              top: -20px;
+              left: 0;
+              margin-left: -50%;
+              width: 100%;
+              border: 1px solid #949494;
+            }
+          }
+
+            .c-structure__child__article{
+              position: relative;
+              display: block;
+              margin-bottom: 40px;
+
+              &:before{
+                content: '';
+                position: absolute;
+                top: -20px;
+                left: 50%;
+                margin-left: -1px;
+                width: 2px;
+                height: 100%;
+                border: 1px solid #949494;
+              }
+
+              .c-structure__link{
+                display: block;
+              }
+            }
+
+              .c-structure__detail__row{
+                position: relative;
+                padding-left: 20px;
+
+                &:before{
+                  content: '';
+                  position: absolute;
+                  top: -60px;
+                  left: 10px;
+                  width: 1px;
+                  bottom: 26px;
+                  border: 1px solid #949494;
+                }
+              }
+
+                .c-structure__detail__item{
+                  position: relative;
+                  margin-bottom: 15px;
+
+                  &:before{
+                    content: '';
+                    position: absolute;
+                    margin-top: -1px;
+                    left: -10px;
+                    bottom: 26px;
+                    width: 100%;
+                    border: 1px solid #949494;
+                  }
+                }
+
+                  .c-structure__detail__article{
+
+                    .c-structure__link{
+                      display: block;
+                      background-color: #007bff;
+                      color: #ffffff;
+                    }
+                  }
+.ant-popover-inner-content:empty {
+  display: none;
+}
 </style>

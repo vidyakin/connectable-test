@@ -28,7 +28,7 @@
               title="Действия с группой"
               trigger="click"
               overlayClassName="group-header-action-popup-content"
-              v-if="currentGroup && currentGroup.creatorId === user._id"
+              v-if="currentGroup && currentGroup.creatorId === userinfo._id"
             >
               <template slot="content">
                 <a-popconfirm
@@ -60,19 +60,19 @@
             type="primary"
             @click="createParticipant"
             v-if="currentGroup && currentGroup.type === 0 && currentGroup.participants &&
-                    currentGroup.participants.findIndex(({_id}) =>_id === user._id) === -1"
+                    currentGroup.participants.findIndex(({_id}) =>_id === userinfo._id) === -1"
           >Вступить</a-button>
           <a-button
             type="primary"
             @click="createParticipantsRequest"
             v-if="currentGroup && currentGroup.type === 1 && currentGroup.participants &&
-                    currentGroup.participants.findIndex(({_id}) =>_id === user._id) === -1
+                    currentGroup.participants.findIndex(({_id}) =>_id === userinfo._id) === -1
  && !participantsRequest"
           >Подать заявку</a-button>
           <a-button
             @click="deleteParticipant"
             v-if="currentGroup && currentGroup.type === 1 && currentGroup.participants &&
-                    currentGroup.participants.findIndex(({_id}) =>_id === user._id) === -1
+                    currentGroup.participants.findIndex(({_id}) =>_id === userinfo._id) === -1
                     && participantsRequest"
           >Отменить заявку</a-button>
         </template>
@@ -97,7 +97,7 @@
     </div>
     <template
       v-if="(currentGroup && currentGroup.type === 0 )||
-       currentGroup.participants.findIndex(({_id}) => _id === user._id) !== -1"
+       currentGroup.participants.findIndex(({_id}) => _id === userinfo._id) !== -1"
     >
       <app-comment-input :parent="{type: 'group', id: currentGroup && currentGroup._id}" />
       <app-post v-for="(post, index) in posts" :post="post" :key="index" />
@@ -119,7 +119,7 @@ import {
 import AppGroupEditDrawer from '../components/drawers/GroupEditDrawer';
 import AppRequestsDrawer from '../components/drawers/RequestsDrawer';
 import AppInviteDrawer from '../components/drawers/InviteDrawer';
-
+import store from '../store';
 export default {
   components: {
     AppCommentInput,
@@ -132,6 +132,7 @@ export default {
     return {
       editVisible: false,
       requestVisible: false,
+      userinfo: (store.getters.userData.result ? store.getters.userData.result : store.getters.user.result),
     };
   },
   methods: {
@@ -199,7 +200,7 @@ export default {
     });
   },
   computed: {
-    ...mapGetters(['posts', 'currentGroup', 'user']),
+    ...mapGetters(['posts', 'currentGroup', 'user', 'userData']),
   },
 };
 </script>

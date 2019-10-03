@@ -19,7 +19,7 @@ import { mapGetters } from 'vuex';
 import AppLoginBar from './LoginBar';
 import { SEND_NEW_POST } from '../../store/post/actions.type';
 import Vue from 'vue';
-
+import store from '../../store';
 export default {
   name: 'AppCommentInput',
   components: {
@@ -29,6 +29,7 @@ export default {
     return {
       current: '',
       fileList: [],
+      datauser: (store.getters.userData ? store.getters.userData : store.getters.user),
     };
   },
   computed: {
@@ -40,7 +41,7 @@ export default {
         this.$store.dispatch(SEND_NEW_POST, {
           message: this.current,
           parent: this.parent,
-          author: this.currentUser,
+          author: this.datauser.result,
           attachment: [],
           formData: this.handleUpload(),
         });

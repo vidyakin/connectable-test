@@ -78,7 +78,7 @@ import 'moment/locale/ru';
 import AppAddEventModal from '../components/modal/AddEventModal.vue';
 import { DELETE_EVENT, GET_EVENTS } from '../store/user/actions.type';
 import { mapGetters } from 'vuex';
-
+import store from '../store';
 export default Vue.extend({
   data() {
     return {
@@ -99,19 +99,21 @@ export default Vue.extend({
         'Декабрь',
       ],
       weekday: ['ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ', 'ВС'],
+      userInfo: (store.getters.userData ? store.getters.userData : store.getters.user),
     };
   },
   beforeCreate() {
     moment.locale('ru');
-    if (this.user) {
-      this.$store.dispatch(GET_EVENTS, this.user.id);
+
+    if (this.userInfo) {
+      this.$store.dispatch(GET_EVENTS, this.userInfo.id);
     }
   },
   components: {
     AppAddEventModal,
   },
   computed: {
-    ...mapGetters(['user', 'events']),
+    ...mapGetters(['user', 'events', 'userData']),
   },
   watch: {
     user(user) {

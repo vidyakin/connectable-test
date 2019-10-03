@@ -1,13 +1,17 @@
 const express = require('express');
 const mail = require('./email/index');
 const jwt = require('jsonwebtoken');
+var moment = require('moment');
 
 module.exports = (Collection, serializer, options) => {
+
     const create = (req, res) => {
         let result = {};
         let status = 201;
         const newEntry = req.body;
+        //console.log(req.body);
         Collection.create(newEntry, async (e, data) => {
+            console.log(Collection.collection.collectionName);
             if (e) {
                 status = 500;
                 result.status = status;
@@ -15,6 +19,12 @@ module.exports = (Collection, serializer, options) => {
             } else {
                 if (Collection.collection.collectionName === 'groupinvites') {
                     mail.sendInvite(data.userId, `https://connectable.pro/invite/${data._id}`)
+                }
+                if (Collection.collection.collectionName === 'groups') {
+                    mail.AddUserInGroup(req.body.userEmail, `https://connectable.pro/login/`, {name:data.name, description:data.description})
+                }
+                if (Collection.collection.collectionName === 'events') {
+                    mail.CalendarEvent(req.body.userEmail, `https://connectable.pro/login/`, {name:data.name, comment:data.comment, date:moment(data.date).locale('ru').format("MMM Do YY"), time:data.time})
                 }
                 result.status = status;
                 result.result = await serializer(data);

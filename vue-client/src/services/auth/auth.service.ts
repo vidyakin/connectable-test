@@ -10,8 +10,9 @@ export const login = (context: any, user: any) => {
     .then((response) => {
       localStorage.setItem('authorization', 'true');
       localStorage.setItem('token', `${response.data.token}`);
-      console.log(response.data.result);
+
       context.commit(SET_USER, response.data);
+        context.commit(SET_USER_DATA, response.data);
       setAuthToken(`${response.data.token}`);
     });
 };

@@ -28,10 +28,11 @@
         </div>
       </div>
     </div>
-    <div class="event-name">
+    <!--<div class="event-name">
       <label>Продолжительность</label>
-      <a-input v-model="duration"></a-input>
-    </div>
+
+      <a-date-picker v-model="duration"></a-date-picker>
+    </div>-->
     <div class="event-name">
       <label>Комментарий</label>
       <a-input v-model="comment"></a-input>
@@ -58,7 +59,7 @@
   import AppInput from '../common/Input';
   import moment from 'moment';
   import {CREATE_EVENT, UPDATE_USER_INFO} from '../../store/user/actions.type';
-
+  import store from '../../store';
   export default {
     data() {
       return {
@@ -78,24 +79,25 @@
         date: moment(),
         time: moment.relTime,
         comment: '',
-        duration: '',
+        userInfo: (store.getters.userData ? store.getters.userData : store.getters.user),
       };
     },
     methods: {
       setCurrentColor(color) {
         this.currentColor = color;
       },
+
       createEvent() {
-        const {name, date, time, duration, comment, currentColor} = this;
-        const event = {name, date, time, duration, comment, color: currentColor.color};
-        event.userId = this.user._id;
+        const {name, date, time, comment, currentColor, userInfo} = this;
+        const event = {name, date, time, comment, color: currentColor.color};
+        event.userId = this.userInfo.result._id;
+        event.userEmail = this.userInfo.result.email;
         this.$store.dispatch(CREATE_EVENT, event)
           .finally(() => {
             this.name = '';
             this.date = moment();
             this.time = moment.relTime;
             this.comment = '';
-            this.duration = '';
             this.close();
           });
 
@@ -108,7 +110,7 @@
       AppInput,
     },
     computed: {
-      ...mapGetters(['user']),
+      ...mapGetters(['user', 'userData']),
     },
     props: {
       visible: Boolean,
