@@ -34,7 +34,7 @@ if(localStorage.getItem('token')) {
 
 
 setAuthInterceptor();
-Vue.axios.defaults.baseURL = 'http://localhost:4000';
+Vue.axios.defaults.baseURL = 'http://localhost:8080';
 setAuthToken(localStorage.getItem('token'));
 
 Vue.use(VueMq, {
