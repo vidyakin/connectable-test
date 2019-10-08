@@ -34,7 +34,19 @@
                 </a-table>
                 <div class="count" v-if="Object.size(dep.users)">{{Object.size(dep.users)}} - участников </div>
               </template>
-              <div class="c-structure__link" @click="currentLenth">{{dep.name}}</div>
+              <div class="c-structure__link" @click="currentLenth">{{dep.name}}
+                <a-popconfirm
+                        title="Подтверите удаление"
+                        okText="Подтверждаю"
+                        cancelText="Отмена"
+                        @confirm="deleteBlock(dep._id)"
+                >
+                  <a-tooltip title="Удалить">
+                    <a-button class="delete-department" icon="delete"></a-button>
+                  </a-tooltip>
+                </a-popconfirm>
+              </div>
+
             </a-popover>
 
           </div>
@@ -61,7 +73,18 @@
                     </a-table>
                     <div class="count" v-if="Object.size(dep.users)">{{Object.size(dep.users)}} - участников </div>
                   </template>
-                  <div class="c-structure__link" @click="currentLenth">{{dep.name}}</div>
+                  <div class="c-structure__link" @click="currentLenth">{{dep.name}}
+                    <a-popconfirm
+                            title="Подтверите удаление"
+                            okText="Подтверждаю"
+                            cancelText="Отмена"
+                            @confirm="deleteBlock(dep._id)"
+                    >
+                      <a-tooltip title="Удалить">
+                        <a-button class="delete-department" icon="delete"></a-button>
+                      </a-tooltip>
+                    </a-popconfirm>
+                  </div>
                 </a-popover>
 
               </div>
@@ -88,7 +111,18 @@
                         </a-table>
                         <div class="count" v-if="Object.size(dep_3.users)">{{Object.size(dep_3.users)}} - участников </div>
                       </template>
-                      <div class="c-structure__link" @click="currentLenth">{{dep_3.name}}</div>
+                      <div class="c-structure__link" @click="currentLenth">{{dep_3.name}}
+                        <a-popconfirm
+                                title="Подтверите удаление"
+                                okText="Подтверждаю"
+                                cancelText="Отмена"
+                                @confirm="deleteBlock(dep_3._id)"
+                        >
+                          <a-tooltip title="Удалить">
+                            <a-button class="delete-department" icon="delete"></a-button>
+                          </a-tooltip>
+                        </a-popconfirm>
+                      </div>
                     </a-popover>
 
                   </div>
@@ -115,7 +149,18 @@
                             </a-table>
                             <div class="count" v-if="Object.size(dep_4.users)">{{Object.size(dep_4.users)}} - участников </div>
                           </template>
-                          <div class="c-structure__link" @click="currentLenth">{{dep_4.name}}</div>
+                          <div class="c-structure__link" @click="currentLenth">{{dep_4.name}}
+                            <a-popconfirm
+                                    title="Подтверите удаление"
+                                    okText="Подтверждаю"
+                                    cancelText="Отмена"
+                                    @confirm="deleteBlock(dep_4._id)"
+                            >
+                              <a-tooltip title="Удалить">
+                                <a-button class="delete-department" icon="delete"></a-button>
+                              </a-tooltip>
+                            </a-popconfirm>
+                          </div>
                         </a-popover>
                       </div>
                     </div>
@@ -141,7 +186,7 @@
   import AppCreateProject from '../components/drawers/CreateProject';
   import AppCreateDepartment from '../components/drawers/CreateDepartment';
   import {mapGetters} from 'vuex';
-  import {GET_DEP} from '../store/structure/actions.type';
+  import {GET_DEP, DELETE_DEP} from '../store/structure/actions.type';
   import AppProjects from '../views/Projects';
   import AppDepantaments from '../components/common/Departaments';
   const columns = [
@@ -227,6 +272,13 @@
       openDepartment() {
         this.departmentVisible = true;
       },
+      deleteBlock(id) {
+        this.$store
+                .dispatch(DELETE_DEP, id)
+                .finally(() => {
+                  this.$store.dispatch(GET_DEP);
+                });
+      },
     },
     beforeCreate() {
       this.$store.dispatch(GET_DEP);
@@ -264,7 +316,13 @@
 </script>
 
 <style lang="scss">
-
+  .delete-department {
+    background: transparent;
+    position: absolute;
+    right: 0;
+    top: 0;
+    border: none;
+  }
   .is-hide-img-header{
     .structure {
       height: calc(100vh - 50px);

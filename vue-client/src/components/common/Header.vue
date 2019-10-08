@@ -18,11 +18,10 @@ import { SET_SHOW_IMAGE_HEADER } from '../../store/shower/mutations.type';
 import { mapGetters } from 'vuex';
 import { LOGIN } from '../../store/user/actions.type';
 import AppLoginBar from './LoginBar';
-
 export default {
   name: 'AppHeader',
   components: {
-    AppLoginBar,
+    AppLoginBar
   },
   data() {
     return {

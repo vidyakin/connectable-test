@@ -111,10 +111,11 @@
         },
         watch: {
             notification(notification) {
-                this.settings.addUser = notification.addUser;
-                this.settings.publications = notification.publications;
-                this.settings.eventComment = notification.eventComment;
-                this.settings.eventCalendar = notification.eventCalendar;
+                console.log(notification);
+                this.settings.addUser = (notification ? notification.addUser: false);
+                this.settings.publications = (notification ? notification.publications: false);
+                this.settings.eventComment = (notification ? notification.eventComment: false);
+                this.settings.eventCalendar = (notification ? notification.eventCalendar: false);
             }
         }
     });

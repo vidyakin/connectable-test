@@ -314,6 +314,21 @@ app.get('/api/department', (req, res) => {
         }
     });
 });
+//delete department
+app.delete('/api/department/:depId', (req, res) => {
+    let {depId} = req.params;
+    console.log(depId);
+    Department.deleteOne({ _id:depId },function(error, collection){
+        if (error) return res.status(500).send("There was a problem registering the user.");
+        else {
+            Department.find({}, (err, department) => {
+                if (!err && department) {
+                    res.status(200).send(department);
+                }
+            });
+        }
+    });
+});
 //put notifications
 app.post('/api/notification', (req, res, next) => {
     let notifi =req.body,
@@ -345,7 +360,7 @@ app.post('/api/notification', (req, res, next) => {
                     obj_result
                 ).then(result => {
                     console.log(`Successfully update  items.`);
-                    res.status(status).send(notifi);
+                    res.status(status).send(data);
                 }).catch(err => console.error(`Failed to update items: ${err}`));
 
             }
@@ -353,8 +368,8 @@ app.post('/api/notification', (req, res, next) => {
                 db.collection('notifications').insertOne(notifi,function(err, collection){
                     if (err) return res.status(500).send("There was a problem registering the user.");
                     else {
-                        console.log(`Successfully added  items.`);
-                        res.status(status).send(notifi);
+                        console.log(data);
+                        res.status(status).send(data);
                     }
                 });
             }
