@@ -3,7 +3,9 @@
     <app-user-edit-drawer :close="closeEditDrawer" :visible="editDrawerVisible"></app-user-edit-drawer>
     <div class="user-info-avatar">
       <a-avatar :src=" (currentUser && currentUser.googleImage ? currentUser.googleImage : require('../../assets/no_image.png')) "></a-avatar>
-      <a-button>Подписаться</a-button>
+      <a-button v-model="statusFollow" v-if="currentUser._id != userData.result._id" :class="{'is-active' : followIds.includes(userData.result._id)}" @click="handleFollowClick(currentUser._id, userData.result._id, userData.result.email, followIds.includes(userData.result._id))">
+        {{ followIds.includes(userData.result._id) ? 'Уже подписаны' : 'Подписаться' }}
+      </a-button>
     </div>
 
     <div class="user-info-content">
@@ -28,7 +30,9 @@ import { mapGetters } from 'vuex';
 import AppLoginBar from './LoginBar';
 import AppUserEditDrawer from '../drawers/UserEditDrawer';
 import { SEND_NEW_POST } from '../../store/post/actions.type';
+import { GET_USER } from '../../store/user/actions.type';
 
+import {USER_FOLLOW, USER_UNFOLLOW} from '../../store/followers/actions.type';
 export default {
   name: 'AppUserInfo',
   components: {
@@ -39,16 +43,40 @@ export default {
     return {
       current: '',
       editDrawerVisible: false,
+      statusFollow: false,
+      followIds: []
     };
   },
   computed: {
-    ...mapGetters(['currentUser']),
+    ...mapGetters(['currentUser', 'userData']),
   },
   methods: {
     closeEditDrawer() {
       this.editDrawerVisible = false;
     },
+    handleFollowClick(user_id, current_user_id, current_user_email, follow_status) {
+      let eventName;
+      if(!follow_status) {
+        this.statusFollow = true;
+        eventName = USER_FOLLOW;
+      }
+      else {
+        this.statusFollow = false;
+        eventName = USER_UNFOLLOW;
+      }
+
+      this.$store
+      .dispatch(eventName, {userID: user_id, curentUserID: current_user_id, userEmail: current_user_email})
+      .finally(() => {
+        this.$store.dispatch(GET_USER, this.$route.params._id);
+      });
+    }
   },
+  watch: {
+    currentUser(currentUser) {
+      this.followIds = currentUser.followers;
+    }
+  }
 };
 </script>
 
@@ -75,6 +103,14 @@ export default {
       height: 4.5rem;
       width: 4.5rem;
       margin-bottom: 0.75rem;
+    }
+    button {
+      min-width: 130px;
+    }
+    button.is-active {
+      border-color: #40a9ff;
+      background: #40a9ff;
+      color: #fff;
     }
   }
 

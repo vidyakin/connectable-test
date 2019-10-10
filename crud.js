@@ -12,6 +12,8 @@ module.exports = (Collection, serializer, options) => {
         //console.log(req.body);
         Collection.create(newEntry, async (e, data) => {
             console.log(Collection.collection.collectionName);
+
+
             if (e) {
                 status = 500;
                 result.status = status;
@@ -25,6 +27,10 @@ module.exports = (Collection, serializer, options) => {
                 }
                 if (Collection.collection.collectionName === 'events') {
                     mail.CalendarEvent(req.body.userEmail, `https://connectable.pro/login/`, {name:data.name, comment:data.comment, date:moment(data.date).locale('ru').format("MMM Do YY"), time:data.time})
+                }
+                if (Collection.collection.collectionName === 'posts') {
+                    console.log(data.author.followers);
+                    mail.FollowEvent(data.author.followersEmail, `https://connectable.pro/login/`, {userName:data.author.firstName, msg:data.message});
                 }
                 result.status = status;
                 result.result = await serializer(data);

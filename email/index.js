@@ -56,4 +56,13 @@ module.exports.CalendarEvent = async(to, url, eventdata) => {
         text: `Создано новое событие ${eventdata.name + ' ' + eventdata.comment + ' ' + eventdata.date + ' ' + eventdata.time}. Для входа на сайт перейдите по ссылке: ${url}`, // plain text body
     });
 };
+//follow msg user
+module.exports.FollowEvent = async(to, url, eventdata) => {
+    transporter.sendMail({
+        from: '"Connectable" <mail@connectable.pro>', // sender address
+        to: to.join(','), // list of receivers
+        subject: `Новый пост от ${eventdata.userName}`, // Subject line
+        text: `Добавлен пост: ${eventdata.msg}. Для входа на сайт перейдите по ссылке: ${url}`, // plain text body
+    });
+};
 

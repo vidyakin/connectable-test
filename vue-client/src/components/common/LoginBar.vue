@@ -10,7 +10,7 @@
           </a-menu-item>
         </a-menu>
         <a-button class="logout" >
-          {{ (currentUser ? currentUser.firstName : this.datauser.result.firstName) + ' ' + (currentUser ? currentUser.lastName : this.datauser.result.lastName) }}
+          {{ this.datauser.result.firstName + ' ' + this.datauser.result.lastName }}
             <a-icon type="down" />
         </a-button>
       </a-dropdown>

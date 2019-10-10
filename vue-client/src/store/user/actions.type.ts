@@ -13,3 +13,4 @@ export const GET_USER = 'GET_USER';
 export const LOGOUT = 'LOGOUT';
 export const INSERT_USER_INFO = 'INSERT_USER_INFO';
 export const CHECK_USER_INFO = 'CHECK_USER_INFO';
+

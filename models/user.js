@@ -23,8 +23,9 @@ const userSchema = new Schema({
     googleToken: String,
     firstName: String,
     lastName: String,
-    googleId: Number
-
+    googleId: Number,
+    followers: Array,
+    followersEmail: Array
 });
 
 userSchema.pre('save', function (next) {

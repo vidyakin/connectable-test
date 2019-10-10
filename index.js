@@ -317,7 +317,7 @@ app.get('/api/department', (req, res) => {
 //delete department
 app.delete('/api/department/:depId', (req, res) => {
     let {depId} = req.params;
-    console.log(depId);
+
     Department.deleteOne({ _id:depId },function(error, collection){
         if (error) return res.status(500).send("There was a problem registering the user.");
         else {
@@ -392,5 +392,24 @@ app.get('/api/notification', (req, res) => {
         }
     });
 });
+//follow
+app.post('/api/follow', (req, res) => {
+    let {userID, curentUserID, userEmail} = req.body;
+    User.findByIdAndUpdate(userID, {$push: { followers:curentUserID, followersEmail:userEmail } },{}, function(error, collection){
+        if (error) return res.status(500).send("There was a problem registering the user.");
+        else res.status(200).send(curentUserID);
+    });
+
+});
+//unfollow
+app.post('/api/unfollow', (req, res) => {
+    let {userID, curentUserID, userEmail} = req.body;
+    User.findByIdAndUpdate(userID, {$pull: { followers:curentUserID, followersEmail:userEmail } },{}, function(error, collection){
+        if (error) return res.status(500).send("There was a problem registering the user.");
+        else res.status(200).send(curentUserID);
+    });
+});
+
+
 
 app.listen(port, () => console.log(`[Server]: Listening on port ${port}`));
