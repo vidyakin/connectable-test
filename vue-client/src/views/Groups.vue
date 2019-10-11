@@ -1,5 +1,13 @@
 <template>
+
   <div class="groups">
+    <div class="address-header align-right">
+      <div class="address-header-search">
+        <a-input v-model="searchText">
+          <a-icon type="search" slot="prefix"></a-icon>
+        </a-input>
+      </div>
+    </div>
     <app-group-create-drawer :visible="createVisible" :close="closeCreate" />
     <div class="groups-header">
       <div class="groups-header-name">Группы</div>
@@ -8,12 +16,13 @@
       </div>
     </div>
     <div class="groups-body">
-      <app-group v-for="(group, index) in groups" :group="group" :key="index"></app-group>
+      <app-group v-for="(group, index) in this.filterData" :group="group" :key="index"></app-group>
     </div>
   </div>
 </template>
 <script>
 import AppGroupCreateDrawer from '../components/drawers/GroupCreateDrawer';
+//import AppSearchForm from '../components/common/SearchForm';
 import { mapGetters } from 'vuex';
 import { GET_GROUPS } from '../store/group/actions.type';
 import AppGroup from '../components/common/Group';
@@ -26,6 +35,9 @@ export default {
   data() {
     return {
       createVisible: false,
+      groupsData: [],
+      searchText: '',
+      filterData: [],
     };
   },
   methods: {
@@ -36,16 +48,37 @@ export default {
       this.createVisible = true;
     },
   },
+
+  computed: {
+    ...mapGetters(['groups']),
+  },
   beforeCreate() {
     this.$store.dispatch(GET_GROUPS);
   },
-  computed: {
-    ...mapGetters(['groups']),
+  beforeMount() {
+    this.$store.dispatch(GET_GROUPS);
+  },
+  watch: {
+    groups(groups) {
+      this.filterData = groups;
+      this.fullData = [...this.filterData];
+    },
+    searchText(text) {
+      this.filterData = this.fullData.filter(el => {
+        return (
+        el.name.indexOf(text) !== -1
+        );
+      });
+
+    },
   },
 };
 </script>
 
 <style lang="scss">
+  .address-header.align-right {
+  justify-content: flex-end;
+}
 .is-hide-img-header{
   .groups {
     height: calc(100vh - 50px);

@@ -3,7 +3,8 @@
     <app-user-edit-drawer :close="closeEditDrawer" :visible="editDrawerVisible"></app-user-edit-drawer>
     <div class="user-info-avatar">
       <a-avatar :src=" (currentUser && currentUser.googleImage ? currentUser.googleImage : require('../../assets/no_image.png')) "></a-avatar>
-      <a-button v-model="statusFollow" v-if="currentUser._id != userData.result._id" :class="{'is-active' : followIds.includes(userData.result._id)}" @click="handleFollowClick(currentUser._id, userData.result._id, userData.result.email, followIds.includes(userData.result._id))">
+
+      <a-button v-model="statusFollow" v-if="this.$route.params._id != userData.result._id" :class="{'is-active' : followIds.includes(userData.result._id)}" @click="handleFollowClick(currentUser._id, userData.result._id, userData.result.email, followIds.includes(userData.result._id))">
         {{ followIds.includes(userData.result._id) ? 'Уже подписаны' : 'Подписаться' }}
       </a-button>
     </div>
@@ -44,7 +45,8 @@ export default {
       current: '',
       editDrawerVisible: false,
       statusFollow: false,
-      followIds: []
+      followIds: [],
+      userinfo: [],
     };
   },
   computed: {
@@ -75,7 +77,7 @@ export default {
   watch: {
     currentUser(currentUser) {
       this.followIds = currentUser.followers;
-    }
+    },
   }
 };
 </script>

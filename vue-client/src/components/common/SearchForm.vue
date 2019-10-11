@@ -1,8 +1,11 @@
 <template>
     <div class='search-field'>
-        <a-input-search v-model="searchText" placeholder="Поиск" @search="onSearch">
+        <a-input v-model="searchText">
             <a-icon type="search" slot="prefix"></a-icon>
-        </a-input-search>
+        </a-input>
+        <!--<a-input-search v-model="searchText" placeholder="Поиск" @search="onSearch">
+            <a-icon type="search" slot="prefix"></a-icon>
+        </a-input-search>-->
     </div>
 </template>
 <style lang="scss">

@@ -1,7 +1,15 @@
 <template>
+
   <div class="projects">
+    <div class="address-header align-right">
+      <div class="address-header-search">
+        <a-input v-model="searchText">
+          <a-icon type="search" slot="prefix"></a-icon>
+        </a-input>
+      </div>
+    </div>
     <div class="projects-body">
-      <app-project v-for="(project, index) in projects" :project="project" :key="index"></app-project>
+      <app-project v-for="(project, index) in this.filterData" :project="project" :key="index"></app-project>
     </div>
   </div>
 </template>
@@ -18,6 +26,8 @@
     data() {
       return {
         createVisible: false,
+        filterData: [],
+        searchText: '',
       };
     },
     methods: {
@@ -31,13 +41,33 @@
     beforeCreate() {
       this.$store.dispatch(GET_PROJECTS);
     },
+    beforeMount() {
+      this.$store.dispatch(GET_PROJECTS);
+    },
     computed: {
       ...mapGetters(['projects']),
+    },
+    watch: {
+      projects(projects) {
+        this.filterData = projects;
+        this.fullData = [...this.filterData];
+      },
+      searchText(text) {
+        this.filterData = this.fullData.filter(el => {
+          return (
+                  el.name.indexOf(text) !== -1
+          );
+        });
+
+      },
     },
   };
 </script>
 
 <style lang="scss">
+  .address-header.align-right {
+    justify-content: flex-end;
+  }
 .projects {
   height: 100%;
   &-body {

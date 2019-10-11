@@ -231,10 +231,10 @@ export default {
 
   &-header {
     display: flex;
-    margin: 1.5rem 3.125rem 1rem 3.125rem;
-    justify-content: space-between;
+      margin: 1.5rem 3.125rem 1rem 3.125rem;
+      justify-content: space-between;
 
-    &-name {
+      &-name {
       height: 31px;
       font-size: 24px;
       font-weight: normal;
