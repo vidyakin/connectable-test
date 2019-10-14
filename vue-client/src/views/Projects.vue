@@ -55,7 +55,7 @@
       searchText(text) {
         this.filterData = this.fullData.filter(el => {
           return (
-                  el.name.indexOf(text) !== -1
+                  el.name.toLowerCase().indexOf(text) !== -1
           );
         });
 

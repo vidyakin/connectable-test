@@ -26,7 +26,6 @@ module.exports = (Collection, serializer, options) => {
                     }
                 }
                 if (Collection.collection.collectionName === 'events') {
-                    console.log(req.body);
                     if(req.body.emailSend) {
                     mail.CalendarEvent(req.body.userEmail, `https://connectable.pro/login/`, {name:data.name, comment:data.comment, date:moment(data.date).locale('ru').format("MMM Do YY"), time:data.time})
                     }
