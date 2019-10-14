@@ -65,6 +65,7 @@ import AppInput from '../common/Input';
 import { UPDATE_USER_INFO } from '../../store/user/actions.type';
 import ATextarea from 'ant-design-vue/es/input/TextArea';
 import { CREATE_GROUP } from '../../store/group/actions.type';
+import {GET_NOTIFICATION} from '../../store/notification/actions.type';
 import store from '../../store';
 export default {
   name: 'AppUserEditDrawer',
@@ -73,6 +74,7 @@ export default {
       current: '',
       createButtonSpinning: false,
       type: 1,
+      statusEmailSend: false,
       userinfo: (store.getters.userData.result ? store.getters.userData.result : store.getters.user.result),
     };
   },
@@ -81,7 +83,7 @@ export default {
     AppInput,
   },
   computed: {
-    ...mapGetters(['user', 'userData']),
+    ...mapGetters(['user', 'userData', 'notification']),
   },
   methods: {
     onClose() {
@@ -98,6 +100,7 @@ export default {
               type: this.type,
               creatorId: this.userinfo._id,
               userEmail: this.userinfo.email,
+              emailSend: this.statusEmailSend,
             })
             .finally(() => {
               this.createButtonSpinning = false;
@@ -106,6 +109,7 @@ export default {
         }
       });
     },
+
     handleChange(e) {
       this.type = e;
     },
@@ -116,6 +120,13 @@ export default {
   },
   beforeCreate() {
     this.form = this.$form.createForm(this);
+    this.$store.dispatch(GET_NOTIFICATION);
+  },
+
+  watch: {
+    notification(notification) {
+      this.statusEmailSend = (notification ? notification.publications : false);
+    }
   },
 };
 </script>

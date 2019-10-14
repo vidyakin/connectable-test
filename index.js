@@ -142,6 +142,7 @@ app.post('/api/register', function(req,res){
         lastname = req.body.lastName,
         email = req.body.email,
         password = req.body.password,
+        emailSend = req.body.emailSend,
         data = {
             "firstName": firstName,
             "lastName":lastname,
@@ -183,7 +184,10 @@ app.post('/api/register', function(req,res){
                     db.collection('users').insertOne(data,function(err, collection){
                         if (err) return res.status(500).send("There was a problem registering the user.");
                     });
-                    mail.NewUser(email, `https://connectable.pro/login/`, {email:email, password:password})
+                    if(emailSend) {
+                        mail.NewUser(email, `https://connectable.pro/login/`, {email:email, password:password});
+                    }
+
                 }
             });
 
@@ -359,7 +363,6 @@ app.post('/api/notification', (req, res, next) => {
                 Notification.updateMany({},
                     obj_result
                 ).then(result => {
-                    console.log(`Successfully update  items.`);
                     res.status(status).send(data);
                 }).catch(err => console.error(`Failed to update items: ${err}`));
 
@@ -368,7 +371,6 @@ app.post('/api/notification', (req, res, next) => {
                 db.collection('notifications').insertOne(notifi,function(err, collection){
                     if (err) return res.status(500).send("There was a problem registering the user.");
                     else {
-                        console.log(data);
                         res.status(status).send(data);
                     }
                 });
@@ -379,9 +381,6 @@ app.post('/api/notification', (req, res, next) => {
             }
         }
     });
-
-
-
 });
 //display status notification
 app.get('/api/notification', (req, res) => {

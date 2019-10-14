@@ -13,10 +13,14 @@
                         </a-checkbox>
                     </a-form-item>
                 </div>
-                <!--<div class="custom-control custom-checkbox mb-3">
-                    <input type="checkbox" v-model="settings.subscribe" class="custom-control-input" id="subscribe" name="subscribe">
-                    <label class="custom-control-label" for="subscribe">У пользователей, на которых он подписан</label>
-                </div>-->
+                <div class="custom-control custom-checkbox mb-3">
+                    <a-form-item class="wrap-field">
+                        <a-checkbox v-decorator="['subscribe']" :checked="settings.subscribe"
+                                    @change="onChangeSubscribe" >
+                            У пользователей, на которых он подписан
+                        </a-checkbox>
+                    </a-form-item>
+                </div>
                 <!-- <div class="custom-control custom-checkbox mb-3">
                    <input type="checkbox" v-model="settings.eventComment" class="custom-control-input" id="eventComment" name="eventComment" value="">
                    <label class="custom-control-label" for="eventComment">во всех публикациях и комментариях, где юзера тегнули через @</label>
@@ -41,7 +45,7 @@
                 <div class="custom-control custom-checkbox mb-3">
                     <a-form-item class="form-group">
                         <a-spin :spinning="createButtonSpinning">
-                            <a-button type="primary" html-type="submit" class="btn btn-primary">Создать</a-button>
+                            <a-button type="primary" html-type="submit" class="btn btn-primary">Сохранить</a-button>
                         </a-spin>
                     </a-form-item>
                 </div>
@@ -86,6 +90,7 @@
                             })
                             .finally(() => {
                                 this.createButtonSpinning = false;
+                                this.$store.dispatch(GET_NOTIFICATION);
                             });
                     }
                 });
@@ -94,7 +99,10 @@
                 this.settings.addUser = e.target.checked;
                 this.addUser = e.target.checked;
             },
-
+            onChangeSubscribe(e) {
+                this.settings.subscribe = e.target.checked;
+                this.subscribe = e.target.checked;
+            },
             onChangeCalendar (e) {
                 this.settings.eventCalendar = e.target.checked;
                 this.eventCalendar = e.target.checked;
@@ -116,6 +124,7 @@
                 this.settings.publications = (notification ? notification.publications: false);
                 this.settings.eventComment = (notification ? notification.eventComment: false);
                 this.settings.eventCalendar = (notification ? notification.eventCalendar: false);
+                this.settings.subscribe = (notification ? notification.subscribe: false);
             }
         }
     });

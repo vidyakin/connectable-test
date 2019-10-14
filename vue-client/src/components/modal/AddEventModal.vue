@@ -60,6 +60,7 @@
   import moment from 'moment';
   import {CREATE_EVENT, UPDATE_USER_INFO} from '../../store/user/actions.type';
   import store from '../../store';
+  import {GET_NOTIFICATION} from '../../store/notification/actions.type';
   export default {
     data() {
       return {
@@ -79,6 +80,7 @@
         date: moment(),
         time: moment.relTime,
         comment: '',
+        statusEmailSend: false,
         userInfo: (store.getters.userData ? store.getters.userData : store.getters.user),
       };
     },
@@ -92,6 +94,7 @@
         const event = {name, date, time, comment, color: currentColor.color};
         event.userId = this.userInfo.result._id;
         event.userEmail = this.userInfo.result.email;
+        event.emailSend = this.statusEmailSend;
         this.$store.dispatch(CREATE_EVENT, event)
           .finally(() => {
             this.name = '';
@@ -110,11 +113,19 @@
       AppInput,
     },
     computed: {
-      ...mapGetters(['user', 'userData']),
+      ...mapGetters(['user', 'userData', 'notification']),
     },
     props: {
       visible: Boolean,
       close: Function,
+    },
+    beforeCreate() {
+      this.$store.dispatch(GET_NOTIFICATION);
+    },
+    watch: {
+      notification(notification) {
+        this.statusEmailSend = (notification ? notification.eventCalendar : false);
+      }
     },
   };
 </script>

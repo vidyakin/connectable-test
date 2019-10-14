@@ -18,6 +18,7 @@
 import { mapGetters } from 'vuex';
 import AppLoginBar from './LoginBar';
 import { SEND_NEW_POST } from '../../store/post/actions.type';
+import {GET_NOTIFICATION} from '../../store/notification/actions.type';
 import Vue from 'vue';
 import store from '../../store';
 export default {
@@ -29,11 +30,12 @@ export default {
     return {
       current: '',
       fileList: [],
+      statusEmailSend: false,
       datauser: (store.getters.userData ? store.getters.userData : store.getters.user),
     };
   },
   computed: {
-    ...mapGetters(['showHeaderImage', 'user', 'currentUser', 'userData']),
+    ...mapGetters(['showHeaderImage', 'user', 'currentUser', 'userData', 'notification']),
   },
   methods: {
     send() {
@@ -43,6 +45,7 @@ export default {
           parent: this.parent,
           author: this.datauser.result,
           attachment: [],
+          emailSend: this.statusEmailSend,
           formData: this.handleUpload(),
         });
       }
@@ -71,6 +74,14 @@ export default {
         return null;
       }
     },
+  },
+  beforeCreate() {
+    this.$store.dispatch(GET_NOTIFICATION);
+  },
+  watch: {
+    notification(notification) {
+      this.statusEmailSend = (notification ? notification.subscribe : false);
+    }
   },
   props: {
     parent: Object,

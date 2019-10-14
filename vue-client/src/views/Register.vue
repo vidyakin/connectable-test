@@ -5,7 +5,7 @@
 			  <div class="col-sm-8 offset-sm-2">
 					<form class="u-form" @submit.prevent="handleSubmit">
 						<fieldset>
-							<legend>Регистрация</legend>
+							<legend>Регистрация {{this.statusEmailSend}}</legend>
 						<div class="form-group">
 							<label for="firstName">Имя</label>
 							<input type="text" v-model="user.firstName" name="firstName" class="form-control" :class="{ 'is-invalid': submitted && !user.firstName }" />
@@ -41,7 +41,9 @@
 
 <script>
 import Vue from 'vue';
+import { mapGetters } from 'vuex';
 import { INSERT_USER_INFO } from '../store/user/actions.type';
+import {GET_NOTIFICATION} from '../store/notification/actions.type';
 import store from '../store';
 export default Vue.extend({
   data () {
@@ -53,9 +55,13 @@ export default Vue.extend({
               password: ''
           },
           submitted: false,
-		  error: false
+		  error: false,
+		  statusEmailSend: false,
       }
   },
+	computed: {
+		...mapGetters(['notification']),
+	},
   methods: {
       handleSubmit(e) {
           this.submitted = true;
@@ -68,7 +74,8 @@ export default Vue.extend({
                 firstName:this.user.firstName,
                 lastName:this.user.lastName,
                 email:this.user.email,
-                password:this.user.password
+                password:this.user.password,
+			  emailSend: this.statusEmailSend
               }).finally(() => {
 				  if(!store.getters.errorRegister) {
 					  this.$router.push({ name: 'about' });
@@ -82,6 +89,14 @@ export default Vue.extend({
           }        
       }
   },
+	beforeCreate() {
+		this.$store.dispatch(GET_NOTIFICATION);
+	},
+	watch: {
+		notification(notification) {
+			this.statusEmailSend = (notification ? notification.addUser : false);
+		}
+	},
 });
 </script>
 
