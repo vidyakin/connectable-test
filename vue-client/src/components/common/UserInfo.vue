@@ -20,7 +20,7 @@
       <div class="user-info-content-email">{{currentUser && currentUser.email}}</div>
     </div>
 
-    <div class="user-info-edit">
+    <div class="user-info-edit" v-if="userData.result._id == this.$route.params._id || $can('read', {'accessEmail': userData.result.email, '__type': 'User'})">
       <a-button icon="edit" @click="editDrawerVisible = true"></a-button>
     </div>
   </div>
@@ -77,6 +77,7 @@ export default {
   watch: {
     currentUser(currentUser) {
       this.followIds = currentUser.followers;
+      this.userinfo = currentUser._id;
     },
   }
 };

@@ -1,7 +1,7 @@
 <template>
   <div class="profile">
     <app-user-info></app-user-info>
-    <app-comment-input :parent="{type: 'user', id: userData && userData.result._id}" />
+    <app-comment-input :parent="{type: 'user', id: userData && userData.result._id}" v-if="userData.result._id == this.$route.params._id || $can('read', {'accessEmail': userData.result.email, '__type': 'User'})" />
     <app-post v-for="(post, index) in posts" :post="post" :key="index" />
   </div>
 </template>

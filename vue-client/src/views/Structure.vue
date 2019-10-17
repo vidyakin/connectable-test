@@ -6,7 +6,7 @@
       <div class="structure-header-name">
         Структура
       </div>
-      <div class="structure-header-search">
+      <div class="structure-header-search" v-if="$can('read', {'accessEmail': datauser.email, '__type': 'User'})">
         <a-button type="primary" v-if="test" @click="openDepartment">Добавить разделы</a-button>
         <a-button type="primary" v-else="!test" @click="openCreate">Создать проект</a-button>
       </div>
@@ -22,7 +22,7 @@
                 <a-table
                         v-if="dep.name"
                         :columns="columns"
-                        :dataSource="userData(dep)"
+                        :dataSource="userDataFunc(dep)"
                         :pagination="false"
 
                 >
@@ -61,7 +61,7 @@
                     <a-table
                             v-if="dep.name"
                             :columns="columns"
-                            :dataSource="userData(dep)"
+                            :dataSource="userDataFunc(dep)"
                             :pagination="false"
 
                     >
@@ -99,7 +99,7 @@
                         <a-table
                                 v-if="dep_3.name"
                                 :columns="columns"
-                                :dataSource="userData(dep_3)"
+                                :dataSource="userDataFunc(dep_3)"
                                 :pagination="false"
 
                         >
@@ -137,7 +137,7 @@
                             <a-table
                                     v-if="dep_4.name"
                                     :columns="columns"
-                                    :dataSource="userData(dep_4)"
+                                    :dataSource="userDataFunc(dep_4)"
                                     :pagination="false"
 
                             >
@@ -189,6 +189,7 @@
   import {GET_DEP, DELETE_DEP} from '../store/structure/actions.type';
   import AppProjects from '../views/Projects';
   import AppDepantaments from '../components/common/Departaments';
+  import store from '../store';
   const columns = [
     {
       title: '',
@@ -229,13 +230,14 @@
         res_data: [],
         columns,
         userLength: '',
+        datauser: (store.getters.userData.result ? store.getters.userData.result : store.getters.user )
       };
     },
     methods: {
       goTo(id) {
         this.$router.push({ name: 'profile', params: { _id: id } });
       },
-      userData(param) {
+      userDataFunc(param) {
         if( Object.size(param.users)) {
           for (let i = 0; i < Object.size(param.users); i++) {
             for (let j = 0; j < Object.size(this.data); j++) {
@@ -284,7 +286,7 @@
       this.$store.dispatch(GET_DEP);
     },
     computed: {
-      ...mapGetters(['departments', 'users']),
+      ...mapGetters(['departments', 'users', 'userData']),
     },
     watch: {
       users(users) {
@@ -300,6 +302,7 @@
         });
         this.fullData = [...this.data];
       },
+
       departments(departments) {
         const row = [];
         this.dep_arr = departments.map(e => {

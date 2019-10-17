@@ -33,7 +33,7 @@
         <img src="@/assets/Icons/Structure.svg" alt />
         Структура
       </a-menu-item>
-      <a-menu-item key="/settings" class="footer" >
+      <a-menu-item key="/settings" class="footer" v-if="$can('read', {'accessEmail': datauser.result.email, '__type': 'User'})" >
         <img src="@/assets/Icons/setting.svg" alt />
         Настройки
       </a-menu-item>
@@ -66,7 +66,7 @@
       <a-menu-item key="/structure">
         <img src="@/assets/Icons/Structure.svg" alt />
       </a-menu-item>
-      <a-menu-item key="/settings" class="footer" >
+      <a-menu-item key="/settings" class="footer"  >
         <img src="@/assets/Icons/setting.svg" alt />
       </a-menu-item>
     </a-menu>
