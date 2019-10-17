@@ -39,7 +39,7 @@
                         title="Подтверите удаление"
                         okText="Подтверждаю"
                         cancelText="Отмена"
-                        @confirm="deleteBlock(dep._id)"
+                        @confirm="deleteBlock(dep._id)" v-if="$can('read', {'accessEmail': datauser.email, '__type': 'User'})"
                 >
                   <a-tooltip title="Удалить">
                     <a-button class="delete-department" icon="delete"></a-button>
@@ -78,7 +78,7 @@
                             title="Подтверите удаление"
                             okText="Подтверждаю"
                             cancelText="Отмена"
-                            @confirm="deleteBlock(dep._id)"
+                            @confirm="deleteBlock(dep._id)" v-if="$can('read', {'accessEmail': datauser.email, '__type': 'User'})"
                     >
                       <a-tooltip title="Удалить">
                         <a-button class="delete-department" icon="delete"></a-button>
@@ -116,7 +116,7 @@
                                 title="Подтверите удаление"
                                 okText="Подтверждаю"
                                 cancelText="Отмена"
-                                @confirm="deleteBlock(dep_3._id)"
+                                @confirm="deleteBlock(dep_3._id)" v-if="$can('read', {'accessEmail': datauser.email, '__type': 'User'})"
                         >
                           <a-tooltip title="Удалить">
                             <a-button class="delete-department" icon="delete"></a-button>
@@ -154,7 +154,7 @@
                                     title="Подтверите удаление"
                                     okText="Подтверждаю"
                                     cancelText="Отмена"
-                                    @confirm="deleteBlock(dep_4._id)"
+                                    @confirm="deleteBlock(dep_4._id)" v-if="$can('read', {'accessEmail': datauser.email, '__type': 'User'})"
                             >
                               <a-tooltip title="Удалить">
                                 <a-button class="delete-department" icon="delete"></a-button>

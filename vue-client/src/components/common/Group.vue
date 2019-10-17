@@ -5,7 +5,7 @@
         <div class="group-header-content-name" @click="redirectToGroup">{{group.name}}</div>
         <div class="group-header-content-count">{{group.participants.length}} участников</div>
       </div>
-      <div class="group-header-action">
+      <div class="group-header-action" v-if="$can('read', {'accessEmail': datauser.email, '__type': 'User'})">
         <a-popover
           title="Действия с группой"
           trigger="click"
@@ -39,11 +39,19 @@ import { mapGetters } from 'vuex';
 import {
   DELETE_GROUP,
 } from '@/store/group/actions.type';
-
+import store from '../../store';
 export default {
   name: 'AppGroup',
+  data() {
+    return {
+      datauser: (store.getters.userData ? store.getters.userData.result : store.getters.user ),
+    };
+  },
   props: {
     group: Object,
+  },
+  computed: {
+    ...mapGetters(['userData']),
   },
   methods: {
     deleteGroup() {

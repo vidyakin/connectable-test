@@ -5,7 +5,7 @@
         <div class="project-header-content-name" @click="redirectToGroup">{{project.name}}</div>
         <div class="project-header-content-count">{{project.participants.length}} участников</div>
       </div>
-      <div class="project-header-action">
+      <div class="project-header-action" v-if="$can('read', {'accessEmail': datauser.email, '__type': 'User'})">
         <a-popover
           title="Действия с группой"
           trigger="click"
@@ -38,12 +38,18 @@
 
 <script>
 import { mapGetters } from 'vuex';
+import store from '../../store';
 import {
   DELETE_PROJECT,
 } from '@/store/project/actions.type';
 
 export default {
   name: 'AppProject',
+  data() {
+    return {
+      datauser: (store.getters.userData ? store.getters.userData.result : store.getters.user )
+    };
+  },
   props: {
     project: Object,
   },
@@ -56,7 +62,7 @@ export default {
     },
   },
   computed: {
-    ...mapGetters(['user']),
+    ...mapGetters(['user','userData']),
   },
 };
 </script>
