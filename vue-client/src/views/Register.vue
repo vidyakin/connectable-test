@@ -29,7 +29,7 @@
 						</div>
 						<div class="form-group">
 							<button class="btn btn-primary">Регистрация</button>
-							<router-link to="/login" class="btn btn-link">Авторизоваться</router-link>
+							<router-link to="/login" class="btn btn-link">Авторизация</router-link>
 						</div>
 					  </fieldset>
 					</form>

@@ -208,7 +208,7 @@ export default {
 <style lang="scss">
 .groups-header {
   display: flex;
-  margin: 1.5rem 3.125rem 1rem 3.125rem;
+  margin: 1.5rem 0 1rem 0;
   justify-content: space-between;
 
   &-name {
@@ -227,6 +227,7 @@ export default {
 .group-view {
   height: calc(100vh - 3.125rem);
   overflow: auto;
+  padding: 30px;
   background-color: #f0f0f7;
 
   &-header {
@@ -248,7 +249,7 @@ export default {
   }
 
   .group-body {
-    margin: 1.5rem 3.125rem 1rem 3.125rem;
+    margin: 1.5rem 0 1rem 0;
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;

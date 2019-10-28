@@ -100,7 +100,7 @@ export default {
   padding: 0;
   height: 100%;
   width: 12.5rem !important;
-  @media (max-width: 1024px) {
+  @media (max-width: 1023px) {
     width: 4rem !important;
   }
 

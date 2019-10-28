@@ -22,7 +22,7 @@
                         <div v-show="submitted && user.password && error.password" class="invalid-feedback">Пароль неверный</div>
                     </div>
                     <div class="form-group">
-                        <button class="btn btn-primary">Авторизоваться</button>
+                        <button class="btn btn-primary">Авторизация</button>
                         <router-link to="/register" class="btn btn-link">Регистрация</router-link>
                     </div>
                 </fieldset>
