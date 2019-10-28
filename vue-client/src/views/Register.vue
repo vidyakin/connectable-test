@@ -5,7 +5,7 @@
 			  <div class="col-sm-8 offset-sm-2">
 					<form class="u-form" @submit.prevent="handleSubmit">
 						<fieldset>
-							<legend>Регистрация {{this.statusEmailSend}}</legend>
+							<legend>Регистрация </legend>
 						<div class="form-group">
 							<label for="firstName">Имя</label>
 							<input type="text" v-model="user.firstName" name="firstName" class="form-control" :class="{ 'is-invalid': submitted && !user.firstName }" />
