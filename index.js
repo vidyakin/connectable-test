@@ -209,7 +209,7 @@ app.post('/api/register', function(req,res){
 
 });
 //login page
-app.post('/api/loginPage', function(req,res){
+app.post('/api/loginPage', validateToken, function(req,res){
 
     let email =req.body.email,
         password = req.body.password,
