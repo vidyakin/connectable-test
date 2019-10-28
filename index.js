@@ -209,7 +209,7 @@ app.post('/api/register', function(req,res){
 
 });
 //login page
-app.post('/api/loginPage', validateToken, function(req,res){
+app.post('/api/loginPage', function(req,res){
 
     let email =req.body.email,
         password = req.body.password,
@@ -226,7 +226,7 @@ app.post('/api/loginPage', validateToken, function(req,res){
                     const payload = {result: user};
                     const secret = process.env.JWT_SECRET;
                     const token = jwt.sign(payload, secret, {
-                        expiresIn: 86400 // expires in 24 hours
+                        expiresIn: 20// expires in 24 hours
                     });
 
                     result.token = token;

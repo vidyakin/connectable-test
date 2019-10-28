@@ -5,15 +5,35 @@ import {setAuthToken} from '@/services/auth/setAuthToken';
 import store from '../../store';
 import { router } from '../../router';
 
+function decodeToken(response:any) {
+    var base64Url = response.split('.')[1];
+    var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    var jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+    return jsonPayload;
+};
 export const login = (context: any, user: any) => {
   return Vue.axios.post('/api/login', user)
     .then((response) => {
-      localStorage.setItem('authorization', 'true');
-      localStorage.setItem('token', `${response.data.token}`);
+        var jsonPayload = decodeToken(response.data.token);
+        var playload = JSON.parse(jsonPayload);
+        var date = Math.floor(Date.now() / 1000);
+        if(date >= playload.exp) {
+            localStorage.removeItem('authorization');
+            localStorage.removeItem('token');
+            store.commit(SET_USER, null);
+            store.commit(SET_USER_DATA, null);
+            router.push('/login');
+        }
+        else {
+            localStorage.setItem('authorization', 'true');
+            localStorage.setItem('token', `${response.data.token}`);
+            context.commit(SET_USER, response.data);
+            context.commit(SET_USER_DATA, response.data);
+            setAuthToken(`${response.data.token}`);
+        }
 
-      context.commit(SET_USER, response.data);
-        context.commit(SET_USER_DATA, response.data);
-      setAuthToken(`${response.data.token}`);
     });
 };
 
@@ -50,12 +70,20 @@ export const getInfoAboutUser = (context: any) => {
       context.commit(SET_USER, response.data);
     });
 };
+
 export const getInfoUser = (token : any) => {
-    var base64Url = token.split('.')[1];
-    var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    var jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
-        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-    }).join(''));
+    var jsonPayload = decodeToken(token);
     var playload = JSON.parse(jsonPayload);
-    return store.commit(SET_USER_DATA, playload);
+    var date = Math.floor(Date.now() / 1000);
+    if(date >= playload.exp) {
+        localStorage.removeItem('authorization');
+        localStorage.removeItem('token');
+        store.commit(SET_USER, null);
+        store.commit(SET_USER_DATA, null);
+        router.push('/login');
+    }
+    else {
+        return store.commit(SET_USER_DATA, playload);
+    }
+
 };

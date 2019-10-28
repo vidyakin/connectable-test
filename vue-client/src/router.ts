@@ -2,6 +2,7 @@ import Vue from 'vue';
 import Router from 'vue-router';
 import Home from './views/Home.vue';
 import store from './store';
+import {getInfoUser} from "@/services/auth/auth.service";
 Vue.use(Router);
 
 const view = (name: string) => {
@@ -105,6 +106,10 @@ router.beforeEach((to, from, next) => {
   const authRequired = !publicPages.includes(to.path);
   const loggedIn = localStorage.getItem('authorization');
   const isLoggedIn = localStorage.getItem('token');
+
+  if(localStorage.getItem('token')) {
+    getInfoUser(localStorage.getItem('token'));
+  }
 
   if (authRequired && (!isLoggedIn || !loggedIn)) {
     return next({ name: 'login' });
