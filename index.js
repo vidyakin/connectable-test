@@ -226,7 +226,7 @@ app.post('/api/loginPage', function(req,res){
                     const payload = {result: user};
                     const secret = process.env.JWT_SECRET;
                     const token = jwt.sign(payload, secret, {
-                        expiresIn: 20// expires in 24 hours
+                        expiresIn: 86400 // expires in 24 hours
                     });
 
                     result.token = token;

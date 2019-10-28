@@ -49,7 +49,7 @@ module.exports = (req, res) => {
         const payload = {result: user};
         const secret = process.env.JWT_SECRET;
         result.token = jwt.sign(payload, secret, {
-          expiresIn: 20// expires in 24 hours
+          expiresIn: 86400 // expires in 24 hours
         });
 
         result.status = status;
@@ -64,7 +64,7 @@ module.exports = (req, res) => {
           const payload = {user: newUser.googleId};
           const secret = process.env.JWT_SECRET;
           result.token = jwt.sign(payload, secret, {
-            expiresIn: 20// expires in 24 hours
+            expiresIn: 86400 // expires in 24 hours
           });
           result.status = status;
           result.result = newUser;
