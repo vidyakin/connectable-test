@@ -130,6 +130,7 @@ export default {
   &-content {
     height: 16rem;
     background-color: white;
+    overflow: auto;
 
     &-participant {
       display: flex;

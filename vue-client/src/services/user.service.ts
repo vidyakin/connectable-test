@@ -75,7 +75,7 @@ export const getUser = (context: any, userId: number) => {
 
 export const insertNewUser = (context: any, dataUser : any) => { 
   return Vue.axios
-    .post(`api/register`, dataUser).then((response: any) => { 
+    .post(`api/register`, dataUser).then((response: any) => {
         if(response.data.status == 200) {
             context.commit(ERROR_REGISTER, '');
             context.commit(SUCCESS_REGISTER, 'Регистрация прошла успешно');

@@ -78,9 +78,9 @@ export default Vue.extend({
 			  emailSend: this.statusEmailSend
               }).finally(() => { console.log(store.getters.errorRegister);
 				  if(!store.getters.errorRegister) {
-					  this.$router.push({ name: 'about' }); console.log(1);
+					  this.$router.push({ name: 'about' });
 				  }
-				  else { console.log(2);
+				  else {
 					  document.getElementById('email').classList.add('is-invalid');
 					  this.submitted = true;
 					  this.error = true;
