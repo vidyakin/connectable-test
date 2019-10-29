@@ -12,7 +12,7 @@
     <div class="groups-header">
       <div class="groups-header-name">Группы</div>
       <div class="groups-header-search">
-        <a-button type="primary" @click="openCreate" v-if="$can('read', {'accessEmail': datauser.email, '__type': 'User'})">Создать группу</a-button>
+        <a-button type="primary" @click="openCreate" >Создать группу</a-button>
       </div>
     </div>
     <div class="groups-body">
