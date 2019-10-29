@@ -161,9 +161,9 @@ app.post('/api/register', function(req,res){
                     result.status = status;
                     res.status(status).send(result);
                 } else {
-                    status = 401;
+                    status = 202;
                     result.status = status;
-                    result.error = `Authentication error`;
+                    result.error = `Authentication error. This email is already registered`;
                 }
 
                 res.status(status).send(result);

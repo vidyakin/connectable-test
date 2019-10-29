@@ -76,17 +76,18 @@ export default Vue.extend({
                 email:this.user.email,
                 password:this.user.password,
 			  emailSend: this.statusEmailSend
-              }).finally(() => {
+              }).finally(() => { console.log(store.getters.errorRegister);
 				  if(!store.getters.errorRegister) {
-					  this.$router.push({ name: 'about' });
+					  this.$router.push({ name: 'about' }); console.log(1);
 				  }
-				  else {
+				  else { console.log(2);
 					  document.getElementById('email').classList.add('is-invalid');
 					  this.submitted = true;
 					  this.error = true;
 				  }
             });
-          }        
+          }
+
       }
   },
 	beforeCreate() {

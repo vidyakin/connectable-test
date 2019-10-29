@@ -225,7 +225,7 @@ export default {
 }
 
 .group-view {
-  height: calc(100vh - 3.125rem);
+  height: calc(100vh - 210px);
   overflow: auto;
   padding: 30px;
   background-color: #f0f0f7;
