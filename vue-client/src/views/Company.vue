@@ -46,6 +46,7 @@ export default Vue.extend({
   computed: {
     ...mapGetters(['posts']),
   },
+
 });
 </script>
 

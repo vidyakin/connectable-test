@@ -126,7 +126,6 @@ export default {
             ...this.postForEditing,
             message: formFields.message,
             formData: this.handleUpload(),
-            edited: true,
           };
           console.log(post);
           this.$store.dispatch(EDIT_POST, post).finally(() => {

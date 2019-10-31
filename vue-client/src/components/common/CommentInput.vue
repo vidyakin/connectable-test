@@ -21,6 +21,7 @@ import { SEND_NEW_POST } from '../../store/post/actions.type';
 import {GET_NOTIFICATION} from '../../store/notification/actions.type';
 import Vue from 'vue';
 import store from '../../store';
+import moment from 'moment';
 export default {
   name: 'AppCommentInput',
   components: {
@@ -42,6 +43,7 @@ export default {
       if (this.current !== '') {
         this.$store.dispatch(SEND_NEW_POST, {
           message: this.current,
+          created: moment(),
           parent: this.parent,
           author: this.datauser.result,
           attachment: [],
