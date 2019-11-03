@@ -14,7 +14,7 @@
       <div class="comment-wrapper-content-time">
         <span
           @click="like(comment._id, 'comment')"
-          v-if="comment.likes.findIndex(e => e.author._id === user._id) ===  -1"
+          v-if="comment.likes.findIndex(e => e.author._id === datauser._id) ===  -1"
         >Нравится</span>
         <span @click="answering = true">Ответить</span>
         {{ getMomentTime(comment.created) }}
@@ -39,7 +39,7 @@
           <div class="comment-wrapper-content-time">
             <span
               @click="like(answer._id, 'answer')"
-              v-if="answer.likes.findIndex(e => e.author._id === user._id) ===  -1"
+              v-if="answer.likes.findIndex(e => e.author._id === datauser._id) ===  -1"
             >Нравится</span>
             {{getMomentTime(answer.created) }}
           </div>

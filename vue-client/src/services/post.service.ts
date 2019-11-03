@@ -86,6 +86,22 @@ export const sendLike = (context: any, like: any) => {
       }
     });
 };
+export const dislike = (context: any, disLike: any) => {
+    return Vue.axios
+        //.delete(`api/dislike/${arrRes}`)
+        .post('api/dislike', disLike)
+        .then((response: any) => {
+            return response.data;
+            /*const newLike = response.data.result;
+            if (newLike.parent.type === 'post') {
+                context.commit(ADD_LIKE_FOR_POST, newLike);
+            }
+            if (newLike.parent.type === 'comment') {
+                context.commit(ADD_LIKE_FOR_COMMENT, newLike);
+            }*/
+
+        });
+};
 
 export const sendComment = (context: any, comment: any) => {
   return Vue.axios

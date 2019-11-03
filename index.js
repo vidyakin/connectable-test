@@ -408,7 +408,16 @@ app.post('/api/unfollow', (req, res) => {
         else res.status(200).send(curentUserID);
     });
 });
-
+//dislike
+app.post('/api/dislike', (req, res) => {
+    let authorId = req.body;
+    Like.deleteOne({parent : authorId.parent, author: authorId.author},function(error, collection){
+        if (error) return res.status(500).send("There was a problem with dislike.");
+        else {
+            res.status(200).send('Like deleted');
+        }
+    });
+});
 
 
 app.listen(port, () => console.log(`[Server]: Listening on port ${port}`));

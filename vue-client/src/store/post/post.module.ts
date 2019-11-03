@@ -7,8 +7,9 @@ import {
   SEND_COMMENT,
   SEND_LIKE,
   SEND_NEW_POST,
+  DELETE_LIKE,
 } from '@/store/post/actions.type';
-import {deletePost, editPost, getPosts, repost, sendComment, sendLike, sendNewPost} from '@/services/post.service';
+import {deletePost, editPost, getPosts, repost, sendComment, sendLike, sendNewPost, dislike} from '@/services/post.service';
 import {
   ADD_ANSWER_FOR_COMMENT,
   ADD_COMMENT_FOR_POST,
@@ -48,6 +49,7 @@ const actions = {
   [SEND_NEW_POST]: sendNewPost,
   [GET_POSTS]: getPosts,
   [SEND_LIKE]: sendLike,
+  [DELETE_LIKE]: dislike,
   [SEND_COMMENT]: sendComment,
   [DELETE_POST]: deletePost,
   [REPOST]: repost,

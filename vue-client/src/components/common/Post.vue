@@ -47,8 +47,10 @@
         </div>
       </div>
       <div class="post-wrapper-footer">
-        <span v-if="user && post.likes.findIndex(e => e.author._id === user._id) > -1">Вам нравится</span>
-        <a-button icon="like" @click="like(post._id)" v-else>Нравится</a-button>
+        <span v-if="datauser && post.likes.findIndex(e => e.author._id === datauser._id) > -1" >
+          <a-button icon="dislike" @click="dislike(post._id)">Не нравится</a-button>
+          </span>
+        <a-button icon="like" @click="likes(post._id)" v-else>Нравится</a-button>
         <a-button icon="message" @click="commented">Комментировать</a-button>
       </div>
       <div class="post-wrapper-comments">
@@ -108,6 +110,7 @@ import {
   SEND_COMMENT,
   SEND_LIKE,
   SEND_NEW_POST,
+  DELETE_LIKE,
 } from '../../store/post/actions.type';
 import moment from 'moment';
 import {
@@ -115,6 +118,7 @@ import {
   SET_POST_FOR_EDITING,
 } from '../../store/post/mutations.type';
 import store from '../../store';
+import { GET_POSTS } from '../../store/post/actions.type';
 export default {
   name: 'AppPost',
   components: {
@@ -140,12 +144,28 @@ export default {
     getMomentTime(time) {
       return moment(time).fromNow(true);
     },
-    like(postId) {
-      const like = {
+    likes(postId) {
+      const likes = {
         parent: { type: 'post', id: postId },
         author: this.datauser,
       };
-      this.$store.dispatch(SEND_LIKE, like);
+      this.$store.dispatch(SEND_LIKE, likes);
+    },
+    dislike(postId) {
+      const likes = {
+        parent: { type: 'post', id: postId },
+        author: this.datauser,
+      };
+      this.$store.dispatch(DELETE_LIKE, likes).finally(() => {
+        this.$store.dispatch(GET_POSTS, {
+          filter: {
+            parent: {
+              type: 'company',
+              id: '0',
+            },
+          },
+        });
+      });
     },
     sendComment(postId) {
       const comment = {
