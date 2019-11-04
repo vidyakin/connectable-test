@@ -49,7 +49,7 @@
                             <a-select v-decorator="['members']"
                                     labelInValue
                                     mode="multiple"
-                                    placeholder="Select users"
+                                    placeholder="Выберите пользователей"
                                     style="width: 100%"
                                     :filterOption="false"
                                     @search="search"

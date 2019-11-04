@@ -1,5 +1,5 @@
 <template>
-  <div class="post-wrapper">
+  <div class="post-wrapper" >
     <div class="post-wrapper-body">
       <div class="post-wrapper-header">
         <div class="post-wrapper-header-photo">
@@ -82,7 +82,7 @@
       </div>
     </div>
     <div>
-      <a-popover title="Действия с постом" trigger="click" overlayClassName="action-popup-content">
+      <a-popover title="Действия с постом" trigger="click" :container="'post-' + post._id" overlayClassName="action-popup-content">
         <template slot="content">
           <a-tooltip title="Удалить">
             <a-icon type="delete" @click="deletePost"></a-icon>
@@ -94,7 +94,7 @@
             <a-icon type="edit" @click="editPost"></a-icon>
           </a-tooltip>
         </template>
-        <a-button icon="menu" class="open-action-button"></a-button>
+        <a-button icon="menu" class="open-action-button" :id="'post-' + post._id"></a-button>
       </a-popover>
     </div>
   </div>
