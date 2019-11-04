@@ -2,7 +2,7 @@
   <div class="c-register">
 	  <div class="container">
 		  <div class="row">
-			  <div class="col-sm-8 offset-sm-2">
+			  <div class="col-sm-4 offset-sm-4">
 					<form class="u-form" @submit.prevent="handleSubmit">
 						<fieldset>
 							<legend>Регистрация </legend>
