@@ -82,7 +82,7 @@
       </div>
     </div>
     <div>
-      <a-popover title="Действия с постом" trigger="click" :container="'post-' + post._id" overlayClassName="action-popup-content">
+      <a-popover title="Действия с постом" trigger="click" :container="'post-' + post._id" overlayClassName="action-popup-content" v-if="post && post.author._id === datauser._id">
         <template slot="content">
           <a-tooltip title="Удалить">
             <a-icon type="delete" @click="deletePost"></a-icon>
@@ -157,11 +157,25 @@ export default {
         author: this.datauser,
       };
       this.$store.dispatch(DELETE_LIKE, likes).finally(() => {
+        let parentVal = '', idUrl = '0';
+        switch (this.$route.path.split('/')[1]) {
+          case 'group':
+            parentVal = 'group';
+            idUrl = this.$route.params._id;
+            break;
+          case 'profile':
+            parentVal = 'user';
+            idUrl = this.$route.params._id;
+            break;
+          case 'company':
+            parentVal = 'company';
+            break;
+        }
         this.$store.dispatch(GET_POSTS, {
           filter: {
             parent: {
-              type: 'company',
-              id: '0',
+              type: parentVal,
+              id: idUrl,
             },
           },
         });

@@ -71,6 +71,7 @@
       title="Действия с комментарием"
       trigger="click"
       overlayClassName="action-popup-content"
+      v-if="comment && comment.author._id === datauser._id"
     >
       <template slot="content">
         <a-tooltip title="Удалить">
