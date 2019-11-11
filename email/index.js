@@ -19,14 +19,26 @@ transporter.verify(function(error, success) {
   }
 });
 //
-module.exports.sendInvite = async(to, url) => {
-  let email = await UserDao.findById(to);
+module.exports.sendInvite = async(to, url, typeGroup) => {
+  let email = await UserDao.findById(to), groupName = '';
   email = email.email;
+
+  switch (typeGroup) {
+      case 0:
+          groupName = 'открытую группу';
+          break;
+      case 1:
+          groupName = 'закрытую группу';
+          break;
+      case 2:
+          groupName = 'приватную группу';
+          break;
+  }
  transporter.sendMail({
     from: '"Connectable" <mail@connectable.pro>', // sender address
     to: email, // list of receivers
-    subject: "Приглашение в закрытую группу", // Subject line
-    text: `Здравствуйте, вас приглашают в закрытую группу, принять или отклонить приглашение вы можете по ссылке ${url}`, // plain text body
+    subject: `Приглашение в ${groupName}`, // Subject line
+    text: `Здравствуйте, вас приглашают в ${groupName}, принять или отклонить приглашение вы можете по ссылке ${url}`, // plain text body
   });
  };
 //register new user

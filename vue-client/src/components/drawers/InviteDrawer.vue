@@ -71,7 +71,7 @@
       sendInvite() {
         this.buttonSpinning = true;
         Promise.all(this.value.map(userId => {
-            this.$store.dispatch(CREATE_INVITE, {userId: userId.key, groupId: this.currentGroup._id});
+            this.$store.dispatch(CREATE_INVITE, {userId: userId.key, groupId: this.currentGroup._id, groupType:this.currentGroup.type});
           },
         ))
           .finally(() => {
