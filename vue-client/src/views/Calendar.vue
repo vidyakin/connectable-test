@@ -8,16 +8,16 @@
     <div class="calendar-body">
       <a-calendar v-model="currentDay">
         <template slot="dateCellRender" slot-scope="value">
-          <div>
+          <div v-for="(val, index) in getEventsForThisMonth()">
             <div
               class="event-wrapper"
               v-if="getEventsForDay(value)"
-              :style="{'background-color' : getEventsForDay(value).color,
-                 'border-color':getEventsForDay(value).color}"
+              :style="{'background-color' : val.color,
+                 'border-color':val.color}"
             >
               <div class="event-name">
-                {{getEventsForDay(value).name}}
-                {{getEventsForDay(value).time}}
+                {{val.name}}
+                {{val.time}}
               </div>
             </div>
           </div>
@@ -135,6 +135,14 @@ export default Vue.extend({
         this.events.find(event => {
           return moment(event.date).isSame(day, 'day');
         })
+      );
+    },
+    getEventsForMonth(month) {
+      return (
+              this.events &&
+              this.events.find(event => {
+                return moment(event.date).isSame(month, 'month');
+              })
       );
     },
     getMonthName() {
@@ -266,7 +274,7 @@ export default Vue.extend({
     }
 
     .event-wrapper {
-      margin-top: 50%;
+     /* margin-top: 50%;*/
       border-radius: 0.25rem;
       border: 1px solid;
 

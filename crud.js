@@ -21,11 +21,13 @@ module.exports = (Collection, serializer, options) => {
                     mail.sendInvite(data.userId, `https://connectable.pro/invite/${data._id}`)
                 }
                 if (Collection.collection.collectionName === 'groups') {
+
                     if(req.body.emailSend) {
                     mail.AddUserInGroup(req.body.userEmail, `https://connectable.pro/login/`, {name:data.name, description:data.description});
                     }
                 }
                 if (Collection.collection.collectionName === 'events') {
+
                     if(req.body.emailSend) {
                     mail.CalendarEvent(req.body.userEmail, `https://connectable.pro/login/`, {name:data.name, comment:data.comment, date:moment(data.date).locale('ru').format("MMM Do YY"), time:data.time})
                     }
@@ -113,7 +115,7 @@ module.exports = (Collection, serializer, options) => {
                         result.token = token;
                         result.result = await serializer(data);
 
-                        console.log(result.result);
+
                     }
                     return res.status(status).send(result);
                 });
