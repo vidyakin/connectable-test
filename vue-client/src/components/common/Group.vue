@@ -1,5 +1,5 @@
 <template>
-  <div class="group">
+  <div class="group" v-if="group.type === 2 && group.creatorId === datauser._id">
     <div class="group-header">
       <div class="group-header-content">
         <div class="group-header-content-name" @click="redirectToGroup">{{group.name}}</div>
@@ -26,6 +26,39 @@
         <div class="group-content-participant-info">
           <div
             class="group-content-participant-info-name"
+          >{{participant.firstName + " " + participant.lastName}}</div>
+          <div class="group-content-participant-info-positions">{{participant.positions.join(', ')}}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="group" v-else-if="group.type != 2">
+    <div class="group-header">
+      <div class="group-header-content">
+        <div class="group-header-content-name" @click="redirectToGroup">{{group.name}}</div>
+        <div class="group-header-content-count">{{group.participants.length}} участников</div>
+      </div>
+      <div class="group-header-action" v-if="$can('read', {'accessEmail': datauser.email, '__type': 'User'})">
+        <a-popover
+                title="Действия с группой"
+                trigger="click"
+                overlayClassName="group-header-action-popup-content"
+        >
+          <template slot="content">
+            <a-tooltip title="Удалить">
+              <a-button icon="delete" @click="deleteGroup"></a-button>
+            </a-tooltip>
+          </template>
+          <a-button icon="menu" class="open-action-button"></a-button>
+        </a-popover>
+      </div>
+    </div>
+    <div class="group-content" v-if="group.participants">
+      <div class="group-content-participant" v-for="participant in group.participants">
+        <!--<a-avatar :src="participant.googleImage"></a-avatar>-->
+        <div class="group-content-participant-info">
+          <div
+                  class="group-content-participant-info-name"
           >{{participant.firstName + " " + participant.lastName}}</div>
           <div class="group-content-participant-info-positions">{{participant.positions.join(', ')}}</div>
         </div>

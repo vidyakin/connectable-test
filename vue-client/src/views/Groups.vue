@@ -16,7 +16,7 @@
       </div>
     </div>
     <div class="groups-body">
-      <app-group v-for="(group, index) in this.filterData" :group="group" :key="index"></app-group>
+      <app-group v-for="(group, index) in this.filterData" :group="group" :key="index" ></app-group>
     </div>
   </div>
 </template>

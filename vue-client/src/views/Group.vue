@@ -14,7 +14,7 @@
     <div class="groups-header">
       <div class="groups-header-name">Группы</div>
     </div>
-    <div class="group-body">
+    <div class="group-body" >
       <div class="group-body-info">
         <div class="group-body-info-header">
           <div class="group-body-info-header-content">
