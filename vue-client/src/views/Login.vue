@@ -28,8 +28,11 @@
                 </fieldset>
               </form>
             </div>
+
         </div>
-        <app-login-google />
+        <div class="row">
+            <app-login-google />
+        </div>
     </div>
   </div>
 </template>
@@ -107,6 +110,11 @@ export default Vue.extend({
     legend{
             font-size: 2em;
             text-align: center;
+    }
+    .row {
+        height: 100%;
+        background-color: transparent !important;
+        box-shadow: none !important;
     }
 }
 </style>t>

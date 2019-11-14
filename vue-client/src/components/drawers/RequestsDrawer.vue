@@ -9,14 +9,14 @@
   >
     <div class="requests-wrapper">
       <div class="request" v-for="participant in currentGroup.requests">
-        <a-avatar :src="participant.googleImage"></a-avatar>
+        <a-avatar :src="(participant.googleImage ? participant.googleImage : require('../../assets/no_image.png'))"></a-avatar>
         <div class="request-info">
           <div class="request-info-name">{{participant.firstName + " " + participant.lastName}}</div>
           <div class="request-info-positions">{{participant.positions.join(', ')}}</div>
         </div>
         <div class="request-actions">
           <a-button type="primary" icon="check" @click="approve(participant._id)"></a-button>
-          <a-button type="danger" icon="close"></a-button>
+          <a-button type="danger" icon="close"  @click="deleteParticipant(participant._id)"></a-button>
         </div>
       </div>
     </div>
@@ -28,6 +28,14 @@ import { mapGetters } from 'vuex';
 import AppInput from '../common/Input';
 import { UPDATE_USER_INFO } from '../../store/user/actions.type';
 import ATextarea from 'ant-design-vue/es/input/TextArea';
+import store from '../../store';
+import {
+  CREATE_PARTICIPANT,
+  DELETE_GROUP,
+  DELETE_PARTICIPANT,
+  GET_CURRENT_GROUP,
+  GET_PARTICIPANTS_REQUEST,
+} from '../../store/group/actions.type';
 import {
   APPROVE_PARTICIPANTS_REQUEST,
   CREATE_GROUP,
@@ -41,6 +49,7 @@ export default {
       current: '',
       createButtonSpinning: false,
       type: 1,
+      userinfo: (store.getters.userData.result ? store.getters.userData.result : store.getters.user.result),
     };
   },
   components: {
@@ -48,7 +57,7 @@ export default {
     AppInput,
   },
   computed: {
-    ...mapGetters(['user', 'currentGroup']),
+    ...mapGetters(['user', 'currentGroup', 'posts', 'userData']),
   },
   methods: {
     onClose() {
@@ -58,6 +67,20 @@ export default {
       this.$store.dispatch(APPROVE_PARTICIPANTS_REQUEST, {
         groupId: this.currentGroup._id,
         participantId,
+      });
+    },
+    deleteParticipant(participantId) {
+      this.$store
+              .dispatch(DELETE_PARTICIPANT, {
+                participantId: participantId,
+                groupId: this.currentGroup._id,
+              })
+              .then(() => this.checkParticipants());
+    },
+    checkParticipants() {
+      this.$store.dispatch(GET_PARTICIPANTS_REQUEST, {
+        groupId: this.currentGroup._id,
+        participantId: this.userinfo._id,
       });
     },
   },
@@ -78,6 +101,7 @@ export default {
   .request {
     display: flex;
     padding: 0.5rem;
+    justify-content: space-between;
 
     &-info {
       margin-left: 0.5rem;

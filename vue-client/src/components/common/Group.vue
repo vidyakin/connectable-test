@@ -122,6 +122,7 @@ export default {
     padding: 0.75rem 0.5rem 0.75rem 1rem;
     display: flex;
     justify-content: space-between;
+    margin-bottom: 15px;
 
     &-content {
       &-name {
@@ -167,7 +168,7 @@ export default {
 
     &-participant {
       display: flex;
-      padding: 1rem;
+      padding: 5px 1rem;
 
       &-info {
         margin-left: 0.5rem;

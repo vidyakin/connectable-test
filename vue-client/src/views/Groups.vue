@@ -79,7 +79,20 @@ export default {
 
 <style lang="scss">
   .address-header.align-right {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    margin: 0;
+    -webkit-box-pack: justify;
+    -ms-flex-pack: justify;
+    justify-content: space-between;
+    margin-bottom: 30px;
   justify-content: flex-end;
+    text-align: right;
+}
+.address-header .ant-input {
+    background-color: #f0f0f7 !important;
+    border-radius: 5rem;
 }
 .is-hide-img-header{
   .groups {

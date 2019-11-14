@@ -83,7 +83,7 @@
           v-for="(participant, index) in currentGroup && currentGroup.participants"
           :key="index"
         >
-          <a-avatar :src="participant.googleImage"></a-avatar>
+          <a-avatar :src="(participant.googleImage ? participant.googleImage : require('../assets/no_image.png'))"></a-avatar>
           <div class="group-body-participants-participant-info">
             <div
               class="group-body-participants-participant-info-name"
@@ -97,7 +97,7 @@
     </div>
     <template
       v-if="(currentGroup && currentGroup.type === 0 )||
-       currentGroup.participants.findIndex(({_id}) => _id === userinfo._id) !== -1"
+       currentGroup && currentGroup.participants.findIndex(({_id}) => _id === userinfo._id) !== -1"
     >
       <app-comment-input :parent="{type: 'group', id: currentGroup && currentGroup._id}" />
       <app-post v-for="(post, index) in posts" :post="post" :key="index" />
@@ -158,14 +158,14 @@ export default {
     },
     createParticipant() {
       this.$store.dispatch(CREATE_PARTICIPANT, {
-        participantId: this.user._id,
+        participantId: this.userinfo._id,
         groupId: this.currentGroup._id,
       });
     },
     deleteParticipant() {
       this.$store
         .dispatch(DELETE_PARTICIPANT, {
-          participantId: this.user._id,
+          participantId: this.userinfo._id,
           groupId: this.currentGroup._id,
         })
         .then(() => this.checkParticipants());
@@ -173,7 +173,7 @@ export default {
     createParticipantsRequest() {
       this.$store
         .dispatch(CREATE_PARTICIPANT, {
-          participantId: this.user._id,
+          participantId: this.userinfo._id,
           groupId: this.currentGroup._id,
           approved: false,
         })
@@ -182,7 +182,7 @@ export default {
     checkParticipants() {
       this.$store.dispatch(GET_PARTICIPANTS_REQUEST, {
         groupId: this.currentGroup._id,
-        participantId: this.user._id,
+        participantId: this.userinfo._id,
       });
     },
   },
@@ -200,7 +200,7 @@ export default {
     });
   },
   computed: {
-    ...mapGetters(['posts', 'currentGroup', 'user', 'userData']),
+    ...mapGetters(['posts', 'currentGroup', 'user', 'userData', 'participantsRequest']),
   },
 };
 </script>
@@ -256,7 +256,7 @@ export default {
 
     &-info {
       min-width: 15rem;
-      width: calc(100% - 17rem);
+      width: calc(100% - 23rem);
       background-color: white;
       height: 19rem;
       border-radius: 0.25rem;
@@ -318,7 +318,7 @@ export default {
 
     &-participants {
       min-width: 15rem;
-      width: 15rem;
+      width: 22rem;
       background-color: white;
       height: 19rem;
       border-radius: 0.25rem;
@@ -328,6 +328,7 @@ export default {
 
       &-participant {
         display: flex;
+        margin-bottom: 10px;
 
         &-info {
           margin-left: 0.5rem;
