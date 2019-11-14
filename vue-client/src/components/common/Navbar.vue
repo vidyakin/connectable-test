@@ -9,31 +9,31 @@
       v-if="$mq==='desktop'"
     >
       <a-menu-item key="/" class="header">connectable</a-menu-item>
-      <a-menu-item key="/company">
+      <a-menu-item key="/company" :class="{active:isActive == 'company'}">
         <img src="@/assets/Icons/company.svg" alt />
         Компания
       </a-menu-item>
-      <a-menu-item key="/addressBook">
+      <a-menu-item key="/addressBook" :class="{active:isActive == 'addressBook'}">
         <img src="@/assets/Icons/Adress book.svg" alt />
         Адресная книга
       </a-menu-item>
-      <a-menu-item :key="this.datauser && `/profile/${this.datauser.result._id}`">
+      <a-menu-item :key="this.datauser && `/profile/${this.datauser.result._id}`" :class="{active:isActive == 'profile'}">
         <img src="@/assets/Icons/user.svg" alt />
         Пользователь
       </a-menu-item>
-      <a-menu-item key="/groups">
+      <a-menu-item key="/groups" :class="{active:isActive == 'groups'}">
         <img src="@/assets/Icons/Groups.svg" alt />
         Группы
       </a-menu-item>
-      <a-menu-item key="/calendar">
+      <a-menu-item key="/calendar" :class="{active:isActive == 'calendar'}">
         <img src="@/assets/Icons/calendar.svg" alt />
         Календарь
       </a-menu-item>
-      <a-menu-item key="/structure">
+      <a-menu-item key="/structure" :class="{active:isActive == 'structure'}">
         <img src="@/assets/Icons/Structure.svg" alt />
         Структура
       </a-menu-item>
-      <a-menu-item key="/settings" class="footer" v-if="$can('read', {'accessEmail': datauser.result.email, '__type': 'User'})" >
+      <a-menu-item key="/settings" class="footer" v-if="$can('read', {'accessEmail': datauser.result.email, '__type': 'User'})" :class="{active:isActive == 'settings'}" >
         <img src="@/assets/Icons/setting.svg" alt />
         Настройки
       </a-menu-item>
@@ -81,13 +81,18 @@ export default {
   data() {
     return {
       current: 1,
-      datauser: (store.getters.user ? store.getters.user : store.getters.userData)
+      datauser: (store.getters.user ? store.getters.user : store.getters.userData),
+      isActive: this.$route.path.split('/')[1],
     };
   },
   methods: {
     goToPage(e) {
-      this.$router.push({ path: e.key });
+      if(this.$route.path != e.key) {
+        this.$router.push({ path: e.key });
+      }
+      this.isActive = e.key.split('/')[1];
     },
+
   },
   computed: {
     ...mapGetters(['user','userData']),
@@ -106,12 +111,16 @@ export default {
 
   .ant-menu {
     background: #43425d !important;
-
+    .ant-menu-item.active {
+      background-color: transparent;
+      color: #fff;
+    }
     .ant-menu-item {
       height: 2.5rem;
       font-size: 1rem;
       text-align: left;
       padding-left: 1.5rem;
+
       @media (max-width: 1024px) {
         padding-left: 10px!important;
         padding-right: 10px;
