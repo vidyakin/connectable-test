@@ -15,8 +15,21 @@
           <div class="request-info-positions">{{participant.positions.join(', ')}}</div>
         </div>
         <div class="request-actions">
-          <a-button type="primary" icon="check" @click="approve(participant._id)"></a-button>
-          <a-button type="danger" icon="close"  @click="deleteParticipant(participant._id)"></a-button>
+          <a-popover
+                  title="Действия с пользователем"
+                  trigger="click"
+                  overlayClassName="user-action-wrap"
+          >
+            <template slot="content">
+              <div class="user-action">
+                <a-button type="primary" icon="check" @click="approve(participant._id)"></a-button>
+                <a-button type="danger" icon="close"  @click="deleteParticipant(participant._id)"></a-button>
+              </div>
+            </template>
+            <a-button icon="menu" class="open-action-button"></a-button>
+          </a-popover>
+
+
         </div>
       </div>
     </div>
@@ -93,6 +106,13 @@ export default {
 </script>
 
 <style lang="scss">
+  .user-action {
+    display: flex;
+  }
+  .user-action button {
+    display: block;
+    margin: 0 auto;
+  }
 .requests-wrapper {
   .ant-btn {
     margin-left: 0.5rem;
@@ -102,29 +122,28 @@ export default {
     display: flex;
     padding: 0.5rem;
     justify-content: space-between;
-
+    .ant-avatar {
+      margin-right: 10px;
+    }
     &-info {
-      margin-left: 0.5rem;
 
       &-name {
-        height: 17px;
         font-size: 13px;
         font-weight: bold;
         font-style: normal;
         font-stretch: normal;
-        line-height: 1.85;
+        line-height: 1.3;
         letter-spacing: normal;
         text-align: left;
         color: #4d565c;
       }
 
       &-positions {
-        height: 14px;
         font-size: 11px;
         font-weight: normal;
         font-style: normal;
         font-stretch: normal;
-        line-height: 1.18;
+        line-height: 1.3;
         letter-spacing: normal;
         text-align: left;
         color: #808495;

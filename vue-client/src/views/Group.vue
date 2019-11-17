@@ -27,6 +27,7 @@
             <a-popover
               title="Действия с группой"
               trigger="click"
+              v-model="visible"
               overlayClassName="group-header-action-popup-content"
               v-if="currentGroup && currentGroup.creatorId === userinfo._id"
             >
@@ -44,8 +45,8 @@
                 <a-tooltip title="Редактировать">
                   <a-button icon="edit" @click="editGroup"></a-button>
                 </a-tooltip>
-                <a-tooltip title="Заявки">
-                  <a-badge :count="currentGroup && currentGroup.requests.length">
+                <a-tooltip title="Заявки" >
+                  <a-badge :count="currentGroup && currentGroup.requests.length" @click="hide">
                     <a-button icon="team" @click="openRequests"></a-button>
                   </a-badge>
                 </a-tooltip>
@@ -132,10 +133,14 @@ export default {
     return {
       editVisible: false,
       requestVisible: false,
+      visible: false,
       userinfo: (store.getters.userData.result ? store.getters.userData.result : store.getters.user.result),
     };
   },
   methods: {
+    hide() {
+      this.visible = false;
+    },
     editGroup() {
       this.openEdit();
     },
