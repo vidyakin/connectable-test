@@ -148,4 +148,13 @@ export default {
     flex-wrap: wrap;
   }
 }
+  @media (max-width: 480px) {
+    .group {
+      margin-right: 0;
+    }
+    .groups-body {
+      margin: 1.5rem 1rem 1rem 1rem;
+    }
+  }
+
 </style>

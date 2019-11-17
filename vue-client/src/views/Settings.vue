@@ -173,5 +173,12 @@
     .form-group {
         display: inline-block;
     }
+    .setting .ant-checkbox-wrapper {
+        display: flex;
+        margin: 0 0 20px;
+    }
+    setting .ant-checkbox-wrapper + span, .ant-checkbox + span {
+        line-height: 16px;
+    }
 
 </style>
