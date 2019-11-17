@@ -38,7 +38,7 @@
                                 @change="handleChangeDep"
                                 :notFoundContent="'Раздел не найдено'"
                         >
-                            <a-select-option v-for="d in data" :key="d._id">{{d.name}}</a-select-option>
+                            <a-select-option v-for="d in departments" :key="d._id">{{d.name}}</a-select-option>
                         </a-select>
                         </a-form-item>
                     </div>

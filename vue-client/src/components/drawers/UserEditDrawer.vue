@@ -69,7 +69,7 @@
               <app-input
                 label="Почта"
                 placeholder="example@email.com"
-                :disabled="1"
+                :disabled="true"
                 :defaultValue="currentUser && currentUser.email"
                 v-decorator="['email', {initialValue:currentUser &&  currentUser.email,
                 rules: [{
