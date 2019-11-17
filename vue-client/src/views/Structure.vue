@@ -17,6 +17,7 @@
         <div class="c-structure">
 
           <div class="c-structure__head" v-for="(dep, index) in departments" v-if="(dep.level == 1)" >
+            <div class="structure-el">
             <a-popover placement="bottom" trigger="click" >
               <template slot="content" >
                 <a-table
@@ -35,20 +36,21 @@
                 <div class="count" v-if="Object.size(dep.users)">{{Object.size(dep.users)}} - участников </div>
               </template>
               <div class="c-structure__link" @click="currentLenth">{{dep.name}}
-                <a-popconfirm
-                        title="Подтверите удаление"
-                        okText="Подтверждаю"
-                        cancelText="Отмена"
-                        @confirm="deleteBlock(dep._id)" v-if="$can('read', {'accessEmail': datauser.email, '__type': 'User'})"
-                >
-                  <a-tooltip title="Удалить">
-                    <a-button class="delete-department" icon="delete"></a-button>
-                  </a-tooltip>
-                </a-popconfirm>
+
               </div>
 
             </a-popover>
-
+            <a-popconfirm
+                    title="Подтверите удаление"
+                    okText="Подтверждаю"
+                    cancelText="Отмена"
+                    @confirm="deleteBlock(dep._id)" v-if="$can('read', {'accessEmail': datauser.email, '__type': 'User'})"
+            >
+              <a-tooltip title="Удалить">
+                <a-button class="delete-department" icon="delete"></a-button>
+              </a-tooltip>
+            </a-popconfirm>
+            </div>
           </div>
 
           <div class="c-structure__row" >
@@ -74,19 +76,19 @@
                     <div class="count" v-if="Object.size(dep.users)">{{Object.size(dep.users)}} - участников </div>
                   </template>
                   <div class="c-structure__link" @click="currentLenth">{{dep.name}}
-                    <a-popconfirm
-                            title="Подтверите удаление"
-                            okText="Подтверждаю"
-                            cancelText="Отмена"
-                            @confirm="deleteBlock(dep._id)" v-if="$can('read', {'accessEmail': datauser.email, '__type': 'User'})"
-                    >
-                      <a-tooltip title="Удалить">
-                        <a-button class="delete-department" icon="delete"></a-button>
-                      </a-tooltip>
-                    </a-popconfirm>
+
                   </div>
                 </a-popover>
-
+                <a-popconfirm
+                        title="Подтверите удаление"
+                        okText="Подтверждаю"
+                        cancelText="Отмена"
+                        @confirm="deleteBlock(dep._id)" v-if="$can('read', {'accessEmail': datauser.email, '__type': 'User'})"
+                >
+                  <a-tooltip title="Удалить">
+                    <a-button class="delete-department" icon="delete"></a-button>
+                  </a-tooltip>
+                </a-popconfirm>
               </div>
 
               <div class="c-structure__child__row ">
@@ -112,19 +114,19 @@
                         <div class="count" v-if="Object.size(dep_3.users)">{{Object.size(dep_3.users)}} - участников </div>
                       </template>
                       <div class="c-structure__link" @click="currentLenth">{{dep_3.name}}
-                        <a-popconfirm
-                                title="Подтверите удаление"
-                                okText="Подтверждаю"
-                                cancelText="Отмена"
-                                @confirm="deleteBlock(dep_3._id)" v-if="$can('read', {'accessEmail': datauser.email, '__type': 'User'})"
-                        >
-                          <a-tooltip title="Удалить">
-                            <a-button class="delete-department" icon="delete"></a-button>
-                          </a-tooltip>
-                        </a-popconfirm>
+
                       </div>
                     </a-popover>
-
+                    <a-popconfirm
+                            title="Подтверите удаление"
+                            okText="Подтверждаю"
+                            cancelText="Отмена"
+                            @confirm="deleteBlock(dep_3._id)" v-if="$can('read', {'accessEmail': datauser.email, '__type': 'User'})"
+                    >
+                      <a-tooltip title="Удалить">
+                        <a-button class="delete-department" icon="delete"></a-button>
+                      </a-tooltip>
+                    </a-popconfirm>
                   </div>
 
                   <div class="c-structure__detail__row" v-for="(dep_4, index) in departments" v-if="(dep_4.level == 4 && dep_4.parent.label == dep_3.name)">
@@ -150,18 +152,19 @@
                             <div class="count" v-if="Object.size(dep_4.users)">{{Object.size(dep_4.users)}} - участников </div>
                           </template>
                           <div class="c-structure__link" @click="currentLenth">{{dep_4.name}}
-                            <a-popconfirm
-                                    title="Подтверите удаление"
-                                    okText="Подтверждаю"
-                                    cancelText="Отмена"
-                                    @confirm="deleteBlock(dep_4._id)" v-if="$can('read', {'accessEmail': datauser.email, '__type': 'User'})"
-                            >
-                              <a-tooltip title="Удалить">
-                                <a-button class="delete-department" icon="delete"></a-button>
-                              </a-tooltip>
-                            </a-popconfirm>
+
                           </div>
                         </a-popover>
+                        <a-popconfirm
+                                title="Подтверите удаление"
+                                okText="Подтверждаю"
+                                cancelText="Отмена"
+                                @confirm="deleteBlock(dep_4._id)" v-if="$can('read', {'accessEmail': datauser.email, '__type': 'User'})"
+                        >
+                          <a-tooltip title="Удалить">
+                            <a-button class="delete-department" icon="delete"></a-button>
+                          </a-tooltip>
+                        </a-popconfirm>
                       </div>
                     </div>
 
@@ -322,9 +325,22 @@
   .delete-department {
     background: transparent;
     position: absolute;
-    right: 0;
+    right: 72px;
     top: 0;
     border: none;
+    z-index: 1;
+  }
+  .structure-el {
+    position: relative;
+    min-width: 200px;
+    display: inline-block;
+    max-width: 100%;
+    .delete-department {
+      right: 0;
+    }
+  }
+  .c-structure__detail__item .delete-department, .c-structure__child__item .delete-department{
+    right: 0;
   }
   .is-hide-img-header{
     .structure {

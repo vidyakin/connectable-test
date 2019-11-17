@@ -118,7 +118,7 @@
             },
             search(text) {
                 text = text.toLowerCase();
-                this.data = this.users.filter(el => {
+                this.data = this.users.filter(el => { console.log(el);
                     return (
                         el.firstName.toLowerCase().indexOf(text) !== -1 ||
                         el.lastName.toLowerCase().indexOf(text) !== -1 ||
@@ -131,7 +131,7 @@
             searchdep(text) {
                 text = text.toLowerCase();
                 this.data = this.departments.filter(el => {
-                    console.log(el);
+
                     return (
                         el.name.toLowerCase().indexOf(text) !== -1
                     );
