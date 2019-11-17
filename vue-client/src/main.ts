@@ -3,12 +3,14 @@ import App from './App.vue';
 import {router} from './router';
 import store from './store';
 
+
 import Antd from 'ant-design-vue';
 import 'ant-design-vue/dist/antd.css';
 import VuexAxios from 'vue-axios';
 import axios from 'axios';
 import ability from '../config/ability';
 import { abilitiesPlugin } from '@casl/vue';
+
 // @ts-ignore
 import VueMq from 'vue-mq';
 
@@ -23,18 +25,16 @@ const gauthOption = {
   prompt: 'select_account',
 };
 Vue.use(GAuth, gauthOption);
-
 Vue.use(VuexAxios, axios);
 Vue.use(Antd);
-
 Vue.use(abilitiesPlugin, ability);
+var SocialSharing = require('vue-social-sharing');
+Vue.use(SocialSharing);
 
 Vue.config.productionTip = false;
 if(localStorage.getItem('token')) {
   getInfoUser(localStorage.getItem('token'));
 }
-
-
 
 setAuthInterceptor();
 Vue.axios.defaults.baseURL = 'http://localhost:4000';

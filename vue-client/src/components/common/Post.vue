@@ -82,20 +82,43 @@
       </div>
     </div>
     <div>
+
       <a-popover title="Действия с постом" trigger="click" :container="'post-' + post._id" overlayClassName="action-popup-content" v-if="post && post.author._id === datauser._id">
         <template slot="content">
           <a-tooltip title="Удалить">
             <a-icon type="delete" @click="deletePost"></a-icon>
           </a-tooltip>
-          <a-tooltip title="Поделиться">
-            <a-icon type="share-alt" @click="repost"></a-icon>
-          </a-tooltip>
+          <a-popover title="Поделиться" trigger="click" v-if="post && post.author._id === datauser._id">
+              <template slot="content">
+                  <social-sharing :url="pubUrl"
+                                  :title="post && post.message"
+                                  :description="post && post.message"
+                                  :quote="post && post.message"
+                                  :twitter-user="post.author.firstName + ' ' + post.author.lastName"
+                                  class="share-popup"
+                                  inline-template>
+                    <div>
+                      <network network="facebook">
+                        <a-icon type="facebook"></a-icon>
+                      </network>
+                      <network network="linkedin">
+                        <a-icon type="linkedin"></a-icon>
+                      </network>
+                      <network network="twitter">
+                        <a-icon type="twitter"></a-icon>
+                      </network>
+                    </div>
+                  </social-sharing>
+              </template>
+            <a-button icon="share-alt" class="open-action-button" ></a-button>
+          </a-popover>
           <a-tooltip title="Редактировать">
             <a-icon type="edit" @click="editPost"></a-icon>
           </a-tooltip>
         </template>
         <a-button icon="menu" class="open-action-button" :id="'post-' + post._id"></a-button>
       </a-popover>
+
     </div>
   </div>
 </template>
@@ -119,6 +142,7 @@ import {
 } from '../../store/post/mutations.type';
 import store from '../../store';
 import { GET_POSTS } from '../../store/post/actions.type';
+import  { PUBLIC_URL } from '../../../config/dev.env';
 export default {
   name: 'AppPost',
   components: {
@@ -131,6 +155,7 @@ export default {
       commenting: false,
       commentContent: '',
       allComment: false,
+      pubUrl: PUBLIC_URL,
       datauser: (store.getters.userData.result ? store.getters.userData.result : store.getters.currentUser),
     };
   },
@@ -232,7 +257,25 @@ export default {
     width: 2rem !important;
   }
 }
-
+.share-popup {
+  display: flex;
+  justify-content: center;
+  .anticon {
+    font-size: 18px;
+  }
+  span {
+    display: inline-block;
+    padding: 0 10px;
+    outline: none;
+    cursor: pointer;
+    svg {
+      transition:all .3s;
+    }
+    &:hover svg {
+      fill: #40a9ff;
+    }
+  }
+}
 .comment-input {
   margin: 0 1rem !important;
   box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.04) !important;
