@@ -18,7 +18,7 @@ const eventSchema = new Schema({
   comment: String,
   color: String,
   googleEventId: String,
-
+  attendees: Array
 });
 /*Bearer*/
 eventSchema.pre('save', function (next) {
@@ -31,8 +31,10 @@ eventSchema.pre('save', function (next) {
       description: this.comment,
       start: {'dateTime': new Date(this.date.setHours(this.time.split(':')[0], this.time.split(':')[1]))},
       end: {'dateTime': new Date(this.date.setHours(this.time.split(':')[0], this.time.split(':')[1]))},
-      summary: this.name,
+      summary: this.name
     };
+    if(this.attendees) event.attendees = this.attendees;
+
     axios
       .post('https://www.googleapis.com/calendar/v3/calendars/primary/events',
         event, {headers: headers})

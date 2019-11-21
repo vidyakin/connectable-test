@@ -33,7 +33,7 @@
                   </div>
 
                 </a-table>
-                <div class="count" v-if="Object.size(dep.users)">{{Object.size(dep.users)}} - участников </div>
+                <div class="count" v-if="Object.size(dep.users)">{{Object.size(dep.users)}} - {{endingWords(Object.size(dep.users))}} </div>
               </template>
               <div class="c-structure__link" @click="currentLenth">{{dep.name}}
 
@@ -73,7 +73,7 @@
                       </div>
 
                     </a-table>
-                    <div class="count" v-if="Object.size(dep.users)">{{Object.size(dep.users)}} - участников </div>
+                    <div class="count" v-if="Object.size(dep.users)">{{Object.size(dep.users)}} - {{endingWords(Object.size(dep.users))}} </div>
                   </template>
                   <div class="c-structure__link" @click="currentLenth">{{dep.name}}
 
@@ -111,7 +111,7 @@
                           </div>
 
                         </a-table>
-                        <div class="count" v-if="Object.size(dep_3.users)">{{Object.size(dep_3.users)}} - участников </div>
+                        <div class="count" v-if="Object.size(dep_3.users)">{{Object.size(dep_3.users)}} - {{endingWords(Object.size(dep.users))}} </div>
                       </template>
                       <div class="c-structure__link" @click="currentLenth">{{dep_3.name}}
 
@@ -149,7 +149,7 @@
                               </div>
 
                             </a-table>
-                            <div class="count" v-if="Object.size(dep_4.users)">{{Object.size(dep_4.users)}} - участников </div>
+                            <div class="count" v-if="Object.size(dep_4.users)">{{Object.size(dep_4.users)}} - {{endingWords(Object.size(dep.users))}} </div>
                           </template>
                           <div class="c-structure__link" @click="currentLenth">{{dep_4.name}}
 
@@ -233,6 +233,7 @@
         res_data: [],
         columns,
         userLength: '',
+        output: '',
         datauser: (store.getters.userData.result ? store.getters.userData.result : store.getters.user )
       };
     },
@@ -283,6 +284,20 @@
                 .finally(() => {
                   this.$store.dispatch(GET_DEP);
                 });
+      },
+      endingWords(count) {
+        if (count == 0) {
+          this.output = 'нет участников';
+        } else if (count == 1) {
+          this.output = ' участник';
+        } else if ((count > 20) && ((count % 10) == 1)) {
+          this.output = ' участник';
+        } else if (((count >= 2) && (count <= 4)) || (((count % 10) >= 2) && ((count % 10) <= 4)) && (count > 20)) {
+          this.output = ' участника';
+        } else {
+          this.output = ' участников';
+        }
+        return this.output;
       },
     },
     beforeCreate() {

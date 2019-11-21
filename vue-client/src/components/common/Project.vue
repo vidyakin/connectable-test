@@ -3,7 +3,7 @@
     <div class="project-header">
       <div class="project-header-content">
         <div class="project-header-content-name" @click="redirectToGroup">{{project.name}}</div>
-        <div class="project-header-content-count">{{project.participants.length}} участников</div>
+        <div class="project-header-content-count">{{project.participants.length}} {{project && endingWords(project.participants.length)}}</div>
       </div>
       <div class="project-header-action" v-if="$can('read', {'accessEmail': datauser.email, '__type': 'User'})">
         <a-popover
@@ -47,7 +47,8 @@ export default {
   name: 'AppProject',
   data() {
     return {
-      datauser: (store.getters.userData ? store.getters.userData.result : store.getters.user )
+      datauser: (store.getters.userData ? store.getters.userData.result : store.getters.user ),
+      output: '',
     };
   },
   props: {
@@ -59,6 +60,20 @@ export default {
     },
     redirectToGroup() {
       this.$router.push({ name: 'project', params: { _id: this.project._id } });
+    },
+    endingWords(count) {
+      if (count == 0) {
+        this.output = 'нет участников';
+      } else if (count == 1) {
+        this.output = ' участник';
+      } else if ((count > 20) && ((count % 10) == 1)) {
+        this.output = ' участник';
+      } else if (((count >= 2) && (count <= 4)) || (((count % 10) >= 2) && ((count % 10) <= 4)) && (count > 20)) {
+        this.output = ' участника';
+      } else {
+        this.output = ' участников';
+      }
+      return this.output;
     },
   },
   computed: {

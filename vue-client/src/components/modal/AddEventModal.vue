@@ -28,6 +28,23 @@
         </div>
       </div>
     </div>
+    <div class="event-name">
+    <a-form-item>
+      <label>Пригласить участника</label>
+      <a-select v-decorator="['members']"
+                labelInValue
+                mode="multiple"
+                placeholder="Выберите пользователей"
+                style="width: 100%"
+                :filterOption="false"
+                @search="search"
+                @change="handleChange"
+                :notFoundContent="'Пользователя не найдено'"
+      >
+        <a-select-option v-for="d in data" :key="d.email">{{d.firstName + ' ' + d.lastName}}</a-select-option>
+      </a-select>
+    </a-form-item>
+    </div>
     <!--<div class="event-name">
       <label>Продолжительность</label>
 
@@ -58,7 +75,7 @@
   import {mapGetters} from 'vuex';
   import AppInput from '../common/Input';
   import moment from 'moment';
-  import {CREATE_EVENT, UPDATE_USER_INFO} from '../../store/user/actions.type';
+  import {CREATE_EVENT, UPDATE_USER_INFO, GET_USERS} from '../../store/user/actions.type';
   import store from '../../store';
   import {GET_NOTIFICATION} from '../../store/notification/actions.type';
   export default {
@@ -77,6 +94,8 @@
           color: '#ff0000',
         },
         name: '',
+        data: [],
+        selectVal: '',
         date: moment(),
         time: moment.relTime,
         comment: '',
@@ -95,6 +114,10 @@
         event.userId = this.userInfo.result._id;
         event.userEmail = this.userInfo.result.email;
         event.emailSend = this.statusEmailSend;
+        event.attendees = (this.selectVal ? this.selectVal.map(el => {
+          return {'email': el.key}
+        }) : '');
+
         this.$store.dispatch(CREATE_EVENT, event)
           .finally(() => {
             this.name = '';
@@ -108,12 +131,31 @@
       changeTime(time, timeString) {
         this.time = timeString;
       },
+      handleChange(value) {
+        Object.assign(this, {
+          value,
+          data: [],
+        });
+        this.selectVal = value;
+      },
+      search(text) {
+        text = text.toLowerCase();
+        this.data = this.users.filter(el => {
+          return (
+                  el.firstName.toLowerCase().indexOf(text) !== -1 ||
+                  el.lastName.toLowerCase().indexOf(text) !== -1 ||
+                  (el.firstName + ' ' + el.lastName).toLowerCase().indexOf(text) !==
+                  -1 ||
+                  (el.lastName + ' ' + el.firstName).toLowerCase().indexOf(text) !== -1
+          );
+        });
+      },
     },
     components: {
       AppInput,
     },
     computed: {
-      ...mapGetters(['user', 'userData', 'notification']),
+      ...mapGetters(['user', 'userData', 'users', 'notification']),
     },
     props: {
       visible: Boolean,
@@ -127,6 +169,9 @@
         this.statusEmailSend = (notification ? notification.eventCalendar : false);
       }
     },
+    mounted() {
+      this.$store.dispatch(GET_USERS);
+    },
   };
 </script>
 
@@ -136,7 +181,7 @@
     .ant-modal-content {
       padding: 2.5rem;
       width: 33.75rem;
-      height: 30rem;
+      height: 35rem;
     }
 
     .ant-modal-header {

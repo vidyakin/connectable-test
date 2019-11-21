@@ -21,7 +21,7 @@
         </div>
         
       </a-table>
-      {{userLength}} - участников
+      {{userLength}} - {{endingWords(userLength)}}
         </template>
         <div class="seo seo-1" @click="currentLenth">Департамент IT</div>
       </a-popover>
@@ -86,6 +86,7 @@ export default {
       data: [],
       columns,
       userLength: '',
+      output: '',
     };
   },
   methods: {
@@ -96,6 +97,20 @@ export default {
     currentLenth() {
       this.userLength = this.users.length;
       console.log(this.userLength);
+    },
+    endingWords(count) {
+      if (count == 0) {
+        this.output = 'нет участников';
+      } else if (count == 1) {
+        this.output = ' участник';
+      } else if ((count > 20) && ((count % 10) == 1)) {
+        this.output = ' участник';
+      } else if (((count >= 2) && (count <= 4)) || (((count % 10) >= 2) && ((count % 10) <= 4)) && (count > 20)) {
+        this.output = ' участника';
+      } else {
+        this.output = ' участников';
+      }
+      return this.output;
     },
   },
   computed: {

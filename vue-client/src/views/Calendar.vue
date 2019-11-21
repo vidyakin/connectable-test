@@ -8,7 +8,7 @@
     <div class="calendar-body">
       <a-calendar v-model="currentDay">
         <template slot="dateCellRender" slot-scope="value">
-          <div v-for="(val, index) in getEventsForThisMonth()">
+          <div v-for="val in getEventsForThisMonth()" :key="val.name"  v-if="getDayFromDate(value).day == getDayFromDate(val.date).day">
             <div
               class="event-wrapper"
               v-if="getEventsForDay(value)"

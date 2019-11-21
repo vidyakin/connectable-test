@@ -38,7 +38,7 @@
                                 @change="handleChangeDep"
                                 :notFoundContent="'Раздел не найдено'"
                         >
-                            <a-select-option v-for="d in departments" :key="d._id">{{d.name}}</a-select-option>
+                            <a-select-option v-for="d in departments" :key="d._id" v-if="depLevels.arrayOne.indexOf(d._id) == -1 && depLevels.arrayTwo.indexOf(d._id) == -1 && depLevels.arrayThree.indexOf(d._id) == -1">{{d.name}}</a-select-option>
                         </a-select>
                         </a-form-item>
                     </div>
@@ -64,7 +64,7 @@
             </div>
             <a-form-item class="create-group-button-wrapper">
                 <a-spin :spinning="createButtonSpinning">
-                    <a-button type="primary" html-type="submit">Создать</a-button>
+                    <a-button type="primary" html-type="submit" v-if="depLevels.arrayOne.length <= 1 &&  selectVal">Создать {{selectVal}}</a-button>
                 </a-spin>
             </a-form-item>
         </a-form>
@@ -86,6 +86,12 @@
                 buttonSpinning: false,
                 data: [],
                 value: [],
+                selectVal: '',
+                depLevels: {
+                    arrayOne: [],
+                    arrayTwo: [],
+                    arrayThree: []
+                },
             };
         },
         components: {
@@ -118,7 +124,7 @@
             },
             search(text) {
                 text = text.toLowerCase();
-                this.data = this.users.filter(el => { console.log(el);
+                this.data = this.users.filter(el => {
                     return (
                         el.firstName.toLowerCase().indexOf(text) !== -1 ||
                         el.lastName.toLowerCase().indexOf(text) !== -1 ||
@@ -148,7 +154,9 @@
                     value,
                     data: [],
                 });
+                this.selectVal = value;
             },
+
         },
         props: {
             close: Function,
@@ -161,6 +169,25 @@
             this.$store.dispatch(GET_USERS);
             this.$store.dispatch(GET_DEP);
         },
+        watch: {
+            departments(departments) {
+                departments.map(e => {
+                    if (e.level == 1) {
+                        this.depLevels.arrayOne.push(e._id);
+                    }
+                    if(e.level == 2 && this.depLevels.arrayTwo) {
+                        this.depLevels.arrayTwo.push(e._id);
+                    }
+                    if(e.level == 3) {
+                        this.depLevels.arrayThree.push(e._id);
+                    }
+                });
+               /* if(this.depLevels.arrayOne.length > 1) this.depLevels.arrayOne = [];
+                if(this.depLevels.arrayTwo.length <= 3) this.depLevels.arrayTwo = [];
+                if(this.depLevels.arrayThree.length <= 6) this.depLevels.arrayThree = [];
+                console.log(this.depLevels.arrayTwo);*/
+            },
+        }
     };
 </script>
 

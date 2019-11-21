@@ -12,7 +12,7 @@
             >{{currentProject && currentProject.name}}</div>
             <div
               class="group-body-info-header-content-participants"
-            >{{currentProject && currentProject.participants.length}} участников</div>
+            >{{currentProject && currentProject.participants.length}} {{currentProject && endingWords(currentProject.participants.length)}}</div>
           </div>
           <div class="group-body-info-header-action">
             <a-popover
@@ -103,6 +103,7 @@ export default {
     return {
       editVisible: false,
       requestVisible: false,
+      output: '',
     };
   },
   methods: {
@@ -154,6 +155,20 @@ export default {
         groupId: this.currentGroup._id,
         participantId: this.user._id,
       });
+    },
+    endingWords(count) {
+      if (count == 0) {
+        this.output = 'нет участников';
+      } else if (count == 1) {
+        this.output = ' участник';
+      } else if ((count > 20) && ((count % 10) == 1)) {
+        this.output = ' участник';
+      } else if (((count >= 2) && (count <= 4)) || (((count % 10) >= 2) && ((count % 10) <= 4)) && (count > 20)) {
+        this.output = ' участника';
+      } else {
+        this.output = ' участников';
+      }
+      return this.output;
     },
   },
   beforeMount() {
