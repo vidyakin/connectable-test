@@ -340,8 +340,9 @@
   .delete-department {
     background: transparent;
     position: absolute;
-    right: 72px;
-    top: 0;
+    right: 0;
+    margin-right: 15px;
+    top: 13px;
     border: none;
     z-index: 1;
   }
@@ -429,8 +430,6 @@
 
       .c-structure__row{
         position: relative;
-        display: block;
-        width: 100%;
         font-size: 0;
 
         &:before{
@@ -446,7 +445,7 @@
       }
 
         .c-structure__item{
-          width: 33.33%;
+          min-width: 33.33%;
           position: relative;
           padding: 20px 15px;
           display: inline-block;
@@ -475,9 +474,9 @@
 
           .c-structure__article{
             position: relative;
-            display: block;
+            display: inline-block;
             margin-bottom: 40px;
-
+            padding: 15px 15px;
             &:before{
               content: '';
               position: absolute;

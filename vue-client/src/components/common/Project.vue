@@ -75,6 +75,9 @@ export default {
       }
       return this.output;
     },
+    beforeMount() {
+      this.$store.dispatch(GET_CURRENT_PROJECT, this.$route.params._id);
+    },
   },
   computed: {
     ...mapGetters(['user','userData']),

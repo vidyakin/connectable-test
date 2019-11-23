@@ -38,9 +38,7 @@
         this.createVisible = true;
       },
     },
-    beforeCreate() {
-      this.$store.dispatch(GET_PROJECTS);
-    },
+   
     beforeMount() {
       this.$store.dispatch(GET_PROJECTS);
     },
@@ -66,7 +64,22 @@
 
 <style lang="scss">
   .address-header.align-right {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    margin: 0;
+    -webkit-box-pack: justify;
+    -ms-flex-pack: justify;
+    justify-content: space-between;
+    margin-bottom: 30px;
+    -webkit-box-pack: end;
+    -ms-flex-pack: end;
     justify-content: flex-end;
+    text-align: right;
+  }
+  .address-header .ant-input {
+    background-color: #f0f0f7 !important;
+    border-radius: 5rem;
   }
 .projects {
   height: 100%;

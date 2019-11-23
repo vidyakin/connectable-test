@@ -64,7 +64,7 @@
             </div>
             <a-form-item class="create-group-button-wrapper">
                 <a-spin :spinning="createButtonSpinning">
-                    <a-button type="primary" html-type="submit" v-if="depLevels.arrayOne.length <= 1 &&  selectVal">Создать {{selectVal}}</a-button>
+                    <a-button type="primary" html-type="submit" v-if="(departments && !departments.length) || selectVal">Создать  </a-button>
                 </a-spin>
             </a-form-item>
         </a-form>
@@ -118,6 +118,7 @@
                                 this.createButtonSpinning = false;
                                 this.onClose();
                                 this.$store.dispatch(GET_DEP);
+                                this.selectVal = '';
                             });
                     }
                 });
@@ -164,6 +165,7 @@
         },
         beforeCreate() {
             this.form = this.$form.createForm(this);
+            this.$store.dispatch(GET_DEP);
         },
         mounted() {
             this.$store.dispatch(GET_USERS);
@@ -171,21 +173,24 @@
         },
         watch: {
             departments(departments) {
+                this.depLevels.arrayOne = [];
+                this.depLevels.arrayTwo = [];
+                this.depLevels.arrayThree = [];
                 departments.map(e => {
-                    if (e.level == 1) {
-                        this.depLevels.arrayOne.push(e._id);
+                    if (e.level == 1 && e.parent) {
+                        this.depLevels.arrayOne.push(e.parent.key);
                     }
-                    if(e.level == 2 && this.depLevels.arrayTwo) {
-                        this.depLevels.arrayTwo.push(e._id);
+                    if(e.level == 2 && e.parent) {
+                        this.depLevels.arrayTwo.push(e.parent.key);
                     }
-                    if(e.level == 3) {
-                        this.depLevels.arrayThree.push(e._id);
+                    if(e.level == 3 && e.parent) {
+                        this.depLevels.arrayThree.push(e.parent.key);
                     }
                 });
-               /* if(this.depLevels.arrayOne.length > 1) this.depLevels.arrayOne = [];
-                if(this.depLevels.arrayTwo.length <= 3) this.depLevels.arrayTwo = [];
-                if(this.depLevels.arrayThree.length <= 6) this.depLevels.arrayThree = [];
-                console.log(this.depLevels.arrayTwo);*/
+               if(this.depLevels.arrayTwo.length < 3) this.depLevels.arrayOne = [];
+                 if(this.depLevels.arrayTwo.length < 3) this.depLevels.arrayTwo = [];
+                if(this.depLevels.arrayThree.length < 6) this.depLevels.arrayThree = [];
+
             },
         }
     };
