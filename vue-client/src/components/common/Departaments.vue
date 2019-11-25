@@ -141,9 +141,7 @@ export default {
 .ant-table-small {
   border: none;
 }
-.ant-table-thead {
-  display: none;
-}
+
 .ant-table-tbody > tr > td {
   border-bottom: none;
 }
