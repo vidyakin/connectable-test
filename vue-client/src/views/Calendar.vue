@@ -27,7 +27,8 @@
     <div class="months-events">
       <div class="month-event">
         <div class="month-name">{{getMonthName()}}</div>
-        <div class="event" v-for="event in getEventsForThisMonth()">
+        <div class="event" v-if="getEventsForThisMonth()" v-for="event in getEventsForThisMonth()" :style="{
+                 'border-color':event.color}">
           <div class="event-date">
             <div class="event-date-day">{{getDayFromDate(event.date).day}}</div>
             <div class="event-date-weekday">{{getDayFromDate(event.date).weekday}}</div>
@@ -45,27 +46,35 @@
             </a-popover>
           </div>
         </div>
+        <div class="event" v-else>Пока нету запланированных событий</div>
       </div>
       <div class="month-event">
         <div class="month-name">{{getNextMonthName()}}</div>
-        <div class="event" v-for="event in getEventsForNextMonth()">
-          <div class="event-date">
-            <div class="event-date-day">{{getDayFromDate(event.date).day}}</div>
-            <div class="event-date-weekday">{{getDayFromDate(event.date).weekday}}</div>
-          </div>
-          <div class="event-name">
-            <div>{{event.name}}, {{event.comment}}</div>
-            <div class="event-time">{{event.time}}</div>
-          </div>
-          <div class="event-action">
-            <a-popover title="Действия с событием">
-              <template slot="content">
-                <a-icon type="delete" @click="deleteEvent(event._id)"></a-icon>
-              </template>
-              <a-button icon="menu"></a-button>
-            </a-popover>
+        <div class="event-wrap" v-if="getEventsForNextMonth().length">
+          <div class="event" v-for="event in getEventsForNextMonth()" :style="{
+                 'border-color':event.color}">
+            <div class="event-date">
+              <div class="event-date-day">{{getDayFromDate(event.date).day}}</div>
+              <div class="event-date-weekday">{{getDayFromDate(event.date).weekday}}</div>
+            </div>
+            <div class="event-name">
+              <div>{{event.name}}, {{event.comment}}</div>
+              <div class="event-time">{{event.time}}</div>
+            </div>
+            <div class="event-action">
+              <a-popover title="Действия с событием">
+                <template slot="content">
+                  <a-icon type="delete" @click="deleteEvent(event._id)"></a-icon>
+                </template>
+                <a-button icon="menu"></a-button>
+              </a-popover>
+            </div>
           </div>
         </div>
+        <div class="event-wrap" v-else >
+          <div class="event no-events">Пока нету запланированных событий</div>
+        </div>
+
       </div>
     </div>
   </div>
@@ -294,7 +303,9 @@ export default Vue.extend({
     flex-wrap: wrap;
     margin-right: 0;
   }
-
+  .no-events {
+    flex-direction: column;
+  }
   .event {
     display: flex;
     height: 80px;
@@ -302,6 +313,7 @@ export default Vue.extend({
     background-color: #f5f6fa;
     margin-bottom: 10px;
     padding: 1rem 1.5rem;
+    border-left: 4px solid transparent;
 
     &-date {
       &-weekday {
@@ -342,7 +354,18 @@ export default Vue.extend({
       text-align: left;
       color: #4d565c;
       margin-left: 2rem;
+      padding-left: 2rem;
       width: calc(100% - 5rem);
+      position: relative;
+    }
+    &-name:before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 50px;
+      width: 1px;
+      background-color:rgba(128, 132, 149, .6);
     }
 
     &-action {
