@@ -342,6 +342,7 @@ export default {
     font-style: normal;
     font-stretch: normal;
     letter-spacing: normal;
+    word-break: break-word;
 
     &-likes {
       margin-top: 1rem;
