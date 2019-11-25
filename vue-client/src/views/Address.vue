@@ -250,4 +250,12 @@ export default {
     }
   }
 }
+
+  .address-body .ant-table-thead th {
+    width: 14.5rem;
+  }
+.address-body .ant-table-thead th:first-child, .address-body .ant-table-thead th:nth-child(2) {
+  width: 18rem;
+}
+
 </style>
