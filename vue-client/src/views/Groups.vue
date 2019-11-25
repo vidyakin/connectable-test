@@ -156,5 +156,20 @@ export default {
       margin: 1.5rem 1rem 1rem 1rem;
     }
   }
+  .groups-body {
+
+    margin: 2rem 0 2rem 0;
+  }
+  .group:last-child {
+    margin-right: 0;
+  }
+  .group {
+    height: auto;
+  }
+  @media (min-width: 1280px) {
+    .groups-body {
+      flex-wrap: nowrap;
+    }
+  }
 
 </style>
