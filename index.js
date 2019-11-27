@@ -157,20 +157,14 @@ app.post('/api/register', function(req,res){
             bcrypt.compare(password, user.password).then(match => {
                 if (match) {
                     status = 202;
-                    result.email = user.email;
                     result.status = status;
-                    res.status(status).send(result);
+                    result.error = `Authentication error. This email is already registered`;
                 } else {
                     status = 202;
                     result.status = status;
                     result.error = `Authentication error. This email is already registered`;
                 }
 
-                res.status(status).send(result);
-            }).catch(err => {
-                status = 500;
-                result.status = status;
-                result.error = err;
                 res.status(status).send(result);
             });
         } else {
