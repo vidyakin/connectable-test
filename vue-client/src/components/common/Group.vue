@@ -3,7 +3,7 @@
     <div class="group-header">
       <div class="group-header-content">
         <div class="group-header-content-name" @click="redirectToGroup">{{group.name}}</div>
-        <div class="group-header-content-count">{{group.participants.length}} участников</div>
+        <div class="group-header-content-count">{{group.participants.length}} {{group && endingWords(group.participants.length)}}</div>
       </div>
       <div class="group-header-action" v-if="$can('read', {'accessEmail': datauser.email, '__type': 'User'})">
         <a-popover
@@ -36,7 +36,7 @@
     <div class="group-header">
       <div class="group-header-content">
         <div class="group-header-content-name" @click="redirectToGroup">{{group.name}}</div>
-        <div class="group-header-content-count">{{group.participants.length}} участников</div>
+        <div class="group-header-content-count">{{group.participants.length}} {{group && endingWords(group.participants.length)}}</div>
       </div>
       <div class="group-header-action" v-if="$can('read', {'accessEmail': datauser.email, '__type': 'User'})">
         <a-popover
@@ -78,6 +78,7 @@ export default {
   data() {
     return {
       datauser: (store.getters.userData ? store.getters.userData.result : store.getters.user ),
+      output: '',
     };
   },
   props: {
@@ -89,6 +90,20 @@ export default {
   methods: {
     deleteGroup() {
       this.$store.dispatch(DELETE_GROUP, this.group._id);
+    },
+    endingWords(count) {
+      if (count == 0) {
+        this.output = 'нет участников';
+      } else if (count == 1) {
+        this.output = ' участник';
+      } else if ((count > 20) && ((count % 10) == 1)) {
+        this.output = ' участник';
+      } else if (((count >= 2) && (count <= 4)) || (((count % 10) >= 2) && ((count % 10) <= 4)) && (count > 20)) {
+        this.output = ' участника';
+      } else {
+        this.output = ' участников';
+      }
+      return this.output;
     },
     redirectToGroup() {
       this.$router.push({ name: 'group', params: { _id: this.group._id } });
@@ -125,6 +140,8 @@ export default {
     margin-bottom: 15px;
 
     &-content {
+      max-width: 95%;
+
       &-name {
         height: 20px;
         font-size: 16px;
@@ -135,6 +152,9 @@ export default {
         letter-spacing: normal;
         text-align: left;
         color: #949494;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
 
         &:hover {
           cursor: pointer;

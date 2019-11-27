@@ -99,7 +99,7 @@ export default {
 
   .logout {
     border: none;
-    padding: 2px;
+    /*padding: 2px;*/
     height: auto;
   }
   .user-info {
@@ -112,7 +112,7 @@ export default {
     }
 
     i {
-      line-height: 3.125rem;
+      line-height: 0;
       margin-right: 0.5rem;
       margin-left: 0.5rem;
     }

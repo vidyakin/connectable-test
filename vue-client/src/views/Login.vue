@@ -78,7 +78,9 @@ export default Vue.extend({
                     }).finally(() => {
                         console.log(store.getters.errorLogin);
                         if(!store.getters.errorLogin) {
-                            this.$router.push({ name: 'about' });
+                            this.$router.push({
+                                name: 'about'
+                            }, () => {});
                         }
                         else {
                             this.submitted = true;

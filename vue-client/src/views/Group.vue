@@ -21,7 +21,7 @@
             <div class="group-body-info-header-content-name">{{currentGroup && currentGroup.name}}</div>
             <div
               class="group-body-info-header-content-participants"
-            >{{currentGroup && currentGroup.participants.length}} участников</div>
+            >{{currentGroup && currentGroup.participants.length}}  {{currentGroup && endingWords(currentGroup.participants.length)}}</div>
           </div>
           <div class="group-body-info-header-action">
             <a-popover
@@ -134,10 +134,25 @@ export default {
       editVisible: false,
       requestVisible: false,
       visible: false,
+      output: '',
       userinfo: (store.getters.userData.result ? store.getters.userData.result : store.getters.user.result),
     };
   },
   methods: {
+    endingWords(count) {
+      if (count == 0) {
+        this.output = 'нет участников';
+      } else if (count == 1) {
+        this.output = ' участник';
+      } else if ((count > 20) && ((count % 10) == 1)) {
+        this.output = ' участник';
+      } else if (((count >= 2) && (count <= 4)) || (((count % 10) >= 2) && ((count % 10) <= 4)) && (count > 20)) {
+        this.output = ' участника';
+      } else {
+        this.output = ' участников';
+      }
+      return this.output;
+    },
     hide() {
       this.visible = false;
     },
