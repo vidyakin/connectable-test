@@ -77,6 +77,7 @@
         </template>
       </div>
       <div class="group-body-participants">
+        <div class="group-body-info-header-content-name">Участники</div>
         <div
           class="group-body-participants-participant"
           v-for="(participant, index) in currentGroup && currentGroup.participants"
@@ -288,7 +289,7 @@ export default {
 
         &-content {
           &-name {
-            height: 23px;
+            /*height: 23px;*/
             font-size: 18px;
             font-weight: bold;
             font-style: normal;
@@ -297,6 +298,7 @@ export default {
             letter-spacing: normal;
             text-align: left;
             color: #4d4f5c;
+            padding-bottom: 20px;
           }
 
           &-participants {
