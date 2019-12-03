@@ -27,7 +27,7 @@
     <div class="months-events">
       <div class="month-event">
         <div class="month-name">{{getMonthName()}}</div>
-        <div class="event" v-if="getEventsForThisMonth()" v-for="event in getEventsForThisMonth()" :style="{
+        <div class="event" v-if="getEventsForThisMonth().length" v-for="event in getEventsForThisMonth()" :style="{
                  'border-color':event.color}">
           <div class="event-date">
             <div class="event-date-day">{{getDayFromDate(event.date).day}}</div>
