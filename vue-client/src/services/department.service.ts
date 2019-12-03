@@ -29,3 +29,11 @@ export const deleteDepartment = (context: any, depId: any) => {
             context.commit(ADD_DEP, response.data);
         });
 };
+
+export const updateDepartment = (context: any, dep: any) => {
+    return Vue.axios
+        .put(`api/department/`, dep)
+        .then((response: any) => {
+            context.commit(ADD_DEP, response.data);
+        });
+};

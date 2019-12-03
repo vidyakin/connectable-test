@@ -4,8 +4,8 @@
     <div class="user-info-avatar">
       <a-avatar :src=" (currentUser && currentUser.googleImage ? currentUser.googleImage : require('../../assets/no_image.png')) "></a-avatar>
 
-      <a-button v-model="statusFollow" v-if="this.$route.params._id != userData.result._id" :class="{'is-active' : followIds.includes(userData.result._id)}" @click="handleFollowClick(currentUser._id, userData.result._id, userData.result.email, followIds.includes(userData.result._id))">
-        {{ followIds.includes(userData.result._id) ? 'Уже подписаны' : 'Подписаться' }}
+      <a-button v-model="statusFollow" v-if="this.$route.params._id != datauser._id" :class="{'is-active' : followIds.includes(datauser._id)}" @click="handleFollowClick(currentUser._id, datauser._id, datauser.email, followIds.includes(datauser._id))">
+        {{ followIds.includes(datauser._id) ? 'Уже подписаны' : 'Подписаться' }}
       </a-button>
     </div>
 
@@ -20,7 +20,7 @@
       <div class="user-info-content-email">{{currentUser && currentUser.email}}</div>
     </div>
 
-    <div class="user-info-edit" v-if="userData.result._id == this.$route.params._id || $can('read', {'accessEmail': userData.result.email, '__type': 'User'})">
+    <div class="user-info-edit" v-if="datauser._id == this.$route.params._id || $can('read', {'accessEmail': datauser.email, '__type': 'User'})">
       <a-button icon="edit" @click="editDrawerVisible = true"></a-button>
     </div>
   </div>
@@ -32,7 +32,7 @@ import AppLoginBar from './LoginBar';
 import AppUserEditDrawer from '../drawers/UserEditDrawer';
 import { SEND_NEW_POST } from '../../store/post/actions.type';
 import { GET_USER } from '../../store/user/actions.type';
-
+import store from '../../store';
 import {USER_FOLLOW, USER_UNFOLLOW} from '../../store/followers/actions.type';
 export default {
   name: 'AppUserInfo',
@@ -47,6 +47,7 @@ export default {
       statusFollow: false,
       followIds: [],
       userinfo: [],
+      datauser: (store.getters.userData ? store.getters.userData.result : store.getters.user ),
     };
   },
   computed: {

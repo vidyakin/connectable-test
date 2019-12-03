@@ -2,6 +2,7 @@
   <div class="structure">
     <app-create-project :visible="createVisible" :close="closeCreate"/>
     <app-create-department :visible="departmentVisible" :close="closeDepartment"/>
+    <app-edit-department :visible="depEditVisible" :close="closeDepEdit" :curentData="dataDep" />
     <div class="structure-header">
       <div class="structure-header-name">
         Структура
@@ -18,6 +19,7 @@
 
           <div class="c-structure__head" v-for="(dep, index) in departments" v-if="(dep.level == 1)" >
             <div class="structure-el">
+
             <a-popover placement="bottom" trigger="click" >
               <template slot="content" >
                 <a-table
@@ -40,30 +42,35 @@
               </div>
 
             </a-popover>
+
             <a-popconfirm
                     title="Подтверите удаление"
                     okText="Подтверждаю"
                     cancelText="Отмена"
                     @confirm="deleteBlock(dep._id)" v-if="$can('read', {'accessEmail': datauser.email, '__type': 'User'})"
             >
+
               <a-tooltip title="Удалить">
                 <a-button class="delete-department" icon="delete"></a-button>
               </a-tooltip>
             </a-popconfirm>
+              <a-tooltip title="Редактировать">
+                <a-button class="delete-department edit" icon="edit" @click="openDepEdit(dep.name, dep.users, dep._id)"></a-button>
+              </a-tooltip>
             </div>
           </div>
 
           <div class="c-structure__row" >
 
-            <div class="c-structure__item" v-for="(dep, index) in departments" v-if="(dep.level > 1 && dep.level < 3)">
+            <div class="c-structure__item" v-for="(dep_2, index) in departments" v-if="(dep_2.level > 1 && dep_2.level < 3)">
 
-              <div class="c-structure__article" v-if="(dep.level == 2)">
+              <div class="c-structure__article" v-if="(dep_2.level == 2)">
                 <a-popover placement="bottom" trigger="click" >
                   <template slot="content" >
                     <a-table
-                            v-if="dep.name"
+                            v-if="dep_2.name"
                             :columns="columns"
-                            :dataSource="userDataFunc(dep)"
+                            :dataSource="userDataFunc(dep_2)"
                             :pagination="false"
 
                     >
@@ -73,9 +80,9 @@
                       </div>
 
                     </a-table>
-                    <div class="count" v-if="Object.size(dep.users)">{{Object.size(dep.users)}} - {{endingWords(Object.size(dep.users))}} </div>
+                    <div class="count" v-if="Object.size(dep_2.users)">{{Object.size(dep_2.users)}} - {{endingWords(Object.size(dep_2.users))}} </div>
                   </template>
-                  <div class="c-structure__link" @click="currentLenth">{{dep.name}}
+                  <div class="c-structure__link" @click="currentLenth">{{dep_2.name}}
 
                   </div>
                 </a-popover>
@@ -83,17 +90,21 @@
                         title="Подтверите удаление"
                         okText="Подтверждаю"
                         cancelText="Отмена"
-                        @confirm="deleteBlock(dep._id)" v-if="$can('read', {'accessEmail': datauser.email, '__type': 'User'})"
+                        @confirm="deleteBlock(dep_2._id)" v-if="$can('read', {'accessEmail': datauser.email, '__type': 'User'})"
                 >
                   <a-tooltip title="Удалить">
                     <a-button class="delete-department" icon="delete"></a-button>
                   </a-tooltip>
+
                 </a-popconfirm>
+                <a-tooltip title="Редактировать">
+                  <a-button class="delete-department edit" icon="edit" @click="openDepEdit(dep_2.name, dep_2.users, dep_2._id)"></a-button>
+                </a-tooltip>
               </div>
 
               <div class="c-structure__child__row ">
 
-                <div class="c-structure__child__item" v-for="(dep_3, index) in departments" v-if="(dep_3.level == 3 && dep_3.parent.label == dep.name)">
+                <div class="c-structure__child__item" v-for="(dep_3, index) in departments" v-if="(dep_3.level == 3 && dep_3.parent.label == dep_2.name)">
 
                   <div class="c-structure__child__article">
                     <a-popover placement="bottom" trigger="click">
@@ -111,7 +122,7 @@
                           </div>
 
                         </a-table>
-                        <div class="count" v-if="Object.size(dep_3.users)">{{Object.size(dep_3.users)}} - {{endingWords(Object.size(dep.users))}} </div>
+                        <div class="count" v-if="Object.size(dep_3.users)">{{Object.size(dep_3.users)}} - {{endingWords(Object.size(dep_3.users))}} </div>
                       </template>
                       <div class="c-structure__link" @click="currentLenth">{{dep_3.name}}
 
@@ -125,6 +136,9 @@
                     >
                       <a-tooltip title="Удалить">
                         <a-button class="delete-department" icon="delete"></a-button>
+                      </a-tooltip>
+                      <a-tooltip title="Редактировать">
+                        <a-button class="delete-department edit" icon="edit"></a-button>
                       </a-tooltip>
                     </a-popconfirm>
                   </div>
@@ -149,7 +163,7 @@
                               </div>
 
                             </a-table>
-                            <div class="count" v-if="Object.size(dep_4.users)">{{Object.size(dep_4.users)}} - {{endingWords(Object.size(dep.users))}} </div>
+                            <div class="count" v-if="Object.size(dep_4.users)">{{Object.size(dep_4.users)}} - {{endingWords(Object.size(dep_4.users))}} </div>
                           </template>
                           <div class="c-structure__link" @click="currentLenth">{{dep_4.name}}
 
@@ -163,6 +177,9 @@
                         >
                           <a-tooltip title="Удалить">
                             <a-button class="delete-department" icon="delete"></a-button>
+                          </a-tooltip>
+                          <a-tooltip title="Редактировать">
+                            <a-button class="delete-department edit" icon="edit"></a-button>
                           </a-tooltip>
                         </a-popconfirm>
                       </div>
@@ -188,6 +205,7 @@
 
   import AppCreateProject from '../components/drawers/CreateProject';
   import AppCreateDepartment from '../components/drawers/CreateDepartment';
+  import AppEditDepartment from '../components/drawers/EditDepartment';
   import {mapGetters} from 'vuex';
   import {GET_DEP, DELETE_DEP} from '../store/structure/actions.type';
   import AppProjects from '../views/Projects';
@@ -222,11 +240,13 @@
       AppProjects,
       AppDepantaments,
       AppCreateDepartment,
+      AppEditDepartment,
     },
     data() {
       return {
         createVisible: false,
         departmentVisible : false,
+        depEditVisible : false,
         test: true,
         data: [],
         dep_arr: [],
@@ -234,6 +254,7 @@
         columns,
         userLength: '',
         output: '',
+        dataDep: {},
         datauser: (store.getters.userData.result ? store.getters.userData.result : store.getters.user )
       };
     },
@@ -242,16 +263,17 @@
         this.$router.push({ name: 'profile', params: { _id: id } });
       },
       userDataFunc(param) {
+        const resData = [];
         if( Object.size(param.users)) {
           for (let i = 0; i < Object.size(param.users); i++) {
             for (let j = 0; j < Object.size(this.data); j++) {
 
               if (param.users[i].key == this.data[j].key) {
-                this.res_data[i] = this.data[j];
+                resData[i] = this.data[j];
               }
             }
           }
-          return this.res_data;
+          return resData;
         }
       },
       currentLenth() {
@@ -275,8 +297,21 @@
       closeDepartment() {
         this.departmentVisible = false;
       },
+      closeDepEdit() {
+        this.depEditVisible = false;
+      },
       openDepartment() {
         this.departmentVisible = true;
+      },
+      openDepEdit(name, listOfUsers, id) {
+        this.depEditVisible = true;
+        this.dataDep.depName = name;
+        const arrUsers = [];
+        for (let [key, value] of Object.entries(listOfUsers)) {
+          arrUsers.push(value.key);
+        }
+        this.dataDep.users = arrUsers;
+        this.dataDep.id = id;
       },
       deleteBlock(id) {
         this.$store
@@ -333,18 +368,30 @@
         });
       },
     },
+
   };
 </script>
 
 <style lang="scss">
+  .delete-department.edit {
+    margin-right: 0;
+  }
   .delete-department {
     background: transparent;
     position: absolute;
     right: 0;
-    margin-right: 15px;
-    top: 13px;
+    margin-right: 28px;
+    top: 0;
     border: none;
     z-index: 1;
+    padding: 0 8px;
+    height: auto;
+
+    i {
+      font-size: 12px;
+      vertical-align: top;
+      line-height: 23px !important;
+    }
   }
   .structure-el {
     position: relative;
@@ -476,7 +523,7 @@
             position: relative;
             display: inline-block;
             margin-bottom: 40px;
-            padding: 15px 15px;
+            padding: 0;
             &:before{
               content: '';
               position: absolute;

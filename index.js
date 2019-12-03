@@ -52,6 +52,7 @@ app.use('/api/groupInvite', validateToken, require('./crud')(GroupInvite, invite
 app.use('/api/projectParticipant', validateToken, require('./crud')(ProjectParticipant, serializers.serializer));
 app.use('/api/project', validateToken, require('./crud')(Project, projectSerializer));
 
+
 app.post('/api/upload', (req, res, next) => {
   let imageFile = req.files.files;
   const fileName = `/public/${Date.now()}${imageFile.name}`;
@@ -327,6 +328,22 @@ app.delete('/api/department/:depId', (req, res) => {
         }
     });
 });
+//update department
+app.put('/api/department', (req, res) => {
+    let {_id, name, users} = req.body; console.log(users);
+    Department.findByIdAndUpdate(_id, {$set: { name:name, users:users }},{new: true}, function(error, collection){ console.log(error);
+        if (error) return res.status(500).send("There was a problem registering the user.");
+        else {
+            Department.find({}, (err, department) => {
+                if (!err && department) {
+                    res.status(200).send(department);
+                }
+            });
+        }
+    });
+
+});
+app.put('/api/department', validateToken, require('./crud')(Department, serializers.serializer));
 //put notifications
 app.post('/api/notification', (req, res, next) => {
     let notifi =req.body,

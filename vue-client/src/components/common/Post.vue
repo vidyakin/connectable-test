@@ -83,7 +83,7 @@
     </div>
     <div>
 
-      <a-popover title="Действия с постом" trigger="click" :container="'post-' + post._id" overlayClassName="action-popup-content" v-if="post && post.author._id === datauser._id">
+      <a-popover title="Действия с постом" trigger="click" :container="'post-' + post._id" overlayClassName="action-popup-content" v-if="post && post.author._id === datauser._id || $can('read', {'accessEmail': datauser.email, '__type': 'User'})">
         <template slot="content">
           <a-tooltip title="Удалить">
             <a-icon type="delete" @click="deletePost"></a-icon>
