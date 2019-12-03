@@ -153,7 +153,7 @@ export default {
     return {
       current: '',
       commenting: false,
-        visible: false,
+      visible: false,
       commentContent: '',
       allComment: false,
       pubUrl: PUBLIC_URL,
@@ -164,6 +164,11 @@ export default {
     ...mapGetters(['showHeaderImage', 'user', 'currentUser', 'userData']),
   },
   methods: {
+    handleScroll () {
+      if(this.visible) {
+        this.visible = false;
+      }
+    },
     commented() {
       this.commenting = true;
     },
@@ -225,7 +230,7 @@ export default {
     editPost() {
       this.$store.commit(SET_POST_FOR_EDITING, this.post);
       this.$store.commit(SET_EDIT_POST_VISIBLE, true);
-        this.visible = false;
+      this.visible = false;
     },
     seeAllComment() {
       this.allComment = true;
@@ -243,6 +248,9 @@ export default {
         parent: { type: 'user', id: this.datauser._id },
       });
     },
+  },
+  beforeMount() {
+    document.getElementById('profile').addEventListener('scroll', this.handleScroll);
   },
   props: {
     post: Object,

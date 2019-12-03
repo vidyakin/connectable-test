@@ -1,5 +1,5 @@
 <template>
-  <div class="profile">
+  <div id="profile" class="profile">
     <app-user-info></app-user-info>
     <app-comment-input :parent="{type: 'user', id: datauser && datauser._id}" v-if="datauser._id == $route.params._id || $can('read', {'accessEmail': datauser.email, '__type': 'User'})" />
 
