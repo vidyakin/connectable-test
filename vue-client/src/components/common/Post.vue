@@ -83,7 +83,7 @@
     </div>
     <div>
 
-      <a-popover title="Действия с постом" trigger="click" :container="'post-' + post._id" overlayClassName="action-popup-content" v-if="post && post.author._id === datauser._id || $can('read', {'accessEmail': datauser.email, '__type': 'User'})">
+      <a-popover title="Действия с постом" v-model="visible" trigger="click" :container="'post-' + post._id" overlayClassName="action-popup-content" v-if="post && post.author._id === datauser._id || $can('read', {'accessEmail': datauser.email, '__type': 'User'})">
         <template slot="content">
           <a-tooltip title="Удалить">
             <a-icon type="delete" @click="deletePost"></a-icon>
@@ -153,6 +153,7 @@ export default {
     return {
       current: '',
       commenting: false,
+        visible: false,
       commentContent: '',
       allComment: false,
       pubUrl: PUBLIC_URL,
@@ -212,9 +213,11 @@ export default {
         author: this.datauser,
         message: this.commentContent,
       };
-      this.$store.dispatch(SEND_COMMENT, comment).then(() => {
-        this.commentContent = '';
-      });
+      if(this.commentContent) {
+          this.$store.dispatch(SEND_COMMENT, comment).then(() => {
+              this.commentContent = '';
+          });
+      }
     },
     deletePost() {
       this.$store.dispatch(DELETE_POST, this.post._id);
@@ -222,6 +225,7 @@ export default {
     editPost() {
       this.$store.commit(SET_POST_FOR_EDITING, this.post);
       this.$store.commit(SET_EDIT_POST_VISIBLE, true);
+        this.visible = false;
     },
     seeAllComment() {
       this.allComment = true;

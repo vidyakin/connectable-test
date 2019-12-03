@@ -124,9 +124,11 @@ export default {
         author: this.datauser,
         message: this.commentContent,
       };
-      this.$store
-        .dispatch(SEND_COMMENT, comment)
-        .then(() => (this.commentContent = ''));
+      if(this.commentContent) {
+        this.$store
+                .dispatch(SEND_COMMENT, comment)
+                .then(() => (this.commentContent = ''));
+      }
     },
     like(id, type) {
       const like = {
