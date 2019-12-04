@@ -137,10 +137,11 @@
                       <a-tooltip title="Удалить">
                         <a-button class="delete-department" icon="delete"></a-button>
                       </a-tooltip>
-                      <a-tooltip title="Редактировать">
-                        <a-button class="delete-department edit" icon="edit"></a-button>
-                      </a-tooltip>
+
                     </a-popconfirm>
+                    <a-tooltip title="Редактировать">
+                      <a-button class="delete-department edit" icon="edit" @click="openDepEdit(dep_3.name, dep_3.users, dep_3._id)"></a-button>
+                    </a-tooltip>
                   </div>
 
                   <div class="c-structure__detail__row" v-for="(dep_4, index) in departments" v-if="(dep_4.level == 4 && dep_4.parent.label == dep_3.name)">
@@ -178,10 +179,11 @@
                           <a-tooltip title="Удалить">
                             <a-button class="delete-department" icon="delete"></a-button>
                           </a-tooltip>
-                          <a-tooltip title="Редактировать">
-                            <a-button class="delete-department edit" icon="edit"></a-button>
-                          </a-tooltip>
+
                         </a-popconfirm>
+                        <a-tooltip title="Редактировать">
+                          <a-button class="delete-department edit" icon="edit" @click="openDepEdit(dep_4.name, dep_4.users, dep_4._id)"></a-button>
+                        </a-tooltip>
                       </div>
                     </div>
 
@@ -321,18 +323,19 @@
                 });
       },
       endingWords(count) {
+        let outputVal = '';
         if (count == 0) {
-          this.output = 'нет участников';
+          outputVal = 'нет участников';
         } else if (count == 1) {
-          this.output = ' участник';
+          outputVal = ' участник';
         } else if ((count > 20) && ((count % 10) == 1)) {
-          this.output = ' участник';
+          outputVal = ' участник';
         } else if (((count >= 2) && (count <= 4)) || (((count % 10) >= 2) && ((count % 10) <= 4)) && (count > 20)) {
-          this.output = ' участника';
+          outputVal = ' участника';
         } else {
-          this.output = ' участников';
+          outputVal = ' участников';
         }
-        return this.output;
+        return this.output = outputVal;
       },
     },
     beforeCreate() {

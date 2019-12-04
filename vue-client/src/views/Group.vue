@@ -1,5 +1,5 @@
 <template>
-  <div class="group-view">
+  <div id="profile" class="group-view">
     <app-group-edit-drawer :visible="editVisible" :close="closeEdit" />
     <app-requests-drawer
       :visible="requestVisible"
@@ -100,7 +100,7 @@
        currentGroup && currentGroup.participants.findIndex(({_id}) => _id === userinfo._id) !== -1"
     >
       <app-comment-input :parent="{type: 'group', id: currentGroup && currentGroup._id}" />
-      <app-post v-for="(post, index) in posts" :post="post" :key="index" />
+        <app-post v-for="(post, index) in posts" :post="post" :key="index" />
     </template>
   </div>
 </template>
