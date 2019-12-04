@@ -330,7 +330,7 @@ app.delete('/api/department/:depId', (req, res) => {
 });
 //update department
 app.put('/api/department', (req, res) => {
-    let {_id, name, users} = req.body; console.log(users);
+    let {_id, name, users} = req.body;
     Department.findByIdAndUpdate(_id, {$set: { name:name, users:users }},{new: true}, function(error, collection){ console.log(error);
         if (error) return res.status(500).send("There was a problem registering the user.");
         else {
