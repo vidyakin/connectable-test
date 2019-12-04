@@ -1,5 +1,5 @@
 <template>
-  <div class="company">
+  <div id="profile" class="company">
     <app-comment-input
       v-model="content"
       @pressEnter="sendMessage"
