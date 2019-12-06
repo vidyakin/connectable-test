@@ -3,6 +3,7 @@
     <app-navbar />
     <div class="content">
       <app-post-edit-drawer />
+      <app-comment-edit-drawer />
       <div class="header">
         <app-header />
       </div>
@@ -17,6 +18,7 @@ import Vue from 'vue';
 import AppNavbar from '../components/common/Navbar.vue';
 import AppHeader from '../components/common/Header.vue';
 import AppPostEditDrawer from '../components/drawers/PostEditDrawer.vue';
+import AppCommentEditDrawer from '../components/drawers/CommentEditDrawer.vue';
 import { GET_INFO_ABOUT_USER } from '@/store/user/actions.type';
 import moment from 'moment';
 
@@ -26,6 +28,7 @@ export default Vue.extend({
     AppNavbar,
     AppHeader,
     AppPostEditDrawer,
+    AppCommentEditDrawer,
   },
   methods: {},
   beforeMount() {

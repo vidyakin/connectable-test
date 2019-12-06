@@ -78,7 +78,7 @@
           <a-icon type="delete" @click="deleteComment(comment._id)"></a-icon>
         </a-tooltip>
         <a-tooltip title="Редактировать">
-          <a-icon type="edit" @click></a-icon>
+          <a-icon type="edit" @click="editPost"></a-icon>
         </a-tooltip>
       </template>
       <a-button icon="ellipsis" class="open-action-button"></a-button>
@@ -95,6 +95,11 @@ import {
   SEND_LIKE,
   SEND_NEW_POST,
 } from '../../store/post/actions.type';
+import {
+  SET_EDIT_POST_VISIBLE,
+  SET_COMMENT_FOR_EDITING,
+  SET_EDIT_COMMENT_VISIBLE,
+} from '../../store/post/mutations.type';
 import moment from 'moment';
 import store from '../../store';
 export default {
@@ -108,6 +113,7 @@ export default {
       commentContent: '',
       answering: false,
       showAnswer: false,
+      visible: false,
       datauser: (store.getters.userData.result ? store.getters.userData.result : store.getters.currentUser),
     };
   },
@@ -144,10 +150,16 @@ export default {
       };
       this.$store.dispatch(DELETE_COMMENT, id);
     },
+    editPost() {
+      this.$store.commit(SET_COMMENT_FOR_EDITING, this.comment);
+      this.$store.commit(SET_EDIT_COMMENT_VISIBLE, true);
+      this.visible = false;
+    },
   },
   props: {
     parent: Object,
     comment: Object,
+    post: Object,
   },
 };
 </script>

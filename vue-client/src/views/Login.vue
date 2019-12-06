@@ -76,7 +76,6 @@ export default Vue.extend({
                         email:this.user.email,
                         password:this.user.password
                     }).finally(() => {
-                        console.log(store.getters.errorLogin);
                         if(!store.getters.errorLogin) {
                             this.$router.push({
                                 name: 'about'

@@ -96,7 +96,6 @@ export default {
     },
     currentLenth() {
       this.userLength = this.users.length;
-      console.log(this.userLength);
     },
     endingWords(count) {
       if (count == 0) {

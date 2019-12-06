@@ -119,7 +119,7 @@
         },
         watch: {
             notification(notification) {
-                console.log(notification);
+
                 this.settings.addUser = (notification ? notification.addUser: false);
                 this.settings.publications = (notification ? notification.publications: false);
                 this.settings.eventComment = (notification ? notification.eventComment: false);

@@ -4,7 +4,7 @@ import {
   ADD_COMMENT_FOR_POST,
   ADD_LIKE_FOR_COMMENT,
   ADD_LIKE_FOR_POST,
-  ADD_POST, CHANGE_POST,
+  ADD_POST, CHANGE_POST, CHANGE_COMMENT,
   REMOVE_POST,
   SET_POSTS,
 } from '@/store/post/mutations.type';
@@ -52,10 +52,14 @@ export const editPost = (context: any, post: any) => {
         context.commit(CHANGE_POST, response.data.result);
       });
   }
-
-
 };
-
+export const editComment = (context: any, comment: any) => {
+   return Vue.axios
+            .put('api/comment/' + comment._id, comment)
+            .then((response: any) => {
+                context.commit(CHANGE_COMMENT, response.data.result);
+            });
+};
 export const repost = (context: any, post: any) => {
   return Vue.axios
     .post('api/post', post)

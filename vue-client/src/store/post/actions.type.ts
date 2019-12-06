@@ -8,3 +8,4 @@ export const DELETE_LIKE = 'DELETE_LIKE';
 export const SEND_COMMENT = 'SEND_COMMENT';
 export const REPOST = 'REPOST';
 export const EDIT_POST = 'EDIT_POST';
+export const EDIT_COMMENT = 'EDIT_COMMENT';

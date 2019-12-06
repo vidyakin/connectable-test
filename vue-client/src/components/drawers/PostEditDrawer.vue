@@ -127,7 +127,7 @@ export default {
             message: formFields.message,
             formData: this.handleUpload(),
           };
-          console.log(post);
+
           this.$store.dispatch(EDIT_POST, post).finally(() => {
             this.createButtonSpinning = false;
             this.onClose();

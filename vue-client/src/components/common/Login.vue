@@ -40,7 +40,6 @@ export default {
         // GoogleUser.getBasicProfile() : Get the user's basic profile information.
         // GoogleUser.getAuthResponse() : Get the response object from the user's auth session. access_token and so on
         const isSignIn = this.$gAuth.isAuthorized;
-        console.log(isSignIn);
       });
     },
   },
