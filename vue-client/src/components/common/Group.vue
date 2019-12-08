@@ -89,7 +89,12 @@ export default {
   },
   methods: {
     deleteGroup() {
-      this.$store.dispatch(DELETE_GROUP, this.group._id);
+      this.$store.dispatch(DELETE_GROUP, this.group._id).then(() => {
+        this.$notification['success']({
+          message: 'Група удалена',
+          placement: 'topRight'
+        });
+      });
     },
     endingWords(count) {
       if (count == 0) {

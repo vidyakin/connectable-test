@@ -225,7 +225,13 @@ export default {
       }
     },
     deletePost() {
-      this.$store.dispatch(DELETE_POST, this.post._id);
+      this.$store.dispatch(DELETE_POST, this.post._id).then(() => {
+
+        this.$notification['success']({
+          message: 'Пост удален',
+          placement: 'topRight'
+        });
+      });
     },
     editPost() {
       this.$store.commit(SET_POST_FOR_EDITING, this.post);

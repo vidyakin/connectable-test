@@ -91,6 +91,7 @@ import { mapGetters } from 'vuex';
 import AppLoginBar from './LoginBar';
 import {
   GET_POSTS,
+  DELETE_COMMENT,
   SEND_COMMENT,
   SEND_LIKE,
   SEND_NEW_POST,
@@ -144,11 +145,13 @@ export default {
       this.$store.dispatch(SEND_LIKE, like);
     },
     deleteComment(id) {
-      const like = {
-        parent: { type, id },
-        author: this.datauser,
-      };
-      this.$store.dispatch(DELETE_COMMENT, id);
+      console.log(123);
+      this.$store.dispatch(DELETE_COMMENT, id).then(() => {
+                this.$notification['success']({
+                  message: 'Комментарий удален',
+                  placement: 'topRight'
+                });
+      });
     },
     editPost() {
       this.$store.commit(SET_COMMENT_FOR_EDITING, this.comment);

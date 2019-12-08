@@ -183,7 +183,13 @@ export default Vue.extend({
       };
     },
     deleteEvent(id) {
-      this.$store.dispatch(DELETE_EVENT, id);
+      this.$store.dispatch(DELETE_EVENT, id).then(() => {
+
+        this.$notification['success']({
+          message: 'Событие удалено',
+          placement: 'topRight'
+        });
+      });
     },
   },
 });

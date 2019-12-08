@@ -8,17 +8,18 @@ import {
   SEND_LIKE,
   SEND_NEW_POST,
   DELETE_LIKE,
+  DELETE_COMMENT,
   EDIT_COMMENT,
 } from '@/store/post/actions.type';
-import {deletePost, editPost, getPosts, repost, sendComment, sendLike, sendNewPost, dislike, editComment} from '@/services/post.service';
+import {deletePost, editPost, getPosts, repost, sendComment, sendLike, sendNewPost, dislike, editComment, deleteComment} from '@/services/post.service';
 import {
   ADD_ANSWER_FOR_COMMENT,
   ADD_COMMENT_FOR_POST,
   ADD_LIKE_FOR_COMMENT,
   ADD_LIKE_FOR_POST,
-  ADD_POST, CHANGE_POST,CHANGE_COMMENT,
+  ADD_POST, CHANGE_POST, CHANGE_COMMENT,
   REMOVE_POST, SET_EDIT_POST_VISIBLE, SET_POST_FOR_EDITING, SET_EDIT_COMMENT_VISIBLE, SET_COMMENT_FOR_EDITING,
-  SET_POSTS,
+  SET_POSTS, REMOVE_COMMENT,
 } from '@/store/post/mutations.type';
 import {DELETE_EVENT} from '@/store/user/actions.type';
 
@@ -68,6 +69,7 @@ const actions = {
   [DELETE_LIKE]: dislike,
   [SEND_COMMENT]: sendComment,
   [DELETE_POST]: deletePost,
+  [DELETE_COMMENT]: deleteComment,
   [REPOST]: repost,
   [EDIT_POST]: editPost,
   [EDIT_COMMENT]: editComment,
@@ -148,6 +150,23 @@ const mutations = {
       ];
     }
   },
+  [REMOVE_COMMENT](state: State, commentId: any) {
+    let commentIndex: any;
+    const postIndex = state.posts.findIndex((post) => {
+      commentIndex = post.comments.findIndex((currentComment: any) => currentComment._id === commentId);
+      return commentIndex !== -1;
+    });
+    state.posts = [...state.posts.slice(0, postIndex),
+      {
+        ...state.posts[postIndex],
+        comments: [
+          ...state.posts[postIndex].comments!.slice(0, commentIndex),
+          ...state.posts[postIndex].comments!.slice(commentIndex + 1),
+        ],
+      },
+      ...state.posts.slice(postIndex + 1)];
+  },
+
   [CHANGE_POST](state: State, post: any) {
     if (state.posts) {
       const index = state.posts!.findIndex(({_id}) => _id === post._id);

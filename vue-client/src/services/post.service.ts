@@ -6,6 +6,7 @@ import {
   ADD_LIKE_FOR_POST,
   ADD_POST, CHANGE_POST, CHANGE_COMMENT,
   REMOVE_POST,
+  REMOVE_COMMENT,
   SET_POSTS,
 } from '@/store/post/mutations.type';
 
@@ -124,3 +125,11 @@ export const deletePost = (context: any, postId: number) => {
       context.commit(REMOVE_POST, response.data.result);
     });
 };
+export const deleteComment= (context: any, commentId: number) => {
+    return Vue.axios
+        .delete('api/comment/' + commentId)
+        .then((response: any) => {
+            context.commit(REMOVE_COMMENT, response.data.result);
+        });
+};
+
