@@ -309,9 +309,12 @@
         this.depEditVisible = true;
         this.dataDep.depName = name;
         const arrUsers = [];
-        for (let [key, value] of Object.entries(listOfUsers)) {
-          arrUsers.push(value.key);
+        if(listOfUsers) {
+          for (let [key, value] of Object.entries(listOfUsers)) {
+            arrUsers.push(value.key);
+          }
         }
+
         this.dataDep.users = arrUsers;
         this.dataDep.id = id;
       },
