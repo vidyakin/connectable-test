@@ -28,8 +28,19 @@
 <script>
 import { GET_USERS } from '../store/user/actions.type';
 import { mapGetters } from 'vuex';
-/*
-filters: [
+
+
+
+const columns = [
+  {
+    title: 'Сотрудник',
+    dataIndex: 'name',
+    scopedSlots: { customRender: 'name' },
+  },
+  {
+    title: 'Должность',
+    dataIndex: 'positions',
+    filters: [
       {
         text: 'Менеджер',
         value: 'Менеджер',
@@ -41,17 +52,6 @@ filters: [
     ],
     filterMultiple: true,
     onFilter: (value, record) => record.positions.indexOf(value) !== -1,
- */
-const columns = [
-  {
-    title: 'Сотрудник',
-    dataIndex: 'name',
-    scopedSlots: { customRender: 'name' },
-  },
-  {
-    title: 'Должность',
-    dataIndex: 'positions',
-
   },
   {
     title: 'Телефон',

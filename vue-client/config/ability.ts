@@ -7,6 +7,6 @@ function subjectName(item: any) {
     return item.__type;
 }
 export default AbilityBuilder.define( {subjectName}, (can: any) => {
-    can(['crud'], 'User', { accessEmail: 'w.project.portal3@gmail.com' });
+    can(['crud'], 'User', { accessEmail: 'kostiantyn.lebedynskiy@gmail.com' });
 });
 // w.project.portal3@gmail.com
