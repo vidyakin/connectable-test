@@ -57,9 +57,7 @@ export default {
   beforeCreate() {
     this.$store.dispatch(GET_GROUPS);
   },
-  beforeMount() {
-    this.$store.dispatch(GET_GROUPS);
-  },
+
   watch: {
     groups(groups) {
       this.filterData = groups;
