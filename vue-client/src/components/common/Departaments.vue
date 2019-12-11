@@ -151,7 +151,7 @@ export default {
     margin-right: 0;
   }
 }
-.row {
+.departaments .row {
   display: flex;
   align-items: center;
   height: 130px;
