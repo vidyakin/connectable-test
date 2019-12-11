@@ -304,6 +304,7 @@ export default Vue.extend({
 .month-event {
   flex: 1;
   margin-right: 2rem;
+  max-width: 100%;
 
   @media (max-width: 567px) {
     flex-wrap: wrap;
@@ -314,7 +315,7 @@ export default Vue.extend({
   }
   .event {
     display: flex;
-    height: 80px;
+    /*height: 80px;*/
     border-radius: 4px;
     background-color: #f5f6fa;
     margin-bottom: 10px;
@@ -350,7 +351,7 @@ export default Vue.extend({
     }
 
     &-name {
-      height: 35px;
+      /*height: 35px;*/
       font-size: 13px;
       font-weight: bold;
       font-style: normal;
@@ -363,6 +364,7 @@ export default Vue.extend({
       padding-left: 2rem;
       width: calc(100% - 5rem);
       position: relative;
+      word-break: break-word;
     }
     &-name:before {
       content: '';
