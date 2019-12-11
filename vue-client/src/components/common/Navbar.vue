@@ -8,7 +8,8 @@
       @click="goToPage"
       v-if="$mq==='desktop'"
     >
-      <a-menu-item key="/" class="header">connectable</a-menu-item>
+      <a-menu-item key="/" class="header">
+        <img src="@/assets/logo.svg" class="logo" alt /></a-menu-item>
       <a-menu-item key="/company" :class="{active:isActive == 'company'}">
         <img src="@/assets/Icons/company.svg" alt />
         Компания
@@ -47,7 +48,7 @@
       @click="goToPage"
       v-if="$mq==='tablet'"
     >
-      <a-menu-item key="/" class="header">logo</a-menu-item>
+      <a-menu-item key="/" class="header"><img src="@/assets/logo.svg" class="logo" alt /></a-menu-item>
       <a-menu-item key="/company">
         <img src="@/assets/Icons/company.svg" alt />
       </a-menu-item>
@@ -101,6 +102,15 @@ export default {
 </script>
 
 <style lang="scss">
+  .navbar .ant-menu .ant-menu-item img.logo {
+    width: 94px;
+    max-width: 100%;
+    height: 20.5px;
+    object-fit: contain;
+    display: block;
+    margin-right: 0;
+    margin: 14px auto;
+  }
 .navbar {
   padding: 0;
   height: 100%;
@@ -148,7 +158,7 @@ export default {
       -webkit-backdrop-filter: blur(5px);
       backdrop-filter: blur(5px);
       box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0.05);
-      background-color: #000000;
+
 
       font-size: 1rem;
       font-weight: normal;
@@ -156,6 +166,14 @@ export default {
       font-stretch: normal;
       letter-spacing: normal;
       color: #abaac5;
+    }
+    .header:after {
+      width: 100%;
+      height: 100%;
+      transform: scaleY(1);
+      background: #000000;
+      z-index: -1;
+      opacity: 1;
     }
   }
 }
