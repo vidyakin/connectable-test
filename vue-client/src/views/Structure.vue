@@ -54,7 +54,7 @@
                 <a-button class="delete-department" icon="delete"></a-button>
               </a-tooltip>
             </a-popconfirm>
-              <a-tooltip title="Редактировать">
+              <a-tooltip title="Редактировать" v-if="$can('read', {'accessEmail': datauser.email, '__type': 'User'})">
                 <a-button class="delete-department edit" icon="edit" @click="openDepEdit(dep.name, dep.users, dep._id)"></a-button>
               </a-tooltip>
             </div>
@@ -97,7 +97,7 @@
                   </a-tooltip>
 
                 </a-popconfirm>
-                <a-tooltip title="Редактировать">
+                <a-tooltip title="Редактировать" v-if="$can('read', {'accessEmail': datauser.email, '__type': 'User'})">
                   <a-button class="delete-department edit" icon="edit" @click="openDepEdit(dep_2.name, dep_2.users, dep_2._id)"></a-button>
                 </a-tooltip>
               </div>
@@ -139,7 +139,7 @@
                       </a-tooltip>
 
                     </a-popconfirm>
-                    <a-tooltip title="Редактировать">
+                    <a-tooltip title="Редактировать" v-if="$can('read', {'accessEmail': datauser.email, '__type': 'User'})">
                       <a-button class="delete-department edit" icon="edit" @click="openDepEdit(dep_3.name, dep_3.users, dep_3._id)"></a-button>
                     </a-tooltip>
                   </div>
@@ -181,7 +181,7 @@
                           </a-tooltip>
 
                         </a-popconfirm>
-                        <a-tooltip title="Редактировать">
+                        <a-tooltip title="Редактировать" v-if="$can('read', {'accessEmail': datauser.email, '__type': 'User'})">
                           <a-button class="delete-department edit" icon="edit" @click="openDepEdit(dep_4.name, dep_4.users, dep_4._id)"></a-button>
                         </a-tooltip>
                       </div>
