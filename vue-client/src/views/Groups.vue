@@ -16,7 +16,7 @@
       </div>
     </div>
     <div class="groups-body">
-      <app-group v-for="(group, index) in this.filterData" :group="group" :key="index" ></app-group>
+      <app-group v-for="(group, index) in sortedGroup" :group="group" :key="index" ></app-group>
     </div>
   </div>
 </template>
@@ -39,7 +39,7 @@ export default {
       groupsData: [],
       searchText: '',
       filterData: [],
-      datauser: (store.getters.userData ? store.getters.userData.result : store.getters.user )
+      datauser: (store.getters.userData ? store.getters.userData.result : store.getters.user ),
     };
   },
   methods: {
@@ -52,6 +52,16 @@ export default {
   },
 
   computed: {
+    sortedGroup: function() {
+      function compare(a, b) {
+        if (a.name < b.name)
+          return -1;
+        if (a.name > b.name)
+          return 1;
+        return 0;
+      };
+      return this.filterData.sort(compare);
+    },
     ...mapGetters(['groups', 'userData']),
   },
   beforeCreate() {
