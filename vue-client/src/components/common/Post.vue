@@ -83,12 +83,12 @@
     </div>
     <div>
 
-      <a-popover title="Действия с постом" v-model="visible" trigger="click" :container="'post-' + post._id" overlayClassName="action-popup-content" v-if="post && post.author._id === datauser._id || $can('read', {'accessEmail': datauser.email, '__type': 'User'})">
+      <a-popover  title="Действия с постом" v-model="visible" trigger="click" :container="'post-' + post._id" overlayClassName="action-popup-content" v-if="post && post.author._id === datauser._id || $can('read', {'accessEmail': datauser.email, '__type': 'User'})">
         <template slot="content">
           <a-tooltip title="Удалить">
             <a-icon type="delete" @click="deletePost"></a-icon>
           </a-tooltip>
-          <a-popover title="Поделиться" trigger="click" v-if="post && post.author._id === datauser._id">
+          <a-popover title="Поделиться" trigger="click">
               <template slot="content">
                   <social-sharing :url="pubUrl"
                                   :title="post && post.message"
@@ -265,6 +265,9 @@ export default {
 </script>
 
 <style lang="scss">
+  .ant-popover-inner-content {
+    text-align: center;
+  }
 .post-comment-input {
   margin: 1rem 0 !important;
   display: flex;
