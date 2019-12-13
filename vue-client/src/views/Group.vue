@@ -280,8 +280,12 @@ export default {
       height: 19rem;
       border-radius: 0.25rem;
       padding: 1rem;
-
       box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.15);
+
+      @media (max-width: 767px) {
+        width: 100%;
+       margin-bottom: 1rem;
+      }
 
       &-header {
         display: flex;
@@ -343,8 +347,11 @@ export default {
       height: 19rem;
       border-radius: 0.25rem;
       padding: 1rem;
-
       box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.15);
+
+      @media (max-width: 767px) {
+        width: 100%;
+      }
 
       &-participant {
         display: flex;

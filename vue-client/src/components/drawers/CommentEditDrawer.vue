@@ -94,7 +94,7 @@
 
     .create-group-drawer {
         .form {
-            height: 100%;
+            height: auto;
         }
 
         .ant-drawer-content-wrapper {

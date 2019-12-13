@@ -369,6 +369,9 @@ export default {
       margin-top: 1rem;
     }
   }
+  &-content img {
+    max-width: 100%;
+  }
 
   &-footer {
     color: #4d565c;

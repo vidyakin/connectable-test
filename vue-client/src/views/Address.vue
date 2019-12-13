@@ -152,6 +152,9 @@ export default {
     height: calc(100vh - 50px);
   }
 }
+.address .ant-table-small {
+  border: none;
+}
 .address {
   padding: 30px;
   height: calc(100vh - 210px);

@@ -250,4 +250,14 @@ export default {
     cursor: pointer;
   }
 }
+  @media (max-width: 1023px) {
+    .comment-wrapper-content-text {
+      flex-wrap: wrap;
+    }
+    .comment-wrapper-content-text-message {
+      width: 100%;
+      padding: 0 8px;
+    }
+  }
+
 </style>

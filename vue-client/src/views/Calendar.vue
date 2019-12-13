@@ -170,7 +170,12 @@ export default Vue.extend({
       );
     },
     getNextMonthName() {
+    if(moment().month() == 11) {
+      return this.months[0];
+    }
+    else {
       return this.months[moment().month() + 1];
+    }
     },
     getEventsForNextMonth() {
       return (

@@ -244,5 +244,8 @@
       margin-right: 0.5rem;
     }
   }
+  .add-event-modal .ant-modal-content {
+    max-width: 100%;
+  }
 
 </style>
