@@ -130,8 +130,9 @@ export default {
       font-size: 1rem;
       text-align: left;
       padding-left: 1.5rem;
+      text-align: left;
 
-      @media (max-width: 1024px) {
+      @media (max-width: 1023px) {
         padding-left: 10px!important;
         padding-right: 10px;
         text-align: center;
