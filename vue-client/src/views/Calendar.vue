@@ -27,26 +27,30 @@
     <div class="months-events">
       <div class="month-event">
         <div class="month-name">{{getMonthName()}}</div>
-        <div class="event" v-if="getEventsForThisMonth().length" v-for="event in getEventsForThisMonth()" :style="{
-                 'border-color':event.color}">
-          <div class="event-date">
-            <div class="event-date-day">{{getDayFromDate(event.date).day}}</div>
-            <div class="event-date-weekday">{{getDayFromDate(event.date).weekday}}</div>
-          </div>
-          <div class="event-name">
-            <div>{{event.name}}, {{event.comment}}</div>
-            <div class="event-time">{{event.time}}</div>
-          </div>
-          <div class="event-action">
-            <a-popover title="Действия с событием" trigger="click">
-              <template slot="content">
-                <a-icon type="delete" @click="deleteEvent(event._id)"></a-icon>
-              </template>
-              <a-button icon="menu"></a-button>
-            </a-popover>
+        <div class="event-wrap" v-if="getEventsForThisMonth().length">
+          <div class="event"  v-for="event in getEventsForThisMonth()" :style="{
+                   'border-color':event.color}">
+            <div class="event-date">
+              <div class="event-date-day">{{getDayFromDate(event.date).day}}</div>
+              <div class="event-date-weekday">{{getDayFromDate(event.date).weekday}}</div>
+            </div>
+            <div class="event-name">
+              <div>{{event.name}}, {{event.comment}}</div>
+              <div class="event-time">{{event.time}}</div>
+            </div>
+            <div class="event-action">
+              <a-popover title="Действия с событием" trigger="click">
+                <template slot="content">
+                  <a-icon type="delete" @click="deleteEvent(event._id)"></a-icon>
+                </template>
+                <a-button icon="menu"></a-button>
+              </a-popover>
+            </div>
           </div>
         </div>
-        <div class="event" v-else>Пока нету запланированных событий</div>
+        <div class="event-wrap" v-else >
+          <div class="event no-events">Пока нету запланированных событий</div>
+        </div>
       </div>
       <div class="month-event">
         <div class="month-name">{{getNextMonthName()}}</div>
@@ -174,6 +178,14 @@ export default Vue.extend({
         this.events.filter( (event) => {
           return moment(event.date).isSame(moment().add(1, 'M'), 'month');
         })
+      );
+    },
+    getEventsForPrevMonth() {
+      return (
+              this.events &&
+              this.events.filter( (event) => {
+                return moment(event.date).isSame(moment().subtract(1, 'M'), 'month');
+              })
       );
     },
     getDayFromDate(date) {
