@@ -25,6 +25,7 @@
         @click="() => showAnswer=true"
       >Показать {{comment.answers.length}} ответ</span>
       <span v-if="showAnswer" class="show-answers" @click="() => showAnswer=false">Скрыть</span>
+
       <div v-if="showAnswer" class="comment-wrapper" v-for="answer in comment.answers">
         <div class="comment-wrapper-avatar">
           <a-avatar :src="(comment && comment.author.googleImage ? comment.author.googleImage : require('../../assets/no_image.png'))"></a-avatar>
@@ -50,7 +51,9 @@
             {{answer.likes.length}}
           </div>
         </div>
+
       </div>
+
       <div class="post-comment-input" v-if="showAnswer || answering">
         <a-avatar :src="(this.datauser.googleImage ? this.datauser.googleImage : require('../../assets/no_image.png'))"></a-avatar>
         <a-input
@@ -145,7 +148,6 @@ export default {
       this.$store.dispatch(SEND_LIKE, like);
     },
     deleteComment(id) {
-      console.log(123);
       this.$store.dispatch(DELETE_COMMENT, id).then(() => {
                 this.$notification['success']({
                   message: 'Комментарий удален',

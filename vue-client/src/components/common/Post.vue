@@ -395,4 +395,7 @@ export default {
     }
   }
 }
+  .comment-wrapper-content {
+    width: 100%;
+  }
 </style>

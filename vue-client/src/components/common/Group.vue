@@ -129,7 +129,8 @@ export default {
   }
 }
 .group {
-  width: 16rem;
+  min-width: 16rem;
+  max-width: 16rem;
   background-color: white;
   height: 313.8px;
   border-radius: 4px;
