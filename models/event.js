@@ -34,7 +34,7 @@ eventSchema.pre('save', function (next) {
       summary: this.name
     };
     if(this.attendees) event.attendees = this.attendees;
-
+    
     axios
       .post('https://www.googleapis.com/calendar/v3/calendars/primary/events',
         event, {headers: headers})

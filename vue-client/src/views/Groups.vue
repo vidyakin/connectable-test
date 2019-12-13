@@ -157,27 +157,30 @@ export default {
   }
 }
   @media (max-width: 480px) {
-    .group {
+    /*.group {
       margin-right: 0;
-    }
+    }*/
     .groups-body {
       margin: 1.5rem 1rem 1rem 1rem;
     }
   }
   .groups-body {
-
+    justify-content: center;
     margin: 2rem 0 2rem 0;
   }
-  .group:last-child {
+ /* .group:last-child {
     margin-right: 0;
-  }
+  }*/
   .group {
     height: auto;
+    margin-right: 1rem;
+    margin-left: 1rem;
   }
   @media (min-width: 1280px) {
     .groups-body {
       flex-wrap: nowrap;
     }
   }
+
 
 </style>
