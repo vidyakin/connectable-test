@@ -9,7 +9,7 @@ services:
         - DB_URL
     image: connbackend/temp
     container_name: connbackend
-    restart: on-failure
+    restart: always
     depends_on:
       - mongodb
     command: bash -c "node deploy_scripts/nodejs_init/wait_for_mongo.js && node index.js"
@@ -22,6 +22,7 @@ services:
   mongodb:
     image: mongo:latest
     container_name: "mongodb"
+    restart: always
     environment:
       MONGO_DATA_DIR: /data/db
       MONGO_LOG_DIR: /var/log
@@ -37,7 +38,7 @@ services:
       dockerfile: Dockerfile_vue
     image: connfrontend/temp
     container_name: connfrontend
-    restart: on-failure
+    restart: always
     depends_on:
       - connbackend
     ports:
