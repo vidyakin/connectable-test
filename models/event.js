@@ -27,12 +27,17 @@ eventSchema.pre('save', function (next) {
     const headers = {
       'Authorization': `Bearer ${data.googleToken}`,
     };
+    const targetTime = new Date(this.date.setHours(this.time.split(':')[0], this.time.split(':')[1])),
+        timeZoneFromDB = 0,
+        tzDifference = timeZoneFromDB * 60 + targetTime.getTimezoneOffset(),
+        offsetTime = new Date(targetTime.getTime() + tzDifference * 60 * 1000);
     const event = {
       description: this.comment,
-      start: {'dateTime': new Date(this.date.setHours(this.time.split(':')[0], this.time.split(':')[1]))},
-      end: {'dateTime': new Date(this.date.setHours(this.time.split(':')[0], this.time.split(':')[1]))},
+      start: {'dateTime': offsetTime},
+      end: {'dateTime': offsetTime},
       summary: this.name
     };
+
     if(this.attendees) event.attendees = this.attendees;
     
     axios
