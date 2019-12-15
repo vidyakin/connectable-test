@@ -120,12 +120,12 @@ export default {
   },
   beforeCreate() {
     this.form = this.$form.createForm(this);
-    this.$store.dispatch(GET_NOTIFICATION);
+    this.$store.dispatch(GET_NOTIFICATION, store.getters.userData.result._id);
   },
 
   watch: {
     notification(notification) {
-      this.statusEmailSend = (notification ? notification.publications : false);
+      this.statusEmailSend = (notification && notification.userId == store.getters.userData.result._id ? notification.publications : false);
     }
   },
 };

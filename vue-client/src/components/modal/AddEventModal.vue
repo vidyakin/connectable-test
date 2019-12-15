@@ -162,11 +162,11 @@
       close: Function,
     },
     beforeCreate() {
-      this.$store.dispatch(GET_NOTIFICATION);
+      this.$store.dispatch(GET_NOTIFICATION, store.getters.userData.result._id);
     },
     watch: {
       notification(notification) {
-        this.statusEmailSend = (notification ? notification.eventCalendar : false);
+        this.statusEmailSend = (notification && notification.userId == store.getters.userData.result._id ? notification.publications : false);
       }
     },
     mounted() {

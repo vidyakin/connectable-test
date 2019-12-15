@@ -1,6 +1,6 @@
 <template>
     <div class="setting">
-        <div class="setting-name">Настройки уведомлений</div>
+        <div class="setting-name">Настройки уведомлений </div>
 
         <a-form :form="form" class="u-form form" @submit="handleSubmit">
 
@@ -72,25 +72,27 @@
                 submitted: false,
                 error: false,
                 createButtonSpinning: false,
+                userId: (store.getters.userData.result ? store.getters.userData.result._id : ''),
             }
         },
         computed: {
-            ...mapGetters(['notification']),
+            ...mapGetters(['notification', 'userData']),
         },
         methods: {
             handleSubmit(e) {
                 e.preventDefault();
-                const { addUser, publications, eventComment, eventCalendar } = this.settings;
+                const { addUser, publications, eventComment, eventCalendar} = this.settings;
                 this.form.validateFieldsAndScroll((err, formFields) => {
                     if (!err) {
                         this.createButtonSpinning = true;
                         this.$store
                             .dispatch(PUT_NOTIFICATION, {
                                 ...formFields,
+                                userId:this.userId
                             })
                             .finally(() => {
                                 this.createButtonSpinning = false;
-                                this.$store.dispatch(GET_NOTIFICATION);
+                                this.$store.dispatch(GET_NOTIFICATION, this.userId);
                             });
                     }
                 });
@@ -115,11 +117,10 @@
         },
         beforeCreate() {
             this.form = this.$form.createForm(this);
-            this.$store.dispatch(GET_NOTIFICATION);
+            this.$store.dispatch(GET_NOTIFICATION, store.getters.userData.result._id);
         },
         watch: {
             notification(notification) {
-
                 this.settings.addUser = (notification ? notification.addUser: false);
                 this.settings.publications = (notification ? notification.publications: false);
                 this.settings.eventComment = (notification ? notification.eventComment: false);

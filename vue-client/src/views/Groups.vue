@@ -177,9 +177,9 @@ export default {
     margin-left: 1rem;
   }
   @media (min-width: 1280px) {
-    .groups-body {
+    /*.groups-body {
       flex-wrap: nowrap;
-    }
+    }*/
   }
 
 

@@ -60,7 +60,7 @@ export default Vue.extend({
       }
   },
 	computed: {
-		...mapGetters(['notification']),
+		...mapGetters(['notification', 'userData']),
 	},
   methods: {
       handleSubmit(e) {
@@ -93,11 +93,11 @@ export default Vue.extend({
       }
   },
 	beforeCreate() {
-		this.$store.dispatch(GET_NOTIFICATION);
+		this.$store.dispatch(GET_NOTIFICATION, store.getters.userData.result._id);
 	},
 	watch: {
 		notification(notification) {
-			this.statusEmailSend = (notification ? notification.addUser : false);
+			this.statusEmailSend = (notification && notification.userId == store.getters.userData.result._id ? notification.publications : false);
 		}
 	},
 });

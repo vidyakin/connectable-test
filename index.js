@@ -171,7 +171,6 @@ app.post('/api/register', function(req,res){
         } else {
             bcrypt.hash(password, 10, function (err, hash) {
                 if (err) {
-                    console.log('Error hashing password for user', email);
                     next(err);
                 }
                 else {
@@ -371,10 +370,21 @@ app.post('/api/notification', (req, res, next) => {
                 else {
                     obj_result = { $set: obj_data, $set: notifi };
                 }
-                Notification.updateMany({},
+                Notification.updateMany({userId:notifi.userId},
                     obj_result
                 ).then(result => {
-                    res.status(status).send(data);
+                    if(result.n > 0) { console.log(1);
+                        res.status(status).send();
+                    }
+                    else { console.log(2);
+                        db.collection('notifications').insertOne(notifi,function(err, collection){
+                            if (err) return res.status(500).send("There was a problem registering the user.");
+                            else {
+                                res.status(status).send();
+                            }
+                        });
+                    }
+
                 }).catch(err => console.error(`Failed to update items: ${err}`));
 
             }
@@ -382,7 +392,7 @@ app.post('/api/notification', (req, res, next) => {
                 db.collection('notifications').insertOne(notifi,function(err, collection){
                     if (err) return res.status(500).send("There was a problem registering the user.");
                     else {
-                        res.status(status).send(data);
+                        res.status(status).send();
                     }
                 });
             }
@@ -394,11 +404,15 @@ app.post('/api/notification', (req, res, next) => {
     });
 });
 //display status notification
-app.get('/api/notification', (req, res) => {
-    let status = 200;
-    Notification.find({}, (err, notifications) => {
+app.get('/api/notification/:userId', (req, res) => {
+    let userId = req.params.userId,
+        status = 200;
+    Notification.findOne({userId}, (err, notifications) => {
         if (!err && notifications) {
             res.status(status).send(notifications);
+        }
+        else {
+            res.status(status).send();
         }
     });
 });
