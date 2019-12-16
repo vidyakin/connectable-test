@@ -28,7 +28,7 @@
 
       <div v-if="showAnswer" class="comment-wrapper" v-for="answer in comment.answers">
         <div class="comment-wrapper-avatar">
-          <a-avatar :src="(comment && comment.author.googleImage ? comment.author.googleImage : require('../../assets/no_image.png'))"></a-avatar>
+          <a-avatar :src="(answer && answer.author.googleImage ? answer.author.googleImage : require('../../assets/no_image.png'))"></a-avatar>
         </div>
         <div class="comment-wrapper-content">
           <div class="comment-wrapper-content-text">
@@ -51,7 +51,22 @@
             {{answer.likes.length}}
           </div>
         </div>
-
+        <a-popover
+                title="Действия с комментарием"
+                trigger="click"
+                overlayClassName="action-popup-content"
+                v-if="comment && comment.author._id === datauser._id"
+        >
+          <template slot="content">
+            <a-tooltip title="Удалить">
+              <a-icon type="delete" @click="deleteComment(comment._id)"></a-icon>
+            </a-tooltip>
+            <a-tooltip title="Редактировать">
+              <a-icon type="edit" @click="editAnswer(comment._id, answer)"></a-icon>
+            </a-tooltip>
+          </template>
+          <a-button icon="ellipsis" class="open-action-button"></a-button>
+        </a-popover>
       </div>
 
       <div class="post-comment-input" v-if="showAnswer || answering">
@@ -160,6 +175,18 @@ export default {
       this.$store.commit(SET_EDIT_COMMENT_VISIBLE, true);
       this.visible = false;
     },
+    editAnswer(id, answer) {
+      const comment = {
+        answers: answer,
+        parent: { type: 'comment', id },
+        author: this.datauser,
+        message: answer.message,
+      };
+
+      this.$store.commit(SET_COMMENT_FOR_EDITING, comment);
+      this.$store.commit(SET_EDIT_COMMENT_VISIBLE, true);
+      this.visible = false;
+    }
   },
   props: {
     parent: Object,
