@@ -55,14 +55,14 @@
                 title="Действия с комментарием"
                 trigger="click"
                 overlayClassName="action-popup-content"
-                v-if="comment && comment.author._id === datauser._id"
+                v-if="answer && answer.author._id === datauser._id"
         >
           <template slot="content">
             <a-tooltip title="Удалить">
-              <a-icon type="delete" @click="deleteComment(comment._id)"></a-icon>
+              <a-icon type="delete" @click="deleteAnswer(answer)"></a-icon>
             </a-tooltip>
             <a-tooltip title="Редактировать">
-              <a-icon type="edit" @click="editAnswer(comment._id, answer)"></a-icon>
+              <a-icon type="edit" @click="editAnswer(answer)"></a-icon>
             </a-tooltip>
           </template>
           <a-button icon="ellipsis" class="open-action-button"></a-button>
@@ -133,6 +133,7 @@ export default {
       answering: false,
       showAnswer: false,
       visible: false,
+      show: false,
       datauser: (store.getters.userData.result ? store.getters.userData.result : store.getters.currentUser),
     };
   },
@@ -163,6 +164,7 @@ export default {
       this.$store.dispatch(SEND_LIKE, like);
     },
     deleteComment(id) {
+
       this.$store.dispatch(DELETE_COMMENT, id).then(() => {
                 this.$notification['success']({
                   message: 'Комментарий удален',
@@ -170,23 +172,33 @@ export default {
                 });
       });
     },
+    deleteAnswer(answer) {
+      const comment = {_id:answer._id, parent: answer.parent.id, type: 'answer'};
+      this.$store.dispatch(DELETE_COMMENT, comment).then(() => {
+        this.$notification['success']({
+          message: 'Комментарий удален',
+          placement: 'topRight'
+        });
+      });
+    },
     editPost() {
       this.$store.commit(SET_COMMENT_FOR_EDITING, this.comment);
       this.$store.commit(SET_EDIT_COMMENT_VISIBLE, true);
       this.visible = false;
     },
-    editAnswer(id, answer) {
+    editAnswer(answer) {
       const comment = {
-        answers: answer,
-        parent: { type: 'comment', id },
+        _id: answer._id,
         author: this.datauser,
         message: answer.message,
+        status: 'answer'
       };
-
       this.$store.commit(SET_COMMENT_FOR_EDITING, comment);
       this.$store.commit(SET_EDIT_COMMENT_VISIBLE, true);
       this.visible = false;
-    }
+      this.show = false;
+    },
+
   },
   props: {
     parent: Object,

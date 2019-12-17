@@ -86,7 +86,7 @@ module.exports = (Collection, serializer, options) => {
 
 
     const update = (req, res) => {
-        const changedEntry = req.body; console.log(changedEntry);
+        const changedEntry = req.body;
         let result = {};
         let status = 201;
 
