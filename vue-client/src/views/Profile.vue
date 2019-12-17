@@ -3,7 +3,7 @@
     <app-user-info></app-user-info>
     <app-comment-input :parent="{type: 'user', id: datauser && datauser._id}" v-if="datauser._id == $route.params._id" />
 
-    <app-post v-for="(post, index) in posts" v-if="(post.author._id == $route.params._id)" :post="post" :key="index" />
+    <app-post v-for="(post, index) in posts" v-if="(post && post.author._id == $route.params._id)" :post="post" :key="index" />
 
   </div>
 </template>

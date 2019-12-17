@@ -155,7 +155,7 @@ export default {
     .header {
       margin-top: 0;
       border-left: 0 !important;
-      width: 12.5rem;
+      width: 100%;
       height: 3.125rem;
       opacity: 0.3;
       -webkit-backdrop-filter: blur(5px);
