@@ -11,7 +11,7 @@
           <div v-for="val in getEventsForThisMonth()" :key="val.name"  v-if="getDayFromDate(value).day == getDayFromDate(val.date).day">
             <div
               class="event-wrapper"
-              v-if="getEventsForDay(value)"
+              v-if="getEventsForDay(value) && val.userId === userinfo._id"
               :style="{'background-color' : val.color,
                  'border-color':val.color}"
             >
@@ -29,7 +29,7 @@
         <div class="month-name">{{getMonthName()}}</div>
         <div class="event-wrap" v-if="getEventsForThisMonth().length">
           <div class="event"  v-for="event in getEventsForThisMonth()" :style="{
-                   'border-color':event.color}">
+                   'border-color':event.color}" v-if="event && event.userId === userinfo._id">
             <div class="event-date">
               <div class="event-date-day">{{getDayFromDate(event.date).day}}</div>
               <div class="event-date-weekday">{{getDayFromDate(event.date).weekday}}</div>
@@ -47,6 +47,9 @@
               </a-popover>
             </div>
           </div>
+          <div class="event-wrap" v-else >
+            <div class="event no-events">Пока нету запланированных событий</div>
+          </div>
         </div>
         <div class="event-wrap" v-else >
           <div class="event no-events">Пока нету запланированных событий</div>
@@ -56,7 +59,7 @@
         <div class="month-name">{{getNextMonthName()}}</div>
         <div class="event-wrap" v-if="getEventsForNextMonth().length">
           <div class="event" v-for="event in getEventsForNextMonth()" :style="{
-                 'border-color':event.color}">
+                 'border-color':event.color}" v-if="event && event.userId === userinfo._id">
             <div class="event-date">
               <div class="event-date-day">{{getDayFromDate(event.date).day}}</div>
               <div class="event-date-weekday">{{getDayFromDate(event.date).weekday}}</div>
@@ -73,6 +76,9 @@
                 <a-button icon="menu"></a-button>
               </a-popover>
             </div>
+          </div>
+          <div class="event-wrap" v-else >
+            <div class="event no-events">Пока нету запланированных событий</div>
           </div>
         </div>
         <div class="event-wrap" v-else >
@@ -112,7 +118,7 @@ export default Vue.extend({
         'Декабрь',
       ],
       weekday: ['ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ', 'ВС'],
-      userInfo: (store.getters.userData ? store.getters.userData : store.getters.user),
+      userinfo: (store.getters.userData.result ? store.getters.userData.result : store.getters.user.result),
     };
   },
   beforeCreate() {

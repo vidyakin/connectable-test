@@ -28,7 +28,7 @@ eventSchema.pre('save', function (next) {
       'Authorization': `Bearer ${data.googleToken}`,
     };
     const targetTime = new Date(this.date.setHours(this.time.split(':')[0], this.time.split(':')[1])),
-        timeZoneFromDB = 0,
+        timeZoneFromDB = -2,
         tzDifference = timeZoneFromDB * 60 + targetTime.getTimezoneOffset(),
         offsetTime = new Date(targetTime.getTime() + tzDifference * 60 * 1000);
     const event = {

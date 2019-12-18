@@ -238,7 +238,7 @@ export default {
 
     &-text {
       background-color: #f5f6fa;
-      border-radius: 4rem;
+      border-radius: 1rem;
       display: flex;
       /*height: 2rem;*/
       line-height: 1.5rem;
