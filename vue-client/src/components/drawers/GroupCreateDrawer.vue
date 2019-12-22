@@ -11,9 +11,9 @@
       <div class="form-row">
         <div class="row">
           <div class="col-sm-12">
+            <div class="label">Названия</div>
             <a-form-item>
               <app-input
-                label="Названия"
                 placeholder="Названия"
                 v-decorator="['name', {
                 rules: [

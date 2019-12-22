@@ -62,7 +62,12 @@ export default Vue.extend({
   background-color: transparent !important;
   border: 0 !important;
 }
-
+.ant-drawer {
+  z-index: 1031 !important;
+}
+.ant-popover {
+  z-index: 1031 !important;
+}
 .action-popup-content {
   .anticon {
     margin: 0 1rem !important;

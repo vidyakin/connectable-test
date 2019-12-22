@@ -14,7 +14,6 @@
             <div class="label">Название</div>
         <a-form-item>
           <app-input
-            label="Название"
             placeholder="Название"
             :defaultValue="currentGroup && currentGroup.name"
             v-decorator="['name', {

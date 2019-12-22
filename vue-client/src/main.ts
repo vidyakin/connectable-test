@@ -8,8 +8,6 @@ import VuexAxios from 'vue-axios';
 import axios from 'axios';
 import ability from '../config/ability';
 import { abilitiesPlugin } from '@casl/vue';
-import Vue2Filters from 'vue2-filters';
-
 
 // @ts-ignore
 import VueMq from 'vue-mq';
@@ -30,7 +28,7 @@ Vue.use(Antd);
 Vue.use(abilitiesPlugin, ability);
 var SocialSharing = require('vue-social-sharing');
 Vue.use(SocialSharing);
-Vue.use(Vue2Filters);
+
 
 Vue.config.productionTip = false;
 if(localStorage.getItem('token')) {

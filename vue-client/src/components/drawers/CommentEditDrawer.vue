@@ -91,9 +91,7 @@
     .edit-attachment-btn {
         width: 50%;
     }
-    .ant-drawer {
-        z-index: 9999 !important;
-    }
+
     .create-group-drawer {
         .form {
             height: auto;
