@@ -225,6 +225,9 @@ export default {
 </script>
 
 <style lang="scss">
+  .group-view .group-body-participants {
+    overflow-y: scroll;
+  }
 .groups-header {
   display: flex;
   margin: 1.5rem 0 1rem 0;
