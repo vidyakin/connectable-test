@@ -93,7 +93,7 @@
     >
       <template slot="content">
         <a-tooltip title="Удалить">
-          <a-icon type="delete" @click="deleteComment(comment._id)"></a-icon>
+          <a-icon type="delete" @click="deleteComment(comment)"></a-icon>
         </a-tooltip>
         <a-tooltip title="Редактировать">
           <a-icon type="edit" @click="editPost"></a-icon>
@@ -163,9 +163,9 @@ export default {
       };
       this.$store.dispatch(SEND_LIKE, like);
     },
-    deleteComment(id) {
+    deleteComment(comment) {
 
-      this.$store.dispatch(DELETE_COMMENT, id).then(() => {
+      this.$store.dispatch(DELETE_COMMENT, comment).then(() => {
                 this.$notification['success']({
                   message: 'Комментарий удален',
                   placement: 'topRight'

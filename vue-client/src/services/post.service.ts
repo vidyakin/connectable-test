@@ -131,7 +131,7 @@ export const deletePost = (context: any, postId: number) => {
       context.commit(REMOVE_POST, response.data.result);
     });
 };
-export const deleteComment= (context: any, commentId: any) => {
+export const deleteComment= (context: any, commentId: any) => { console.log(commentId);
     return Vue.axios
         .delete('api/comment/' + commentId._id)
         .then((response: any) => {
