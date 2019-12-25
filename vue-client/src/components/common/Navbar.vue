@@ -9,7 +9,11 @@
       v-if="$mq==='desktop'"
     >
       <a-menu-item key="/" class="header">
-        <img src="@/assets/logo.svg" class="logo" alt /></a-menu-item>
+        <img src="@/assets/logo.svg" class="logo" alt />
+        <span class="logo-mob circle-1"></span>
+        <span class="logo-mob circle-2"></span>
+        <span class="logo-mob circle-3"></span>
+      </a-menu-item>
       <a-menu-item key="/company" :class="{active:isActive == 'company'}">
         <img src="@/assets/Icons/company.svg" alt />
         Компания
@@ -49,7 +53,11 @@
       @click="goToPage"
       v-if="$mq==='tablet'"
     >
-      <a-menu-item key="/" class="header"><img src="@/assets/logo.svg" class="logo" alt /></a-menu-item>
+      <a-menu-item key="/" class="header"><img src="@/assets/logo.svg" class="logo" alt />
+        <span class="logo-mob circle-1"></span>
+        <span class="logo-mob circle-2"></span>
+        <span class="logo-mob circle-3"></span>
+      </a-menu-item>
       <a-menu-item key="/company">
         <img src="@/assets/Icons/company.svg" alt />
       </a-menu-item>
@@ -103,6 +111,26 @@ export default {
 </script>
 
 <style lang="scss">
+  .logo-mob {
+    display: none;
+    width: 6.3px;
+    height: 6.3px;
+    border-radius: 50%;
+    margin-right: 2px;
+
+    @media (max-width: 1023px) {
+      display: inline-block;
+    }
+  }
+  .circle-1 {
+    background-color: #ff1d25;
+  }
+  .circle-2 {
+    background-color: #7ac943;
+  }
+  .circle-3 {
+    background-color: #3fa9f5;
+  }
   .navbar .ant-menu .ant-menu-item img.logo {
     width: 94px;
     max-width: 100%;
@@ -111,6 +139,10 @@ export default {
     display: block;
     margin-right: 0;
     margin: 14px auto;
+
+    @media (max-width: 1023px) {
+      display: none;
+    }
   }
 .navbar {
   padding: 0;
@@ -157,12 +189,10 @@ export default {
       border-left: 0 !important;
       width: 100%;
       height: 3.125rem;
-      opacity: 0.3;
+      opacity: 1;
       -webkit-backdrop-filter: blur(5px);
       backdrop-filter: blur(5px);
       box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0.05);
-
-
       font-size: 1rem;
       font-weight: normal;
       font-style: normal;
@@ -175,8 +205,8 @@ export default {
       height: 100%;
       transform: scaleY(1);
       background: #000000;
-      z-index: -1;
-      opacity: 1;
+      z-index: 1;
+      opacity: .3;
     }
   }
 }
