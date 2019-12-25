@@ -58,6 +58,9 @@ export default Vue.extend({
 </script>
 
 <style lang="scss">
+  .ant-popover-message > .anticon {
+    left:0;
+  }
 .open-action-button {
   background-color: transparent !important;
   border: 0 !important;

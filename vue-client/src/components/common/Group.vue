@@ -121,7 +121,7 @@ export default {
 .group-header-action-popup-content {
   .ant-popover-inner-content {
     display: flex;
-    /*justify-content: center;*/
+    justify-content: center;
     .ant-btn {
       border: 0;
       background-color: transparent;
