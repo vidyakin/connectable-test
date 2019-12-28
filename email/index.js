@@ -1,7 +1,10 @@
 const nodemailer = require("nodemailer");
 const UserDao = require('../dao/user-dao');
-
-  let transporter = nodemailer.createTransport({
+const User = require('../models').User;
+const async = require('async');
+const bcrypt = require('bcrypt');
+const crypto = require('crypto');
+var transporter = nodemailer.createTransport({
     host: "mail.connectable.pro",
     port: 465,
     secure: true, // true for 465, false for other ports
@@ -10,6 +13,8 @@ const UserDao = require('../dao/user-dao');
       pass: 'ISOc^s^v7alo'
     }
   });
+var hbs = require('nodemailer-express-handlebars'),
+    path = require('path');
 
 transporter.verify(function(error, success) {
   if (error) {
@@ -18,6 +23,7 @@ transporter.verify(function(error, success) {
     console.log('Server is ready to take our messages');
   }
 });
+
 //
 module.exports.sendInvite = async(to, url, typeGroup) => {
   let email = await UserDao.findById(to), groupName = '';
@@ -78,3 +84,114 @@ module.exports.FollowEvent = async(to, url, eventdata) => {
     });
 };
 
+exports.render_forgot_password_template = function(req, res) {
+    return res.sendFile(path.resolve('./public/forgot-password.html'));
+};
+
+exports.render_reset_password_template = function(req, res) {
+    return res.sendFile(path.resolve('./public/reset-password.html'));
+};
+
+/**
+ * Forgot password
+ */
+exports.forgot_password = function(req, res) {
+    async.waterfall([
+        function(done) {
+            User.findOne({
+                email: req.body.email
+            }).exec(function(err, user) {
+                if (user) {
+                    done(err, user);
+                } else {
+                    return res.status(200).json({ status: 404, message: 'Пользователь не найден.' });
+                    //done('Пользователь не найден.');
+                }
+            });
+        },
+        function(user, done) {
+            // create the random token
+            crypto.randomBytes(20, function(err, buffer) {
+                var token = buffer.toString('hex');
+                done(err, user, token);
+            });
+        },
+        function(user, token, done) {
+            User.findByIdAndUpdate({ _id: user._id }, { reset_password_token: token, reset_password_expires: Date.now() + 86400000 }, { upsert: true, new: true }).exec(function(err, new_user) {
+                done(err, token, new_user);
+            });
+        },
+        function(token, user, done) {
+            var data = {
+                to: user.email,
+                from: '"Connectable" <mail@connectable.pro>',
+                subject: 'Забыли пароль?',
+                html:''+
+                    '<h3>Уважаемый '+user.firstName+',</h3>'+
+                    '<p>Вы запросили сброс пароля, пожалуйста, используйте эту <a href="https://connectable.pro/reset-password/'+token+'">ссылку</a> чтобы сбросить пароль</p>'+
+                    '<br>'+
+                    '<p>С уважениям Connectable!</p>',
+            };
+
+            transporter.sendMail(data, function(err) {
+                if (!err) {
+                    return res.status(200).json({ status: 200, message: 'Пожалуйста, проверьте свою электронную почту для дальнейших инструкций' });
+                } else {
+                    return done(err);
+                }
+            });
+
+        }
+    ], function(err) {
+        return res.status(422).json({ message: err });
+    });
+};
+
+/**
+ * Reset password
+ */
+exports.reset_password = function(req, res, next) {
+
+    User.findOne({
+        reset_password_token: req.body.token,
+        reset_password_expires: {
+            $gt: Date.now()
+        }
+    }).exec(function(err, user) {
+        if (!err && user) {
+            if (req.body.newPassword === req.body.verifyPassword) {
+                user.password = bcrypt.hashSync(req.body.newPassword, 10);
+                user.reset_password_token = undefined;
+                user.reset_password_expires = undefined;
+                user.save(function(err) {
+                    if (err) {
+                        return res.status(422).send({
+                            message: err
+                        });
+                    } else {
+                        var data = {
+                            to: user.email,
+                            from: '"Connectable" <mail@connectable.pro>',
+                            subject: 'Сброс пароля',
+                            html:''+
+                                '<h3>Уважаемый '+user.firstName+',</h3>'+
+                                '<p>Ваш пароль был успешно сброшен, теперь вы можете войти с новым паролем.</p>',
+                        };
+
+                        transporter.sendMail(data, function(err) {
+                            if (!err) {
+                                return res.status(200).json({ status: 200, message: 'Ваш пароль был успешно сброшен' });
+                            } else {
+                                return done(err);
+                            }
+                        });
+                    }
+                });
+            } else {
+                return res.status(200).json({ status: 422, message: 'Пароли не соответствуют' });
+            }
+        } else {
+            return res.status(200).json({ status: 400, message: 'Токен сброса пароля недействителен или срок его действия истек.' });
+        }
+    });
+};

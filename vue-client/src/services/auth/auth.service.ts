@@ -1,9 +1,22 @@
 import Vue from 'vue';
-import {LOGIN} from '@/store/user/actions.type';
-import {SET_USER, SET_USER_DATA} from '@/store/user/mutations.type';
+import {LOGIN, FORGOT_PASSWORD} from '@/store/user/actions.type';
+import {SET_USER, SET_USER_DATA, FORGOT_INFO, RESET_INFO} from '@/store/user/mutations.type';
 import {setAuthToken} from '@/services/auth/setAuthToken';
 import store from '../../store';
 import { router } from '../../router';
+
+export const forgotPasword = (context: any, email: any) => {
+    return Vue.axios.post('/auth/forgot_password', email)
+    .then((response) => {
+        context.commit(FORGOT_INFO, response.data);
+    });
+};
+export const resetPassword = (context: any, userPasswords: any) => {
+    return Vue.axios.post(`/auth/reset_password/${userPasswords.token}`, userPasswords)
+        .then((response) => {
+            context.commit(RESET_INFO, response.data);
+        });
+};
 
 function decodeToken(response:any) {
     var base64Url = response.split('.')[1];

@@ -98,12 +98,23 @@ export const router =  new Router({
       name: 'register',
       component: view('Register'),
     },
+    {
+      path: '/forgot-password/',
+      name: 'ForgotPassword',
+      component: view('ForgotPassword'),
+    },
+    {
+      path: '/reset-password/:token',
+      name: 'ResetPassword',
+      component: view('ResetPassword'),
+    },
   ],
 });
-
+console.log();
 router.beforeEach((to, from, next) => {
-  const publicPages = ['/login', '/register'];
+  const publicPages = ['/login', '/register', '/forgot-password'];
   const authRequired = !publicPages.includes(to.path);
+  const resetPas = location.pathname;
   const loggedIn = localStorage.getItem('authorization');
   const isLoggedIn = localStorage.getItem('token');
 
@@ -111,7 +122,7 @@ router.beforeEach((to, from, next) => {
     getInfoUser(localStorage.getItem('token'));
   }
 
-  if (authRequired && (!isLoggedIn || !loggedIn)) {
+  if (authRequired && (!isLoggedIn || !loggedIn) && !resetPas.includes('reset-password')) {
     return next({ name: 'login' });
   }
   next();

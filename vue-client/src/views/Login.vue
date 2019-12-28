@@ -118,7 +118,7 @@ export default Vue.extend({
         box-shadow: none !important;
     }
 }
-</style>t>
+</style>
 
 <style lang="scss">
 .c-login{

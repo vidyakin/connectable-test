@@ -52,6 +52,13 @@ app.use('/api/groupInvite', validateToken, require('./crud')(GroupInvite, invite
 app.use('/api/projectParticipant', validateToken, require('./crud')(ProjectParticipant, serializers.serializer));
 app.use('/api/project', validateToken, require('./crud')(Project, projectSerializer));
 
+var userHandlers = require('./email/index.js');
+app.route('/auth/forgot_password')
+    .get(userHandlers.render_forgot_password_template)
+    .post(userHandlers.forgot_password);
+app.route('/auth/reset_password/:token')
+    .get(userHandlers.render_reset_password_template)
+    .post(userHandlers.reset_password);
 
 app.post('/api/upload', (req, res, next) => {
   let imageFile = req.files.files;

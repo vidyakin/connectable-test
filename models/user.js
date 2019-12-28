@@ -25,7 +25,13 @@ const userSchema = new Schema({
     lastName: String,
     googleId: Number,
     followers: Array,
-    followersEmail: Array
+    followersEmail: Array,
+    reset_password_token: {
+        type: String
+    },
+    reset_password_expires: {
+        type: Date
+    }
 });
 
 userSchema.pre('save', function (next) {
