@@ -32,6 +32,13 @@
         </div>
         <div class="row">
             <app-login-google />
+            <div class="col-sm-4 offset-sm-4">
+                <fieldset>
+                <div class="form-group">
+                    <router-link to="/forgot-password" class="btn btn-link">Забыли пароль?</router-link>
+                </div>
+                </fieldset>
+            </div>
         </div>
     </div>
   </div>

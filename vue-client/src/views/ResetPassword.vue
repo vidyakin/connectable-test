@@ -7,7 +7,7 @@
                             :description="resetInfo.message"
                             type="success"
                     />
-                    Перейти на страницу <a href="https://connectable.pro/login">входа</a>
+                    Перейти на страницу <router-link to="/login" class="btn btn-link">входа</router-link>
                 </div>
                 <div v-else-if="resetInfo && resetInfo.status != 200" class="col-sm-6 offset-sm-3 ">
                     <a-alert
