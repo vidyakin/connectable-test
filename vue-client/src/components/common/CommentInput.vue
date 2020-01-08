@@ -1,14 +1,14 @@
 <template class="comment-input">
   <a-input class="input" placeholder="Сообщение..." v-model="current" @pressEnter="send">
     <div slot="addonAfter" class="comment-input-action">
-      <a-icon type="link" @click="handleUpload"></a-icon>
+      <!--<a-icon type="link" @click="handleUpload"></a-icon>-->
       <a-upload
         :multiple="false"
         :fileList="fileList"
         :beforeUpload="beforeUpload"
         :handleRemove="handleRemove"
       >
-        <a-icon type="video-camera"></a-icon>
+        <a-icon type="file"></a-icon>
       </a-upload>
     </div>
   </a-input>
@@ -41,6 +41,7 @@ export default {
   methods: {
     send() {
       if (this.current !== '') {
+
         this.$store.dispatch(SEND_NEW_POST, {
           message: this.current,
           created: moment(),

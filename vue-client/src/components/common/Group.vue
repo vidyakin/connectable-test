@@ -146,7 +146,7 @@ export default {
     margin-bottom: 15px;
 
     &-content {
-      max-width: 95%;
+      max-width: 90%;
 
       &-name {
         height: 20px;
