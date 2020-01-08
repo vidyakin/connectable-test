@@ -22,7 +22,6 @@ export const editUser = (context: any, user: any) => {
   return Vue.axios
     .put(`api/user/${user._id}`, user)
     .then((response: any) => {
-    console.log(response.data.result);
     context.commit(UPDATE_USER, response.data.result);
     context.commit(SET_USER_DATA, response.data);
     localStorage.setItem('token', response.data.token);

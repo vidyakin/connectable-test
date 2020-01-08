@@ -9,7 +9,7 @@ module.exports = (Collection, serializer, options) => {
         let result = {};
         let status = 201;
         const newEntry = req.body;
-        //console.log(req.body);
+        //console.log(newEntry);
         Collection.create(newEntry, async (e, data) => {
 
             if (e) {
@@ -89,7 +89,8 @@ module.exports = (Collection, serializer, options) => {
         const changedEntry = req.body;
         let result = {};
         let status = 201;
-
+        //console.log(req.params._id);
+        //console.log(changedEntry);
         Collection.updateOne({_id: req.params._id}, changedEntry, (e, data) => {
             if (e) {
                 status = 500;

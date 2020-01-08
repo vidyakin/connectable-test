@@ -148,6 +148,7 @@ export default {
       const comment = {
         parent: { type: 'comment', id },
         author: this.datauser,
+        created: moment(),
         message: this.commentContent,
       };
       if(this.commentContent) {

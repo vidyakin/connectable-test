@@ -103,13 +103,6 @@ export const dislike = (context: any, disLike: any) => {
         .post('api/dislike', disLike)
         .then((response: any) => {
             return response.data;
-            /*const newLike = response.data.result;
-            if (newLike.parent.type === 'post') {
-                context.commit(ADD_LIKE_FOR_POST, newLike);
-            }
-            if (newLike.parent.type === 'comment') {
-                context.commit(ADD_LIKE_FOR_COMMENT, newLike);
-            }*/
 
         });
 };

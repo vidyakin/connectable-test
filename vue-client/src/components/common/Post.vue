@@ -216,6 +216,7 @@ export default {
       const comment = {
         parent: { type: 'post', id: postId },
         author: this.datauser,
+        created: moment(),
         message: this.commentContent,
       };
       if(this.commentContent) {
