@@ -30,7 +30,6 @@ export const editUser = (context: any, user: any) => {
 };
 
 export const createEvent = (context: any, event: any) => {
-    console.log(event);
   return Vue.axios
     .post(`api/event/`, event)
     .then((response: any) => {

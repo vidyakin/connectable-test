@@ -93,6 +93,10 @@
                             .finally(() => {
                                 this.createButtonSpinning = false;
                                 this.$store.dispatch(GET_NOTIFICATION, this.userId);
+                                this.$notification['success']({
+                                    message: 'Настройки сохранены',
+                                    placement: 'topRight'
+                                });
                             });
                     }
                 });

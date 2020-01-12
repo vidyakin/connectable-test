@@ -269,6 +269,7 @@ app.post('/api/department', (req, res, next) => {
         level = '',
         result = {},
         status = 200;
+
     if(depData.parent) {
         let name = depData.parent.label;
         Department.findOne({name}, (err, dep) => {
@@ -279,6 +280,7 @@ app.post('/api/department', (req, res, next) => {
                 }
                 Department.findOne({slug}, (error, department) => {
                     if (!error && !department) {
+
                         db.collection('departments').insertOne(depData,function(error, collection){
                             if (error) return res.status(500).send("There was a problem registering the user.");
                         });
@@ -337,7 +339,8 @@ app.delete('/api/department/:depId', (req, res) => {
 //update department
 app.put('/api/department', (req, res) => {
     let {_id, name, users} = req.body;
-    Department.findByIdAndUpdate(_id, {$set: { name:name, users:users }},{new: true}, function(error, collection){ console.log(error);
+    let slug = latinize(req.body.name.toLowerCase().replace(/ /g,'_'));
+    Department.findByIdAndUpdate(_id, {$set: { name:name, users:users, slug:slug }},{new: true}, function(error, collection){ console.log(error);
         if (error) return res.status(500).send("There was a problem registering the user.");
         else {
             Department.find({}, (err, department) => {
@@ -349,13 +352,13 @@ app.put('/api/department', (req, res) => {
     });
 
 });
-app.put('/api/department', validateToken, require('./crud')(Department, serializers.serializer));
+//app.put('/api/department', validateToken, require('./crud')(Department, serializers.serializer));
 //put notifications
 app.post('/api/notification', (req, res, next) => {
     let notifi =req.body,
         status = 200,
         result = '';
-
+    console.log(notifi);
     Notification.findOne({}, (err, resbd) => {
         if(!err) {
             if (!err && resbd) {
@@ -380,14 +383,14 @@ app.post('/api/notification', (req, res, next) => {
                 Notification.updateMany({userId:notifi.userId},
                     obj_result
                 ).then(result => {
-                    if(result.n > 0) { console.log(1);
-                        res.status(status).send();
+                    if(result.n > 0) {
+                        res.status(status).send('Настройки сохранены');
                     }
-                    else { console.log(2);
+                    else {
                         db.collection('notifications').insertOne(notifi,function(err, collection){
                             if (err) return res.status(500).send("There was a problem registering the user.");
                             else {
-                                res.status(status).send();
+                                res.status(status).send('Настройки сохранены');
                             }
                         });
                     }
@@ -399,7 +402,7 @@ app.post('/api/notification', (req, res, next) => {
                 db.collection('notifications').insertOne(notifi,function(err, collection){
                     if (err) return res.status(500).send("There was a problem registering the user.");
                     else {
-                        res.status(status).send();
+                        res.status(status).send('Настройки сохранены');
                     }
                 });
             }
