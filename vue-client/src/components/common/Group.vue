@@ -5,7 +5,7 @@
         <div class="group-header-content-name" @click="redirectToGroup">{{group.name}}</div>
         <div class="group-header-content-count">{{group.participants.length}} {{group && endingWords(group.participants.length)}}</div>
       </div>
-      <div class="group-header-action" v-if="$can('read', {'accessEmail': datauser.email, '__type': 'User'})">
+      <div class="group-header-action" v-if="group && group.creatorId === datauser._id" >
         <a-popover
           title="Действия с группой"
           trigger="click"
@@ -38,7 +38,8 @@
         <div class="group-header-content-name" @click="redirectToGroup">{{group.name}}</div>
         <div class="group-header-content-count">{{group.participants.length}} {{group && endingWords(group.participants.length)}}</div>
       </div>
-      <div class="group-header-action" v-if="$can('read', {'accessEmail': datauser.email, '__type': 'User'})">
+      <!--v-if="$can('read', {'accessEmail': datauser.email, '__type': 'User'})"-->
+      <div class="group-header-action" v-if="group && group.creatorId === datauser._id" >
         <a-popover
                 title="Действия с группой"
                 trigger="click"
