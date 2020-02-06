@@ -37,7 +37,7 @@ export const login = (context: any, user: any) => {
             localStorage.removeItem('token');
             store.commit(SET_USER, null);
             store.commit(SET_USER_DATA, null);
-            router.push('/login');
+            router.push('/login'); 
         }
         else {
             localStorage.setItem('authorization', 'true');
@@ -55,6 +55,29 @@ export const logout = (context: any) => {
     localStorage.removeItem('token');
     context.commit(SET_USER, null);
     context.commit(SET_USER_DATA, null);
+};
+
+export const loginWithOutlook = (context: any, params: any) => {
+  Vue.axios.post(`api/outlook/login`, {
+    code: params.code
+  }).then(response => {
+    let name = response.data.name.split(' ');
+    const userForLogin = {
+      outlookId: response.data.uid,
+      aud: response.data.aud,
+      outlookToken: response.data.access_token,
+      firstName: name[0],
+      lastName: name[1],
+      email: response.data.email,
+    };
+    console.log(response)
+    context.dispatch(LOGIN, userForLogin).finally(() => {
+      router.push('/about');
+    });
+  }).catch(e => {
+    console.log(e)
+  });
+  
 };
 
 export const loginWithGoogle = (context: any, $gAuth: any) => {

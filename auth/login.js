@@ -3,7 +3,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 module.exports = (req, res) => {
-  const {username, password, googleId} = req.body;
+  const {username, password, googleId, outlookId} = req.body;
   if (username && password) {
     let result = {};
     let status = 200;
@@ -36,6 +36,41 @@ module.exports = (req, res) => {
         result.status = status;
         result.error = err;
         res.status(status).send(result);
+      }
+    });
+  }
+  else if (outlookId) {
+    let result = {};
+    let status = 200;
+
+    User.findOne({outlookId: outlookId}, (err, user) => {
+      if (!err && user) {
+        status = 200;
+        user.password = '';
+        const payload = {result: user};
+        const secret = process.env.JWT_SECRET;
+        result.token = jwt.sign(payload, secret, {
+          expiresIn: 86400 // expires in 24 hours
+        });
+
+        result.status = status;
+        result.result = user;
+        User.findOneAndUpdate({_id: user._id}, {outlookId: req.body.outlookId}, (err, data) => {
+        });
+        res.status(status).send(result);
+      } else {
+        req.body.password = 'nopass';
+        User.create(req.body, (err, newUser) => {
+          status = 201;
+          const payload = {user: newUser.outlookId};
+          const secret = process.env.JWT_SECRET;
+          result.token = jwt.sign(payload, secret, {
+            expiresIn: 86400 // expires in 24 hours
+          });
+          result.status = status;
+          result.result = newUser;
+          res.status(status).send(result);
+        })
       }
     });
   }

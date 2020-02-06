@@ -26,6 +26,10 @@ const Project = require('./models').Project;
 const Department = require('./models').Department;
 const Notification = require('./models').Notification;
 
+const authOutlook = require('./auth/outlook/');
+const calendarOutlook = require('./calendar');
+const roleRoutes = require('./role/routes');
+
 const app = express();
 const port = process.env.PORT || 4000;
 
@@ -51,6 +55,11 @@ app.use('/api/groupParticipant', validateToken, require('./crud')(GroupParticipa
 app.use('/api/groupInvite', validateToken, require('./crud')(GroupInvite, inviteSerializer));
 app.use('/api/projectParticipant', validateToken, require('./crud')(ProjectParticipant, serializers.serializer));
 app.use('/api/project', validateToken, require('./crud')(Project, projectSerializer));
+
+app.use('/api/outlook', authOutlook);
+app.use('/api/outlook/event', calendarOutlook);
+app.use("/role", roleRoutes);
+
 
 var userHandlers = require('./email/index.js');
 app.route('/auth/forgot_password')

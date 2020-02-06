@@ -214,6 +214,16 @@ export default Vue.extend({
       });
     },
   },
+  beforeCreate() {
+        const a = Vue.axios.get('/api/outlook/event')
+            .then((response) => {
+               console.log(response)
+                
+            }).catch((e) => {
+                console.log(e);
+            });
+        return a;
+    }
 });
 </script>
 

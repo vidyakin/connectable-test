@@ -32,6 +32,11 @@
         </div>
         <div class="row">
             <app-login-google />
+          
+                <div class="login-page">
+                    <a class="f6 link dim br2 ph3 pv2 mb2 dib white bg-dark-blue" v-bind:href="outlookUrl">Login with Outlook</a>
+                </div>
+
             <div class="col-sm-4 offset-sm-4">
                 <fieldset>
                 <div class="form-group">
@@ -48,6 +53,7 @@
 import Vue from 'vue';
 import { CHECK_USER_INFO } from '../store/user/actions.type';
 import AppLoginGoogle from '../components/common/LoginBarGoogle.vue';
+import AppLoginOutlook from '../components/common/LoginBarOutlook.vue';
 import {
     SUCCESS_REGISTER
 } from '@/store/user/mutations.type';
@@ -64,12 +70,14 @@ export default Vue.extend({
             error: {
                 email: false,
                 password: false
-            }
+            },
+            outlookUrl: ''
         }
     },
     components: {
         AppSuccessRegister,
-        AppLoginGoogle
+        AppLoginGoogle,
+        AppLoginOutlook
     },
     methods: {
         handleSubmit (e) {
@@ -103,6 +111,16 @@ export default Vue.extend({
 
             }
         }
+    }, 
+     beforeCreate() {
+        const a = Vue.axios.get('/api/outlook/login-url')
+            .then((response) => {
+                this.outlookUrl = response.data.loginUrl;
+                
+            }).catch((e) => {
+                console.log(e);
+            });
+        return a;
     }
 });
 </script>
@@ -126,6 +144,16 @@ export default Vue.extend({
     }
 }
 </style>
+<style scoped>
+  .login-page {
+    width: 100%;
+    height: 10vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+</style>
+
 
 <style lang="scss">
 .c-login{

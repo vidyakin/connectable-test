@@ -6,6 +6,7 @@
 					<form class="u-form" @submit.prevent="handleSubmit">
 						<fieldset>
 							<legend>Регистрация </legend>
+							<legend>zalupa </legend>
 						<div class="form-group">
 							<label for="firstName">Имя</label>
 							<input type="text" v-model="user.firstName" name="firstName" class="form-control" :class="{ 'is-invalid': submitted && !user.firstName }" />
