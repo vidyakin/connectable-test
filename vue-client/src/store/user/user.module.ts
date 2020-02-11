@@ -21,13 +21,14 @@ import {
   GET_INFO_ABOUT_USER, GET_USER, GET_USERS,
   LOGIN,
   LOGIN_WITH_GOOGLE, LOGOUT,
+  LOGIN_WITH_OUTLOOK,
   UPDATE_USER_INFO,
   INSERT_USER_INFO,
   CHECK_USER_INFO,
   FORGOT_PASSWORD,
   RESET_PASSWORD,
 } from '@/store/user/actions.type';
-import {getInfoAboutUser, login, loginWithGoogle, logout, forgotPasword, resetPassword} from '@/services/auth/auth.service';
+import {getInfoAboutUser, login, loginWithGoogle, loginWithOutlook, logout, forgotPasword, resetPassword} from '@/services/auth/auth.service';
 import {createEvent, deleteEvent, editUser, getEvents, getUser, getUsers, insertNewUser, checkUserInfo} from '@/services/user.service';
 
 interface State {
@@ -186,6 +187,7 @@ const actions = {
   [FORGOT_PASSWORD]:forgotPasword,
   [RESET_PASSWORD]:resetPassword,
   [LOGIN_WITH_GOOGLE]: loginWithGoogle,
+  [LOGIN_WITH_OUTLOOK]: loginWithOutlook,
   [GET_INFO_ABOUT_USER]: getInfoAboutUser,
   [UPDATE_USER_INFO]: editUser,
   [INSERT_USER_INFO]: insertNewUser,

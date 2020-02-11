@@ -11,6 +11,8 @@ import {
   DELETE_COMMENT,
   EDIT_COMMENT,
 } from '@/store/post/actions.type';
+
+import {} from '@/store/post/actions.type';
 import {deletePost, editPost, getPosts, repost, sendComment, sendLike, sendNewPost, dislike, editComment, deleteComment} from '@/services/post.service';
 import {
   ADD_ANSWER_FOR_COMMENT,

@@ -24,6 +24,8 @@ const userSchema = new Schema({
     firstName: String,
     lastName: String,
     googleId: Number,
+    outlookId: String,
+    aud: String,
     followers: Array,
     followersEmail: Array,
     reset_password_token: {
