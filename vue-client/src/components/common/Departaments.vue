@@ -98,11 +98,11 @@ export default {
       this.userLength = this.users.length;
     },
     endingWords(count) {
-      if (count == 0) {
+      if (count === 0) {
         this.output = 'нет участников';
-      } else if (count == 1) {
+      } else if (count === 1) {
         this.output = ' участник';
-      } else if ((count > 20) && ((count % 10) == 1)) {
+      } else if ((count > 20) && ((count % 10) === 1)) {
         this.output = ' участник';
       } else if (((count >= 2) && (count <= 4)) || (((count % 10) >= 2) && ((count % 10) <= 4)) && (count > 20)) {
         this.output = ' участника';

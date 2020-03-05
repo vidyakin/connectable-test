@@ -59,10 +59,9 @@ export const editComment = (context: any, comment: any) => {
    return Vue.axios
             .put('api/comment/' + comment._id, comment)
             .then((response: any) => {
-                if(comment.status) {
+                if (comment.status) {
                     context.commit(CHANGE_ANSWER, response.data.result);
-                }
-                else {
+                } else {
                     context.commit(CHANGE_COMMENT, response.data.result);
                 }
             });
@@ -99,7 +98,7 @@ export const sendLike = (context: any, like: any) => {
 };
 export const dislike = (context: any, disLike: any) => {
     return Vue.axios
-        //.delete(`api/dislike/${arrRes}`)
+        // .delete(`api/dislike/${arrRes}`)
         .post('api/dislike', disLike)
         .then((response: any) => {
             return response.data;
@@ -124,17 +123,18 @@ export const deletePost = (context: any, postId: number) => {
       context.commit(REMOVE_POST, response.data.result);
     });
 };
-export const deleteComment= (context: any, commentId: any) => { console.log(commentId);
-    return Vue.axios
-        .delete('api/comment/' + commentId._id)
-        .then((response: any) => {
-            if(commentId.type) {
-                context.commit(REMOVE_ANSWER, commentId);
-            }
-            else {
-                context.commit(REMOVE_COMMENT, response.data.result);
-            }
+export const deleteComment = (context: any, commentId: any) => {
+  console.log(commentId);
+  
+  return Vue.axios
+    .delete('api/comment/' + commentId._id)
+    .then((response: any) => {
+        if (commentId.type) {
+            context.commit(REMOVE_ANSWER, commentId);
+        } else {
+            context.commit(REMOVE_COMMENT, response.data.result);
+        }
 
-        });
+    });
 };
 

@@ -91,18 +91,18 @@ export default Vue.extend({
                         email:this.user.email,
                         password:this.user.password
                     }).finally(() => {
-                        if(!store.getters.errorLogin) {
+                        if (!store.getters.errorLogin) {
                             this.$router.push({
                                 name: 'about'
                             }, () => {});
                         }
                         else {
                             this.submitted = true;
-                            if(store.getters.errorLogin.email) {
+                            if (store.getters.errorLogin.email) {
                                 document.getElementById('email').classList.add('is-invalid');
                                 this.error.email = true;
                             }
-                            if(store.getters.errorLogin.password) {
+                            if (store.getters.errorLogin.password) {
                                 document.getElementById('password').classList.add('is-invalid');
                                 this.error.password = true;
                             }
@@ -111,7 +111,7 @@ export default Vue.extend({
 
             }
         }
-    }, 
+    },
      beforeCreate() {
         const a = Vue.axios.get('/api/outlook/login-url')
             .then((response) => {

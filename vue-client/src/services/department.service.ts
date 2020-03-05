@@ -1,10 +1,10 @@
 import Vue from 'vue';
 import {ADD_DEP} from '@/store/structure/mutations.type';
 import {ADD_NEW_DEP, DELETE_DEP} from '@/store/structure/actions.type';
-import {SET_USERS} from "@/store/user/mutations.type";
-import {REMOVE_GROUP} from "@/store/group/mutations.type";
+import {SET_USERS} from '@/store/user/mutations.type';
+import {REMOVE_GROUP} from '@/store/group/mutations.type';
 
-export const putDepartmentsList = (context: any, depinfo : any) => {
+export const putDepartmentsList = (context: any, depinfo: any) => {
     return Vue.axios
         .post(`api/department`, depinfo).then((response: any) => {
             console.log(response.data);
@@ -12,7 +12,7 @@ export const putDepartmentsList = (context: any, depinfo : any) => {
 
         }).catch(err => {
             console.log(err);
-        })
+        });
 };
 export const getDepartmentsList = (context: any) => {
     return Vue.axios

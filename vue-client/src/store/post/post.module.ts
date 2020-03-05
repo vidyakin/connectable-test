@@ -13,7 +13,10 @@ import {
 } from '@/store/post/actions.type';
 
 import {} from '@/store/post/actions.type';
-import {deletePost, editPost, getPosts, repost, sendComment, sendLike, sendNewPost, dislike, editComment, deleteComment} from '@/services/post.service';
+import {
+  deletePost, editPost, getPosts, repost,
+  sendComment, sendLike, sendNewPost, dislike, editComment, deleteComment} from '@/services/post.service';
+
 import {
   ADD_ANSWER_FOR_COMMENT,
   ADD_COMMENT_FOR_POST,

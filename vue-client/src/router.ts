@@ -2,7 +2,7 @@ import Vue from 'vue';
 import Router from 'vue-router';
 import Home from './views/Home.vue';
 import store from './store';
-import {getInfoUser} from "@/services/auth/auth.service";
+import {getInfoUser} from '@/services/auth/auth.service';
 Vue.use(Router);
 
 const view = (name: string) => {

@@ -115,7 +115,7 @@
         event.userEmail = this.userInfo.result.email;
         event.emailSend = this.statusEmailSend;
         event.attendees = (this.selectVal ? this.selectVal.map(el => {
-          return {'email': el.key}
+          return {'email': el.key};
         }) : '');
 
         this.$store.dispatch(CREATE_EVENT, event)
@@ -166,7 +166,9 @@
     },
     watch: {
       notification(notification) {
-        this.statusEmailSend = (notification && notification.userId == store.getters.userData.result._id ? notification.publications : false);
+        this.statusEmailSend = (notification && notification.userId == store.getters.userData.result._id 
+          ? notification.publications
+          : false);
       }
     },
     mounted() {

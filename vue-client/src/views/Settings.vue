@@ -60,7 +60,7 @@
     import store from '../store';
 
     export default Vue.extend({
-        data () {
+        data() {
             return {
                 settings: {
                     addUser: false,
@@ -101,7 +101,7 @@
                     }
                 });
             },
-            onChange (e) {
+            onChange(e) {
                 this.settings.addUser = e.target.checked;
                 this.addUser = e.target.checked;
             },
@@ -109,11 +109,11 @@
                 this.settings.subscribe = e.target.checked;
                 this.subscribe = e.target.checked;
             },
-            onChangeCalendar (e) {
+            onChangeCalendar(e) {
                 this.settings.eventCalendar = e.target.checked;
                 this.eventCalendar = e.target.checked;
             },
-            onChangePublications (e) {
+            onChangePublications(e) {
                 this.settings.publications = e.target.checked;
                 this.publications = e.target.checked;
             },

@@ -187,8 +187,8 @@
                         this.depLevels.arrayThree.push(e.parent.key);
                     }
                 });
-               if(this.depLevels.arrayTwo.length < 3) this.depLevels.arrayOne = [];
-                 if(this.depLevels.arrayTwo.length < 3) this.depLevels.arrayTwo = [];
+                if(this.depLevels.arrayTwo.length < 3) this.depLevels.arrayOne = [];
+                if(this.depLevels.arrayTwo.length < 3) this.depLevels.arrayTwo = [];
                 if(this.depLevels.arrayThree.length < 6) this.depLevels.arrayThree = [];
 
             },

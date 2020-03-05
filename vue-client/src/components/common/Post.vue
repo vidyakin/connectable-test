@@ -165,7 +165,7 @@ export default {
   },
   methods: {
     handleScroll () {
-      if(this.visible) {
+      if (this.visible) {
         this.visible = false;
       }
     },
@@ -188,7 +188,8 @@ export default {
         author: this.datauser,
       };
       this.$store.dispatch(DELETE_LIKE, likes).finally(() => {
-        let parentVal = '', idUrl = '0';
+        let parentVal = ''
+        let idUrl = '0';
         switch (this.$route.path.split('/')[1]) {
           case 'group':
             parentVal = 'group';
@@ -219,10 +220,10 @@ export default {
         created: moment(),
         message: this.commentContent,
       };
-      if(this.commentContent) {
-          this.$store.dispatch(SEND_COMMENT, comment).then(() => {
-              this.commentContent = '';
-          });
+      if (this.commentContent) {
+        this.$store.dispatch(SEND_COMMENT, comment).then(() => {
+            this.commentContent = '';
+        });
       }
     },
     deletePost() {
