@@ -21,10 +21,12 @@ exports.getLoginURL = () => {
 
 // get user and access token from authorization code
 exports.authorize = async authCode => {
+  console.log(`Тест импорта констант: ${APP_CONSTANTS}`)
+  const { APP_CONSTANTS } = require('./constants')
   try {
     const result = await oauth2.authorizationCode.getToken({
       code: authCode,
-      redirect_uri: process.env.REDIRECT_URI,
+      redirect_uri: APP_CONSTANTS.REDIRECT_URI, //process.env.REDIRECT_URI, // в константе разный путь для разных режимов
       scope: process.env.APP_SCOPES
     })
     const token = oauth2.accessToken.create(result)

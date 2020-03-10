@@ -26,10 +26,6 @@ const Project = require('./models').Project;
 const Department = require('./models').Department;
 const Notification = require('./models').Notification;
 
-const authOutlook = require('./auth/outlook/');
-const calendarOutlook = require('./calendar');
-const roleRoutes = require('./role/routes');
-
 const app = express();
 const port = process.env.PORT || 4000;
 
@@ -43,8 +39,8 @@ app.use(bodyParser.urlencoded({extended: true}));
 
 app.use(express.static('static'));
 
+app.use('/api', require('./auth/authRouter')); // ???
 app.use('/api/user/me', validateToken, require('./auth/authRouter'));
-app.use('/api', require('./auth/authRouter'));
 app.use('/api/user', validateToken, require('./crud')(User, serializers.serializer));
 app.use('/api/group', validateToken, require('./crud')(Group, groupSerializer));
 app.use('/api/post', validateToken, require('./crud')(Post, serializers.postSerializer));
@@ -56,10 +52,9 @@ app.use('/api/groupInvite', validateToken, require('./crud')(GroupInvite, invite
 app.use('/api/projectParticipant', validateToken, require('./crud')(ProjectParticipant, serializers.serializer));
 app.use('/api/project', validateToken, require('./crud')(Project, projectSerializer));
 
-app.use('/api/outlook', authOutlook);
-app.use('/api/outlook/event', calendarOutlook);
-app.use("/role", roleRoutes);
-
+app.use('/api/outlook', require('./auth/outlook/'));
+app.use('/api/outlook/event', require('./calendar'));
+app.use("/role", require('./role/routes'));
 
 var userHandlers = require('./email/index.js');
 app.route('/auth/forgot_password')

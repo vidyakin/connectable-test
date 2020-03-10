@@ -10,7 +10,9 @@ const authService = require('./auth.service')
  *
  */
 exports.getLoginURL = (req, res, next) => {
+  console.log('auth.ctrl.js=>getLoginURL(): ENV=',process.env.NODE_ENV)
   const loginUrl = authService.getLoginURL()
+  console.log('loginURL:',loginUrl)
   return res.json({ loginUrl })
 }
 
@@ -25,8 +27,11 @@ exports.getLoginURL = (req, res, next) => {
  */
 exports.login = async (req, res, next) => {
   // authorize code
+  console.log(`auth.ctrl.js=>login(): ENV=${process.env.NODE_ENV}`)
   const authResult = await authService.authorize(req.body.code)
   if (authResult.error) {
+    console.log(`Ошибка: ${authResult.error.message}`)
+    console.log(`Сообщение: ${JSON.stringify(authResult.error.code.payload)}`)
     return res.sendStatus(500).json(authResult.error)
   }
 
