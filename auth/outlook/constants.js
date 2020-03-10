@@ -17,5 +17,5 @@ exports.APP_CONSTANTS = {
   APP_ID: process.env.APP_ID,
   APP_PASSWORD: process.env.APP_PASSWORD,
   APP_SCOPES: process.env.APP_SCOPES,
-  REDIRECT_URI: process.env.REDIRECT_URI
+  REDIRECT_URI: process.env.NODE_ENV !== 'development' ? process.env.PUBLIC_URL+"/authorize" : process.env.REDIRECT_URI
 }

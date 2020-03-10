@@ -28,8 +28,7 @@
       <div class="month-event">
         <div class="month-name">{{getMonthName()}}</div>
         <div class="event-wrap" v-if="getEventsForThisMonth().length">
-          <div class="event"  v-for="event in getEventsForThisMonth()" :style="{
-                   'border-color':event.color}">
+          <div class="event"  v-for="event in getEventsForThisMonth()" :style="{'border-color':event.color}">
             <div class="event-date">
               <div class="event-date-day">{{getDayFromDate(event.date).day}}</div>
               <div class="event-date-weekday">{{getDayFromDate(event.date).weekday}}</div>
@@ -56,8 +55,7 @@
       <div class="month-event">
         <div class="month-name">{{getNextMonthName()}}</div>
         <div class="event-wrap" v-if="getEventsForNextMonth().length">
-          <div class="event" v-for="event in getEventsForNextMonth()" :style="{
-                 'border-color':event.color}">
+          <div class="event" v-for="event in getEventsForNextMonth()" :style="{'border-color':event.color}">
             <div class="event-date">
               <div class="event-date-day">{{getDayFromDate(event.date).day}}</div>
               <div class="event-date-weekday">{{getDayFromDate(event.date).weekday}}</div>
@@ -153,10 +151,10 @@ export default Vue.extend({
     },
     getEventsForMonth(month) {
       return (
-              this.events &&
-              this.events.find(event => {
-                return moment(event.date).isSame(month, 'month');
-              })
+        this.events &&
+        this.events.find(event => {
+          return moment(event.date).isSame(month, 'month');
+        })
       );
     },
     getMonthName() {
@@ -166,25 +164,24 @@ export default Vue.extend({
       return (
         this.events &&
         this.events.filter(event => {
-          if(event && event.userId === this.userinfo._id) {
+          if (event && event.userId === this.userinfo._id) {
             return moment(event.date).isSame(moment(), 'month');
           }
         })
       );
     },
     getNextMonthName() {
-    if(moment().month() == 11) {
-      return this.months[0];
-    }
-    else {
-      return this.months[moment().month() + 1];
-    }
+      if (moment().month() === 11) {
+        return this.months[0];
+      } else {
+        return this.months[moment().month() + 1];
+      }
     },
     getEventsForNextMonth() {
       return (
         this.events &&
         this.events.filter( (event) => {
-          if(event && event.userId === this.userinfo._id) {
+          if (event && event.userId === this.userinfo._id) {
             return moment(event.date).isSame(moment().add(1, 'M'), 'month');
           }
         })
@@ -218,7 +215,6 @@ export default Vue.extend({
         const a = Vue.axios.get('/api/outlook/event')
             .then((response) => {
                console.log(response)
-                
             }).catch((e) => {
                 console.log(e);
             });

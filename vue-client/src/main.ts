@@ -15,7 +15,7 @@ import VueMq from 'vue-mq';
 import {setAuthInterceptor} from '@/services/auth/authInterceptor';
 import {setAuthToken} from '@/services/auth/setAuthToken';
 import GAuth from 'vue-google-oauth2';
-import {getInfoUser} from  '@/services/auth/auth.service';
+import {getInfoUser} from '@/services/auth/auth.service';
 
 const gauthOption = {
   clientId: '303964737986-rrtn3uic2fecmflemndjd8a1v4pjn76g.apps.googleusercontent.com',
@@ -26,12 +26,13 @@ Vue.use(GAuth, gauthOption);
 Vue.use(VuexAxios, axios);
 Vue.use(Antd);
 Vue.use(abilitiesPlugin, ability);
-var SocialSharing = require('vue-social-sharing');
+
+const SocialSharing = require('vue-social-sharing');
 Vue.use(SocialSharing);
 
 
 Vue.config.productionTip = false;
-if(localStorage.getItem('token')) {
+if (localStorage.getItem('token')) {
   getInfoUser(localStorage.getItem('token'));
 }
 

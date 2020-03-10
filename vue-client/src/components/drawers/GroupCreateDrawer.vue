@@ -125,7 +125,7 @@ export default {
 
   watch: {
     notification(notification) {
-      this.statusEmailSend = (notification && notification.userId == store.getters.userData.result._id ? notification.publications : false);
+      this.statusEmailSend = (notification && notification.userId === store.getters.userData.result._id ? notification.publications : false);
     }
   },
 };

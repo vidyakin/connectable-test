@@ -155,11 +155,11 @@ export default {
     },
     deleteParticipantById(participantId) {
       this.$store
-              .dispatch(DELETE_PARTICIPANT, {
-                participantId: participantId,
-                groupId: this.currentGroup._id,
-              })
-              .then(() => this.checkParticipants());
+        .dispatch(DELETE_PARTICIPANT, {
+          participantId,
+          groupId: this.currentGroup._id,
+        })
+        .then(() => this.checkParticipants());
     },
     createParticipantsRequest() {
       this.$store
@@ -177,9 +177,9 @@ export default {
       });
     },
     endingWords(count) {
-      if (count == 0) {
+      if (count === 0) {
         this.output = 'нет участников';
-      } else if (count == 1) {
+      } else if (count === 1) {
         this.output = ' участник';
       } else if ((count > 20) && ((count % 10) == 1)) {
         this.output = ' участник';

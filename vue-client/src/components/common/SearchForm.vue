@@ -86,16 +86,16 @@
             ...mapGetters(['posts']),
         },
         methods: {
-            onSearch (value) {
-                var self=this;
+            onSearch(value) {
+                let self=this;
                 this.result = self.current.filter(function(cust){ return cust.message.toLowerCase().indexOf(self.searchText.toLowerCase())>=0;});
-                var tt = this.result.map(e => {
+                let tt = this.result.map(e => {
                     const row = [];
                     row.push(e.id);
                     return row;
                 });
                 console.log(tt);
-                if(!value) {
+                if (!value) {
                     this.$store.dispatch(GET_POSTS, {
                         filter: {
                             parent: {
@@ -104,15 +104,13 @@
                             },
                         },
                     });
-                }
-                else {
+                } else {
                     this.$store.dispatch(GET_POSTS, {
                         filter: {
                             _id: tt,
                         },
                     });
                 }
-
             }
 
         },

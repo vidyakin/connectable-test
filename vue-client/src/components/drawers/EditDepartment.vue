@@ -93,9 +93,9 @@
                 const arrUsers = [];
                 const name = this.inputTitle ? this.inputTitle : this.curentData.depName,
                       _id = this.curentData.id;
-               const members = this.selectMembers ? this.selectMembers : this.curentData.users;
-                for (let [key, value] of Object.entries(members)) {
-                    arrUsers[key] = {'key':value};
+                const members = this.selectMembers ? this.selectMembers : this.curentData.users;
+                for ([key, value] of Object.entries(members)) {
+                    arrUsers[key] = {'key': value};
                 }
                 const users = arrUsers;
 

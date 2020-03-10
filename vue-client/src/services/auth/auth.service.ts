@@ -18,28 +18,28 @@ export const resetPassword = (context: any, userPasswords: any) => {
         });
 };
 
-function decodeToken(response:any) {
-    var base64Url = response.split('.')[1];
-    var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    var jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+function decodeToken(response: any) {
+    const base64Url = response.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => {
         return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
     }).join(''));
     return jsonPayload;
-};
+}
+
 export const login = (context: any, user: any) => {
   return Vue.axios.post('/api/login', user)
     .then((response) => {
-        var jsonPayload = decodeToken(response.data.token);
-        var playload = JSON.parse(jsonPayload);
-        var date = Math.floor(Date.now() / 1000);
-        if(date >= playload.exp) {
+        const jsonPayload = decodeToken(response.data.token);
+        const playload = JSON.parse(jsonPayload);
+        const date = Math.floor(Date.now() / 1000);
+        if (date >= playload.exp) {
             localStorage.removeItem('authorization');
             localStorage.removeItem('token');
             store.commit(SET_USER, null);
             store.commit(SET_USER_DATA, null);
             router.push('/login'); 
-        }
-        else {
+        } else {
             localStorage.setItem('authorization', 'true');
             localStorage.setItem('token', `${response.data.token}`);
             context.commit(SET_USER, response.data);
@@ -60,8 +60,9 @@ export const logout = (context: any) => {
 export const loginWithOutlook = (context: any, params: any) => {
   Vue.axios.post(`api/outlook/login`, {
     code: params.code
-  }).then(response => {
-    let name = response.data.name.split(' ');
+  })
+  .then(response => {
+    const name = response.data.name.split(' ');
     const userForLogin = {
       outlookId: response.data.uid,
       aud: response.data.aud,
@@ -70,14 +71,13 @@ export const loginWithOutlook = (context: any, params: any) => {
       lastName: name[1],
       email: response.data.email,
     };
-    console.log(response)
+    console.log(response);
     context.dispatch(LOGIN, userForLogin).finally(() => {
       router.push('/about');
     });
   }).catch(e => {
-    console.log(e)
+    console.log(e);
   });
-  
 };
 
 export const loginWithGoogle = (context: any, $gAuth: any) => {
@@ -95,7 +95,7 @@ export const loginWithGoogle = (context: any, $gAuth: any) => {
       };
       context.dispatch(LOGIN, userForLogin).finally(() => {
           router.push('/about');
-          //this.$router.push({ name: 'about' });
+          // this.$router.push({ name: 'about' });
         });
     });
 };
@@ -107,18 +107,17 @@ export const getInfoAboutUser = (context: any) => {
     });
 };
 
-export const getInfoUser = (token : any) => {
-    var jsonPayload = decodeToken(token);
-    var playload = JSON.parse(jsonPayload);
-    var date = Math.floor(Date.now() / 1000);
-    if(date >= playload.exp) {
+export const getInfoUser = (token: any) => {
+    const jsonPayload = decodeToken(token);
+    const playload = JSON.parse(jsonPayload);
+    const date = Math.floor(Date.now() / 1000);
+    if (date >= playload.exp) {
         localStorage.removeItem('authorization');
         localStorage.removeItem('token');
         store.commit(SET_USER, null);
         store.commit(SET_USER_DATA, null);
         router.push('/login');
-    }
-    else {
+    } else {
         return store.commit(SET_USER_DATA, playload);
     }
 

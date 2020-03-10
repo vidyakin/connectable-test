@@ -42,7 +42,7 @@
     import store from '../store';
     export default Vue.extend({
         name: 'ForgotPassword',
-        data () {
+        data() {
             return {
                 user: {
                     email: ''
@@ -67,15 +67,15 @@
                     this.disabled = true;
                     this.$store
                         .dispatch(FORGOT_PASSWORD, {
-                            email:this.user.email
+                            email: this.user.email
                         }).finally(() => {
                         this.submitted = false;
                         this.disabled = false;
-                        if(this.forgotInfo.status != 404) this.user.email = '';
+                        if (this.forgotInfo.status !== 404) this.user.email = '';
                     });
 
                 }
-            }
+            },
         },
     });
 </script>

@@ -2,7 +2,7 @@
     <div class="c-forgot-password">
         <div class="container">
             <div class="row">
-                <div v-if="resetInfo && resetInfo.status == 200" class="col-sm-6 offset-sm-3 ">
+                <div v-if="resetInfo && resetInfo.status === 200" class="col-sm-6 offset-sm-3 ">
                     <a-alert
                             :description="resetInfo.message"
                             type="success"
@@ -65,7 +65,7 @@
         },
         components: {},
         methods: {
-            handleSubmit (e) {
+            handleSubmit(e) {
                 this.submitted = true;
                 const {newPassword, verifyPassword, token} = this.user;
                 if (newPassword && verifyPassword) {
@@ -74,7 +74,7 @@
                         .dispatch(RESET_PASSWORD, this.user).finally(() => {
                         this.submitted = false;
                         this.disabled = false;
-                        if(this.resetInfo.status == 200) {
+                        if(this.resetInfo.status === 200) {
                             this.user.newPassword = '';
                             this.user.verifyPassword = '';
                         }
@@ -83,8 +83,8 @@
                 }
             }
         },
-        beforeCreate() {
-        },
+        // beforeCreate() {
+        // },
     });
 </script>
 

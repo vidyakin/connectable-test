@@ -22,7 +22,7 @@
 </template>
 <script>
 import AppGroupCreateDrawer from '../components/drawers/GroupCreateDrawer';
-//import AppSearchForm from '../components/common/SearchForm';
+// import AppSearchForm from '../components/common/SearchForm';
 
 import { mapGetters } from 'vuex';
 import { GET_GROUPS } from '../store/group/actions.type';
@@ -52,12 +52,10 @@ export default {
   },
 
   computed: {
-    sortedGroup: function() {
+    sortedGroup() {
       function compare(a, b) {
-        if (a.name < b.name)
-          return -1;
-        if (a.name > b.name)
-          return 1;
+        if (a.name < b.name) return -1;
+        if (a.name > b.name) return 1;
         return 0;
       };
       return this.filterData.sort(compare);

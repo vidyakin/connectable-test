@@ -22,7 +22,7 @@ export default Vue.extend({
   data() {
     return {
       content: '',
-      arrPosts:[],
+      arrPosts: [ ],
     };
   },
   components: {
@@ -46,14 +46,12 @@ export default Vue.extend({
   },
   computed: {
     ...mapGetters(['posts']),
-    sortedPosts: function() {
+    sortedPosts() {
       function compare(a, b) {
-        if (a.created < b.created)
-          return 1;
-        if (a.created > b.created)
-          return -1;
+        if (a.created < b.created) return 1;
+        if (a.created > b.created) return -1;
         return 0;
-      };
+      }
       return this.arrPosts.sort(compare);
     },
   },

@@ -9,7 +9,7 @@
       </div>
       <div class="structure-header-search" v-if="$can('read', {'accessEmail': datauser.email, '__type': 'User'})">
         <a-button type="primary" v-if="test" @click="openDepartment">Добавить разделы</a-button>
-        <a-button type="primary" v-else="!test" @click="openCreate">Создать проект</a-button>
+        <a-button type="primary" v-else @click="openCreate">Создать проект</a-button>
       </div>
     </div>
 
@@ -17,7 +17,8 @@
       <a-tab-pane tab="Структура" key="1">
         <div class="c-structure">
 
-          <div class="c-structure__head" v-for="(dep, index) in departments" v-if="(dep.level == 1)" >
+          <!-- <div class="c-structure__head" v-for="(dep, index) in departments" v-if="(dep.level == 1)" :key="index" > -->
+          <div class="c-structure__head" v-for="(dep, index) in departments.filter(e=>(e.level === 1))" :key="index" >
             <div class="structure-el">
 
             <a-popover placement="bottom" trigger="click" >
@@ -62,7 +63,8 @@
 
           <div class="c-structure__row" >
 
-            <div class="c-structure__item" v-for="(dep_2, index) in departments" v-if="(dep_2.level > 1 && dep_2.level < 3)">
+            <!-- <div class="c-structure__item" v-for="(dep_2, index) in departments" v-if="(dep_2.level > 1 && dep_2.level < 3)" :key="index"> -->
+            <div class="c-structure__item" v-for="(dep_2, index) in departments.filter(e=>e.level > 1 && e.level < 3)" :key="index">
 
               <div class="c-structure__article" v-if="(dep_2.level == 2)">
                 <a-popover placement="bottom" trigger="click" >
@@ -104,7 +106,8 @@
 
               <div class="c-structure__child__row ">
 
-                <div class="c-structure__child__item" v-for="(dep_3, index) in departments" v-if="(dep_3.level == 3 && dep_3.parent.label == dep_2.name)">
+                <!-- <div class="c-structure__child__item" v-for="(dep_3, index) in departments" v-if="(dep_3.level == 3 && dep_3.parent.label == dep_2.name)" :key="index"> -->
+                <div class="c-structure__child__item" v-for="(dep_3, index) in departments.filter(e => e.level == 3 && e.parent.label == e.name)" :key="index">
 
                   <div class="c-structure__child__article">
                     <a-popover placement="bottom" trigger="click">
@@ -143,8 +146,8 @@
                       <a-button class="delete-department edit" icon="edit" @click="openDepEdit(dep_3.name, dep_3.users, dep_3._id)"></a-button>
                     </a-tooltip>
                   </div>
-
-                  <div class="c-structure__detail__row" v-for="(dep_4, index) in departments" v-if="(dep_4.level == 4 && dep_4.parent.label == dep_3.name)">
+                  <!-- было v-if="(dep_4.level == 4 && dep_4.parent.label == dep_3.name)" -->
+                  <div class="c-structure__detail__row" v-for="(dep_4, index) in departments.filter(e => e.level == 4 && dep_4.parent.label == dep_3.name)" :key="index">
 
                     <div class="c-structure__detail__item">
 
@@ -229,8 +232,8 @@
     },
 
   ];
-  Object.size = function(obj) {
-    var size = 0, key;
+  Object.size = (obj) => {
+    let size = 0;
     for (key in obj) {
       if (obj.hasOwnProperty(key)) size++;
     }
@@ -266,11 +269,11 @@
       },
       userDataFunc(param) {
         const resData = [];
-        if( Object.size(param.users)) {
+        if ( Object.size(param.users)) {
           for (let i = 0; i < Object.size(param.users); i++) {
             for (let j = 0; j < Object.size(this.data); j++) {
 
-              if (param.users[i].key == this.data[j].key) {
+              if (param.users[i].key === this.data[j].key) {
                 resData[i] = this.data[j];
               }
             }
@@ -280,7 +283,7 @@
       },
       currentLenth() {
         this.userLength = this.users.length;
-        //console.log(this.userLength);
+        // console.log(this.userLength);
       },
 
       callback(key) {
@@ -309,8 +312,8 @@
         this.depEditVisible = true;
         this.dataDep.depName = name;
         const arrUsers = [];
-        if(listOfUsers) {
-          for (let [key, value] of Object.entries(listOfUsers)) {
+        if (listOfUsers) {
+          for (const [key, value] of Object.entries(listOfUsers)) {
             arrUsers.push(value.key);
           }
         }
@@ -327,11 +330,11 @@
       },
       endingWords(count) {
         let outputVal = '';
-        if (count == 0) {
+        if (count === 0) {
           outputVal = 'нет участников';
-        } else if (count == 1) {
+        } else if (count === 1) {
           outputVal = ' участник';
-        } else if ((count > 20) && ((count % 10) == 1)) {
+        } else if ((count > 20) && ((count % 10) === 1)) {
           outputVal = ' участник';
         } else if (((count >= 2) && (count <= 4)) || (((count % 10) >= 2) && ((count % 10) <= 4)) && (count > 20)) {
           outputVal = ' участника';
@@ -366,7 +369,7 @@
         const row = [];
         this.dep_arr = departments.map(e => {
           if (Object.size(e.users)) {
-            for (let i= 0; i < Object.size(e.users); i++) {
+            for (let i = 0; i < Object.size(e.users); i++) {
               row[i] = e.users[i].key;
             }
             return row;

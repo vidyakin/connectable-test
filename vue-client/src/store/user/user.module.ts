@@ -184,8 +184,8 @@ const mutations = {
 
 const actions = {
   [LOGIN]: login,
-  [FORGOT_PASSWORD]:forgotPasword,
-  [RESET_PASSWORD]:resetPassword,
+  [FORGOT_PASSWORD]: forgotPasword,
+  [RESET_PASSWORD]: resetPassword,
   [LOGIN_WITH_GOOGLE]: loginWithGoogle,
   [LOGIN_WITH_OUTLOOK]: loginWithOutlook,
   [GET_INFO_ABOUT_USER]: getInfoAboutUser,

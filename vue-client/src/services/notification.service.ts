@@ -9,9 +9,9 @@ export const postNotification = (context: any, notificationInfo : any) => {
 
         }).catch(err => {
             console.log(err);
-        })
+        });
 };
-export const getNotification = (context: any, userId : any) => {
+export const getNotification = (context: any, userId: any) => {
     return Vue.axios
         .get(`api/notification/${userId}` )
         .then((response: any) => {

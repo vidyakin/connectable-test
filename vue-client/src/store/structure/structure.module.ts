@@ -7,7 +7,14 @@ import {
     DELETE_DEP,
     UPDATE_DEP
 } from '@/store/structure/actions.type';
-import {putDepartmentsList, getDepartmentsList, deleteDepartment, updateDepartment} from '@/services/department.service';
+
+import {
+    putDepartmentsList,
+    getDepartmentsList,
+    deleteDepartment,
+    updateDepartment
+} from '@/services/department.service';
+
 interface State {
     departments: any | null;
 }

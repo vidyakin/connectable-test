@@ -23,7 +23,7 @@
     import store from '../../store';
     export default {
         name: 'SuccessRegistration',
-        data () {
+        data() {
             return {
                 successText: (store.getters.successMessage ? store.getters.successMessage : false),
                 errorText: (store.getters.errorRegister ? store.getters.errorRegister : false),
