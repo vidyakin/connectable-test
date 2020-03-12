@@ -15,8 +15,8 @@ exports.SUBSCRIPTION_CONFIG = {
 }
 exports.APP_CONSTANTS = {
   // временно для тестирования логина на моем аккаунте Azure можно включить USE_TEST_APPID=1
-  APP_ID: process.env.USE_TEST_APPID === 1 ? process.env.APP_ID_TEST : process.env.APP_ID,
-  APP_PASSWORD: process.env.USE_TEST_APPID === 1 ? process.env.APP_PASSWORD_TEST : process.env.APP_PASSWORD,
+  APP_ID: process.env.APP_ID,
+  APP_PASSWORD: process.env.APP_PASSWORD,
   APP_SCOPES: process.env.APP_SCOPES,
   REDIRECT_URI: process.env.NODE_ENV === 'development' ? process.env.REDIRECT_URI_LOCAL : process.env.REDIRECT_URI
 }
