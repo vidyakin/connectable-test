@@ -21,8 +21,8 @@ exports.getLoginURL = () => {
 
 // get user and access token from authorization code
 exports.authorize = async authCode => {
-  console.log(`Тест импорта констант: ${APP_CONSTANTS}`)
   const { APP_CONSTANTS } = require('./constants')
+  console.log(`Тест импорта констант: ${APP_CONSTANTS}`)
   try {
     const result = await oauth2.authorizationCode.getToken({
       code: authCode,
@@ -53,7 +53,7 @@ exports.authorize = async authCode => {
   }
 }
 
-exports.subscribeNotifications = async token => {
+exports.subscribeNotifications = async function(token) {
   try {
     const response = await rp({
       method: 'POST',
