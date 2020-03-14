@@ -4,7 +4,7 @@
     <app-success-register />
     <div class="container">
         <div class="row">
-            <div class="col-sm-8 offset-sm-2">
+            <div class="col-sm-4 offset-sm-4">
               <form class="u-form" @submit.prevent="handleSubmit">
 
                 <fieldset>
@@ -22,14 +22,29 @@
                         <div v-show="submitted && user.password && error.password" class="invalid-feedback">Пароль неверный</div>
                     </div>
                     <div class="form-group">
-                        <button class="btn btn-primary">Авторизоваться</button>
+                        <button class="btn btn-primary">Авторизация</button>
                         <router-link to="/register" class="btn btn-link">Регистрация</router-link>
                     </div>
                 </fieldset>
               </form>
             </div>
+
         </div>
-        <app-login-google />
+        <div class="row">
+            <app-login-google />
+          
+                <div class="login-page">
+                    <a class="f6 link dim br2 ph3 pv2 mb2 dib white bg-dark-blue" v-bind:href="outlookUrl">Login with Outlook</a>
+                </div>
+
+            <div class="col-sm-4 offset-sm-4">
+                <fieldset>
+                <div class="form-group">
+                    <router-link to="/forgot-password" class="btn btn-link">Забыли пароль?</router-link>
+                </div>
+                </fieldset>
+            </div>
+        </div>
     </div>
   </div>
 </template>
@@ -38,6 +53,7 @@
 import Vue from 'vue';
 import { CHECK_USER_INFO } from '../store/user/actions.type';
 import AppLoginGoogle from '../components/common/LoginBarGoogle.vue';
+import AppLoginOutlook from '../components/common/LoginBarOutlook.vue';
 import {
     SUCCESS_REGISTER
 } from '@/store/user/mutations.type';
@@ -54,12 +70,14 @@ export default Vue.extend({
             error: {
                 email: false,
                 password: false
-            }
+            },
+            outlookUrl: ''
         }
     },
     components: {
         AppSuccessRegister,
-        AppLoginGoogle
+        AppLoginGoogle,
+        AppLoginOutlook
     },
     methods: {
         handleSubmit (e) {
@@ -73,17 +91,18 @@ export default Vue.extend({
                         email:this.user.email,
                         password:this.user.password
                     }).finally(() => {
-                        console.log(store.getters.errorLogin);
-                        if(!store.getters.errorLogin) {
-                            this.$router.push({ name: 'about' });
+                        if (!store.getters.errorLogin) {
+                            this.$router.push({
+                                name: 'about'
+                            }, () => {});
                         }
                         else {
                             this.submitted = true;
-                            if(store.getters.errorLogin.email) {
+                            if (store.getters.errorLogin.email) {
                                 document.getElementById('email').classList.add('is-invalid');
                                 this.error.email = true;
                             }
-                            if(store.getters.errorLogin.password) {
+                            if (store.getters.errorLogin.password) {
                                 document.getElementById('password').classList.add('is-invalid');
                                 this.error.password = true;
                             }
@@ -92,6 +111,16 @@ export default Vue.extend({
 
             }
         }
+    },
+     beforeCreate() {
+        const a = Vue.axios.get('/api/outlook/login-url')
+            .then((response) => {
+                this.outlookUrl = response.data.loginUrl;
+                
+            }).catch((e) => {
+                console.log(e);
+            });
+        return a;
     }
 });
 </script>
@@ -108,8 +137,23 @@ export default Vue.extend({
             font-size: 2em;
             text-align: center;
     }
+    .row {
+        height: 100%;
+        background-color: transparent !important;
+        box-shadow: none !important;
+    }
 }
-</style>t>
+</style>
+<style scoped>
+  .login-page {
+    width: 100%;
+    height: 10vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+</style>
+
 
 <style lang="scss">
 .c-login{

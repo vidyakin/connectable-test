@@ -46,7 +46,7 @@
               labelInValue
               mode="multiple"
               :value="value"
-              placeholder="Select users"
+              placeholder="Выберите пользователей"
               style="width: 100%"
               :filterOption="false"
               @search="search"
@@ -78,6 +78,7 @@ import {
   CREATE_PROJECT_PARTICIPANT,
   GET_PROJECTS,
 } from '../../store/project/actions.type';
+import store from '../../store';
 export default {
   name: 'AppCreateProject',
   data() {
@@ -87,6 +88,7 @@ export default {
       buttonSpinning: false,
       data: [],
       value: [],
+      userinfo: (store.getters.userData.result ? store.getters.userData.result : store.getters.user.result),
     };
   },
   components: {
@@ -94,7 +96,7 @@ export default {
     AppInput,
   },
   computed: {
-    ...mapGetters(['user', 'users']),
+    ...mapGetters(['user', 'users', 'userData']),
   },
   methods: {
     onClose() {
@@ -108,7 +110,7 @@ export default {
           this.$store
             .dispatch(CREATE_PROJECT, {
               ...formFields,
-              creatorId: this.user._id,
+              creatorId: this.userinfo._id,
             })
             .then(data => {
               Promise.all(

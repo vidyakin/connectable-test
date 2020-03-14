@@ -4,8 +4,10 @@ import {
   ADD_COMMENT_FOR_POST,
   ADD_LIKE_FOR_COMMENT,
   ADD_LIKE_FOR_POST,
-  ADD_POST, CHANGE_POST,
+  ADD_POST, CHANGE_POST, CHANGE_COMMENT, CHANGE_ANSWER,
   REMOVE_POST,
+  REMOVE_COMMENT,
+   REMOVE_ANSWER,
   SET_POSTS,
 } from '@/store/post/mutations.type';
 
@@ -52,10 +54,18 @@ export const editPost = (context: any, post: any) => {
         context.commit(CHANGE_POST, response.data.result);
       });
   }
-
-
 };
-
+export const editComment = (context: any, comment: any) => {
+   return Vue.axios
+            .put('api/comment/' + comment._id, comment)
+            .then((response: any) => {
+                if (comment.status) {
+                    context.commit(CHANGE_ANSWER, response.data.result);
+                } else {
+                    context.commit(CHANGE_COMMENT, response.data.result);
+                }
+            });
+};
 export const repost = (context: any, post: any) => {
   return Vue.axios
     .post('api/post', post)
@@ -86,6 +96,15 @@ export const sendLike = (context: any, like: any) => {
       }
     });
 };
+export const dislike = (context: any, disLike: any) => {
+    return Vue.axios
+        // .delete(`api/dislike/${arrRes}`)
+        .post('api/dislike', disLike)
+        .then((response: any) => {
+            return response.data;
+
+        });
+};
 
 export const sendComment = (context: any, comment: any) => {
   return Vue.axios
@@ -104,3 +123,18 @@ export const deletePost = (context: any, postId: number) => {
       context.commit(REMOVE_POST, response.data.result);
     });
 };
+export const deleteComment = (context: any, commentId: any) => {
+  console.log(commentId);
+  
+  return Vue.axios
+    .delete('api/comment/' + commentId._id)
+    .then((response: any) => {
+        if (commentId.type) {
+            context.commit(REMOVE_ANSWER, commentId);
+        } else {
+            context.commit(REMOVE_COMMENT, response.data.result);
+        }
+
+    });
+};
+

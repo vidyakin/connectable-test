@@ -1,5 +1,5 @@
 <template>
-  <div class="group-view">
+  <div id="profile" class="group-view">
     <app-group-edit-drawer :visible="editVisible" :close="closeEdit" />
     <app-requests-drawer
       :visible="requestVisible"
@@ -11,22 +11,21 @@
       :close="closeRequests"
       v-if="currentGroup && currentGroup.type === 2"
     />
-    <div class="groups-header">
-      <div class="groups-header-name">Группы</div>
-    </div>
-    <div class="group-body">
+
+    <div class="group-body" >
       <div class="group-body-info">
         <div class="group-body-info-header">
           <div class="group-body-info-header-content">
             <div class="group-body-info-header-content-name">{{currentGroup && currentGroup.name}}</div>
             <div
               class="group-body-info-header-content-participants"
-            >{{currentGroup && currentGroup.participants.length}} участников</div>
+            >{{currentGroup && currentGroup.participants.length}}  {{currentGroup && endingWords(currentGroup.participants.length)}}</div>
           </div>
           <div class="group-body-info-header-action">
             <a-popover
               title="Действия с группой"
               trigger="click"
+              v-model="visible"
               overlayClassName="group-header-action-popup-content"
               v-if="currentGroup && currentGroup.creatorId === userinfo._id"
             >
@@ -44,8 +43,8 @@
                 <a-tooltip title="Редактировать">
                   <a-button icon="edit" @click="editGroup"></a-button>
                 </a-tooltip>
-                <a-tooltip title="Заявки">
-                  <a-badge :count="currentGroup && currentGroup.requests.length">
+                <a-tooltip title="Заявки" >
+                  <a-badge :count="currentGroup && currentGroup.requests.length" @click="hide">
                     <a-button icon="team" @click="openRequests"></a-button>
                   </a-badge>
                 </a-tooltip>
@@ -78,12 +77,13 @@
         </template>
       </div>
       <div class="group-body-participants">
+        <div class="group-body-info-header-content-name">Участники</div>
         <div
           class="group-body-participants-participant"
           v-for="(participant, index) in currentGroup && currentGroup.participants"
           :key="index"
         >
-          <a-avatar :src="participant.googleImage"></a-avatar>
+          <a-avatar :src="(participant.googleImage ? participant.googleImage : require('../assets/no_image.png'))"></a-avatar>
           <div class="group-body-participants-participant-info">
             <div
               class="group-body-participants-participant-info-name"
@@ -97,10 +97,10 @@
     </div>
     <template
       v-if="(currentGroup && currentGroup.type === 0 )||
-       currentGroup.participants.findIndex(({_id}) => _id === userinfo._id) !== -1"
+       currentGroup && currentGroup.participants.findIndex(({_id}) => _id === userinfo._id) !== -1"
     >
       <app-comment-input :parent="{type: 'group', id: currentGroup && currentGroup._id}" />
-      <app-post v-for="(post, index) in posts" :post="post" :key="index" />
+        <app-post v-for="(post, index) in posts" :post="post" :key="index" />
     </template>
   </div>
 </template>
@@ -132,10 +132,29 @@ export default {
     return {
       editVisible: false,
       requestVisible: false,
+      visible: false,
+      output: '',
       userinfo: (store.getters.userData.result ? store.getters.userData.result : store.getters.user.result),
     };
   },
   methods: {
+    endingWords(count) {
+      if (count === 0) {
+        this.output = 'нет участников';
+      } else if (count === 1) {
+        this.output = ' участник';
+      } else if ((count > 20) && ((count % 10) === 1)) {
+        this.output = ' участник';
+      } else if (((count >= 2) && (count <= 4)) || (((count % 10) >= 2) && ((count % 10) <= 4)) && (count > 20)) {
+        this.output = ' участника';
+      } else {
+        this.output = ' участников';
+      }
+      return this.output;
+    },
+    hide() {
+      this.visible = false;
+    },
     editGroup() {
       this.openEdit();
     },
@@ -158,14 +177,14 @@ export default {
     },
     createParticipant() {
       this.$store.dispatch(CREATE_PARTICIPANT, {
-        participantId: this.user._id,
+        participantId: this.userinfo._id,
         groupId: this.currentGroup._id,
       });
     },
     deleteParticipant() {
       this.$store
         .dispatch(DELETE_PARTICIPANT, {
-          participantId: this.user._id,
+          participantId: this.userinfo._id,
           groupId: this.currentGroup._id,
         })
         .then(() => this.checkParticipants());
@@ -173,7 +192,7 @@ export default {
     createParticipantsRequest() {
       this.$store
         .dispatch(CREATE_PARTICIPANT, {
-          participantId: this.user._id,
+          participantId: this.userinfo._id,
           groupId: this.currentGroup._id,
           approved: false,
         })
@@ -182,7 +201,7 @@ export default {
     checkParticipants() {
       this.$store.dispatch(GET_PARTICIPANTS_REQUEST, {
         groupId: this.currentGroup._id,
-        participantId: this.user._id,
+        participantId: this.userinfo._id,
       });
     },
   },
@@ -200,15 +219,18 @@ export default {
     });
   },
   computed: {
-    ...mapGetters(['posts', 'currentGroup', 'user', 'userData']),
+    ...mapGetters(['posts', 'currentGroup', 'user', 'userData', 'participantsRequest']),
   },
 };
 </script>
 
 <style lang="scss">
+  .group-view .group-body-participants {
+    overflow-y: scroll;
+  }
 .groups-header {
   display: flex;
-  margin: 1.5rem 3.125rem 1rem 3.125rem;
+  margin: 1.5rem 0 1rem 0;
   justify-content: space-between;
 
   &-name {
@@ -225,16 +247,17 @@ export default {
 }
 
 .group-view {
-  height: calc(100vh - 3.125rem);
+  height: calc(100vh - 210px);
   overflow: auto;
+  padding: 30px;
   background-color: #f0f0f7;
 
   &-header {
     display: flex;
-    margin: 1.5rem 3.125rem 1rem 3.125rem;
-    justify-content: space-between;
+      margin: 1.5rem 3.125rem 1rem 3.125rem;
+      justify-content: space-between;
 
-    &-name {
+      &-name {
       height: 31px;
       font-size: 24px;
       font-weight: normal;
@@ -248,20 +271,24 @@ export default {
   }
 
   .group-body {
-    margin: 1.5rem 3.125rem 1rem 3.125rem;
+    margin: 1.5rem 0 1rem 0;
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
 
     &-info {
       min-width: 15rem;
-      width: calc(100% - 17rem);
+      width: calc(100% - 23rem);
       background-color: white;
       height: 19rem;
       border-radius: 0.25rem;
       padding: 1rem;
-
       box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.15);
+
+      @media (max-width: 767px) {
+        width: 100%;
+       margin-bottom: 1rem;
+      }
 
       &-header {
         display: flex;
@@ -269,7 +296,7 @@ export default {
 
         &-content {
           &-name {
-            height: 23px;
+            /*height: 23px;*/
             font-size: 18px;
             font-weight: bold;
             font-style: normal;
@@ -278,6 +305,7 @@ export default {
             letter-spacing: normal;
             text-align: left;
             color: #4d4f5c;
+            padding-bottom: 20px;
           }
 
           &-participants {
@@ -317,16 +345,20 @@ export default {
 
     &-participants {
       min-width: 15rem;
-      width: 15rem;
+      width: 22rem;
       background-color: white;
       height: 19rem;
       border-radius: 0.25rem;
       padding: 1rem;
-
       box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.15);
+
+      @media (max-width: 767px) {
+        width: 100%;
+      }
 
       &-participant {
         display: flex;
+        margin-bottom: 10px;
 
         &-info {
           margin-left: 0.5rem;

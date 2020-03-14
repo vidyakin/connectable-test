@@ -39,8 +39,8 @@ app.use(bodyParser.urlencoded({extended: true}));
 
 app.use(express.static('static'));
 
+app.use('/api', require('./auth/authRouter')); // ???
 app.use('/api/user/me', validateToken, require('./auth/authRouter'));
-app.use('/api', require('./auth/authRouter'));
 app.use('/api/user', validateToken, require('./crud')(User, serializers.serializer));
 app.use('/api/group', validateToken, require('./crud')(Group, groupSerializer));
 app.use('/api/post', validateToken, require('./crud')(Post, serializers.postSerializer));
@@ -51,6 +51,18 @@ app.use('/api/groupParticipant', validateToken, require('./crud')(GroupParticipa
 app.use('/api/groupInvite', validateToken, require('./crud')(GroupInvite, inviteSerializer));
 app.use('/api/projectParticipant', validateToken, require('./crud')(ProjectParticipant, serializers.serializer));
 app.use('/api/project', validateToken, require('./crud')(Project, projectSerializer));
+
+app.use('/api/outlook', require('./auth/outlook/'));
+app.use('/api/outlook/event', require('./calendar'));
+app.use("/role", require('./role/routes'));
+
+var userHandlers = require('./email/index.js');
+app.route('/auth/forgot_password')
+    .get(userHandlers.render_forgot_password_template)
+    .post(userHandlers.forgot_password);
+app.route('/auth/reset_password/:token')
+    .get(userHandlers.render_reset_password_template)
+    .post(userHandlers.reset_password);
 
 app.post('/api/upload', (req, res, next) => {
   let imageFile = req.files.files;
@@ -142,6 +154,7 @@ app.post('/api/register', function(req,res){
         lastname = req.body.lastName,
         email = req.body.email,
         password = req.body.password,
+        emailSend = req.body.emailSend,
         data = {
             "firstName": firstName,
             "lastName":lastname,
@@ -156,26 +169,19 @@ app.post('/api/register', function(req,res){
             bcrypt.compare(password, user.password).then(match => {
                 if (match) {
                     status = 202;
-                    result.email = user.email;
                     result.status = status;
-                    res.status(status).send(result);
+                    result.error = `Authentication error. This email is already registered`;
                 } else {
-                    status = 401;
+                    status = 202;
                     result.status = status;
-                    result.error = `Authentication error`;
+                    result.error = `Authentication error. This email is already registered`;
                 }
 
-                res.status(status).send(result);
-            }).catch(err => {
-                status = 500;
-                result.status = status;
-                result.error = err;
                 res.status(status).send(result);
             });
         } else {
             bcrypt.hash(password, 10, function (err, hash) {
                 if (err) {
-                    console.log('Error hashing password for user', email);
                     next(err);
                 }
                 else {
@@ -183,7 +189,10 @@ app.post('/api/register', function(req,res){
                     db.collection('users').insertOne(data,function(err, collection){
                         if (err) return res.status(500).send("There was a problem registering the user.");
                     });
-                    mail.NewUser(email, `https://connectable.pro/login/`, {email:email, password:password})
+                    if(emailSend) {
+                        mail.NewUser(email, `https://connectable.pro/login/`, {email:email, password:password});
+                    }
+
                 }
             });
 
@@ -264,6 +273,7 @@ app.post('/api/department', (req, res, next) => {
         level = '',
         result = {},
         status = 200;
+
     if(depData.parent) {
         let name = depData.parent.label;
         Department.findOne({name}, (err, dep) => {
@@ -274,6 +284,7 @@ app.post('/api/department', (req, res, next) => {
                 }
                 Department.findOne({slug}, (error, department) => {
                     if (!error && !department) {
+
                         db.collection('departments').insertOne(depData,function(error, collection){
                             if (error) return res.status(500).send("There was a problem registering the user.");
                         });
@@ -314,12 +325,44 @@ app.get('/api/department', (req, res) => {
         }
     });
 });
+//delete department
+app.delete('/api/department/:depId', (req, res) => {
+    let {depId} = req.params;
+
+    Department.deleteOne({ _id:depId },function(error, collection){
+        if (error) return res.status(500).send("There was a problem registering the user.");
+        else {
+            Department.find({}, (err, department) => {
+                if (!err && department) {
+                    res.status(200).send(department);
+                }
+            });
+        }
+    });
+});
+//update department
+app.put('/api/department', (req, res) => {
+    let {_id, name, users} = req.body;
+    let slug = latinize(req.body.name.toLowerCase().replace(/ /g,'_'));
+    Department.findByIdAndUpdate(_id, {$set: { name:name, users:users, slug:slug }},{new: true}, function(error, collection){ console.log(error);
+        if (error) return res.status(500).send("There was a problem registering the user.");
+        else {
+            Department.find({}, (err, department) => {
+                if (!err && department) {
+                    res.status(200).send(department);
+                }
+            });
+        }
+    });
+
+});
+//app.put('/api/department', validateToken, require('./crud')(Department, serializers.serializer));
 //put notifications
 app.post('/api/notification', (req, res, next) => {
     let notifi =req.body,
         status = 200,
         result = '';
-
+    console.log(notifi);
     Notification.findOne({}, (err, resbd) => {
         if(!err) {
             if (!err && resbd) {
@@ -341,11 +384,21 @@ app.post('/api/notification', (req, res, next) => {
                 else {
                     obj_result = { $set: obj_data, $set: notifi };
                 }
-                Notification.updateMany({},
+                Notification.updateMany({userId:notifi.userId},
                     obj_result
                 ).then(result => {
-                    console.log(`Successfully update  items.`);
-                    res.status(status).send(notifi);
+                    if(result.n > 0) {
+                        res.status(status).send('Настройки сохранены');
+                    }
+                    else {
+                        db.collection('notifications').insertOne(notifi,function(err, collection){
+                            if (err) return res.status(500).send("There was a problem registering the user.");
+                            else {
+                                res.status(status).send('Настройки сохранены');
+                            }
+                        });
+                    }
+
                 }).catch(err => console.error(`Failed to update items: ${err}`));
 
             }
@@ -353,8 +406,7 @@ app.post('/api/notification', (req, res, next) => {
                 db.collection('notifications').insertOne(notifi,function(err, collection){
                     if (err) return res.status(500).send("There was a problem registering the user.");
                     else {
-                        console.log(`Successfully added  items.`);
-                        res.status(status).send(notifi);
+                        res.status(status).send('Настройки сохранены');
                     }
                 });
             }
@@ -364,18 +416,47 @@ app.post('/api/notification', (req, res, next) => {
             }
         }
     });
-
-
-
 });
 //display status notification
-app.get('/api/notification', (req, res) => {
-    let status = 200;
-    Notification.find({}, (err, notifications) => {
+app.get('/api/notification/:userId', (req, res) => {
+    let userId = req.params.userId,
+        status = 200;
+    Notification.findOne({userId}, (err, notifications) => {
         if (!err && notifications) {
             res.status(status).send(notifications);
         }
+        else {
+            res.status(status).send();
+        }
     });
 });
+//follow
+app.post('/api/follow', (req, res) => {
+    let {userID, curentUserID, userEmail} = req.body;
+    User.findByIdAndUpdate(userID, {$push: { followers:curentUserID, followersEmail:userEmail } },{}, function(error, collection){
+        if (error) return res.status(500).send("There was a problem registering the user.");
+        else res.status(200).send(curentUserID);
+    });
+
+});
+//unfollow
+app.post('/api/unfollow', (req, res) => {
+    let {userID, curentUserID, userEmail} = req.body;
+    User.findByIdAndUpdate(userID, {$pull: { followers:curentUserID, followersEmail:userEmail } },{}, function(error, collection){
+        if (error) return res.status(500).send("There was a problem registering the user.");
+        else res.status(200).send(curentUserID);
+    });
+});
+//dislike
+app.post('/api/dislike', (req, res) => {
+    let authorId = req.body;
+    Like.deleteOne({parent : authorId.parent, author: authorId.author},function(error, collection){
+        if (error) return res.status(500).send("There was a problem with dislike.");
+        else {
+            res.status(200).send('Like deleted');
+        }
+    });
+});
+
 
 app.listen(port, () => console.log(`[Server]: Listening on port ${port}`));

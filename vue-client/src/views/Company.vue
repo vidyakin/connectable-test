@@ -1,12 +1,12 @@
 <template>
-  <div class="company">
+  <div id="profile" class="company">
     <app-comment-input
       v-model="content"
       @pressEnter="sendMessage"
       :parent="{type: 'company', id: '0'}"
     />
     <div class="company-name">Компания</div>
-    <app-post v-for="(post, index) in posts" :post="post" :key="index"/>
+    <app-post v-for="(post, index) in sortedPosts" :post="post" :key="index"/>
   </div>
 </template>
 
@@ -22,6 +22,7 @@ export default Vue.extend({
   data() {
     return {
       content: '',
+      arrPosts: [ ],
     };
   },
   components: {
@@ -45,6 +46,19 @@ export default Vue.extend({
   },
   computed: {
     ...mapGetters(['posts']),
+    sortedPosts() {
+      function compare(a, b) {
+        if (a.created < b.created) return 1;
+        if (a.created > b.created) return -1;
+        return 0;
+      }
+      return this.arrPosts.sort(compare);
+    },
+  },
+  watch: {
+    posts(posts) {
+      this.arrPosts = posts;
+    },
   },
 });
 </script>

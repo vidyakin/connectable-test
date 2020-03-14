@@ -3,9 +3,18 @@ import {
 } from '@/store/structure/mutations.type';
 import {
     ADD_NEW_DEP,
-    GET_DEP
+    GET_DEP,
+    DELETE_DEP,
+    UPDATE_DEP
 } from '@/store/structure/actions.type';
-import {putDepartmentsList, getDepartmentsList} from '@/services/department.service';
+
+import {
+    putDepartmentsList,
+    getDepartmentsList,
+    deleteDepartment,
+    updateDepartment
+} from '@/services/department.service';
+
 interface State {
     departments: any | null;
 }
@@ -29,6 +38,8 @@ const mutations = {
 const actions = {
     [ADD_NEW_DEP]: putDepartmentsList,
     [GET_DEP]: getDepartmentsList,
+    [DELETE_DEP]: deleteDepartment,
+    [UPDATE_DEP]: updateDepartment
 };
 
 export default {

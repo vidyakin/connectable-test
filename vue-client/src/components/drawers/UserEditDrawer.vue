@@ -7,7 +7,7 @@
     :visible="visible"
     wrapClassName="user-edit-drawer"
   >
-    <a-form :form="form" class="form" @submit="editUserInfo">
+    <a-form :form="form" class="form user-info" @submit="editUserInfo">
       <div class="form-row">
         <div class="row">
           <div class="col-sm-12">
@@ -69,6 +69,7 @@
               <app-input
                 label="Почта"
                 placeholder="example@email.com"
+                :disabled="true"
                 :defaultValue="currentUser && currentUser.email"
                 v-decorator="['email', {initialValue:currentUser &&  currentUser.email,
                 rules: [{
@@ -162,6 +163,9 @@ export default {
 </script>
 
 <style lang="scss">
+  .user-info .row {
+    height: 100%;
+  }
 .user-edit-drawer {
   .ant-drawer-content-wrapper {
     width: 20rem !important;

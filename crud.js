@@ -9,22 +9,34 @@ module.exports = (Collection, serializer, options) => {
         let result = {};
         let status = 201;
         const newEntry = req.body;
-        //console.log(req.body);
+        //console.log(newEntry);
         Collection.create(newEntry, async (e, data) => {
-            console.log(Collection.collection.collectionName);
+
             if (e) {
                 status = 500;
                 result.status = status;
                 result.error = e;
             } else {
                 if (Collection.collection.collectionName === 'groupinvites') {
-                    mail.sendInvite(data.userId, `https://connectable.pro/invite/${data._id}`)
+                    mail.sendInvite(data.userId, `https://connectable.pro/invite/${data._id}`, req.body.groupType)
                 }
                 if (Collection.collection.collectionName === 'groups') {
-                    mail.AddUserInGroup(req.body.userEmail, `https://connectable.pro/login/`, {name:data.name, description:data.description})
+
+                    if(req.body.emailSend) {
+                    mail.AddUserInGroup(req.body.userEmail, `https://connectable.pro/login/`, {name:data.name, description:data.description});
+                    }
                 }
                 if (Collection.collection.collectionName === 'events') {
+
+                    if(req.body.emailSend) {
                     mail.CalendarEvent(req.body.userEmail, `https://connectable.pro/login/`, {name:data.name, comment:data.comment, date:moment(data.date).locale('ru').format("MMM Do YY"), time:data.time})
+                    }
+                }
+                if (Collection.collection.collectionName === 'posts') {
+                    if(req.body.emailSend) {
+                        mail.FollowEvent(data.author.followersEmail, `https://connectable.pro/login/`, {userName:data.author.firstName, msg:data.message});
+                    }
+
                 }
                 result.status = status;
                 result.result = await serializer(data);
@@ -77,7 +89,8 @@ module.exports = (Collection, serializer, options) => {
         const changedEntry = req.body;
         let result = {};
         let status = 201;
-
+        //console.log(req.params._id);
+        //console.log(changedEntry);
         Collection.updateOne({_id: req.params._id}, changedEntry, (e, data) => {
             if (e) {
                 status = 500;
@@ -103,7 +116,7 @@ module.exports = (Collection, serializer, options) => {
                         result.token = token;
                         result.result = await serializer(data);
 
-                        console.log(result.result);
+
                     }
                     return res.status(status).send(result);
                 });

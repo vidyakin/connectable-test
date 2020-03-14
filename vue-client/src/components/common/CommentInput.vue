@@ -1,14 +1,14 @@
 <template class="comment-input">
   <a-input class="input" placeholder="Сообщение..." v-model="current" @pressEnter="send">
     <div slot="addonAfter" class="comment-input-action">
-      <a-icon type="link" @click="handleUpload"></a-icon>
+      <!--<a-icon type="link" @click="handleUpload"></a-icon>-->
       <a-upload
         :multiple="false"
         :fileList="fileList"
         :beforeUpload="beforeUpload"
         :handleRemove="handleRemove"
       >
-        <a-icon type="video-camera"></a-icon>
+        <a-icon type="file"></a-icon>
       </a-upload>
     </div>
   </a-input>
@@ -18,8 +18,10 @@
 import { mapGetters } from 'vuex';
 import AppLoginBar from './LoginBar';
 import { SEND_NEW_POST } from '../../store/post/actions.type';
+import {GET_NOTIFICATION} from '../../store/notification/actions.type';
 import Vue from 'vue';
 import store from '../../store';
+import moment from 'moment';
 export default {
   name: 'AppCommentInput',
   components: {
@@ -29,20 +31,24 @@ export default {
     return {
       current: '',
       fileList: [],
+      statusEmailSend: false,
       datauser: (store.getters.userData ? store.getters.userData : store.getters.user),
     };
   },
   computed: {
-    ...mapGetters(['showHeaderImage', 'user', 'currentUser', 'userData']),
+    ...mapGetters(['showHeaderImage', 'user', 'currentUser', 'userData', 'notification']),
   },
   methods: {
     send() {
       if (this.current !== '') {
+
         this.$store.dispatch(SEND_NEW_POST, {
           message: this.current,
+          created: moment(),
           parent: this.parent,
           author: this.datauser.result,
           attachment: [],
+          emailSend: this.statusEmailSend,
           formData: this.handleUpload(),
         });
       }
@@ -71,6 +77,14 @@ export default {
         return null;
       }
     },
+  },
+  beforeCreate() {
+    this.$store.dispatch(GET_NOTIFICATION, store.getters.userData.result._id);
+  },
+  watch: {
+    notification(notification) {
+      this.statusEmailSend = (notification && notification.userId == store.getters.userData.result._id ? notification.publications : false);
+    }
   },
   props: {
     parent: Object,

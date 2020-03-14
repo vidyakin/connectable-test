@@ -12,7 +12,7 @@
             >{{currentProject && currentProject.name}}</div>
             <div
               class="group-body-info-header-content-participants"
-            >{{currentProject && currentProject.participants.length}} участников</div>
+            >{{currentProject && currentProject.participants.length}} {{currentProject && endingWords(currentProject.participants.length)}}</div>
           </div>
           <div class="group-body-info-header-action">
             <a-popover
@@ -62,7 +62,19 @@
               class="group-body-participants-participant-info-positions"
             >{{participant.positions.join(', ')}}</div>
           </div>
+          <a-popconfirm
+                  title="Подтверите удаление"
+                  okText="Подтверждаю"
+                  cancelText="Отмена"
+                  @confirm="deleteParticipantById(participant._id)"
+                  v-if="user && participant._id != user._id"
+          >
+            <a-tooltip title="Удалить">
+              <a-button class="delete-department" icon="delete"></a-button>
+            </a-tooltip>
+          </a-popconfirm>
         </div>
+
       </div>
     </div>
     <template
@@ -103,6 +115,7 @@ export default {
     return {
       editVisible: false,
       requestVisible: false,
+      output: '',
     };
   },
   methods: {
@@ -140,6 +153,14 @@ export default {
         })
         .then(() => this.checkParticipants());
     },
+    deleteParticipantById(participantId) {
+      this.$store
+        .dispatch(DELETE_PARTICIPANT, {
+          participantId,
+          groupId: this.currentGroup._id,
+        })
+        .then(() => this.checkParticipants());
+    },
     createParticipantsRequest() {
       this.$store
         .dispatch(CREATE_PARTICIPANT, {
@@ -155,6 +176,20 @@ export default {
         participantId: this.user._id,
       });
     },
+    endingWords(count) {
+      if (count === 0) {
+        this.output = 'нет участников';
+      } else if (count === 1) {
+        this.output = ' участник';
+      } else if ((count > 20) && ((count % 10) == 1)) {
+        this.output = ' участник';
+      } else if (((count >= 2) && (count <= 4)) || (((count % 10) >= 2) && ((count % 10) <= 4)) && (count > 20)) {
+        this.output = ' участника';
+      } else {
+        this.output = ' участников';
+      }
+      return this.output;
+    },
   },
   beforeMount() {
     this.$store.dispatch(GET_CURRENT_PROJECT, this.$route.params._id);
@@ -168,7 +203,7 @@ export default {
 <style lang="scss">
 .groups-header {
   display: flex;
-  margin: 1.5rem 3.125rem 1rem 3.125rem;
+  margin: 1.5rem 0 1rem 0;
   justify-content: space-between;
 
   &-name {
@@ -185,8 +220,9 @@ export default {
 }
 
 .group-view {
-  height: calc(100vh - 3.125rem);
+  height: calc(100vh - 210px);
   overflow: auto;
+  padding: 30px;
   background-color: #f0f0f7;
 
   &-header {
@@ -208,14 +244,14 @@ export default {
   }
 
   .group-body {
-    margin: 1.5rem 3.125rem 1rem 3.125rem;
+    margin: 1.5rem 0 1rem 0;
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
 
     &-info {
       min-width: 15rem;
-      width: calc(100% - 17rem);
+      width: calc(100% - 23rem);
       background-color: white;
       height: 19rem;
       border-radius: 0.25rem;
@@ -277,7 +313,7 @@ export default {
 
     &-participants {
       min-width: 15rem;
-      width: 15rem;
+      width: 22rem;
       background-color: white;
       height: 19rem;
       border-radius: 0.25rem;

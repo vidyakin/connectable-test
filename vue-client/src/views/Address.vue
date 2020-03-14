@@ -29,6 +29,8 @@
 import { GET_USERS } from '../store/user/actions.type';
 import { mapGetters } from 'vuex';
 
+
+
 const columns = [
   {
     title: 'Сотрудник',
@@ -150,6 +152,9 @@ export default {
     height: calc(100vh - 50px);
   }
 }
+.address .ant-table-small {
+  border: none;
+}
 .address {
   padding: 30px;
   height: calc(100vh - 210px);
@@ -250,4 +255,12 @@ export default {
     }
   }
 }
+
+  .address-body .ant-table-thead th {
+    width: 14.5rem;
+  }
+.address-body .ant-table-thead th:first-child, .address-body .ant-table-thead th:nth-child(2) {
+  width: 18rem;
+}
+
 </style>

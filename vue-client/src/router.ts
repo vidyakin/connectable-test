@@ -2,6 +2,7 @@ import Vue from 'vue';
 import Router from 'vue-router';
 import Home from './views/Home.vue';
 import store from './store';
+import {getInfoUser} from '@/services/auth/auth.service';
 Vue.use(Router);
 
 const view = (name: string) => {
@@ -93,20 +94,39 @@ export const router =  new Router({
       component: view('Login'),
     },
     {
+      name: 'authorize',
+      path: '/authorize',
+      component: view('Authorize'),
+    },
+    {
       path: '/register/',
       name: 'register',
       component: view('Register'),
     },
+    {
+      path: '/forgot-password/',
+      name: 'ForgotPassword',
+      component: view('ForgotPassword'),
+    },
+    {
+      path: '/reset-password/:token',
+      name: 'ResetPassword',
+      component: view('ResetPassword'),
+    },
   ],
 });
-
 router.beforeEach((to, from, next) => {
-  const publicPages = ['/login', '/register'];
+  const publicPages = ['/login', '/register', '/forgot-password', '/authorize'];
   const authRequired = !publicPages.includes(to.path);
+  const resetPas = location.pathname;
   const loggedIn = localStorage.getItem('authorization');
   const isLoggedIn = localStorage.getItem('token');
 
-  if (authRequired && (!isLoggedIn || !loggedIn)) {
+  if(localStorage.getItem('token')) {
+    getInfoUser(localStorage.getItem('token'));
+  }
+
+  if (authRequired && (!isLoggedIn || !loggedIn) && !resetPas.includes('reset-password')) {
     return next({ name: 'login' });
   }
   next();

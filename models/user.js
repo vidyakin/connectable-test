@@ -23,8 +23,17 @@ const userSchema = new Schema({
     googleToken: String,
     firstName: String,
     lastName: String,
-    googleId: Number
-
+    googleId: Number,
+    outlookId: String,
+    aud: String,
+    followers: Array,
+    followersEmail: Array,
+    reset_password_token: {
+        type: String
+    },
+    reset_password_expires: {
+        type: Date
+    }
 });
 
 userSchema.pre('save', function (next) {

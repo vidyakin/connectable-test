@@ -10,7 +10,7 @@
           </a-menu-item>
         </a-menu>
         <a-button class="logout" >
-          {{ (currentUser ? currentUser.firstName : this.datauser.result.firstName) + ' ' + (currentUser ? currentUser.lastName : this.datauser.result.lastName) }}
+          {{ this.datauser.result.firstName + ' ' + this.datauser.result.lastName }}
             <a-icon type="down" />
         </a-button>
       </a-dropdown>
@@ -69,7 +69,7 @@ export default {
 }
 
 .user-bar {
-  height: 3.125rem;
+ /* height: 3.125rem;*/
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -89,24 +89,38 @@ export default {
     border: none;
     padding: 0;
     height: auto;
+    position: relative;
+    padding-left: 20px;
+  }
+  .logout::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 1px;
+    background-color: #e8e8e8;
   }
   .user-info {
     display: flex;
     justify-content: flex-end;
-    margin-right: 30px;
+    /*margin-right: 30px;*/
+    padding: 10px 15px;
 
     &-name {
       line-height: 3.125rem;
     }
 
     i {
-      line-height: 3.125rem;
+      line-height: 0;
       margin-right: 0.5rem;
       margin-left: 0.5rem;
     }
 
     .ant-avatar {
-      margin-top: 0.375rem;
+      /*margin-top: 0.375rem;*/
+      margin-top: 0;
+      margin-right: 0;
       width: 2.375rem;
       height: 2.375rem;
     }

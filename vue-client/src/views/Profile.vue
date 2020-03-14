@@ -1,8 +1,10 @@
 <template>
-  <div class="profile">
+  <div id="profile" class="profile">
     <app-user-info></app-user-info>
-    <app-comment-input :parent="{type: 'user', id: userData && userData.result._id}" />
-    <app-post v-for="(post, index) in posts" :post="post" :key="index" />
+    <app-comment-input :parent="{type: 'user', id: datauser && datauser._id}" v-if="datauser._id == $route.params._id" />
+
+    <app-post v-for="(post, index) in posts" v-if="(post && post.author._id == $route.params._id)" :post="post" :key="index" />
+
   </div>
 </template>
 
@@ -14,12 +16,13 @@ import AppUserInfo from '../components/common/UserInfo';
 import { GET_POSTS } from '../store/post/actions.type';
 import { mapGetters } from 'vuex';
 import { GET_USER } from '../store/user/actions.type';
-
+import store from '../store';
 export default Vue.extend({
   name: 'AppCompany',
   data() {
     return {
       content: '',
+      datauser: (store.getters.userData ? store.getters.userData.result : store.getters.user ),
     };
   },
   components: {
@@ -34,7 +37,7 @@ export default Vue.extend({
         filter: {
           parent: {
             type: 'user',
-            id: this.userData.result._id,
+            id: this.$route.params._id,
           },
         },
       });
@@ -50,7 +53,7 @@ export default Vue.extend({
           filter: {
             parent: {
               type: 'user',
-              id: this.userData.result._id,
+              id: this.$route.params._id,
             },
           },
         });

@@ -1,5 +1,5 @@
 <template>
-  <div class="post-wrapper">
+  <div class="post-wrapper" >
     <div class="post-wrapper-body">
       <div class="post-wrapper-header">
         <div class="post-wrapper-header-photo">
@@ -47,8 +47,10 @@
         </div>
       </div>
       <div class="post-wrapper-footer">
-        <span v-if="user && post.likes.findIndex(e => e.author._id === user._id) > -1">Вам нравится</span>
-        <a-button icon="like" @click="like(post._id)" v-else>Нравится</a-button>
+        <span v-if="datauser && post.likes.findIndex(e => e.author._id === datauser._id) > -1" >
+          <a-button icon="dislike" @click="dislike(post._id)">Не нравится</a-button>
+          </span>
+        <a-button icon="like" @click="likes(post._id)" v-else>Нравится</a-button>
         <a-button icon="message" @click="commented">Комментировать</a-button>
       </div>
       <div class="post-wrapper-comments">
@@ -80,20 +82,43 @@
       </div>
     </div>
     <div>
-      <a-popover title="Действия с постом" trigger="click" overlayClassName="action-popup-content">
+
+      <a-popover  title="Действия с постом" v-model="visible" trigger="click" :container="'post-' + post._id" overlayClassName="action-popup-content" v-if="post && post.author._id === datauser._id || $can('read', {'accessEmail': datauser.email, '__type': 'User'})">
         <template slot="content">
           <a-tooltip title="Удалить">
             <a-icon type="delete" @click="deletePost"></a-icon>
           </a-tooltip>
-          <a-tooltip title="Поделиться">
-            <a-icon type="share-alt" @click="repost"></a-icon>
-          </a-tooltip>
+          <a-popover title="Поделиться" trigger="click">
+              <template slot="content">
+                  <social-sharing :url="pubUrl"
+                                  :title="post && post.message"
+                                  :description="post && post.message"
+                                  :quote="post && post.message"
+                                  :twitter-user="post.author.firstName + ' ' + post.author.lastName"
+                                  class="share-popup"
+                                  inline-template>
+                    <div>
+                      <network network="facebook">
+                        <a-icon type="facebook"></a-icon>
+                      </network>
+                      <network network="linkedin">
+                        <a-icon type="linkedin"></a-icon>
+                      </network>
+                      <network network="twitter">
+                        <a-icon type="twitter"></a-icon>
+                      </network>
+                    </div>
+                  </social-sharing>
+              </template>
+            <a-button icon="share-alt" class="open-action-button" ></a-button>
+          </a-popover>
           <a-tooltip title="Редактировать">
             <a-icon type="edit" @click="editPost"></a-icon>
           </a-tooltip>
         </template>
-        <a-button icon="menu" class="open-action-button"></a-button>
+        <a-button icon="menu" class="open-action-button" :id="'post-' + post._id"></a-button>
       </a-popover>
+
     </div>
   </div>
 </template>
@@ -108,6 +133,7 @@ import {
   SEND_COMMENT,
   SEND_LIKE,
   SEND_NEW_POST,
+  DELETE_LIKE,
 } from '../../store/post/actions.type';
 import moment from 'moment';
 import {
@@ -115,6 +141,8 @@ import {
   SET_POST_FOR_EDITING,
 } from '../../store/post/mutations.type';
 import store from '../../store';
+import { GET_POSTS } from '../../store/post/actions.type';
+import  { PUBLIC_URL } from '../../../config/dev.env';
 export default {
   name: 'AppPost',
   components: {
@@ -125,8 +153,10 @@ export default {
     return {
       current: '',
       commenting: false,
+      visible: false,
       commentContent: '',
       allComment: false,
+      pubUrl: PUBLIC_URL,
       datauser: (store.getters.userData.result ? store.getters.userData.result : store.getters.currentUser),
     };
   },
@@ -134,35 +164,81 @@ export default {
     ...mapGetters(['showHeaderImage', 'user', 'currentUser', 'userData']),
   },
   methods: {
+    handleScroll () {
+      if (this.visible) {
+        this.visible = false;
+      }
+    },
     commented() {
       this.commenting = true;
     },
     getMomentTime(time) {
       return moment(time).fromNow(true);
     },
-    like(postId) {
-      const like = {
+    likes(postId) {
+      const likes = {
         parent: { type: 'post', id: postId },
         author: this.datauser,
       };
-      this.$store.dispatch(SEND_LIKE, like);
+      this.$store.dispatch(SEND_LIKE, likes);
+    },
+    dislike(postId) {
+      const likes = {
+        parent: { type: 'post', id: postId },
+        author: this.datauser,
+      };
+      this.$store.dispatch(DELETE_LIKE, likes).finally(() => {
+        let parentVal = ''
+        let idUrl = '0';
+        switch (this.$route.path.split('/')[1]) {
+          case 'group':
+            parentVal = 'group';
+            idUrl = this.$route.params._id;
+            break;
+          case 'profile':
+            parentVal = 'user';
+            idUrl = this.$route.params._id;
+            break;
+          case 'company':
+            parentVal = 'company';
+            break;
+        }
+        this.$store.dispatch(GET_POSTS, {
+          filter: {
+            parent: {
+              type: parentVal,
+              id: idUrl,
+            },
+          },
+        });
+      });
     },
     sendComment(postId) {
       const comment = {
         parent: { type: 'post', id: postId },
         author: this.datauser,
+        created: moment(),
         message: this.commentContent,
       };
-      this.$store.dispatch(SEND_COMMENT, comment).then(() => {
-        this.commentContent = '';
-      });
+      if (this.commentContent) {
+        this.$store.dispatch(SEND_COMMENT, comment).then(() => {
+            this.commentContent = '';
+        });
+      }
     },
     deletePost() {
-      this.$store.dispatch(DELETE_POST, this.post._id);
+      this.$store.dispatch(DELETE_POST, this.post._id).then(() => {
+
+        this.$notification['success']({
+          message: 'Пост удален',
+          placement: 'topRight'
+        });
+      });
     },
     editPost() {
       this.$store.commit(SET_POST_FOR_EDITING, this.post);
       this.$store.commit(SET_EDIT_POST_VISIBLE, true);
+      this.visible = false;
     },
     seeAllComment() {
       this.allComment = true;
@@ -181,6 +257,9 @@ export default {
       });
     },
   },
+  beforeMount() {
+    document.getElementById('profile').addEventListener('scroll', this.handleScroll);
+  },
   props: {
     post: Object,
   },
@@ -188,6 +267,9 @@ export default {
 </script>
 
 <style lang="scss">
+  .ant-popover-inner-content {
+    text-align: center;
+  }
 .post-comment-input {
   margin: 1rem 0 !important;
   display: flex;
@@ -198,7 +280,25 @@ export default {
     width: 2rem !important;
   }
 }
-
+.share-popup {
+  display: flex;
+  justify-content: center;
+  .anticon {
+    font-size: 18px;
+  }
+  span {
+    display: inline-block;
+    padding: 0 10px;
+    outline: none;
+    cursor: pointer;
+    svg {
+      transition:all .3s;
+    }
+    &:hover svg {
+      fill: #40a9ff;
+    }
+  }
+}
 .comment-input {
   margin: 0 1rem !important;
   box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.04) !important;
@@ -265,10 +365,14 @@ export default {
     font-style: normal;
     font-stretch: normal;
     letter-spacing: normal;
+    word-break: break-word;
 
     &-likes {
       margin-top: 1rem;
     }
+  }
+  &-content img {
+    max-width: 100%;
   }
 
   &-footer {
@@ -293,4 +397,7 @@ export default {
     }
   }
 }
+  .comment-wrapper-content {
+    width: 100%;
+  }
 </style>

@@ -8,32 +8,38 @@
       @click="goToPage"
       v-if="$mq==='desktop'"
     >
-      <a-menu-item key="/" class="header">connectable</a-menu-item>
-      <a-menu-item key="/company">
+      <a-menu-item key="/" class="header">
+        <img src="@/assets/logo.svg" class="logo" alt />
+        <span class="logo-mob circle-1"></span>
+        <span class="logo-mob circle-2"></span>
+        <span class="logo-mob circle-3"></span>
+      </a-menu-item>
+      <a-menu-item key="/company" :class="{active:isActive == 'company'}">
         <img src="@/assets/Icons/company.svg" alt />
         Компания
       </a-menu-item>
-      <a-menu-item key="/addressBook">
+      <a-menu-item key="/addressBook" :class="{active:isActive == 'addressBook'}">
         <img src="@/assets/Icons/Adress book.svg" alt />
         Адресная книга
       </a-menu-item>
-      <a-menu-item :key="this.datauser && `/profile/${this.datauser.result._id}`">
+      <a-menu-item :key="this.datauser && `/profile/${this.datauser.result._id}`" :class="{active:isActive == 'profile'}">
         <img src="@/assets/Icons/user.svg" alt />
         Пользователь
       </a-menu-item>
-      <a-menu-item key="/groups">
+      <a-menu-item key="/groups" :class="{active:isActive == 'groups'}">
         <img src="@/assets/Icons/Groups.svg" alt />
         Группы
       </a-menu-item>
-      <a-menu-item key="/calendar">
+      <a-menu-item key="/calendar" :class="{active:isActive == 'calendar'}">
         <img src="@/assets/Icons/calendar.svg" alt />
         Календарь
       </a-menu-item>
-      <a-menu-item key="/structure">
+      <a-menu-item key="/structure" :class="{active:isActive == 'structure'}">
         <img src="@/assets/Icons/Structure.svg" alt />
         Структура
       </a-menu-item>
-      <a-menu-item key="/settings" class="footer" >
+      <!--v-if="$can('read', {'accessEmail': datauser.result.email, '__type': 'User'})"-->
+      <a-menu-item key="/settings" class="footer"  :class="{active:isActive == 'settings'}" >
         <img src="@/assets/Icons/setting.svg" alt />
         Настройки
       </a-menu-item>
@@ -47,7 +53,11 @@
       @click="goToPage"
       v-if="$mq==='tablet'"
     >
-      <a-menu-item key="/" class="header">logo</a-menu-item>
+      <a-menu-item key="/" class="header"><img src="@/assets/logo.svg" class="logo" alt />
+        <span class="logo-mob circle-1"></span>
+        <span class="logo-mob circle-2"></span>
+        <span class="logo-mob circle-3"></span>
+      </a-menu-item>
       <a-menu-item key="/company">
         <img src="@/assets/Icons/company.svg" alt />
       </a-menu-item>
@@ -66,7 +76,7 @@
       <a-menu-item key="/structure">
         <img src="@/assets/Icons/Structure.svg" alt />
       </a-menu-item>
-      <a-menu-item key="/settings" class="footer" >
+      <a-menu-item key="/settings" class="footer"  >
         <img src="@/assets/Icons/setting.svg" alt />
       </a-menu-item>
     </a-menu>
@@ -81,13 +91,18 @@ export default {
   data() {
     return {
       current: 1,
-      datauser: (store.getters.user ? store.getters.user : store.getters.userData)
+      datauser: (store.getters.user ? store.getters.user : store.getters.userData),
+      isActive: this.$route.path.split('/')[1],
     };
   },
   methods: {
     goToPage(e) {
-      this.$router.push({ path: e.key });
+      if(this.$route.path != e.key) {
+        this.$router.push({ path: e.key });
+      }
+      this.isActive = e.key.split('/')[1];
     },
+
   },
   computed: {
     ...mapGetters(['user','userData']),
@@ -96,23 +111,61 @@ export default {
 </script>
 
 <style lang="scss">
+  .logo-mob {
+    display: none;
+    width: 6.3px;
+    height: 6.3px;
+    border-radius: 50%;
+    margin-right: 2px;
+
+    @media (max-width: 1023px) {
+      display: inline-block;
+    }
+  }
+  .circle-1 {
+    background-color: #ff1d25;
+  }
+  .circle-2 {
+    background-color: #7ac943;
+  }
+  .circle-3 {
+    background-color: #3fa9f5;
+  }
+  .navbar .ant-menu .ant-menu-item img.logo {
+    width: 94px;
+    max-width: 100%;
+    height: 20.5px;
+    object-fit: contain;
+    display: block;
+    margin-right: 0;
+    margin: 14px auto;
+
+    @media (max-width: 1023px) {
+      display: none;
+    }
+  }
 .navbar {
   padding: 0;
   height: 100%;
   width: 12.5rem !important;
-  @media (max-width: 1024px) {
+  @media (max-width: 1023px) {
     width: 4rem !important;
   }
 
   .ant-menu {
     background: #43425d !important;
-
+    .ant-menu-item.active {
+      background-color: transparent;
+      color: #fff;
+    }
     .ant-menu-item {
       height: 2.5rem;
       font-size: 1rem;
       text-align: left;
       padding-left: 1.5rem;
-      @media (max-width: 1024px) {
+      text-align: left;
+
+      @media (max-width: 1023px) {
         padding-left: 10px!important;
         padding-right: 10px;
         text-align: center;
@@ -133,20 +186,27 @@ export default {
 
     .header {
       margin-top: 0;
-      width: 12.5rem;
+      border-left: 0 !important;
+      width: 100%;
       height: 3.125rem;
-      opacity: 0.3;
+      opacity: 1;
       -webkit-backdrop-filter: blur(5px);
       backdrop-filter: blur(5px);
       box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0.05);
-      background-color: #000000;
-
       font-size: 1rem;
       font-weight: normal;
       font-style: normal;
       font-stretch: normal;
       letter-spacing: normal;
       color: #abaac5;
+    }
+    .header:after {
+      width: 100%;
+      height: 100%;
+      transform: scaleY(1);
+      background: #000000;
+      z-index: 1;
+      opacity: .3;
     }
   }
 }

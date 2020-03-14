@@ -1,6 +1,6 @@
 <template>
     <div class="setting">
-        <div class="setting-name">Настройки уведомлений</div>
+        <div class="setting-name">Настройки уведомлений </div>
 
         <a-form :form="form" class="u-form form" @submit="handleSubmit">
 
@@ -13,10 +13,14 @@
                         </a-checkbox>
                     </a-form-item>
                 </div>
-                <!--<div class="custom-control custom-checkbox mb-3">
-                    <input type="checkbox" v-model="settings.subscribe" class="custom-control-input" id="subscribe" name="subscribe">
-                    <label class="custom-control-label" for="subscribe">У пользователей, на которых он подписан</label>
-                </div>-->
+                <div class="custom-control custom-checkbox mb-3">
+                    <a-form-item class="wrap-field">
+                        <a-checkbox v-decorator="['subscribe']" :checked="settings.subscribe"
+                                    @change="onChangeSubscribe" >
+                            У пользователей, на которых он подписан
+                        </a-checkbox>
+                    </a-form-item>
+                </div>
                 <!-- <div class="custom-control custom-checkbox mb-3">
                    <input type="checkbox" v-model="settings.eventComment" class="custom-control-input" id="eventComment" name="eventComment" value="">
                    <label class="custom-control-label" for="eventComment">во всех публикациях и комментариях, где юзера тегнули через @</label>
@@ -41,7 +45,7 @@
                 <div class="custom-control custom-checkbox mb-3">
                     <a-form-item class="form-group">
                         <a-spin :spinning="createButtonSpinning">
-                            <a-button type="primary" html-type="submit" class="btn btn-primary">Создать</a-button>
+                            <a-button type="primary" html-type="submit" class="btn btn-primary">Сохранить</a-button>
                         </a-spin>
                     </a-form-item>
                 </div>
@@ -56,7 +60,7 @@
     import store from '../store';
 
     export default Vue.extend({
-        data () {
+        data() {
             return {
                 settings: {
                     addUser: false,
@@ -68,38 +72,48 @@
                 submitted: false,
                 error: false,
                 createButtonSpinning: false,
+                userId: (store.getters.userData.result ? store.getters.userData.result._id : ''),
             }
         },
         computed: {
-            ...mapGetters(['notification']),
+            ...mapGetters(['notification', 'userData']),
         },
         methods: {
             handleSubmit(e) {
                 e.preventDefault();
-                const { addUser, publications, eventComment, eventCalendar } = this.settings;
+                const { addUser, publications, eventComment, eventCalendar} = this.settings;
                 this.form.validateFieldsAndScroll((err, formFields) => {
                     if (!err) {
                         this.createButtonSpinning = true;
                         this.$store
                             .dispatch(PUT_NOTIFICATION, {
                                 ...formFields,
+                                userId:this.userId
                             })
                             .finally(() => {
                                 this.createButtonSpinning = false;
+                                this.$store.dispatch(GET_NOTIFICATION, this.userId);
+                                this.$notification['success']({
+                                    message: 'Настройки сохранены',
+                                    placement: 'topRight'
+                                });
                             });
                     }
                 });
             },
-            onChange (e) {
+            onChange(e) {
                 this.settings.addUser = e.target.checked;
                 this.addUser = e.target.checked;
             },
-
-            onChangeCalendar (e) {
+            onChangeSubscribe(e) {
+                this.settings.subscribe = e.target.checked;
+                this.subscribe = e.target.checked;
+            },
+            onChangeCalendar(e) {
                 this.settings.eventCalendar = e.target.checked;
                 this.eventCalendar = e.target.checked;
             },
-            onChangePublications (e) {
+            onChangePublications(e) {
                 this.settings.publications = e.target.checked;
                 this.publications = e.target.checked;
             },
@@ -107,14 +121,15 @@
         },
         beforeCreate() {
             this.form = this.$form.createForm(this);
-            this.$store.dispatch(GET_NOTIFICATION);
+            this.$store.dispatch(GET_NOTIFICATION, store.getters.userData.result._id);
         },
         watch: {
             notification(notification) {
-                this.settings.addUser = notification.addUser;
-                this.settings.publications = notification.publications;
-                this.settings.eventComment = notification.eventComment;
-                this.settings.eventCalendar = notification.eventCalendar;
+                this.settings.addUser = (notification ? notification.addUser: false);
+                this.settings.publications = (notification ? notification.publications: false);
+                this.settings.eventComment = (notification ? notification.eventComment: false);
+                this.settings.eventCalendar = (notification ? notification.eventCalendar: false);
+                this.settings.subscribe = (notification ? notification.subscribe: false);
             }
         }
     });
@@ -162,6 +177,13 @@
     }
     .form-group {
         display: inline-block;
+    }
+    .setting .ant-checkbox-wrapper {
+        display: flex;
+        margin: 0 0 20px;
+    }
+    setting .ant-checkbox-wrapper + span, .ant-checkbox + span {
+        line-height: 16px;
     }
 
 </style>

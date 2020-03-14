@@ -11,7 +11,9 @@ import {
   ERROR_REGISTER,
   ERROR_LOGIN,
   SUCCESS_REGISTER,
-  SET_USER_DATA
+  SET_USER_DATA,
+  FORGOT_INFO,
+  RESET_INFO
 } from '@/store/user/mutations.type';
 import {
   CREATE_EVENT, DELETE_EVENT,
@@ -19,11 +21,14 @@ import {
   GET_INFO_ABOUT_USER, GET_USER, GET_USERS,
   LOGIN,
   LOGIN_WITH_GOOGLE, LOGOUT,
+  LOGIN_WITH_OUTLOOK,
   UPDATE_USER_INFO,
   INSERT_USER_INFO,
   CHECK_USER_INFO,
+  FORGOT_PASSWORD,
+  RESET_PASSWORD,
 } from '@/store/user/actions.type';
-import {getInfoAboutUser, login, loginWithGoogle, logout} from '@/services/auth/auth.service';
+import {getInfoAboutUser, login, loginWithGoogle, loginWithOutlook, logout, forgotPasword, resetPassword} from '@/services/auth/auth.service';
 import {createEvent, deleteEvent, editUser, getEvents, getUser, getUsers, insertNewUser, checkUserInfo} from '@/services/user.service';
 
 interface State {
@@ -37,6 +42,8 @@ interface State {
   errorLogin: any | null;
   successMessage: any | null;
   userData: any | null;
+  forgotInfo: any | null;
+  resetInfo: any | null;
 }
 
 const store: State = {
@@ -50,11 +57,19 @@ const store: State = {
   errorLogin: null,
   successMessage: null,
   userData: null,
+  forgotInfo: null,
+  resetInfo: null
 };
 
 const getters = {
   user(state: State) {
     return state.user;
+  },
+  forgotInfo(state: State) {
+    return state.forgotInfo;
+  },
+  resetInfo(state: State) {
+    return state.resetInfo;
   },
   currentUser(state: State) {
     return state.currentUser;
@@ -90,6 +105,13 @@ const mutations = {
   [SET_USER](state: State, user: any) {
     state.user = user;
   },
+  [FORGOT_INFO](state: State, forgotInfo: any) {
+    state.forgotInfo = forgotInfo;
+  },
+  [RESET_INFO](state: State, resetInfo: any) {
+    state.resetInfo = resetInfo;
+  },
+
   [UPDATE_USER](state: State, user: any) {
     if (user._id === state.user._id) {
       state.user = user;
@@ -162,7 +184,10 @@ const mutations = {
 
 const actions = {
   [LOGIN]: login,
+  [FORGOT_PASSWORD]: forgotPasword,
+  [RESET_PASSWORD]: resetPassword,
   [LOGIN_WITH_GOOGLE]: loginWithGoogle,
+  [LOGIN_WITH_OUTLOOK]: loginWithOutlook,
   [GET_INFO_ABOUT_USER]: getInfoAboutUser,
   [UPDATE_USER_INFO]: editUser,
   [INSERT_USER_INFO]: insertNewUser,

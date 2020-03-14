@@ -38,7 +38,7 @@
                                 @change="handleChangeDep"
                                 :notFoundContent="'Раздел не найдено'"
                         >
-                            <a-select-option v-for="d in data" :key="d._id">{{d.name}}</a-select-option>
+                            <a-select-option v-for="d in departments" :key="d._id" v-if="depLevels.arrayOne.indexOf(d._id) == -1 && depLevels.arrayTwo.indexOf(d._id) == -1 && depLevels.arrayThree.indexOf(d._id) == -1">{{d.name}}</a-select-option>
                         </a-select>
                         </a-form-item>
                     </div>
@@ -49,7 +49,7 @@
                             <a-select v-decorator="['members']"
                                     labelInValue
                                     mode="multiple"
-                                    placeholder="Select users"
+                                    placeholder="Выберите пользователей"
                                     style="width: 100%"
                                     :filterOption="false"
                                     @search="search"
@@ -64,7 +64,7 @@
             </div>
             <a-form-item class="create-group-button-wrapper">
                 <a-spin :spinning="createButtonSpinning">
-                    <a-button type="primary" html-type="submit">Создать</a-button>
+                    <a-button type="primary" html-type="submit" v-if="(departments && !departments.length) || selectVal">Создать  </a-button>
                 </a-spin>
             </a-form-item>
         </a-form>
@@ -86,6 +86,12 @@
                 buttonSpinning: false,
                 data: [],
                 value: [],
+                selectVal: '',
+                depLevels: {
+                    arrayOne: [],
+                    arrayTwo: [],
+                    arrayThree: []
+                },
             };
         },
         components: {
@@ -112,6 +118,7 @@
                                 this.createButtonSpinning = false;
                                 this.onClose();
                                 this.$store.dispatch(GET_DEP);
+                                this.selectVal = '';
                             });
                     }
                 });
@@ -131,7 +138,7 @@
             searchdep(text) {
                 text = text.toLowerCase();
                 this.data = this.departments.filter(el => {
-                    console.log(el);
+
                     return (
                         el.name.toLowerCase().indexOf(text) !== -1
                     );
@@ -148,7 +155,9 @@
                     value,
                     data: [],
                 });
+                this.selectVal = value;
             },
+
         },
         props: {
             close: Function,
@@ -156,11 +165,34 @@
         },
         beforeCreate() {
             this.form = this.$form.createForm(this);
+            this.$store.dispatch(GET_DEP);
         },
         mounted() {
             this.$store.dispatch(GET_USERS);
             this.$store.dispatch(GET_DEP);
         },
+        watch: {
+            departments(departments) {
+                this.depLevels.arrayOne = [];
+                this.depLevels.arrayTwo = [];
+                this.depLevels.arrayThree = [];
+                departments.map(e => {
+                    if (e.level == 1 && e.parent) {
+                        this.depLevels.arrayOne.push(e.parent.key);
+                    }
+                    if(e.level == 2 && e.parent) {
+                        this.depLevels.arrayTwo.push(e.parent.key);
+                    }
+                    if(e.level == 3 && e.parent) {
+                        this.depLevels.arrayThree.push(e.parent.key);
+                    }
+                });
+                if(this.depLevels.arrayTwo.length < 3) this.depLevels.arrayOne = [];
+                if(this.depLevels.arrayTwo.length < 3) this.depLevels.arrayTwo = [];
+                if(this.depLevels.arrayThree.length < 6) this.depLevels.arrayThree = [];
+
+            },
+        }
     };
 </script>
 

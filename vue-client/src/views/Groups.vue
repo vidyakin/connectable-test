@@ -1,23 +1,33 @@
 <template>
+
   <div class="groups">
+    <div class="address-header align-right">
+      <div class="address-header-search">
+        <a-input v-model="searchText">
+          <a-icon type="search" slot="prefix"></a-icon>
+        </a-input>
+      </div>
+    </div>
     <app-group-create-drawer :visible="createVisible" :close="closeCreate" />
     <div class="groups-header">
       <div class="groups-header-name">Группы</div>
       <div class="groups-header-search">
-        <a-button type="primary" @click="openCreate">Создать группу</a-button>
+        <a-button type="primary" @click="openCreate" >Создать группу</a-button>
       </div>
     </div>
     <div class="groups-body">
-      <app-group v-for="(group, index) in groups" :group="group" :key="index"></app-group>
+      <app-group v-for="(group, index) in sortedGroup" :group="group" :key="index" ></app-group>
     </div>
   </div>
 </template>
 <script>
 import AppGroupCreateDrawer from '../components/drawers/GroupCreateDrawer';
+// import AppSearchForm from '../components/common/SearchForm';
+
 import { mapGetters } from 'vuex';
 import { GET_GROUPS } from '../store/group/actions.type';
 import AppGroup from '../components/common/Group';
-
+import store from '../store';
 export default {
   components: {
     AppGroupCreateDrawer,
@@ -26,6 +36,10 @@ export default {
   data() {
     return {
       createVisible: false,
+      groupsData: [],
+      searchText: '',
+      filterData: [],
+      datauser: (store.getters.userData ? store.getters.userData.result : store.getters.user ),
     };
   },
   methods: {
@@ -36,16 +50,56 @@ export default {
       this.createVisible = true;
     },
   },
+
+  computed: {
+    sortedGroup() {
+      function compare(a, b) {
+        if (a.name < b.name) return -1;
+        if (a.name > b.name) return 1;
+        return 0;
+      };
+      return this.filterData.sort(compare);
+    },
+    ...mapGetters(['groups', 'userData']),
+  },
   beforeCreate() {
     this.$store.dispatch(GET_GROUPS);
   },
-  computed: {
-    ...mapGetters(['groups']),
+
+  watch: {
+    groups(groups) {
+      this.filterData = groups;
+      this.fullData = [...this.filterData];
+    },
+    searchText(text) {
+      this.filterData = this.fullData.filter(el => {
+        return (
+        el.name.toLowerCase().indexOf(text) !== -1
+        );
+      });
+
+    },
   },
 };
 </script>
 
 <style lang="scss">
+  .address-header.align-right {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    margin: 0;
+    -webkit-box-pack: justify;
+    -ms-flex-pack: justify;
+    justify-content: space-between;
+    margin-bottom: 30px;
+  justify-content: flex-end;
+    text-align: right;
+}
+.address-header .ant-input {
+    background-color: #f0f0f7 !important;
+    border-radius: 5rem;
+}
 .is-hide-img-header{
   .groups {
     height: calc(100vh - 50px);
@@ -100,4 +154,31 @@ export default {
     flex-wrap: wrap;
   }
 }
+  @media (max-width: 480px) {
+    /*.group {
+      margin-right: 0;
+    }*/
+    .groups-body {
+      margin: 1.5rem 1rem 1rem 1rem;
+    }
+  }
+  .groups-body {
+    justify-content: center;
+    margin: 2rem 0 2rem 0;
+  }
+ /* .group:last-child {
+    margin-right: 0;
+  }*/
+  .group {
+    height: auto;
+    margin-right: 1rem;
+    margin-left: 1rem;
+  }
+  @media (min-width: 1280px) {
+    /*.groups-body {
+      flex-wrap: nowrap;
+    }*/
+  }
+
+
 </style>

@@ -9,9 +9,11 @@
   >
     <a-form :form="form" class="form" @submit="createGroup">
       <div class="form-row">
+        <div class="row">
+          <div class="col-sm-12">
+            <div class="label">Название</div>
         <a-form-item>
           <app-input
-            label="Название"
             placeholder="Название"
             :defaultValue="currentGroup && currentGroup.name"
             v-decorator="['name', {
@@ -23,6 +25,8 @@
             class="secondary form-input"
           ></app-input>
         </a-form-item>
+          </div>
+          <div class="col-sm-12">
         <div class="label">Описание</div>
         <a-form-item>
           <a-textarea
@@ -36,12 +40,16 @@
             class="secondary form-input"
           ></a-textarea>
         </a-form-item>
+          </div>
+          <div class="col-sm-12">
         <div class="label">Тип</div>
         <a-select @change="handleChange" :defaultValue="currentGroup && currentGroup.type">
           <a-select-option :value="0">Открытая</a-select-option>
           <a-select-option :value="1">Закрытая</a-select-option>
           <a-select-option :value="2">Приватная</a-select-option>
         </a-select>
+          </div>
+          </div>
       </div>
       <a-form-item class="create-group-button-wrapper">
         <a-spin :spinning="createButtonSpinning">
