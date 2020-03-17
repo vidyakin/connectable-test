@@ -2,21 +2,20 @@ version: "3.7"
 services:
   connbackend:
     build:
-      context: .
-      dockerfile: Dockerfile_nodejs
+      context: ./backend
       args:
         - DB_URL
-    image: connbackend/temp
+    image: connbackend
     container_name: connbackend
     restart: always
     depends_on:
       - mongodb
     command: bash -c "node deploy_scripts/nodejs_init/wait_for_mongo.js && npm run dev"
     volumes:
-      - ./:/app
+      - ./backend:/app
       - /app/node_modules
-      - ./static:/app/static
-      - ./deploy_scripts/nodejs_init:/app/nodejs_init
+      - ./backend/static:/app/static
+      - ./backend/deploy_scripts/nodejs_init:/app/nodejs_init
     ports:
         - "4000:4000"
     env_file: .env.dev
@@ -30,17 +29,20 @@ services:
     env_file: .env.dev
     volumes:
       - ./data/db:/data/db
-      - ./deploy_scripts/mongo_init:/docker-entrypoint-initdb.d
+      - ./mongo_db/mongo_init:/docker-entrypoint-initdb.d
     ports:
         - 27017:27017
-  # connfrontend:
-  #   build:
-  #     context: ./vue-client
-  #     dockerfile: Dockerfile_vue
-  #   image: connfrontend/temp
-  #   container_name: connfrontend
-  #   restart: always
-  #   depends_on:
-  #     - connbackend
-  #   ports:
-  #       - "8080:80"
+  connfrontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    image: connfrontend
+    container_name: connfrontend
+    restart: always
+    depends_on:
+      - connbackend
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    ports:
+        - "8080:8080"
