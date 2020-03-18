@@ -15,7 +15,6 @@ services:
       - ./backend:/app
       - /app/node_modules
       - ./backend/static:/app/static
-      - ./backend/deploy_scripts/nodejs_init:/app/nodejs_init
     ports:
         - "4000:4000"
     env_file: .env.dev
