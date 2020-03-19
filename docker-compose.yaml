@@ -27,7 +27,7 @@ services:
       MONGO_LOG_DIR: /var/log
     env_file: .env.dev
     volumes:
-      - ./data/db:/data/db
+      - db-data:/data/db
       - ./mongo_db/mongo_init:/docker-entrypoint-initdb.d
     ports:
         - 27017:27017
@@ -45,3 +45,6 @@ services:
       - /app/node_modules
     ports:
         - "8080:8080"
+
+volumes:
+  db-data:
