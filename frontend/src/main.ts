@@ -37,7 +37,8 @@ if (localStorage.getItem('token')) {
 }
 
 setAuthInterceptor();
-Vue.axios.defaults.baseURL = 'http://localhost:8080';
+Vue.axios.defaults.baseURL = `${process.env.VUE_APP_API_URL}`;
+console.log(`FUUUCK - ${process.env.VUE_APP_API_URL}`)
 setAuthToken(localStorage.getItem('token'));
 
 Vue.use(VueMq, {
@@ -53,3 +54,5 @@ new Vue({
   store,
   render: (h) => h(App),
 }).$mount('#app');
+
+// VUE_APP_API_URL='http://localhost:8080'
