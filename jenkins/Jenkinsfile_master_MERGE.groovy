@@ -77,7 +77,7 @@ pipeline {
                 docker-compose -f docker-compose-prod.yaml build connfrontend &&
                 docker-compose -f docker-compose-prod.yaml up --no-deps -d connfrontend &&
                 docker-compose -f docker-compose-prod.yaml build connbackend &&
-                docker-compose -f docker-compose-prod.yaml up --no-deps -d connbackend &&
+                docker-compose -f docker-compose-prod.yaml up --no-deps -d connbackend
                 '
                 """
                 }
@@ -99,8 +99,7 @@ pipeline {
                                  ),
                                  string(
                                    credentialsId: "${CLOUDFLARE_TOKEN}",
-                                   variable: 'CF_TOKEN',
-                                   usernameVariable: 'SSH_USERNAME'
+                                   variable: 'CF_TOKEN'
                                  )]) {
                 sh """curl -X POST "https://api.cloudflare.com/client/v4/zones/3eb26a729ba17d1d214910633e1204cb/purge_cache" \
                      -H "Authorization: Bearer ${CF_TOKEN}" \
