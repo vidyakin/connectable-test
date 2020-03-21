@@ -4,14 +4,13 @@ pipeline {
     }
     environment {
         GIT_REPO = 'https://github.com/connectable-project/connectable.git'
-        GIT_BRANCH = 'new_master'
         GIT_CREDENTIALS = 'github_conn_http'
     }
     stages {
         stage("Git Checkout") {
             steps {
-                cleanWs()
                 script {
+                   echo "${GIT_BRANCH}"
                    def scmVars = checkout(
                         scm: [
                             $class: "GitSCM",
@@ -25,11 +24,14 @@ pipeline {
                 }
             }
         }
-        stage("Test Docker") {
+        stage("Build Frontend") {
             steps {
-                    sh """docker -v"""
-                    sh """npm -v"""
-                    sh "cd ./backend && docker build ."
+                    sh "docker-compose build connfrontend"
+            }
+        }
+        stage("Build Backend") {
+            steps {
+                    sh "docker-compose build connbackend"
             }
         }
     }
