@@ -5,7 +5,6 @@ pipeline {
     environment {
         GIT_REPO_PATH = 'connectable-project/connectable'
         GIT_CREDENTIALS = 'github_conn_http'
-        GIT_BRANCH = 'new_master'
         SSH_PROD_CREDENTIALS = 'ssh_conn_prod'
         SSH_PROD_IP = '10.128.10.0'
         PROD_ROOT_DIR = 'connectable'
@@ -76,7 +75,6 @@ pipeline {
                 mkdir \$HOME/${NEW_RELEASE_DIR} &&
                 git clone https://${GIT_USER}:${GIT_PASS}@github.com/${GIT_REPO_PATH} \$HOME/${NEW_RELEASE_DIR} &&
                 cd \$HOME/${NEW_RELEASE_DIR} &&
-                git checkout new_master &&
                 cat \$HOME/${PROD_ENV_FILE} >> \$HOME/${NEW_RELEASE_DIR}/${PROD_ENV_FILE}
                 '
                 """
@@ -102,7 +100,8 @@ pipeline {
                 docker-compose -f docker-compose-prod.yaml up --no-deps -d connfrontend &&
                 docker-compose -f docker-compose-prod.yaml build connbackend &&
                 docker-compose -f docker-compose-prod.yaml up --no-deps -d connbackend &&
-                if [ -d \"\$HOME/${OLD_RELEASE_DIR}\" ]; then rm -rf \"\$HOME/${OLD_RELEASE_DIR}\"; fi
+                docker-compose -f docker-compose-prod.yaml build mongodb &&
+                docker-compose -f docker-compose-prod.yaml up --no-deps -d mongodb &&
                 
                 '
                 """
@@ -111,6 +110,24 @@ pipeline {
         }
     }
     post {
+        success {
+            script {
+                withCredentials([sshUserPrivateKey(
+                                   credentialsId: "${SSH_PROD_CREDENTIALS}",
+                                   keyFileVariable: 'SSH_KEYFILE',
+                                   usernameVariable: 'SSH_USERNAME'
+                                 ),
+                                 usernamePassword(
+                                    credentialsId: "${GIT_CREDENTIALS}",
+                                    passwordVariable: 'GIT_PASS',
+                                    usernameVariable: 'GIT_USER'
+                                 )]) {
+                sh """ssh -i ${SSH_KEYFILE} -o StrictHostKeyChecking=no ${SSH_USERNAME}@${SSH_PROD_IP} \
+                'if [ -d \"\$HOME/${OLD_RELEASE_DIR}\" ]; then rm -rf \"\$HOME/${OLD_RELEASE_DIR}\"; fi'
+                """
+                }
+            }
+        }
         failure {
             script {
                 withCredentials([sshUserPrivateKey(
