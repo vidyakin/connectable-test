@@ -3,7 +3,7 @@ pipeline {
         label 'master'
     }
     environment {
-        GIT_REPO_PATH = 'connectable-project/connectable'
+        GIT_REPO = 'https://github.com:connectable-project/connectable'
         GIT_CREDENTIALS = 'github_conn_http'
         SSH_PROD_CREDENTIALS = 'ssh_conn_prod'
         SSH_PROD_IP = '10.128.10.0'
@@ -12,6 +12,21 @@ pipeline {
         CLOUDFLARE_TOKEN = 'cloudflare_token'
     }
     stages {
+        stage("Git Checkout") {
+            steps {
+                script {
+                   checkout(
+                        scm: [
+                            $class: "GitSCM",
+                            userRemoteConfigs: [[
+                                credentialsId: "${GIT_CREDENTIALS}",
+                                url: "${GIT_REPO}"
+                            ]]
+                        ]
+                    )
+                }
+            }
+        }
         stage("Prepare PROD ENV") {
             steps {
                 cleanWs()
