@@ -3,7 +3,7 @@ pipeline {
         label 'master'
     }
     environment {
-        GIT_REPO = 'https://github.com:connectable-project/connectable'
+        GIT_REPO = 'https://github.com/connectable-project/connectable.git'
         GIT_CREDENTIALS = 'github_conn_http'
         SSH_PROD_CREDENTIALS = 'ssh_conn_prod'
         SSH_PROD_IP = '10.128.10.0'
