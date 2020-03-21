@@ -57,6 +57,10 @@ app.use('/api/outlook/event', require('./calendar'));
 app.use("/role", require('./role/routes'));
 
 var userHandlers = require('./email/index.js');
+app.get('/', (req, res) => {
+res.send('Connectable backend says Hello!!!');
+});
+
 app.route('/auth/forgot_password')
     .get(userHandlers.render_forgot_password_template)
     .post(userHandlers.forgot_password);

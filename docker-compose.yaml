@@ -1,0 +1,47 @@
+version: "3.7"
+services:
+  connbackend:
+    build:
+      context: ./backend
+      args:
+        - DB_URL
+    image: connbackend
+    restart: always
+    depends_on:
+      - mongodb
+    command: bash -c "node deploy_scripts/nodejs_init/wait_for_mongo.js && npm run dev"
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+      - ./backend/static:/app/static
+    ports:
+        - "4000:4000"
+    env_file: .env.dev
+  mongodb:
+    image: mongo:latest
+    restart: always
+    environment:
+      MONGO_DATA_DIR: /data/db
+      MONGO_LOG_DIR: /var/log
+    env_file: .env.dev
+    volumes:
+      - db-data:/data/db
+      - ./mongo_db/mongo_init:/docker-entrypoint-initdb.d
+    ports:
+        - 27017:27017
+  connfrontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    image: connfrontend
+    restart: always
+    depends_on:
+      - connbackend
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    ports:
+        - "8080:8080"
+
+volumes:
+  db-data:
