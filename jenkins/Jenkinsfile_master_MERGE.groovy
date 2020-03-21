@@ -9,6 +9,7 @@ pipeline {
         SSH_PROD_IP = '10.128.10.0'
         PROD_ROOT_DIR = 'connectable'
         PROD_ENV_FILE = '.env.prod'
+        CLOUDFLARE_TOKEN = 'cloudflare_token'
     }
     stages {
         stage("Prepare PROD ENV") {
@@ -31,21 +32,6 @@ pipeline {
                                     usernameVariable: 'MONGO_USER'
                                  )
                 ]) {
-                     NEW_RELEASE_DIR = "${PROD_ROOT_DIR}-${BUILD_NUMBER}"
-                     LAST_SUCCESSFUL_BUILD_ID = sh(
-                        script: "curl http://localhost:8080/job/pilot/lastSuccessfulBuild/buildNumber",
-                        returnStdout: true
-                        ).trim()
-                     OLD_RELEASE_DIR = sh(
-                        script: """
-                                ssh -i ${SSH_KEYFILE} -o StrictHostKeyChecking=no ${SSH_USERNAME}@${SSH_PROD_IP} \
-                                '
-                                OLD_RELEASE_DIRS=\$(basename \$HOME}/${PROD_ROOT_DIR}-${LAST_SUCCESSFUL_BUILD_ID}*) &&
-                                echo \$OLD_RELEASE_DIRS
-                                '
-                               """,
-                        returnStdout: true
-                        ).trim()
                     sh """
                     echo "MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}" >> ${PROD_ENV_FILE}
                     echo "MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}" >> ${PROD_ENV_FILE}
@@ -64,18 +50,15 @@ pipeline {
                                    credentialsId: "${SSH_PROD_CREDENTIALS}",
                                    keyFileVariable: 'SSH_KEYFILE',
                                    usernameVariable: 'SSH_USERNAME'
-                                 ),
-                                 usernamePassword(
-                                    credentialsId: "${GIT_CREDENTIALS}",
-                                    passwordVariable: 'GIT_PASS',
-                                    usernameVariable: 'GIT_USER'
                                  )]) {
                 sh """ssh -i ${SSH_KEYFILE} -o StrictHostKeyChecking=no ${SSH_USERNAME}@${SSH_PROD_IP} \
                 '
-                mkdir \$HOME/${NEW_RELEASE_DIR} &&
-                git clone https://${GIT_USER}:${GIT_PASS}@github.com/${GIT_REPO_PATH} \$HOME/${NEW_RELEASE_DIR} &&
-                cd \$HOME/${NEW_RELEASE_DIR} &&
-                cat \$HOME/${PROD_ENV_FILE} >> \$HOME/${NEW_RELEASE_DIR}/${PROD_ENV_FILE}
+                sudo cp -r "\$HOME/${PROD_ROOT_DIR}" "\$HOME/${PROD_ROOT_DIR}-bak" &&
+                cd \$HOME/${PROD_ROOT_DIR} &&
+                git checkout . &&
+                git checkout new_master &&
+                git pull origin new_master &&
+                cat \$HOME/${PROD_ENV_FILE} >> \$HOME/${PROD_ROOT_DIR}/${PROD_ENV_FILE}
                 '
                 """
                 }
@@ -87,22 +70,14 @@ pipeline {
                                    credentialsId: "${SSH_PROD_CREDENTIALS}",
                                    keyFileVariable: 'SSH_KEYFILE',
                                    usernameVariable: 'SSH_USERNAME'
-                                 ),
-                                 usernamePassword(
-                                    credentialsId: "${GIT_CREDENTIALS}",
-                                    passwordVariable: 'GIT_PASS',
-                                    usernameVariable: 'GIT_USER'
                                  )]) {
                 sh """ssh -i ${SSH_KEYFILE} -o StrictHostKeyChecking=no ${SSH_USERNAME}@${SSH_PROD_IP} \
                 '
-                cd \$HOME/${NEW_RELEASE_DIR}
+                cd \$HOME/${PROD_ROOT_DIR} &&
                 docker-compose -f docker-compose-prod.yaml build connfrontend &&
                 docker-compose -f docker-compose-prod.yaml up --no-deps -d connfrontend &&
                 docker-compose -f docker-compose-prod.yaml build connbackend &&
                 docker-compose -f docker-compose-prod.yaml up --no-deps -d connbackend &&
-                docker-compose -f docker-compose-prod.yaml build mongodb &&
-                docker-compose -f docker-compose-prod.yaml up --no-deps -d mongodb &&
-                
                 '
                 """
                 }
@@ -121,9 +96,16 @@ pipeline {
                                     credentialsId: "${GIT_CREDENTIALS}",
                                     passwordVariable: 'GIT_PASS',
                                     usernameVariable: 'GIT_USER'
+                                 ),
+                                 string(
+                                   credentialsId: "${CLOUDFLARE_TOKEN}",
+                                   variable: 'CF_TOKEN',
+                                   usernameVariable: 'SSH_USERNAME'
                                  )]) {
-                sh """ssh -i ${SSH_KEYFILE} -o StrictHostKeyChecking=no ${SSH_USERNAME}@${SSH_PROD_IP} \
-                'if [ -d \"\$HOME/${OLD_RELEASE_DIR}\" ]; then rm -rf \"\$HOME/${OLD_RELEASE_DIR}\"; fi'
+                sh """curl -X POST "https://api.cloudflare.com/client/v4/zones/3eb26a729ba17d1d214910633e1204cb/purge_cache" \
+                     -H "Authorization: Bearer ${CF_TOKEN}" \
+                     -H "Content-Type:application/json" \
+                     --data '{"purge_everything":true}'
                 """
                 }
             }
@@ -141,7 +123,12 @@ pipeline {
                                     usernameVariable: 'GIT_USER'
                                  )]) {
                 sh """ssh -i ${SSH_KEYFILE} -o StrictHostKeyChecking=no ${SSH_USERNAME}@${SSH_PROD_IP} \
-                'rm -rf \"\$HOME/${NEW_RELEASE_DIR}\"'
+                '
+                sudo cp -r "\$HOME/${PROD_ROOT_DIR}-bak" "\$HOME/${PROD_ROOT_DIR}" &&
+                cd \$HOME/${PROD_ROOT_DIR} &&
+                docker kill connbackend connfrontend &&
+                docker-compose -f docker-compose-prod.yaml up connfrontend connbackend
+                '
                 """
                 }
             }
