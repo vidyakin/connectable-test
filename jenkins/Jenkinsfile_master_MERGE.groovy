@@ -140,7 +140,7 @@ pipeline {
                 sudo cp -r "\$HOME/${PROD_ROOT_DIR}-bak" "\$HOME/${PROD_ROOT_DIR}" &&
                 cd \$HOME/${PROD_ROOT_DIR} &&
                 docker kill connbackend connfrontend &&
-                docker-compose -f docker-compose-prod.yaml up connfrontend connbackend
+                docker-compose -f docker-compose-prod.yaml up -d connfrontend connbackend
                 '
                 """
                 }
