@@ -59,6 +59,11 @@ export const router =  new Router({
           component: view('Structure'),
         },
         {
+          path: '/structure_new',
+          name: 'structure',
+          component: view('StructureNew'),
+        },
+        {
           path: '/project/:_id',
           name: 'project',
           component: view('Project'),

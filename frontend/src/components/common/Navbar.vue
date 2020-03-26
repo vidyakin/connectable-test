@@ -22,7 +22,7 @@
         <img src="@/assets/Icons/Adress book.svg" alt />
         Адресная книга
       </a-menu-item>
-      <a-menu-item :key="this.datauser && `/profile/${this.datauser.result._id}`" :class="{active:isActive == 'profile'}">
+      <a-menu-item :key="this.userKey" :class="{active:isActive == 'profile'}">
         <img src="@/assets/Icons/user.svg" alt />
         Пользователь
       </a-menu-item>
@@ -37,6 +37,10 @@
       <a-menu-item key="/structure" :class="{active:isActive == 'structure'}">
         <img src="@/assets/Icons/Structure.svg" alt />
         Структура
+      </a-menu-item>
+      <a-menu-item key="/structure_new" :class="{active:isActive == 'structure'}">
+        <img src="@/assets/Icons/Structure.svg" alt />
+        Структура (нов.)
       </a-menu-item>
       <!--v-if="$can('read', {'accessEmail': datauser.result.email, '__type': 'User'})"-->
       <a-menu-item key="/settings" class="footer"  :class="{active:isActive == 'settings'}" >
@@ -64,7 +68,7 @@
       <a-menu-item key="/addressBook">
         <img src="@/assets/Icons/Adress book.svg" alt />
       </a-menu-item>
-      <a-menu-item :key="this.datauser && `/profile/${this.datauser.result._id}`">
+      <a-menu-item :key="this.userKey">
         <img src="@/assets/Icons/user.svg" alt />
       </a-menu-item>
       <a-menu-item key="/groups">
@@ -74,6 +78,9 @@
         <img src="@/assets/Icons/calendar.svg" alt />
       </a-menu-item>
       <a-menu-item key="/structure">
+        <img src="@/assets/Icons/Structure.svg" alt />
+      </a-menu-item>
+      <a-menu-item key="/structure_new">
         <img src="@/assets/Icons/Structure.svg" alt />
       </a-menu-item>
       <a-menu-item key="/settings" class="footer"  >
@@ -88,6 +95,9 @@ import { mapGetters } from 'vuex';
 import store from '../../store';
 export default {
   name: 'Navbar',
+  mounted() {
+    //console.log(`datauser: ${JSON.stringify(this.datauser)}`);
+  },
   data() {
     return {
       current: 1,
@@ -106,6 +116,9 @@ export default {
   },
   computed: {
     ...mapGetters(['user','userData']),
+    userKey: function() {
+      return this.datauser && this.datauser.result !== undefined && `/profile/${this.datauser.result._id}` || 'nouser';
+    }
   },
 };
 </script>

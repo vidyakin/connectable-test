@@ -79,7 +79,18 @@ export default {
     },
   },
   beforeCreate() {
-    this.$store.dispatch(GET_NOTIFICATION, store.getters.userData.result._id);
+    // const userData = store.getters.userData;
+    // console.log(`beforeCreate CommentInput: userData=${JSON.stringify(this.userData)}`);
+    // if (userData.result != undefined) {
+    //   this.$store.dispatch(GET_NOTIFICATION, userData.result._id);
+    // }
+  },
+  mounted() {
+    console.log(`mounted CommentInput: userData=${JSON.stringify(this.userData)}`);
+    // error if userData has no 'result' ex.: {"user":"672f0479-2248-4f04-aeb5-f8dacb2f2b29","iat":1585168721,"exp":1585255121}
+    if (this.userData.result != undefined) {
+      this.$store.dispatch(GET_NOTIFICATION, this.userData.result._id);
+    }
   },
   watch: {
     notification(notification) {

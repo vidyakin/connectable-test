@@ -38,7 +38,7 @@ if (localStorage.getItem('token')) {
 
 setAuthInterceptor();
 Vue.axios.defaults.baseURL = `${process.env.VUE_APP_API_URL}`;
-console.log(`FUUUCK - ${process.env.VUE_APP_API_URL}`)
+console.log(`backend address: ${process.env.VUE_APP_API_URL}`)
 setAuthToken(localStorage.getItem('token'));
 
 Vue.use(VueMq, {
