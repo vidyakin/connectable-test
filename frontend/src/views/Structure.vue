@@ -7,7 +7,7 @@
       <div class="structure-header-name">
         Структура
       </div>
-      <div class="structure-header-search" v-if="$can('read', {'accessEmail': datauser.email, '__type': 'User'})">
+      <div class="structure-header-search" v-if="userCanRead">
         <a-button type="primary" v-if="test" @click="openDepartment">Добавить разделы</a-button>
         <a-button type="primary" v-else @click="openCreate">Создать проект</a-button>
       </div>
@@ -48,14 +48,14 @@
                     title="Подтверите удаление"
                     okText="Подтверждаю"
                     cancelText="Отмена"
-                    @confirm="deleteBlock(dep._id)" v-if="$can('read', {'accessEmail': datauser.email, '__type': 'User'})"
+                    @confirm="deleteBlock(dep._id)" v-if="userCanRead"
             >
 
               <a-tooltip title="Удалить">
                 <a-button class="delete-department" icon="delete"></a-button>
               </a-tooltip>
             </a-popconfirm>
-              <a-tooltip title="Редактировать" v-if="$can('read', {'accessEmail': datauser.email, '__type': 'User'})">
+              <a-tooltip title="Редактировать" v-if="userCanRead">
                 <a-button class="delete-department edit" icon="edit" @click="openDepEdit(dep.name, dep.users, dep._id)"></a-button>
               </a-tooltip>
             </div>
@@ -92,14 +92,14 @@
                         title="Подтверите удаление"
                         okText="Подтверждаю"
                         cancelText="Отмена"
-                        @confirm="deleteBlock(dep_2._id)" v-if="$can('read', {'accessEmail': datauser.email, '__type': 'User'})"
+                        @confirm="deleteBlock(dep_2._id)" v-if="userCanRead"
                 >
                   <a-tooltip title="Удалить">
                     <a-button class="delete-department" icon="delete"></a-button>
                   </a-tooltip>
 
                 </a-popconfirm>
-                <a-tooltip title="Редактировать" v-if="$can('read', {'accessEmail': datauser.email, '__type': 'User'})">
+                <a-tooltip title="Редактировать" v-if="userCanRead">
                   <a-button class="delete-department edit" icon="edit" @click="openDepEdit(dep_2.name, dep_2.users, dep_2._id)"></a-button>
                 </a-tooltip>
               </div>
@@ -107,7 +107,7 @@
               <div class="c-structure__child__row ">
 
                 <!-- <div class="c-structure__child__item" v-for="(dep_3, index) in departments" v-if="(dep_3.level == 3 && dep_3.parent.label == dep_2.name)" :key="index"> -->
-                <div class="c-structure__child__item" v-for="(dep_3, index) in departments.filter(e => e.level == 3 && e.parent.label == e.name)" :key="index">
+                <div class="c-structure__child__item" v-for="(dep_3, index) in departments" :key="index">
 
                   <div class="c-structure__child__article">
                     <a-popover placement="bottom" trigger="click">
@@ -135,14 +135,14 @@
                             title="Подтверите удаление"
                             okText="Подтверждаю"
                             cancelText="Отмена"
-                            @confirm="deleteBlock(dep_3._id)" v-if="$can('read', {'accessEmail': datauser.email, '__type': 'User'})"
+                            @confirm="deleteBlock(dep_3._id)" v-if="userCanRead"
                     >
                       <a-tooltip title="Удалить">
                         <a-button class="delete-department" icon="delete"></a-button>
                       </a-tooltip>
 
                     </a-popconfirm>
-                    <a-tooltip title="Редактировать" v-if="$can('read', {'accessEmail': datauser.email, '__type': 'User'})">
+                    <a-tooltip title="Редактировать" v-if="userCanRead">
                       <a-button class="delete-department edit" icon="edit" @click="openDepEdit(dep_3.name, dep_3.users, dep_3._id)"></a-button>
                     </a-tooltip>
                   </div>
@@ -177,14 +177,14 @@
                                 title="Подтверите удаление"
                                 okText="Подтверждаю"
                                 cancelText="Отмена"
-                                @confirm="deleteBlock(dep_4._id)" v-if="$can('read', {'accessEmail': datauser.email, '__type': 'User'})"
+                                @confirm="deleteBlock(dep_4._id)" v-if="userCanRead"
                         >
                           <a-tooltip title="Удалить">
                             <a-button class="delete-department" icon="delete"></a-button>
                           </a-tooltip>
 
                         </a-popconfirm>
-                        <a-tooltip title="Редактировать" v-if="$can('read', {'accessEmail': datauser.email, '__type': 'User'})">
+                        <a-tooltip title="Редактировать" v-if="userCanRead">
                           <a-button class="delete-department edit" icon="edit" @click="openDepEdit(dep_4.name, dep_4.users, dep_4._id)"></a-button>
                         </a-tooltip>
                       </div>
@@ -349,6 +349,11 @@
     },
     computed: {
       ...mapGetters(['departments', 'users', 'userData']),
+      userCanRead: function() {
+        const val = Boolean(this.datauser) && this.$can('read', {'accessEmail': this.datauser.email, '__type': 'User'});
+        console.log(`userCanRead: datauser=${JSON.stringify(this.datauser)} val=${val}`)
+        return val;
+      }
     },
     watch: {
       users(users) {
@@ -374,7 +379,7 @@
             }
             return row;
           }
-        });
+        }).filter(e => e.level == 3 && e.parent.label == e.name);
       },
     },
 

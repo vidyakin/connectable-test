@@ -67,7 +67,11 @@ export const getUser = (context: any, userId: number) => {
   return Vue.axios
     .get(`api/user/${userId}`)
     .then((response: any) => {
+      console.log(`getUser then: ${response.data.result}`);
       context.commit(SET_CURRENT_USER, response.data.result);
+    })
+    .catch(e => {
+      console.log(`getUser Error: ${e}`);
     });
 };
 
