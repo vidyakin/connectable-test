@@ -10,7 +10,7 @@ const calendarService = require('./calendar.service')
  *
  */
 exports.getAllEvents = async (req, res, next) => {
-  console.log('nu privet eta toka nachala')
+  console.log('calendar:getAllEvents')
   const { data, error } = await calendarService.getAllEvents(req.headers.authorization, req.query)
   console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@')
   console.log(data)
@@ -29,7 +29,7 @@ exports.getAllEvents = async (req, res, next) => {
  *
  */
 exports.getEvent = async (req, res, next) => {
-  console.log('nu privet eta toka nachala')
+  console.log('calendar:getEvent')
   const { data, error } = await calendarService.getEvent(req.headers.authorization, req.params.id)
   console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@@@')
   console.log(data)
