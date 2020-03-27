@@ -1,16 +1,18 @@
 <template>
-  <div class='org-chart'>
-    <a-page-header
-      style='border: 1px solid rgb(235, 237, 240)'
-      title='Структура'
-    >
-    <template slot='extra'>
-      <a-button key='3' type='primary'>Редактировать</a-button>
-    </template>
-    </a-page-header>
+  <div class='structure'>
+    <div class="structure-header">
+      <div class="structure-header-name">
+        Структура организации
+      </div>
+      <div class="structure-header-search" v-if="canEdit">
+        <div class="structure-header-deptName">{{ currentDept.text || '' }}</div>
+        <a-button type="primary" v-if="test" @click="addDepartment">Добавить раздел</a-button>
+        <a-button type="primary" v-else @click="openCreate">Создать проект</a-button>
+      </div>
+    </div>
     <a-tabs :animated='false' :tabBarGutter='10'>
       <a-tab-pane tab='Отделы' key='1'>
-          <Departments />        
+          <Departments ref="structure" @changeCurrDept="setCurrentDept($event)" />        
       </a-tab-pane>
       <a-tab-pane tab='Проекты' key='2' />
     </a-tabs>
@@ -28,24 +30,90 @@ export default {
   },
   data() {
     return {
-      visible: false,
-      visible2: true,
-      name: 'Vasya'
+      canEdit: true,
+      test: true,
+      currentDept: {}
     };
+  },
+  methods: {
+    addDepartment() {
+      this.$refs.structure.handleShow({type: 'new', dept: this.currentDept });
+    },
+    editDepartment() {
+      this.$refs.structure.handleShow({type: 'edit', dept: this.currentDept });
+    },
+    /**
+     * @param deptInfo Данные о выбранном департаменте, структура { id, text }
+     */
+    setCurrentDept(deptInfo) {
+      this.currentDept = deptInfo;
+    }
   }
 };
 </script>
 
-<style>
+<style lang="scss">
 /* .home {
   width: 1260px;
   margin: 0 auto;
 } */
-
-
-/* модифицируем стили AntDesign для приближения к макету */
-.ant-tabs-bar {
-  margin: 0 !important;
+.ant-tabs {
+  text-align: left;
 }
 
+/* модифицируем стили AntDesign для приближения к макету */
+.ant-tabs {
+  background-color: white;
+  margin: 30px 0;
+
+  .ant-tabs-nav-scroll {
+    text-align: left;
+  }
+}
+
+.structure {
+    padding: 30px;
+
+    height: calc(100vh - 210px);
+    overflow: auto;
+    background-color: #f0f0f7;
+
+    @media (max-width: 767px) {
+      padding: 20px 15px;
+    }
+
+    &-header {
+      display: flex;
+      margin: 0 0 30px;
+      justify-content: space-between;
+
+      @media (max-width: 567px) {
+        flex-wrap: wrap;
+      }
+
+      &-name {
+        font-size: 24px;
+        font-weight: normal;
+        font-style: normal;
+        font-stretch: normal;
+        line-height: 32px;
+        letter-spacing: normal;
+        text-align: left;
+        color: #43425d;
+
+        @media (max-width: 567px) {
+          flex: 1 0 100%;
+          margin-bottom: 15px;
+        }
+      }
+
+      &-search {
+        display: flex;
+        align-items: center;
+      }
+      &-deptName {
+        margin-right: 20px;
+      }
+    }
+}
 </style>

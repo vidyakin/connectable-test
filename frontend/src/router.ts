@@ -60,7 +60,7 @@ export const router =  new Router({
         },
         {
           path: '/structure_new',
-          name: 'structure',
+          name: 'structure_new',
           component: view('StructureNew'),
         },
         {
