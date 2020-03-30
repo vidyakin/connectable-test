@@ -2,6 +2,7 @@
   <a-drawer
     title="Создать группу"
     :closable="true"
+    :width="500"
     @close="onClose"
     destroyOnClose
     :visible="visible"
@@ -11,15 +12,10 @@
       <div class="form-row">
         <div class="row">
           <div class="col-sm-12">
-            <div class="label">Названия</div>
             <a-form-item>
               <app-input
-                placeholder="Названия"
-                v-decorator="['name', {
-                rules: [
-                { required: true, message: 'Название не может быть пустым!', }
-                ]
-              }]"
+                placeholder="Название" label="Название"
+                v-decorator="getDecoratorData('name')"
                 class="secondary form-input"
               ></app-input>
             </a-form-item>
@@ -30,11 +26,7 @@
             <a-form-item>
               <a-textarea
                 placeholder="Описание"
-                v-decorator="['description', {
-                rules: [
-                { required: true, message: 'Описание не может быть пустым!', }
-                ]
-              }]"
+                v-decorator="getDecoratorData('description')"
                 class="secondary form-input"
               ></a-textarea>
             </a-form-item>
@@ -42,7 +34,7 @@
 
           <div class="col-sm-12">
             <div class="label">Тип</div>
-            <a-select @change="handleChange">
+            <a-select @change="handleChange" defaultValue="0">
               <a-select-option value="0">Открытая</a-select-option>
               <a-select-option value="1">Закрытая</a-select-option>
               <a-select-option value="2">Приватная</a-select-option>
@@ -76,6 +68,17 @@ export default {
       type: 1,
       statusEmailSend: false,
       userinfo: (store.getters.userData.result ? store.getters.userData.result : store.getters.user.result),
+      rules: { 
+        name: [
+          { required: true, message: 'Название не может быть пустым!', transform: this.tr },
+          { max:50, message: "Максимальная длина заголовка - 50 символов", transform: this.tr }
+        ],
+        description: [
+          { required: true, message: 'Описание не может быть пустым!', transform: this.tr },
+          { max: 250, message: "Максимальная длина описания - 250 символов", transform: this.tr }
+        ],
+        type: [{ required: true, message: 'Тип группы не может быть пустым!'}]
+      }
     };
   },
   components: {
@@ -89,9 +92,16 @@ export default {
     onClose() {
       this.close();
     },
+    tr(v) {
+      return v === undefined ? '' : v.trim()
+    },
+    getDecoratorData(n) {
+      const result = [ n, { rules: this.rules[n] } ];
+      return result;
+    },
     createGroup(e) {
       e.preventDefault();
-      this.form.validateFieldsAndScroll((err, formFields) => {
+      this.form.validateFields((err, formFields) => {
         if (!err) {
           this.createButtonSpinning = true;
           this.$store
@@ -141,7 +151,7 @@ export default {
   }
 
   .ant-drawer-content-wrapper {
-    width: 20rem !important;
+    // width: 25rem !important; // правильнее указывать ширину в свойстве компонента a-drawer
     overflow: auto;
     height: 100vh;
 

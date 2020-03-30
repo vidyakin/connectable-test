@@ -48,7 +48,7 @@
     import { RESET_PASSWORD } from '../store/user/actions.type';
     export default Vue.extend({
         name: 'ResetPassword',
-        data () {
+        data() {
             return {
                 user: {
                     email: '',
@@ -58,7 +58,7 @@
                 },
                 submitted: false,
                 disabled: false,
-            }
+            };
         },
         computed: {
             ...mapGetters(['resetInfo', 'userData']),
@@ -74,7 +74,7 @@
                         .dispatch(RESET_PASSWORD, this.user).finally(() => {
                         this.submitted = false;
                         this.disabled = false;
-                        if(this.resetInfo.status === 200) {
+                        if (this.resetInfo.status === 200) {
                             this.user.newPassword = '';
                             this.user.verifyPassword = '';
                         }

@@ -68,12 +68,15 @@
                     this.$store
                         .dispatch(FORGOT_PASSWORD, {
                             email: this.user.email
-                        }).finally(() => {
-                        this.submitted = false;
-                        this.disabled = false;
-                        if (this.forgotInfo.status !== 404) this.user.email = '';
-                    });
-
+                        })
+                        .catch(e => {
+                            console.log(e);
+                        }) 
+                        .finally((what) => {
+                            this.submitted = false;
+                            this.disabled = false;
+                            if (this.forgotInfo.status !== 404) this.user.email = '';
+                        });
                 }
             },
         },

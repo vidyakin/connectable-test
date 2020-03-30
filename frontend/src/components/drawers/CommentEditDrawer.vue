@@ -98,7 +98,7 @@
         }
 
         .ant-drawer-content-wrapper {
-            width: 20rem !important;
+            // width: 20rem !important;
             overflow: auto;
             height: 100vh;
 

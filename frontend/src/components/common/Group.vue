@@ -21,7 +21,7 @@
       </div>
     </div>
     <div class="group-content" v-if="group.participants">
-      <div class="group-content-participant" v-for="participant in group.participants">
+      <div class="group-content-participant" v-for="participant in group.participants" :key="participant._id">
         <!--<a-avatar :src="participant.googleImage"></a-avatar>-->
         <div class="group-content-participant-info">
           <div
@@ -55,7 +55,7 @@
       </div>
     </div>
     <div class="group-content" v-if="group.participants">
-      <div class="group-content-participant" v-for="participant in group.participants">
+      <div class="group-content-participant" v-for="participant in group.participants" :key="participant._id">
         <!--<a-avatar :src="participant.googleImage"></a-avatar>-->
         <div class="group-content-participant-info">
           <div

@@ -15,11 +15,7 @@
                             <app-input
                                     label="Названия"
                                     placeholder="Названия"
-                                    v-decorator="['name', {
-                rules: [
-                { required: true, message: 'Название не может быть пустым!', }
-                ]
-              }]"
+                                    v-decorator="['name', { rules: [{ required: true, message: 'Название не может быть пустым!', }]}]"
                                     class="secondary form-input"
                             ></app-input>
                         </a-form-item>
@@ -38,7 +34,7 @@
                                 @change="handleChangeDep"
                                 :notFoundContent="'Раздел не найдено'"
                         >
-                            <a-select-option v-for="d in departments" :key="d._id" v-if="depLevels.arrayOne.indexOf(d._id) == -1 && depLevels.arrayTwo.indexOf(d._id) == -1 && depLevels.arrayThree.indexOf(d._id) == -1">{{d.name}}</a-select-option>
+                            <a-select-option v-for="d in filtered_departments" :key="d._id">{{d.name}}</a-select-option>
                         </a-select>
                         </a-form-item>
                     </div>
@@ -47,14 +43,12 @@
                         <a-form-item>
                             <div class="label">Участники</div>
                             <a-select v-decorator="['members']"
-                                    labelInValue
-                                    mode="multiple"
-                                    placeholder="Выберите пользователей"
+                                    labelInValue mode="multiple"
+                                    placeholder="Выберите пользователей" :notFoundContent="'Пользователя не найдено'"
                                     style="width: 100%"
                                     :filterOption="false"
                                     @search="search"
                                     @change="handleChange"
-                                    :notFoundContent="'Пользователя не найдено'"
                             >
                                 <a-select-option v-for="d in data" :key="d._id">{{d.firstName + ' ' + d.lastName}}</a-select-option>
                             </a-select>
@@ -100,6 +94,16 @@
         },
         computed: {
             ...mapGetters(['user', 'users', 'departments']),
+            filtered_departments: function() {
+                if (!this.departments) {
+                    return []
+                };
+                return this.departments.filter(d => 
+                    this.depLevels.arrayOne.indexOf(d._id) == -1 
+                    && this.depLevels.arrayTwo.indexOf(d._id) == -1 
+                    && this.depLevels.arrayThree.indexOf(d._id) == -1
+                )
+            }
         },
         methods: {
             onClose() {
@@ -129,8 +133,7 @@
                     return (
                         el.firstName.toLowerCase().indexOf(text) !== -1 ||
                         el.lastName.toLowerCase().indexOf(text) !== -1 ||
-                        (el.firstName + ' ' + el.lastName).toLowerCase().indexOf(text) !==
-                        -1 ||
+                        (el.firstName + ' ' + el.lastName).toLowerCase().indexOf(text) !== -1 ||
                         (el.lastName + ' ' + el.firstName).toLowerCase().indexOf(text) !== -1
                     );
                 });
@@ -138,7 +141,6 @@
             searchdep(text) {
                 text = text.toLowerCase();
                 this.data = this.departments.filter(el => {
-
                     return (
                         el.name.toLowerCase().indexOf(text) !== -1
                     );
@@ -206,7 +208,7 @@
         }
 
         .ant-drawer-content-wrapper {
-            width: 20rem !important;
+            // width: 20rem !important;
             overflow: auto;
             height: 100vh;
 

@@ -34,7 +34,7 @@
             <app-login-google />
           
                 <div class="login-page">
-                    <a class="f6 link dim br2 ph3 pv2 mb2 dib white bg-dark-blue" v-bind:href="outlookUrl">Login with Outlook</a>
+                    <a class="f6 link dim br2 ph3 pv2 mb2 dib white bg-dark-blue" v-bind:href="outlookUrl">Войти через учетную запись Microsoft</a>
                 </div>
 
             <div class="col-sm-4 offset-sm-4">
@@ -60,7 +60,7 @@ import {
 import store from '../store';
 import AppSuccessRegister from '../components/notification/SuccessRegister.vue';
 export default Vue.extend({
-    data () {
+    data() {
         return {
             user: {
                 email: '',
@@ -72,7 +72,7 @@ export default Vue.extend({
                 password: false
             },
             outlookUrl: ''
-        }
+        };
     },
     components: {
         AppSuccessRegister,
@@ -80,7 +80,7 @@ export default Vue.extend({
         AppLoginOutlook
     },
     methods: {
-        handleSubmit (e) {
+        handleSubmit(e) {
             this.submitted = true;
             this.error.email = false;
             this.error.password = false;
@@ -95,8 +95,7 @@ export default Vue.extend({
                             this.$router.push({
                                 name: 'about'
                             }, () => {});
-                        }
-                        else {
+                        } else {
                             this.submitted = true;
                             if (store.getters.errorLogin.email) {
                                 document.getElementById('email').classList.add('is-invalid');
@@ -116,7 +115,6 @@ export default Vue.extend({
         const a = Vue.axios.get('/api/outlook/login-url')
             .then((response) => {
                 this.outlookUrl = response.data.loginUrl;
-                
             }).catch((e) => {
                 console.log(e);
             });

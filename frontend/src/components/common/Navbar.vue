@@ -38,7 +38,7 @@
         <img src="@/assets/Icons/Structure.svg" alt />
         Структура
       </a-menu-item>
-      <a-menu-item key="/structure_new" :class="{active:isActive == 'structure'}">
+      <a-menu-item key="/structure_new" :class="{active:isActive == 'structure_new'}">
         <img src="@/assets/Icons/Structure.svg" alt />
         Структура (нов.)
       </a-menu-item>
@@ -47,6 +47,10 @@
         <img src="@/assets/Icons/setting.svg" alt />
         Настройки
       </a-menu-item>
+      <a-menu-item key="/about" :class="{active:isActive == 'about'}">
+        <img src="@/assets/Icons/Structure.svg" alt />
+        О нас
+      </a-menu-item>      
     </a-menu>
 
     <a-menu
@@ -85,6 +89,9 @@
       </a-menu-item>
       <a-menu-item key="/settings" class="footer"  >
         <img src="@/assets/Icons/setting.svg" alt />
+      </a-menu-item>
+       <a-menu-item key="/about">
+        <img src="@/assets/Icons/Structure.svg" alt />
       </a-menu-item>
     </a-menu>
   </div>

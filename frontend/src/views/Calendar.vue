@@ -6,7 +6,7 @@
       <a-button @click="createOpen">Создать событие</a-button>
     </div>
     <div class="calendar-body">
-      <a-calendar v-model="currentDay">
+      <a-calendar v-model="currentDay" :locale="locale">
         <template slot="dateCellRender" slot-scope="value">
           <div v-for="val in getEventsForThisMonth()" :key="val.name"  v-if="getDayFromDate(value).day == getDayFromDate(val.date).day">
             <div
@@ -87,6 +87,7 @@
 import Vue from 'vue';
 import moment from 'moment';
 import 'moment/locale/ru';
+import locale from 'ant-design-vue/es/date-picker/locale/ru_RU';
 import AppAddEventModal from '../components/modal/AddEventModal.vue';
 import { DELETE_EVENT, GET_EVENTS } from '../store/user/actions.type';
 import { mapGetters } from 'vuex';
@@ -112,6 +113,7 @@ export default Vue.extend({
       ],
       weekday: ['ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ', 'ВС'],
       userinfo: (store.getters.userData.result ? store.getters.userData.result : store.getters.user.result),
+      locale
     };
   },
   beforeCreate() {

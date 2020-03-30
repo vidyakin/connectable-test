@@ -55,10 +55,10 @@
 
 <script>
 
-import { VoBasic } from 'vue-orgchart'; 
+import { VoBasic } from 'vue-orgchart';
 import { VueContext } from 'vue-context';
-import "vue-context/src/sass/vue-context.scss";
-import 'vue-orgchart/dist/style.min.css'
+import 'vue-context/src/sass/vue-context.scss';
+import 'vue-orgchart/dist/style.min.css';
 import DepartmentEditForm from './DepartmentEditForm';
 
 
@@ -106,7 +106,7 @@ export default {
                 }
                 ]
             }
-        }
+        };
     },
     mounted() {
         let cc = document.getElementById('chart-container');
