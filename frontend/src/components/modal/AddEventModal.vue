@@ -18,13 +18,13 @@
       <div class="event-date">
         <label>Дата</label>
         <div>
-          <a-date-picker v-model="date"></a-date-picker>
+          <a-date-picker v-model="date" :locale="locale"></a-date-picker>
         </div>
       </div>
       <div class="event-time">
         <label>Время</label>
         <div>
-          <a-time-picker format="HH:mm" @change="changeTime"></a-time-picker>
+          <a-time-picker format="HH:mm" @change="changeTime" placeholder="Время"></a-time-picker>
         </div>
       </div>
     </div>
@@ -58,7 +58,7 @@
       <label>
         Цвет
       </label>
-      <svg viewBox="0 0 20 20" height="30px" width="30px" v-for="color in colors" @click="setCurrentColor(color)">
+      <svg viewBox="0 0 20 20" height="30px" width="30px" v-for="color in colors" @click="setCurrentColor(color)" :key="color">
         <circle cx="10" cy="10" r="10" :fill="color.color">
         </circle>
         <circle cx="10" cy="10" r="7" :fill="currentColor.color === color.color ? color.color : 'white'">
@@ -75,6 +75,7 @@
   import {mapGetters} from 'vuex';
   import AppInput from '../common/Input';
   import moment from 'moment';
+  import locale from 'ant-design-vue/es/date-picker/locale/ru_RU';
   import {CREATE_EVENT, UPDATE_USER_INFO, GET_USERS} from '../../store/user/actions.type';
   import store from '../../store';
   import {GET_NOTIFICATION} from '../../store/notification/actions.type';
@@ -99,6 +100,7 @@
         date: moment(),
         time: moment.relTime,
         comment: '',
+        locale,
         statusEmailSend: false,
         userInfo: (store.getters.userData ? store.getters.userData : store.getters.user),
       };

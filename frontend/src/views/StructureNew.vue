@@ -21,7 +21,7 @@
 
 <script>
 
-import Departments from '../components/structure/Departments';
+import Departments from '../components/structure/Departments'
 
 export default {
   name: 'Home',
@@ -33,23 +33,23 @@ export default {
       canEdit: true,
       test: true,
       currentDept: {}
-    };
+    }
   },
   methods: {
     addDepartment() {
-      this.$refs.structure.handleShow({type: 'new', dept: this.currentDept });
+      this.$refs.structure.handleShow({type: 'new', dept: this.currentDept })
     },
     editDepartment() {
-      this.$refs.structure.handleShow({type: 'edit', dept: this.currentDept });
+      this.$refs.structure.handleShow({type: 'edit', dept: this.currentDept })
     },
     /**
      * @param deptInfo Данные о выбранном департаменте, структура { id, text }
      */
     setCurrentDept(deptInfo) {
-      this.currentDept = deptInfo;
+      this.currentDept = deptInfo
     }
   }
-};
+}
 </script>
 
 <style lang="scss">

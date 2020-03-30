@@ -15,10 +15,10 @@
 
     <a-tabs defaultActiveKey="1" @change="callback">
       <a-tab-pane tab="Структура" key="1">
-        <div class="c-structure">
+        <div class="c-structure" v-if="departments">
 
           <!-- <div class="c-structure__head" v-for="(dep, index) in departments" v-if="(dep.level == 1)" :key="index" > -->
-          <div class="c-structure__head" v-for="(dep, index) in departments.filter(e=>(e.level === 1))" :key="index" >
+          <div class="c-structure__head" v-for="(dep, index) in departments.filter(e => e.level === 1)" :key="index" >
             <div class="structure-el">
 
             <a-popover placement="bottom" trigger="click" >
@@ -63,8 +63,7 @@
 
           <div class="c-structure__row" >
 
-            <!-- <div class="c-structure__item" v-for="(dep_2, index) in departments" v-if="(dep_2.level > 1 && dep_2.level < 3)" :key="index"> -->
-            <div class="c-structure__item" v-for="(dep_2, index) in departments.filter(e=>e.level > 1 && e.level < 3)" :key="index">
+            <div class="c-structure__item" v-for="(dep_2, index) in departments.filter(e => e.level > 1 && e.level < 3)" :key="index">
 
               <div class="c-structure__article" v-if="(dep_2.level == 2)">
                 <a-popover placement="bottom" trigger="click" >
@@ -107,7 +106,7 @@
               <div class="c-structure__child__row ">
 
                 <!-- <div class="c-structure__child__item" v-for="(dep_3, index) in departments" v-if="(dep_3.level == 3 && dep_3.parent.label == dep_2.name)" :key="index"> -->
-                <div class="c-structure__child__item" v-for="(dep_3, index) in departments" :key="index">
+                <div class="c-structure__child__item" v-for="(dep_3, index) in departments.filter(e => e.level == 3 && e.parent.label == e.name)" :key="index">
 
                   <div class="c-structure__child__article">
                     <a-popover placement="bottom" trigger="click">
@@ -147,7 +146,7 @@
                     </a-tooltip>
                   </div>
                   <!-- было v-if="(dep_4.level == 4 && dep_4.parent.label == dep_3.name)" -->
-                  <div class="c-structure__detail__row" v-for="(dep_4, index) in departments.filter(e => e.level == 4 && dep_4.parent.label == dep_3.name)" :key="index">
+                  <div class="c-structure__detail__row" v-for="(dep_4, index) in departments.filter(e => e.level === 4 && dep_4.parent.label === dep_3.name)" :key="index">
 
                     <div class="c-structure__detail__item">
 
@@ -349,9 +348,9 @@
     },
     computed: {
       ...mapGetters(['departments', 'users', 'userData']),
-      userCanRead: function() {
-        const val = Boolean(this.datauser) && this.$can('read', {'accessEmail': this.datauser.email, '__type': 'User'});
-        console.log(`userCanRead: datauser=${JSON.stringify(this.datauser)} val=${val}`)
+      userCanRead() {
+        const val = Boolean(this.datauser) && this.$can('read', {accessEmail: this.datauser.email, __type: 'User'});
+        console.log(`userCanRead: datauser=${JSON.stringify(this.datauser)} val=${val}`);
         return val;
       }
     },
@@ -371,6 +370,7 @@
       },
 
       departments(departments) {
+        if (!departments) return [];
         const row = [];
         this.dep_arr = departments.map(e => {
           if (Object.size(e.users)) {
@@ -379,7 +379,11 @@
             }
             return row;
           }
-        }).filter(e => e.level == 3 && e.parent.label == e.name);
+        });
+        this.dep_arr = this.dep_arr.filter(e => {
+          // TODO: потом надо понять почему тут массив с элементом равным undef
+          e !== undefined && e.level === 3 && e.parent.label === e.name
+        })
       },
     },
 

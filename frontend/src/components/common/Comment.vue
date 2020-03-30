@@ -151,7 +151,7 @@ export default {
         created: moment(),
         message: this.commentContent,
       };
-      if(this.commentContent) {
+      if (this.commentContent) {
         this.$store
                 .dispatch(SEND_COMMENT, comment)
                 .then(() => (this.commentContent = ''));
@@ -167,16 +167,16 @@ export default {
     deleteComment(comment) {
 
       this.$store.dispatch(DELETE_COMMENT, comment).then(() => {
-                this.$notification['success']({
+                this.$notification.success({
                   message: 'Комментарий удален',
                   placement: 'topRight'
                 });
       });
     },
     deleteAnswer(answer) {
-      const comment = {_id:answer._id, parent: answer.parent.id, type: 'answer'};
+      const comment = {_id: answer._id, parent: answer.parent.id, type: 'answer'};
       this.$store.dispatch(DELETE_COMMENT, comment).then(() => {
-        this.$notification['success']({
+        this.$notification.success({
           message: 'Комментарий удален',
           placement: 'topRight'
         });

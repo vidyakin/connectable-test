@@ -22,6 +22,7 @@
           {{text.firstName}} {{text.lastName}}
         </div>
       </a-table>
+      <a-empty v-if="data.lenght === 0" description="Нет данных" />
     </div>
   </div>
 </template>
@@ -134,12 +135,19 @@ export default {
     },
     searchText(text) {
       this.data = this.fullData.filter(el => {
-        return (
-          el.name.firstName.indexOf(text) !== -1 ||
-          el.name.lastName.indexOf(text) !== -1 ||
-          (el.name.firstName + ' ' + el.name.lastName).indexOf(text) !== -1 ||
-          (el.name.lastName + ' ' + el.name.firstName).indexOf(text) !== -1
-        );
+        let strs = [];
+        strs.push(el.name.firstName);
+        strs.push(el.name.lastName);
+        strs.push(el.name.firstName + ' ' + el.name.lastName);
+        strs.push(el.name.lastName + ' ' + el.name.firstName);
+        strs = strs.join("$").toLowerCase();
+        return strs.indexOf(text.toLowerCase()) !== -1;
+        // return (          
+        //   el.name.firstName.indexOf(loweredText) !== -1 ||
+        //   el.name.lastName.indexOf(loweredText) !== -1 ||
+        //   (el.name.firstName + ' ' + el.name.lastName).indexOf(loweredText) !== -1 ||
+        //   (el.name.lastName + ' ' + el.name.firstName).indexOf(loweredText) !== -1
+        // );
       });
     },
   },

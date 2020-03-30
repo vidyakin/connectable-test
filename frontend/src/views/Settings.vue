@@ -73,7 +73,7 @@
                 error: false,
                 createButtonSpinning: false,
                 userId: (store.getters.userData.result ? store.getters.userData.result._id : ''),
-            }
+            };
         },
         computed: {
             ...mapGetters(['notification', 'userData']),
@@ -88,12 +88,12 @@
                         this.$store
                             .dispatch(PUT_NOTIFICATION, {
                                 ...formFields,
-                                userId:this.userId
+                                userId: this.userId
                             })
                             .finally(() => {
                                 this.createButtonSpinning = false;
                                 this.$store.dispatch(GET_NOTIFICATION, this.userId);
-                                this.$notification['success']({
+                                this.$notification.success({
                                     message: 'Настройки сохранены',
                                     placement: 'topRight'
                                 });
@@ -125,11 +125,11 @@
         },
         watch: {
             notification(notification) {
-                this.settings.addUser = (notification ? notification.addUser: false);
-                this.settings.publications = (notification ? notification.publications: false);
-                this.settings.eventComment = (notification ? notification.eventComment: false);
-                this.settings.eventCalendar = (notification ? notification.eventCalendar: false);
-                this.settings.subscribe = (notification ? notification.subscribe: false);
+                this.settings.addUser = (notification ? notification.addUser : false);
+                this.settings.publications = (notification ? notification.publications : false);
+                this.settings.eventComment = (notification ? notification.eventComment : false);
+                this.settings.eventCalendar = (notification ? notification.eventCalendar : false);
+                this.settings.subscribe = (notification ? notification.subscribe : false);
             }
         }
     });

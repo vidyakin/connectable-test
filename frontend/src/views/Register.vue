@@ -47,7 +47,7 @@ import { INSERT_USER_INFO } from '../store/user/actions.type';
 import {GET_NOTIFICATION} from '../store/notification/actions.type';
 import store from '../store';
 export default Vue.extend({
-  data () {
+  data() {
     return {
       user: {
           firstName: '',
@@ -58,7 +58,7 @@ export default Vue.extend({
       submitted: false,
       error: false,
       statusEmailSend: false,
-    }
+    };
   },
   computed: {
     ...mapGetters(['notification', 'userData']),
@@ -66,25 +66,24 @@ export default Vue.extend({
   methods: {
       handleSubmit(e) {
         this.submitted = true;
-    this.error = false;
+        this.error = false;
         const { firstName, lastName, email, password } = this.user;
 
         if (firstName && lastName && email && password) {
           this.$store
           .dispatch(INSERT_USER_INFO, {
-            firstName:this.user.firstName,
-            lastName:this.user.lastName,
-            email:this.user.email,
-            password:this.user.password,
+            firstName: this.user.firstName,
+            lastName: this.user.lastName,
+            email: this.user.email,
+            password: this.user.password,
             emailSend: this.statusEmailSend
           })
           .finally(() => {
-            if(!store.getters.errorRegister) {
+            if (!store.getters.errorRegister) {
               this.$router.push({
                   name: 'about'
               }, () => {});
-            }
-            else {
+            } else {
               document.getElementById('email').classList.add('is-invalid');
               this.submitted = true;
               this.error = true;
@@ -98,7 +97,7 @@ export default Vue.extend({
   },
   watch: {
     notification(notification) {
-      this.statusEmailSend = (notification && notification.userId == store.getters.userData.result._id ? notification.publications : false);
+      this.statusEmailSend = (notification && notification.userId === store.getters.userData.result._id ? notification.publications : false);
     }
   },
 });
