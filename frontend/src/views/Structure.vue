@@ -36,7 +36,8 @@
                   </div>
 
                 </a-table>
-                <div class="count" v-if="Object.size(dep.users)">{{Object.size(dep.users)}} - {{endingWords(Object.size(dep.users))}} </div>
+                <!-- <div class="count" v-if="Object.size(dep.users)">{{Object.size(dep.users)}} - {{endingWords(Object.size(dep.users))}} </div> -->
+                <div class="count" v-if="len(dep.users)">{{countString(dep.users)}} </div>
               </template>
               <div class="c-structure__link" @click="currentLenth">{{dep.name}}
 
@@ -81,7 +82,7 @@
                       </div>
 
                     </a-table>
-                    <div class="count" v-if="Object.size(dep_2.users)">{{Object.size(dep_2.users)}} - {{endingWords(Object.size(dep_2.users))}} </div>
+                    <div class="count" v-if="len(dep_2.users)">{{ countString(dep_2.users) }} </div>
                   </template>
                   <div class="c-structure__link" @click="currentLenth">{{dep_2.name}}
 
@@ -106,7 +107,7 @@
               <div class="c-structure__child__row ">
 
                 <!-- <div class="c-structure__child__item" v-for="(dep_3, index) in departments" v-if="(dep_3.level == 3 && dep_3.parent.label == dep_2.name)" :key="index"> -->
-                <div class="c-structure__child__item" v-for="(dep_3, index) in departments.filter(e => e.level == 3 && e.parent.label == e.name)" :key="index">
+                <div class="c-structure__child__item" v-for="(dep_3, index) in departments.filter(e => e.level == 3 && e.parent.label == dep_2.name)" :key="index">
 
                   <div class="c-structure__child__article">
                     <a-popover placement="bottom" trigger="click">
@@ -124,7 +125,7 @@
                           </div>
 
                         </a-table>
-                        <div class="count" v-if="Object.size(dep_3.users)">{{Object.size(dep_3.users)}} - {{endingWords(Object.size(dep_3.users))}} </div>
+                        <div class="count" v-if="len(dep_3.users)">{{ countString(dep_3.users) }} </div>
                       </template>
                       <div class="c-structure__link" @click="currentLenth">{{dep_3.name}}
 
@@ -146,7 +147,7 @@
                     </a-tooltip>
                   </div>
                   <!-- было v-if="(dep_4.level == 4 && dep_4.parent.label == dep_3.name)" -->
-                  <div class="c-structure__detail__row" v-for="(dep_4, index) in departments.filter(e => e.level === 4 && dep_4.parent.label === dep_3.name)" :key="index">
+                  <div class="c-structure__detail__row" v-for="(dep_4, index) in departments.filter(e => e.level === 4 && e.parent.label === dep_3.name)" :key="index">
 
                     <div class="c-structure__detail__item">
 
@@ -166,7 +167,7 @@
                               </div>
 
                             </a-table>
-                            <div class="count" v-if="Object.size(dep_4.users)">{{Object.size(dep_4.users)}} - {{endingWords(Object.size(dep_4.users))}} </div>
+                            <div class="count" v-if="len(dep_4.users)">{{ countString(dep_4.users) }} </div>
                           </template>
                           <div class="c-structure__link" @click="currentLenth">{{dep_4.name}}
 
@@ -231,13 +232,14 @@
     },
 
   ];
-  Object.size = (obj) => {
-    let size = 0;
-    for (key in obj) {
-      if (obj.hasOwnProperty(key)) size++;
-    }
-    return size;
-  };
+  // Может вызывать ошибку при передаче необъявленной переменной
+  // Object.size = (obj) => {
+  //   let size = 0;
+  //   for (key in obj) {
+  //     if (obj.hasOwnProperty(key)) size++;
+  //   }
+  //   return size;
+  // };
   export default {
     components: {
       AppCreateProject,
@@ -268,9 +270,10 @@
       },
       userDataFunc(param) {
         const resData = [];
-        if ( Object.size(param.users)) {
-          for (let i = 0; i < Object.size(param.users); i++) {
-            for (let j = 0; j < Object.size(this.data); j++) {
+        const usersLen = Object.keys(param.users || {}).length;
+        if ( usersLen ) {
+          for (let i = 0; i < usersLen; i++) {
+            for (let j = 0; j < Object.keys(this.data || {}).length; j++) {
 
               if (param.users[i].key === this.data[j].key) {
                 resData[i] = this.data[j];
@@ -284,7 +287,16 @@
         this.userLength = this.users.length;
         // console.log(this.userLength);
       },
-
+      // Количество полей в объекте 
+      len(arr) {
+        return Object.keys(arr || {}).length
+      },
+      // Строка с количеством сотрудников в отделе
+      countString(arr) {
+        const len = Object.keys(arr || {}).length;
+        const descr = this.endingWords(len);
+        return `${len} - ${descr} :)`;
+      },
       callback(key) {
         if (key === '2') {
           this.test = false;
@@ -370,11 +382,16 @@
       },
 
       departments(departments) {
-        if (!departments) return [];
+        if (!departments) {
+          this.dep_arr = [];
+          return;
+        }
         const row = [];
         this.dep_arr = departments.map(e => {
-          if (Object.size(e.users)) {
-            for (let i = 0; i < Object.size(e.users); i++) {
+          // if (e.users && Object.size(e.users)) {
+          const usersLen = Object.keys(e.users || {}).length
+          if (e.users && usersLen) {
+            for (let i = 0; i < usersLen; i++) {
               row[i] = e.users[i].key;
             }
             return row;
