@@ -295,7 +295,7 @@
       countString(arr) {
         const len = Object.keys(arr || {}).length;
         const descr = this.endingWords(len);
-        return `${len} - ${descr} :)`;
+        return `${len} - ${descr}`;
       },
       callback(key) {
         if (key === '2') {
@@ -487,7 +487,8 @@
 
     .ant-tabs {
       background-color: white;
-      margin: 30px 0;
+      height: calc(100vh - 350px);
+      // margin: 30px 0; // из-за этого полосы прокрутки при 100% высоте
 
       .ant-tabs-nav-scroll {
         text-align: left;

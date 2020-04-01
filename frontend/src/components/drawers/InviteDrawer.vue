@@ -21,9 +21,9 @@
       >
         <a-select-option v-for="d in data" :key="d._id">{{d.firstName + ' ' + d.lastName}}</a-select-option>
       </a-select>
-      <a-spiner :spinning="buttonSpinning">
+      <a-spin :spinning="buttonSpinning">
         <a-button type="primary" @click="sendInvite">Пригласить</a-button>
-      </a-spiner>
+      </a-spin>
     </div>
   </a-drawer>
 </template>

@@ -64,7 +64,7 @@ export default {
 /* модифицируем стили AntDesign для приближения к макету */
 .ant-tabs {
   background-color: white;
-  margin: 30px 0;
+  // margin: 30px 0; // появлялась полоса прокрутки 
 
   .ant-tabs-nav-scroll {
     text-align: left;
