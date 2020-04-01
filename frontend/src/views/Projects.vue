@@ -10,6 +10,9 @@
     </div>
     <div class="projects-body">
       <app-project v-for="(project, index) in this.filterData" :project="project" :key="index"></app-project>
+      <a-empty v-if="filterData.length == 0">
+        <span slot="description">Ничего не найдено</span>
+      </a-empty>
     </div>
   </div>
 </template>
@@ -82,11 +85,15 @@
     border-radius: 5rem;
   }
 .projects {
-  height: 100%;
+  // height: 100%;
+  height: 100vmin;
+  // background-color: beige; // для видимого теста высоты блока
+
   &-body {
     margin: 1.5rem 3.125rem 1rem 3.125rem;
     display: flex;
     flex-wrap: wrap;
+    // justify-content: center; // TODO: под вопросом надо ли центрировать или так норм
   }
 }
 </style>

@@ -11,9 +11,9 @@ outlook.calendar.updateEventAsync = util.promisify(outlook.calendar.updateEvent)
 
 // get all events list
 exports.getAllEvents = async (token, { top = 20 }) => {
-  console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
+  console.log('--- Начало получения всех событий -----')
   let aud = jwt.decode(token);
-  console.log(aud)
+  console.log('Decoded token', aud)
   try {
     // Get the events from outlook api
     const result = await outlook.calendar.getEventsAsync({
@@ -25,11 +25,12 @@ exports.getAllEvents = async (token, { top = 20 }) => {
         '$top': top
       }
     })
-    console.log(result)
-    console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
+    console.log('Result of outlook.calendar.getEventsAsync: ', result)
+    console.log('--- Конец получения событий ---')
     return { data: result.value }
   } catch (err) {
-    console.log('ERROR IS ZALUPA:' + err)
+    const errObj = 
+    console.log(`Ошибка получения событий: ${err.code}, ${err.message} full err (${typeof err}): ${err}`)
     return {
       error: {
         code: err.code, 

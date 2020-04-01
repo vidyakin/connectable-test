@@ -39,6 +39,7 @@ export const createEvent = (context: any, event: any) => {
 };
 
 export const getEvents = (context: any, userId: any) => {
+  
   return Vue.axios
     .get(`api/event/`, {params: {filter: {userId}}})
     .then((response: any) => {

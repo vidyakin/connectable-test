@@ -9,28 +9,32 @@
       </div>
     </div>
     <div class="address-body">
-      <a-table
-        v-if="users"
-        :columns="columns"
-        :dataSource="data"
-        @change="onChange"
-        :pagination="false"
-        size="small"
-      >
-        <div slot="name" slot-scope="text" class="table-row-name" @click="goTo(text.id)">
-          <a-avatar :src="text.googleImage"></a-avatar>
-          {{text.firstName}} {{text.lastName}}
-        </div>
-      </a-table>
-      <a-empty v-if="data.lenght === 0" description="Нет данных" />
+      <a-config-provider>
+        <template v-slot:renderEmpty>
+          <!-- изображение не меняется на SIMPLE несмотря на код как в справке -->
+          <a-empty description="Сотрудники не найдены" :image="imgEmpty" />
+        </template>
+        <a-table
+          v-if="users"
+          :columns="columns"
+          :dataSource="data"
+          @change="onChange"
+          :pagination="false"
+          size="small"
+        >
+          <div slot="name" slot-scope="text" class="table-row-name" @click="goTo(text.id)">
+            <a-avatar :src="text.googleImage"></a-avatar>
+            {{text.firstName}} {{text.lastName}}
+          </div>
+        </a-table>
+      </a-config-provider>
     </div>
   </div>
 </template>
 <script>
+import { Empty } from 'ant-design-vue';
 import { GET_USERS } from '../store/user/actions.type';
 import { mapGetters } from 'vuex';
-
-
 
 const columns = [
   {
@@ -102,8 +106,10 @@ export default {
       data: [],
       columns,
       searchText: '',
+      imgEmpty: ''
     };
   },
+  components: { Empty },
   methods: {
     onChange,
     pressEnter() {
@@ -114,10 +120,14 @@ export default {
     },
   },
   computed: {
-    ...mapGetters(['users']),
+    ...mapGetters(['users'])
+  },
+  beforeCreate() {
+    this.imgEmpty = Empty.PRESENTED_IMAGE_SIMPLE;
   },
   beforeMount() {
     this.$store.dispatch(GET_USERS);
+    
   },
   watch: {
     users(users) {

@@ -58,7 +58,7 @@
       <label>
         Цвет
       </label>
-      <svg viewBox="0 0 20 20" height="30px" width="30px" v-for="color in colors" @click="setCurrentColor(color)" :key="color">
+      <svg viewBox="0 0 20 20" height="30px" width="30px" v-for="color in colors" @click="setCurrentColor(color)" :key="color.color">
         <circle cx="10" cy="10" r="10" :fill="color.color">
         </circle>
         <circle cx="10" cy="10" r="7" :fill="currentColor.color === color.color ? color.color : 'white'">
