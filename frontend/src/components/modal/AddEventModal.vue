@@ -37,6 +37,7 @@
                 placeholder="Выберите пользователей"
                 style="width: 100%"
                 :filterOption="false"
+                :value="selectedItems"
                 @search="search"
                 @change="handleChange"
                 :notFoundContent="'Пользователя не найдено'"
@@ -96,7 +97,8 @@
         },
         name: '',
         data: [],
-        selectVal: '',
+        selectedItems: [],
+        //selectVal: '',
         date: moment(),
         time: moment.relTime,
         comment: '',
@@ -116,7 +118,7 @@
         event.userId = this.userInfo.result._id;
         event.userEmail = this.userInfo.result.email;
         event.emailSend = this.statusEmailSend;
-        event.attendees = (this.selectVal ? this.selectVal.map(el => {
+        event.attendees = (this.selectedItems ? this.selectedItems.map(el => {
           return {'email': el.key};
         }) : '');
 
@@ -134,11 +136,12 @@
         this.time = timeString;
       },
       handleChange(value) {
-        Object.assign(this, {
-          value,
-          data: [],
-        });
-        this.selectVal = value;
+        this.selectedItems = value
+        // Object.assign(this, {
+        //   value,
+        //   data: [],
+        // });
+        // this.selectVal = value;
       },
       search(text) {
         text = text.toLowerCase();
@@ -173,8 +176,9 @@
           : false);
       }
     },
-    mounted() {
-      this.$store.dispatch(GET_USERS);
+    async mounted() {
+      await this.$store.dispatch(GET_USERS);
+      this.data = this.users
     },
   };
 </script>

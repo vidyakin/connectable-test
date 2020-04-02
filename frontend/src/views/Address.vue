@@ -14,8 +14,10 @@
           <!-- изображение не меняется на SIMPLE несмотря на код как в справке -->
           <a-empty description="Сотрудники не найдены" :image="imgEmpty" />
         </template>
+        
         <a-table
           v-if="users"
+          :locale="{filterReset:'Отмена'}"
           :columns="columns"
           :dataSource="data"
           @change="onChange"
@@ -151,7 +153,7 @@ export default {
         strs.push(el.name.firstName + ' ' + el.name.lastName);
         strs.push(el.name.lastName + ' ' + el.name.firstName);
         strs = strs.join("$").toLowerCase();
-        return strs.indexOf(text.toLowerCase()) !== -1;
+        return strs.indexOf(text.toLowerCase().trim()) !== -1;
         // return (          
         //   el.name.firstName.indexOf(loweredText) !== -1 ||
         //   el.name.lastName.indexOf(loweredText) !== -1 ||
