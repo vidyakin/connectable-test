@@ -72,12 +72,7 @@ export default {
       this.fullData = [...this.filterData];
     },
     searchText(text) {
-      this.filterData = this.fullData.filter(el => {
-        return (
-          el.name.toLowerCase().indexOf(text.toLowerCase()) !== -1
-        );
-      });
-
+      this.filterData = this.fullData.filter( el => el.name.toLowerCase().indexOf(text.toLowerCase().trim()) !== -1 );
     },
   },
 };

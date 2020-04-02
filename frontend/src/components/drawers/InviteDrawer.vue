@@ -11,14 +11,15 @@
       <a-select
         labelInValue
         mode="multiple"
-        :value="value"
-        placeholder="Select users"
+        :value="selectedItems"
+        placeholder="Выберите пользователей"
         style="width: 100%"
         :filterOption="false"
-        @search="search"
         @change="handleChange"
+        @search="search"
         :notFoundContent="'Пользователя не найдено'"
       >
+        <!-- если поставить filteredData вместо data, выбранные позиции будут пропадать из списка выбора  -->
         <a-select-option v-for="d in data" :key="d._id">{{d.firstName + ' ' + d.lastName}}</a-select-option>
       </a-select>
       <a-spin :spinning="buttonSpinning">
@@ -41,36 +42,35 @@
         buttonSpinning: false,
         type: 1,
         data: [],
-        value: [],
+        selectedItems: [],
       };
     },
     components: {},
     computed: {
       ...mapGetters(['user', 'currentGroup', 'users']),
+      filteredData() {
+        return !this.data ? [] : this.data.filter(user => !this.selectedItems.map(s => s.key).includes(user._id))
+      }        
     },
     methods: {
       onClose() {
         this.close();
       },
-
       search(text) {
-        text = text.toLowerCase();
-        this.data = this.users.filter(el => {
-          return el.firstName.toLowerCase().indexOf(text) !== -1
-            || el.lastName.toLowerCase().indexOf(text) !== -1
-            || (el.firstName + ' ' + el.lastName).toLowerCase().indexOf(text) !== -1
-            || (el.lastName + ' ' + el.firstName).toLowerCase().indexOf(text) !== -1;
-        });
+        const searchText = text.toLowerCase().trim()
+        // функция, превращающая юзера в строку из сочетаний имени и фамилии
+        const allStr = e => []
+          .concat(e.firstName, e.lastName, e.firstName + ' ' + e.lastName, e.lastName + ' ' + e.firstName)
+          .join('$')
+          .toLowerCase()
+        this.data = searchText === '' ? this.users : this.users.filter(user => allStr(user).indexOf(searchText) !== -1)
       },
       handleChange(value) {
-        Object.assign(this, {
-          value,
-          data: [],
-        });
+        this.selectedItems = value
       },
       sendInvite() {
         this.buttonSpinning = true;
-        Promise.all(this.value.map(userId => {
+        Promise.all(this.selectedItems.map(userId => {
             this.$store.dispatch(CREATE_INVITE, {userId: userId.key, groupId: this.currentGroup._id, groupType:this.currentGroup.type});
           },
         ))
@@ -84,9 +84,10 @@
       close: Function,
       visible: Boolean,
     },
-    mounted() {
-      this.$store.dispatch(GET_USERS);
-    },
+    async mounted() {
+      await this.$store.dispatch(GET_USERS)
+      this.data = this.users;
+    }
   };
 </script>
 

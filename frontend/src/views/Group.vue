@@ -340,6 +340,7 @@ export default {
         letter-spacing: normal;
         text-align: left;
         color: #000000;
+        overflow: scroll;
       }
     }
 
