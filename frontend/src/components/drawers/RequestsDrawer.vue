@@ -8,7 +8,7 @@
     wrapClassName="create-group-drawer"
   >
     <div class="requests-wrapper">
-      <div class="request" v-for="participant in currentGroup.requests">
+      <div class="request" v-for="participant in currentGroup.requests" :key="participant._id">
         <a-avatar :src="(participant.googleImage ? participant.googleImage : require('../../assets/no_image.png'))"></a-avatar>
         <div class="request-info">
           <div class="request-info-name">{{participant.firstName + " " + participant.lastName}}</div>
@@ -31,6 +31,9 @@
 
 
         </div>
+      </div>
+      <div v-if="currentGroup.requests">
+        Нет заявок на вступление в группу
       </div>
     </div>
   </a-drawer>
@@ -64,6 +67,9 @@ export default {
       type: 1,
       userinfo: (store.getters.userData.result ? store.getters.userData.result : store.getters.user.result),
     };
+  },
+  mounted() {
+    console.log('Заявки ', this.currentGroup.participants)
   },
   components: {
     ATextarea,

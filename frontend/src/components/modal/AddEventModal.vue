@@ -10,11 +10,11 @@
     <div slot="title">
       <h3>Новое событие</h3>
     </div>
-    <div class="event-name">
+    <div class="event-name form-line">
       <label>Название</label>
       <a-input v-model="name"></a-input>
     </div>
-    <div class="event-date-time">
+    <div class="event-date-time form-line">
       <div class="event-date">
         <label>Дата</label>
         <div>
@@ -28,8 +28,8 @@
         </div>
       </div>
     </div>
-    <div class="event-name">
-    <a-form-item>
+    <div class="event-name form-line">
+    <!-- <a-form-item> -->
       <label>Пригласить участника</label>
       <a-select v-decorator="['members']"
                 labelInValue
@@ -42,16 +42,16 @@
                 @change="handleChange"
                 :notFoundContent="'Пользователя не найдено'"
       >
-        <a-select-option v-for="d in data" :key="d.email">{{d.firstName + ' ' + d.lastName}}</a-select-option>
+        <a-select-option v-for="d in usersData" :key="d.email">{{d.firstName + ' ' + d.lastName}}</a-select-option>
       </a-select>
-    </a-form-item>
+    <!-- </a-form-item> -->
     </div>
     <!--<div class="event-name">
       <label>Продолжительность</label>
 
       <a-date-picker v-model="duration"></a-date-picker>
     </div>-->
-    <div class="event-name">
+    <div class="event-name form-line">
       <label>Комментарий</label>
       <a-input v-model="comment"></a-input>
     </div>
@@ -96,7 +96,7 @@
           color: '#ff0000',
         },
         name: '',
-        data: [],
+        usersData: [],
         selectedItems: [],
         //selectVal: '',
         date: moment(),
@@ -145,7 +145,7 @@
       },
       search(text) {
         text = text.toLowerCase();
-        this.data = this.users.filter(el => {
+        this.usersData = this.users.filter(el => {
           return (
                   el.firstName.toLowerCase().indexOf(text) !== -1 ||
                   el.lastName.toLowerCase().indexOf(text) !== -1 ||
@@ -178,7 +178,7 @@
     },
     async mounted() {
       await this.$store.dispatch(GET_USERS);
-      this.data = this.users
+      this.usersData = this.users
     },
   };
 </script>
@@ -254,6 +254,10 @@
   }
   .add-event-modal .ant-modal-content {
     max-width: 100%;
+  }
+
+  .form-line {
+    margin-top: .6rem;
   }
 
 </style>

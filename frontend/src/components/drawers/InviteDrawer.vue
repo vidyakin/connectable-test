@@ -50,7 +50,7 @@
       ...mapGetters(['user', 'currentGroup', 'users']),
       filteredData() {
         return !this.data ? [] : this.data.filter(user => !this.selectedItems.map(s => s.key).includes(user._id))
-      }        
+      }
     },
     methods: {
       onClose() {

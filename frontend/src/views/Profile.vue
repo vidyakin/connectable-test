@@ -1,9 +1,14 @@
 <template>
   <div id="profile" class="profile">
     <app-user-info></app-user-info>
-    <app-comment-input :parent="{type: 'user', id: datauser && datauser._id}" v-if="datauser._id == $route.params._id" />
+    <div>Служебная инфа: <br/>
+      userData: {{JSON.stringify(userData)}} <br/>
+      user: {{JSON.stringify(user)}}
+    </div>
+    <!-- <app-comment-input :parent="{type: 'user', id: datauser && datauser._id}" v-if="datauser._id == $route.params._id" /> -->
 
-    <app-post v-for="(post, index) in posts" v-if="(post && post.author._id == $route.params._id)" :post="post" :key="index" />
+    <!-- убрано: v-if="(post && post.author._id == $route.params._id)" -->
+    <app-post v-for="(post, index) in posts.filter(p => p.author._id == $route.params._id)" :post="post" :key="index" />
 
   </div>
 </template>
@@ -43,6 +48,11 @@ export default Vue.extend({
       });
     });
   },
+  mounted() {
+    const v = store.getters.userData ? 'userData.result' : 'user'
+    const d = store.getters.userData ? store.getters.userData.result : store.getters.user
+    console.log(`Profile, variant: ${v} userData is: ${JSON.stringify(store.getters.userData)}`)
+  },
   computed: {
     ...mapGetters(['posts', 'user', 'currentUser', 'userData']),
   },
@@ -74,6 +84,7 @@ export default Vue.extend({
   background-color: #f0f0f7;
   height: calc(100vh - 210px);
   overflow: auto;
+  text-align: left;
 
   @media (max-width: 767px) {
     padding: 20px 15px;

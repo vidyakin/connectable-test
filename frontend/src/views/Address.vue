@@ -17,7 +17,7 @@
         
         <a-table
           v-if="users"
-          :locale="{filterReset:'Отмена'}"
+          :locale="{filterReset:'Сброс'}"
           :columns="columns"
           :dataSource="data"
           @change="onChange"
@@ -147,19 +147,9 @@ export default {
     },
     searchText(text) {
       this.data = this.fullData.filter(el => {
-        let strs = [];
-        strs.push(el.name.firstName);
-        strs.push(el.name.lastName);
-        strs.push(el.name.firstName + ' ' + el.name.lastName);
-        strs.push(el.name.lastName + ' ' + el.name.firstName);
+        let strs = [].concat(el.name.firstName, el.name.lastName, el.name.firstName + ' ' + el.name.lastName, el.name.lastName + ' ' + el.name.firstName);
         strs = strs.join("$").toLowerCase();
         return strs.indexOf(text.toLowerCase().trim()) !== -1;
-        // return (          
-        //   el.name.firstName.indexOf(loweredText) !== -1 ||
-        //   el.name.lastName.indexOf(loweredText) !== -1 ||
-        //   (el.name.firstName + ' ' + el.name.lastName).indexOf(loweredText) !== -1 ||
-        //   (el.name.lastName + ' ' + el.name.firstName).indexOf(loweredText) !== -1
-        // );
       });
     },
   },

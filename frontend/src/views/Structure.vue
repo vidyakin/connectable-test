@@ -198,6 +198,11 @@
 
           </div>
         </div>
+        <div style="width: 100%;" v-if="!departments">
+          <a-empty>
+            <span slot="description">Создайте структуру компании</span>
+          </a-empty>
+        </div>
           <!--<AppDepantaments />-->
       </a-tab-pane>
       <a-tab-pane tab="Проекты" key="2">
@@ -381,13 +386,13 @@
         this.fullData = [...this.data];
       },
 
-      departments(departments) {
-        if (!departments) {
+      departments(deps) {
+        if (!deps) {
           this.dep_arr = [];
           return;
         }
         const row = [];
-        this.dep_arr = departments.map(e => {
+        this.dep_arr = deps.map(e => {
           // if (e.users && Object.size(e.users)) {
           const usersLen = Object.keys(e.users || {}).length
           if (e.users && usersLen) {

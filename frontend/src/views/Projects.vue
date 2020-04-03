@@ -10,9 +10,11 @@
     </div>
     <div class="projects-body">
       <app-project v-for="(project, index) in this.filterData" :project="project" :key="index"></app-project>
-      <a-empty v-if="filterData.length == 0">
-        <span slot="description">Пока что нет проектов</span>
-      </a-empty>
+      <div style="width: 100%;" v-if="filterData.length == 0">
+        <a-empty>
+          <span slot="description">Пока что нет проектов</span>
+        </a-empty>
+      </div>
     </div>
   </div>
 </template>
