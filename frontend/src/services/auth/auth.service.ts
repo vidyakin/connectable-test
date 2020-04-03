@@ -28,6 +28,7 @@ function decodeToken(response: any) {
 }
 
 export const login = (context: any, user: any) => {
+  console.log(`login: user before Axios: ${JSON.stringify(user, null, '\t')}`)
   return Vue.axios.post('/api/login', user)
     .then((response) => {
         const jsonPayload = decodeToken(response.data.token);
@@ -40,11 +41,12 @@ export const login = (context: any, user: any) => {
             store.commit(SET_USER_DATA, null);
             router.push('/login'); 
         } else {
-            localStorage.setItem('authorization', 'true');
-            localStorage.setItem('token', `${response.data.token}`);
-            context.commit(SET_USER, response.data);
-            context.commit(SET_USER_DATA, response.data);
-            setAuthToken(`${response.data.token}`);
+          console.log(`login: response from Axios: ${JSON.stringify(response, null, '\t')}`)
+          localStorage.setItem('authorization', 'true');
+          localStorage.setItem('token', `${response.data.token}`);
+          context.commit(SET_USER, response.data);
+          context.commit(SET_USER_DATA, response.data);
+          setAuthToken(`${response.data.token}`);
         }
 
     });
@@ -88,11 +90,12 @@ export const loginWithGoogle = (context: any, $gAuth: any) => {
       const userForLogin = {
         googleId: GoogleUser.getId(),
         googleToken: GoogleUser.getAuthResponse().access_token,
-        lastName: userInfo.wea,
-        firstName: userInfo.ofa,
-        email: userInfo.U3,
-        googleImage: userInfo.Paa,
+        lastName: userInfo.getFamilyName(),
+        firstName: userInfo.getGivenName(),
+        email: userInfo.getEmail(),
+        googleImage: userInfo.getImageUrl()
       };
+      console.log('auth.service.ts:loginWithGoogle, userForLogin =',JSON.stringify(userForLogin, null, '\t'))
       context.dispatch(LOGIN, userForLogin).finally(() => {
           router.push('/about');
           // this.$router.push({ name: 'about' });

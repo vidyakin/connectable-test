@@ -68,14 +68,14 @@ export default {
       type: 1,
       statusEmailSend: false,
       userinfo: (store.getters.userData.result ? store.getters.userData.result : store.getters.user.result),
-      rules: { 
+      rules: {
         name: [
           { required: true, message: 'Название не может быть пустым!', transform: this.tr },
-          { max:50, message: "Максимальная длина заголовка - 50 символов", transform: this.tr }
+          { max:50, message: 'Максимальная длина заголовка - 50 символов', transform: this.tr }
         ],
         description: [
           { required: true, message: 'Описание не может быть пустым!', transform: this.tr },
-          { max: 250, message: "Максимальная длина описания - 250 символов", transform: this.tr }
+          { max: 250, message: 'Максимальная длина описания - 250 символов', transform: this.tr }
         ],
         type: [{ required: true, message: 'Тип группы не может быть пустым!'}]
       }

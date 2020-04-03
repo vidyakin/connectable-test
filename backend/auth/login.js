@@ -89,8 +89,10 @@ module.exports = (req, res) => {
 
         result.status = status;
         result.result = user;
-        User.findOneAndUpdate({_id: user._id}, {googleToken: req.body.googleToken}, (err, data) => {
+        User.findOneAndUpdate({_id: user._id}, req.body, (err, data) => {
         });
+        console.log(`  >>> Google login, result is: ${JSON.stringify(result, null, '\t')}`)
+        console.log(`  >>> Google login, req.body is: ${JSON.stringify(req.body, null, '\t')}`)        
         res.status(status).send(result);
       } else {
         req.body.password = 'nopass';
@@ -103,6 +105,7 @@ module.exports = (req, res) => {
           });
           result.status = status;
           result.result = newUser;
+          console.log(`  >>> Google user created, newUser is: ${JSON.stringify(newUser, null, '\t')}`)
           res.status(status).send(result);
         })
       }
