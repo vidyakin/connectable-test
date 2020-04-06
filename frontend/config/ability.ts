@@ -8,11 +8,11 @@ function subjectName(item: any) {
 }
 
 function getAdmins() {
-    return ['w.project.portal3@gmail.com', 'vidyakin.sergey@gmail.com']
+    return ['w.project.portal3@gmail.com', 'vidyakin111.sergey@gmail.com']
 }
 
 export default AbilityBuilder.define( {subjectName}, (can: any) => {
     //can(['crud'], 'User', { accessEmail: 'w.project.portal3@gmail.com' });
-    can(['crud'], 'User', { accessEmail: { $in: getAdmins() }});
+    can(['crud'], 'Admin', { accessEmail: { $in: getAdmins() }});
 });
 // w.project.portal3@gmail.com

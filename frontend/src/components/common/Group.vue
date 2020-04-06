@@ -1,20 +1,25 @@
 <template>
-  <div class="group" v-if="group.type === 2 && group.creatorId === datauser._id">
-    <div class="group-header">
+  <!-- Приватная группа, когда пользователь это ее создатель -->
+  <!-- <div class="group" v-if="group.type === 2 && group.creatorId === datauser._id || userIsAdmin"> -->
+  <div class="group" v-if="groupVisible">
+    <div class="group-header" :class="group.type === 2 ? 'private' : ''">
       <div class="group-header-content">
         <div class="group-header-content-name" @click="redirectToGroup">{{group.name}}</div>
         <div class="group-header-content-count">{{group.participants.length}} {{group && endingWords(group.participants.length)}}</div>
       </div>
-      <div class="group-header-action" v-if="group && group.creatorId === datauser._id" >
-        <a-popover
-          title="Действия с группой"
-          trigger="click"
-          overlayClassName="group-header-action-popup-content"
-        >
+      <div class="group-header-action" v-if="group && group.creatorId === datauser._id || userIsAdmin" >
+        <a-popover title="Действия с группой" trigger="click" overlayClassName="group-header-action-popup-content">
           <template slot="content">
-            <a-tooltip title="Удалить">
-              <a-button icon="delete" @click="deleteGroup"></a-button>
-            </a-tooltip>
+            <a-popconfirm
+              title="Подтверите удаление группы"
+              okText="Подтверждаю"
+              cancelText="Отмена"
+              @confirm="deleteGroup"
+            >            
+              <a-tooltip title="Удалить!">
+                <a-button icon="delete"></a-button>
+              </a-tooltip>
+            </a-popconfirm>
           </template>
           <a-button icon="menu" class="open-action-button"></a-button>
         </a-popover>
@@ -24,31 +29,33 @@
       <div class="group-content-participant" v-for="participant in group.participants" :key="participant._id">
         <!--<a-avatar :src="participant.googleImage"></a-avatar>-->
         <div class="group-content-participant-info">
-          <div
-            class="group-content-participant-info-name"
-          >{{participant.firstName + " " + participant.lastName}}</div>
+          <div class="group-content-participant-info-name">{{participant.firstName + " " + participant.lastName}}</div>
           <div class="group-content-participant-info-positions">{{participant.positions.join(', ')}}</div>
         </div>
       </div>
     </div>
   </div>
-  <div class="group" v-else-if="group.type != 2">
+  <!-- Остальные группы -->
+  <!-- <div class="group" v-else-if="group.type != 2">
     <div class="group-header">
       <div class="group-header-content">
         <div class="group-header-content-name" @click="redirectToGroup">{{group.name}}</div>
         <div class="group-header-content-count">{{group.participants.length}} {{group && endingWords(group.participants.length)}}</div>
       </div>
-      <!--v-if="$can('read', {'accessEmail': datauser.email, '__type': 'User'})"-->
-      <div class="group-header-action" v-if="group && group.creatorId === datauser._id" >
-        <a-popover
-                title="Действия с группой"
-                trigger="click"
-                overlayClassName="group-header-action-popup-content"
-        >
+      <! -- v-if="$can('read', {'accessEmail': datauser.email, '__type': 'User'})"-- >
+      <div class="group-header-action" v-if="group && group.creatorId === datauser._id || userIsAdmin" >
+        <a-popover title="Действия с группой" trigger="click" overlayClassName="group-header-action-popup-content">
           <template slot="content">
-            <a-tooltip title="Удалить">
-              <a-button icon="delete" @click="deleteGroup"></a-button>
-            </a-tooltip>
+            <a-popconfirm
+                title="Подтверите удаление группы"
+                okText="Подтверждаю"
+                cancelText="Отмена"
+                @confirm="deleteGroup"
+              >          
+              <a-tooltip title="Удалить!">
+                <a-button icon="delete" @click="deleteGroup"></a-button>
+              </a-tooltip>            
+            </a-popconfirm>
           </template>
           <a-button icon="menu" class="open-action-button"></a-button>
         </a-popover>
@@ -56,16 +63,14 @@
     </div>
     <div class="group-content" v-if="group.participants" @click="redirectToGroup">
       <div class="group-content-participant" v-for="participant in group.participants" :key="participant._id">
-        <!--<a-avatar :src="participant.googleImage"></a-avatar>-->
+        <! -- <a-avatar :src="participant.googleImage"></a-avatar> - ->
         <div class="group-content-participant-info">
-          <div
-                  class="group-content-participant-info-name"
-          >{{participant.firstName + " " + participant.lastName}}</div>
+          <div class="group-content-participant-info-name">{{participant.firstName + " " + participant.lastName}}</div>
           <div class="group-content-participant-info-positions">{{participant.positions.join(', ')}}</div>
         </div>
       </div>
     </div>
-  </div>
+  </div> -->
 </template>
 
 <script>
@@ -86,8 +91,15 @@ export default {
     group: Object,
   },
   computed: {
+    userIsAdmin() {
+      return this.$can('read', {'accessEmail': this.datauser.email, '__type': 'Admin'})
+    },
     ...mapGetters(['userData']),
   },
+  created() {
+    console.log(`>> Group comp created: dataUser is ${JSON.stringify(this.datauser,null,3)}`);    
+  },
+  
   methods: {
     deleteGroup() {
       this.$store.dispatch(DELETE_GROUP, this.group._id).then(() => {
@@ -114,6 +126,9 @@ export default {
     redirectToGroup() {
       this.$router.push({ name: 'group', params: { _id: this.group._id } });
     },
+    groupVisible() {
+      return this.group.type !== 2 || (this.group.type === 2 && this.group.creatorId === this.datauser._id || this.userIsAdmin)
+    }
   },
 };
 </script>
@@ -146,6 +161,10 @@ export default {
     justify-content: space-between;
     margin-bottom: 15px;
 
+    &.private {
+      background-color: lavender;
+    }
+
     &-content {
       max-width: 90%;
 
@@ -166,7 +185,7 @@ export default {
         &:hover {
           cursor: pointer;
         }
-      }
+      }  
 
       &-count {
         height: 13px;

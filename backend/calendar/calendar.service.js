@@ -11,7 +11,7 @@ outlook.calendar.updateEventAsync = util.promisify(outlook.calendar.updateEvent)
 
 // get all events list
 exports.getAllEvents = async (token, { top = 20 }) => {
-  console.log('--- Начало получения всех событий -----')
+  console.log('--- calendar.service: Начало получения всех событий -----')
   let aud = jwt.decode(token);
   console.log('Decoded token', aud)
   try {
@@ -29,7 +29,6 @@ exports.getAllEvents = async (token, { top = 20 }) => {
     console.log('--- Конец получения событий ---')
     return { data: result.value }
   } catch (err) {
-    const errObj = 
     console.log(`Ошибка получения событий: ${err.code}, ${err.message} full err (${typeof err}): ${err}`)
     return {
       error: {

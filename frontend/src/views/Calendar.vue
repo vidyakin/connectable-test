@@ -122,6 +122,15 @@ export default Vue.extend({
     if (this.userInfo) {
       this.$store.dispatch(GET_EVENTS, this.userInfo.id);
     }
+
+    console.log('beforeCreate get events')
+    const a = Vue.axios.get('/api/outlook/event')
+        .then((response) => {
+            console.log('beforeCreate resp:',response)
+        }).catch((e) => {
+            console.log('beforeCreate error:',e);
+        });
+    return a;
   },
   components: {
     AppAddEventModal,
@@ -213,15 +222,7 @@ export default Vue.extend({
       });
     },
   },
-  beforeCreate() {
-        const a = Vue.axios.get('/api/outlook/event')
-            .then((response) => {
-               console.log(response)
-            }).catch((e) => {
-                console.log(e);
-            });
-        return a;
-    }
+
 });
 </script>
 

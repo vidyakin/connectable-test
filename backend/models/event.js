@@ -38,16 +38,19 @@ eventSchema.pre('save', function (next) {
       summary: this.name
     };
 
+    console.log(`>> event.js: 'event' is: ${JSON.stringify(event,null,2)}`)
     if(this.attendees) event.attendees = this.attendees;
     
     axios
       .post('https://www.googleapis.com/calendar/v3/calendars/primary/events',
         event, {headers: headers})
       .catch(e => {
+        console.log(`>> event.js: in axios's catch error: ${JSON.stringify(e,null,2)}`)
         next();
       })
-      .then((data) => {
-        this.googleEventId = data.data.id;
+      .then(_d => {
+        console.log(`>> event.js: in axios's «then» '_d' is: ${JSON.stringify(_d,null,2)}`)
+        this.googleEventId = _d.data.id;
         next();
       })
   })

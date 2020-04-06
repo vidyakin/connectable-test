@@ -5,7 +5,7 @@
         <div class="project-header-content-name" @click="redirectToGroup">{{project.name}}</div>
         <div class="project-header-content-count">{{project.participants.length}} {{project && endingWords(project.participants.length)}}</div>
       </div>
-      <div class="project-header-action" v-if="$can('read', {'accessEmail': datauser.email, '__type': 'User'})">
+      <div class="project-header-action" v-if="$can('read', {'accessEmail': datauser.email, '__type': 'Admin'})">
         <a-popover
           title="Действия с группой"
           trigger="click"

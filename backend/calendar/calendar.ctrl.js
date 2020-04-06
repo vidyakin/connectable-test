@@ -10,11 +10,11 @@ const calendarService = require('./calendar.service')
  *
  */
 exports.getAllEvents = async (req, res, next) => {
-  console.log('calendar: getAllEvents')
+  console.log('@@@@@@@@@@ calendar.ctrl: getAllEvents: @@@@@@@@@@')
+  //console.log('HEADERS',req.headers)
   const { data, error } = await calendarService.getAllEvents(req.headers.authorization, req.query)
-  console.log('@@@@@@@@@@ data of getAllEvents: @@@@@@@@@@')
-  console.log(data)
-  console.log(error)
+  console.log('>> data:',data)
+  console.log('>> error:',error)
   console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@')
   return error ? res.sendStatus(500).json(error) : res.json(data)
 }

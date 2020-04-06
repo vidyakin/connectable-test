@@ -366,7 +366,7 @@
     computed: {
       ...mapGetters(['departments', 'users', 'userData']),
       userCanRead() {
-        const val = Boolean(this.datauser) && this.$can('read', {accessEmail: this.datauser.email, __type: 'User'});
+        const val = Boolean(this.datauser) && this.$can('read', {accessEmail: this.datauser.email, __type: 'Admin'});
         console.log(`userCanRead: datauser=${JSON.stringify(this.datauser)} val=${val}`);
         return val;
       }

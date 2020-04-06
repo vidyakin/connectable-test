@@ -64,8 +64,7 @@
           v-if="allComment"
           class="post-wrapper-comments-open-all"
         >Скрыть</span>
-        <app-comment
-          v-if="!allComment"
+        <app-comment v-if="!allComment"
           v-for="comment in post.comments && post.comments.slice(post.comments.length - 2)"
           :comment="comment"
         ></app-comment>
@@ -83,7 +82,13 @@
     </div>
     <div>
 
-      <a-popover  title="Действия с постом" v-model="visible" trigger="click" :container="'post-' + post._id" overlayClassName="action-popup-content" v-if="post && post.author._id === datauser._id || $can('read', {'accessEmail': datauser.email, '__type': 'User'})">
+      <a-popover  title="Действия с постом" 
+        v-model="visible" 
+        trigger="click" 
+        :container="'post-' + post._id" 
+        overlayClassName="action-popup-content" 
+        v-if="post && post.author._id === datauser._id || $can('read', {'accessEmail': datauser.email, '__type': 'Admin'})"
+      >
         <template slot="content">
           <a-tooltip title="Удалить">
             <a-icon type="delete" @click="deletePost"></a-icon>
