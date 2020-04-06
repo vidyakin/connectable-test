@@ -11,6 +11,8 @@
     <app-group-create-drawer :visible="createVisible" :close="closeCreate" />
     <div class="groups-header">
       <div class="groups-header-name">Группы</div>
+      <!-- <div v-if="userIsAdmin">Я Админ</div>
+      <div v-else>Я не Админ</div> -->
       <div class="groups-header-search">
         <a-button type="primary" @click="openCreate" >Создать группу</a-button>
       </div>
@@ -59,6 +61,9 @@ export default {
         return 0;
       };
       return this.filterData.sort(compare);
+    },
+    userIsAdmin() {
+      return this.$can('read', {'accessEmail': this.datauser.email, '__type': 'Admin'})
     },
     ...mapGetters(['groups', 'userData']),
   },

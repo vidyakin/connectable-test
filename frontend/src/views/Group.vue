@@ -1,25 +1,24 @@
 <template>
   <div id="profile" class="group-view">
     <app-group-edit-drawer :visible="editVisible" :close="closeEdit" />
-    <app-requests-drawer
-      :visible="requestVisible"
+    <!-- запросы на вступление могут видеть в закрытых группых -->
+    <app-requests-drawer v-if="isLoaded"
+      :visible="requestVisible && currentGroup.type === 1"
       :close="closeRequests"
-      v-if="currentGroup && currentGroup.type === 1"
     />
-    <app-invite-drawer
-      :visible="requestVisible"
-      :close="closeRequests"
-      v-if="currentGroup && currentGroup.type === 2"
+    <!-- приглашать можно в закрытых и приватных -->
+    <app-invite-drawer v-if="isLoaded"
+      :visible="invitesVisible"
+      :close="closeInvites"
     />
 
-    <div class="group-body" >
+    <div class="group-body" v-if="isLoaded">
       <div class="group-body-info">
         <div class="group-body-info-header">
           <div class="group-body-info-header-content">
-            <div class="group-body-info-header-content-name">{{currentGroup && currentGroup.name}}</div>
-            <div
-              class="group-body-info-header-content-participants"
-            >{{currentGroup && currentGroup.participants.length}}  {{currentGroup && endingWords(currentGroup.participants.length)}}</div>
+            <div class="group-body-info-header-content-name">{{currentGroup.name}}</div>
+            <div class="group-body-info-type">{{['Открытая','Закрытая','Приватная'][currentGroup.type] }} группа</div>
+            <div class="group-body-info-header-content-participants">{{currentGroup.participants.length}} {{endingWords(currentGroup.participants.length)}}</div>            
           </div>
           <div class="group-body-info-header-action">
             <a-popover
@@ -27,7 +26,7 @@
               trigger="click"
               v-model="visible"
               overlayClassName="group-header-action-popup-content"
-              v-if="currentGroup && currentGroup.creatorId === userinfo._id"
+              v-if="currentGroup.creatorId === userinfo._id || userIsAdmin"
             >
               <template slot="content">
                 <a-popconfirm
@@ -43,8 +42,11 @@
                 <a-tooltip title="Редактировать">
                   <a-button icon="edit" @click="editGroup"></a-button>
                 </a-tooltip>
-                <a-tooltip title="Заявки" >
-                  <a-badge :count="currentGroup && currentGroup.requests.length" @click="hide">
+                <a-tooltip title="Пригласить" v-if="currentGroup.type >= 1">
+                  <a-button icon="plus" @click="openInvites"></a-button>
+                </a-tooltip>
+                <a-tooltip title="Заявки"  v-if="currentGroup.type === 1">
+                  <a-badge :count="currentGroup.requests.length" @click="hide">
                     <a-button icon="team" @click="openRequests"></a-button>
                   </a-badge>
                 </a-tooltip>
@@ -53,35 +55,14 @@
             </a-popover>
           </div>
         </div>
-        <div class="group-body-info-description">{{currentGroup && currentGroup.description}}</div>
-        <template>
-          <a-button
-            type="primary"
-            @click="createParticipant"
-            v-if="currentGroup && currentGroup.type === 0 && currentGroup.participants &&
-                    currentGroup.participants.findIndex(({_id}) =>_id === userinfo._id) === -1"
-          >Вступить</a-button>
-          <a-button
-            type="primary"
-            @click="createParticipantsRequest"
-            v-if="currentGroup && currentGroup.type === 1 && currentGroup.participants &&
-                    currentGroup.participants.findIndex(({_id}) =>_id === userinfo._id) === -1
- && !participantsRequest"
-          >Подать заявку</a-button>
-          <a-button
-            @click="deleteParticipant"
-            v-if="currentGroup && currentGroup.type === 1 && currentGroup.participants &&
-                    currentGroup.participants.findIndex(({_id}) =>_id === userinfo._id) === -1
-                    && participantsRequest"
-          >Отменить заявку</a-button>
-        </template>
+        <div class="group-body-info-description">{{currentGroup.description}}</div>
+        
       </div>
-      <div class="group-body-participants">
-        <div class="group-body-info-header-content-name">Участники</div>
-        <div
-          class="group-body-participants-participant"
-          v-for="(participant, index) in currentGroup && currentGroup.participants"
-          :key="index"
+      <!-- УЧАСТНИКИ -->
+      <div class="group-body-participants" v-if="currentGroup">
+        <div class="group-body-participants-header">Участники ({{currentGroup.participants.length}})</div>
+        <div class="group-body-participants-participant"
+          v-for="(participant, index) in currentGroup.participants" :key="index"
         >
           <a-avatar :src="(participant.googleImage ? participant.googleImage : require('../assets/no_image.png'))"></a-avatar>
           <div class="group-body-participants-participant-info">
@@ -93,15 +74,33 @@
             >{{participant.positions.join(', ')}}</div>
           </div>
         </div>
+        
       </div>
     </div>
-    <template
-      v-if="(currentGroup && currentGroup.type === 0 )||
-       currentGroup && currentGroup.participants.findIndex(({_id}) => _id === userinfo._id) !== -1"
-    >
-      <app-comment-input :parent="{type: 'group', id: currentGroup && currentGroup._id}" />
+    <!-- SPINNER while loading -->
+    <a-spin size="large" v-else />
+    <template v-if="isLoaded && (currentGroup.type === 0 ||currentGroup.participants.findIndex(({_id}) => _id === userinfo._id) !== -1)">
+      <app-comment-input :parent="{type: 'group', id: currentGroup._id}" />
         <app-post v-for="(post, index) in posts" :post="post" :key="index" />
     </template>
+    <template class="btn-additional">
+      <a-button type="primary" @click="createParticipant"
+        v-if="currentGroup.type === 0 && currentGroup.participants && currentGroup.participants.findIndex(({_id}) =>_id === userinfo._id) === -1"
+      >Вступить</a-button>
+      <a-button type="primary" @click="createParticipantsRequest"
+        v-if="currentGroup.type === 1
+              && currentGroup.participants && currentGroup.participants.findIndex(({_id}) =>_id === userinfo._id) === -1
+              && !participantsRequest"
+      >Подать заявку</a-button>
+      <a-button type="primary"
+        @click="deleteParticipant"
+        v-if="currentGroup.type === 1   
+            && currentGroup.participants 
+            && currentGroup.participants.findIndex(({_id}) =>_id === userinfo._id) === -1
+            && participantsRequest"
+      >Отменить заявку</a-button>
+    </template>
+    
   </div>
 </template>
 <script>
@@ -130,11 +129,14 @@ export default {
   },
   data() {
     return {
+      isLoaded: false,
       editVisible: false,
       requestVisible: false,
+      invitesVisible: false,
       visible: false,
       output: '',
       userinfo: (store.getters.userData.result ? store.getters.userData.result : store.getters.user.result),
+      userIsAdmin: false
     };
   },
   methods: {
@@ -163,6 +165,12 @@ export default {
     },
     closeRequests() {
       this.requestVisible = false;
+    },
+    openInvites() {
+      this.invitesVisible = true;
+    },
+    closeInvites() {
+      this.invitesVisible = false;
     },
     deleteGroup() {
       this.$store.dispatch(DELETE_GROUP, this.currentGroup._id).then(() => {
@@ -206,7 +214,9 @@ export default {
     },
   },
   beforeMount() {
-    this.$store.dispatch(GET_CURRENT_GROUP, this.$route.params._id).then(() => {
+    const vm = this
+    this.$store.dispatch(GET_CURRENT_GROUP, this.$route.params._id)
+    .then(() => {
       this.checkParticipants();
       this.$store.dispatch(GET_POSTS, {
         filter: {
@@ -216,7 +226,15 @@ export default {
           },
         },
       });
+    })
+    .then(()=>{
+      vm.isLoaded = true
+      vm.userIsAdmin = vm.$can('read', {'accessEmail': vm.userinfo.email, '__type': 'Admin'})
+      //console.log(`> befMount: currentGroup is ${JSON.stringify(this.currentGroup,null,2)}`)
     });
+  },
+  created() {
+    
   },
   computed: {
     ...mapGetters(['posts', 'currentGroup', 'user', 'userData', 'participantsRequest']),
@@ -282,7 +300,7 @@ export default {
       background-color: white;
       height: 19rem;
       border-radius: 0.25rem;
-      padding: 1rem;
+      padding: 24px;
       box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.15);
 
       @media (max-width: 767px) {
@@ -305,9 +323,8 @@ export default {
             letter-spacing: normal;
             text-align: left;
             color: #4d4f5c;
-            padding-bottom: 20px;
+            padding-bottom: 6px;
           }
-
           &-participants {
             height: 15px;
             opacity: 0.5;
@@ -315,7 +332,7 @@ export default {
             font-weight: normal;
             font-style: normal;
             font-stretch: normal;
-            line-height: 2.08;
+            // line-height: 2.08;
             letter-spacing: normal;
             text-align: left;
             color: #43425d;
@@ -329,6 +346,11 @@ export default {
         }
       }
 
+      &-type {
+        color: royalblue;
+        font-size: 10pt;
+        text-align: left;
+      }
       &-description {
         margin-top: 1.5rem;
 
@@ -352,6 +374,13 @@ export default {
       border-radius: 0.25rem;
       padding: 1rem;
       box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.15);
+
+      &-header {
+        font-size: 13px;
+        font-weight: bold;
+        text-align: left;
+        margin-bottom: 10px;
+      }
 
       @media (max-width: 767px) {
         width: 100%;
@@ -390,6 +419,11 @@ export default {
         }
       }
     }
+  }
+
+  .btn-additional {
+    justify-self: left;
+    display: flex;
   }
 }
 </style>

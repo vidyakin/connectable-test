@@ -17,7 +17,7 @@
         :filterOption="false"
         @change="handleChange"
         @search="search"
-        :notFoundContent="'Пользователя не найдено'"
+        :notFoundContent="'Пользователь не найден'"
       >
         <!-- если поставить filteredData вместо data, выбранные позиции будут пропадать из списка выбора  -->
         <a-select-option v-for="d in data" :key="d._id">{{d.firstName + ' ' + d.lastName}}</a-select-option>
@@ -71,13 +71,24 @@
       sendInvite() {
         this.buttonSpinning = true;
         Promise.all(this.selectedItems.map(userId => {
-            this.$store.dispatch(CREATE_INVITE, {userId: userId.key, groupId: this.currentGroup._id, groupType:this.currentGroup.type});
+          const inviteData = {userId: userId.key, groupId: this.currentGroup._id, groupType:this.currentGroup.type}
+          console.log(`Создаем инвайт: ${JSON.stringify(inviteData,null,2)}`)
+            this.$store.dispatch(CREATE_INVITE, inviteData);
           },
         ))
-          .finally(() => {
+          .finally(result => {
             this.buttonSpinning = false;
+            this.openNotification();
             this.onClose();
           });
+      },
+      openNotification() {
+        this.$notification['success']({
+          message: `Приглашение отправлено`,
+          description:
+            'Результат приглашения положительный',
+          placement:'topRight'
+        });
       },
     },
     props: {

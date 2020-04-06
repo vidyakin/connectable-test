@@ -26,27 +26,18 @@ transporter.verify(function(error, success) {
 
 //
 module.exports.sendInvite = async(to, url, typeGroup) => {
-  let email = await UserDao.findById(to), groupName = '';
+  let email = await UserDao.findById(to);
   email = email.email;
 
-  switch (typeGroup) {
-      case 0:
-          groupName = 'открытую группу';
-          break;
-      case 1:
-          groupName = 'закрытую группу';
-          break;
-      case 2:
-          groupName = 'приватную группу';
-          break;
-  }
- transporter.sendMail({
+  const typeGroupStr = ['открытую группу','закрытую группу','приватную группу'][typeGroup];
+  transporter.sendMail({
     from: '"Connectable" <mail@connectable.pro>', // sender address
     to: email, // list of receivers
-    subject: `Приглашение в ${groupName}`, // Subject line
-    text: `Здравствуйте, вас приглашают в ${groupName}, принять или отклонить приглашение вы можете по ссылке ${url}`, // plain text body
+    subject: `Приглашение в ${typeGroupStr}`, // Subject line
+    text: `Здравствуйте, вас приглашают в ${typeGroupStr}, принять или отклонить приглашение вы можете по ссылке ${url}`, // plain text body
   });
- };
+};
+
 //register new user
 module.exports.NewUser = async(to, url, dataUser) => {
     transporter.sendMail({
@@ -62,7 +53,7 @@ module.exports.AddUserInGroup = async(to, url, groupData) => {
         from: '"Connectable" <mail@connectable.pro>', // sender address
         to: to, // list of receivers
         subject: "Добавление пользователя в групу", // Subject line
-        text: `Вас было добавлено в группу "${groupData.name}" (${groupData.description}). Для входа на сайт перейдите по ссылке: ${url}`, // plain text body
+        text: `Вы были добавлены в группу "${groupData.name}" (${groupData.description}). Для входа на сайт перейдите по ссылке: ${url}`, // plain text body
     });
 };
 //add event in calendar

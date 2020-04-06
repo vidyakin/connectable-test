@@ -42,7 +42,7 @@
         <img src="@/assets/Icons/Structure.svg" alt />
         Структура (нов.)
       </a-menu-item>
-      <!--v-if="$can('read', {'accessEmail': datauser.result.email, '__type': 'User'})"-->
+      <!--v-if="$can('read', {'accessEmail': datauser.result.email, '__type': 'Admin'})"-->
       <a-menu-item key="/settings" class="footer"  :class="{active:isActive == 'settings'}" >
         <img src="@/assets/Icons/setting.svg" alt />
         Настройки

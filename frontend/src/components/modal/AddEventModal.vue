@@ -42,7 +42,7 @@
                 @change="handleChange"
                 :notFoundContent="'Пользователя не найдено'"
       >
-        <a-select-option v-for="d in usersData" :key="d.email">{{d.firstName + ' ' + d.lastName}}</a-select-option>
+        <a-select-option v-for="d in usersData" :key="d._id">{{d.firstName + ' ' + d.lastName}}</a-select-option>
       </a-select>
     <!-- </a-form-item> -->
     </div>
@@ -179,6 +179,7 @@
     async mounted() {
       await this.$store.dispatch(GET_USERS);
       this.usersData = this.users
+      //console.log('userData: ',JSON.stringify(this.usersData,null,2))
     },
   };
 </script>

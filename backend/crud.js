@@ -18,6 +18,7 @@ module.exports = (Collection, serializer, options) => {
                 result.error = e;
             } else {
                 if (Collection.collection.collectionName === 'groupinvites') {
+                    console.log(`>> crud.js > invite : data is ${JSON.stringify(data,null,3)}`)
                     mail.sendInvite(data.userId, `https://connectable.pro/invite/${data._id}`, req.body.groupType)
                 }
                 if (Collection.collection.collectionName === 'groups') {

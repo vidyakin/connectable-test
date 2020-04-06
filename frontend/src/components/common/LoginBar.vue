@@ -11,12 +11,12 @@
         </a-menu>
         <a-button class="logout" >
           <!-- {{currentUser && currentUser.firstName}} {{currentUser && currentUser.lastName}} -->
-          {{ this.datauser.result.firstName + ' ' + this.datauser.result.lastName }}
+            {{ this.datauser.result.firstName + ' ' + this.datauser.result.lastName }}
             <a-icon type="down" />
         </a-button>
       </a-dropdown>
 
-      <a-avatar :src="(currentUser.googleImage ? currentUser.googleImage : require('../../assets/no_image.png'))" />
+      <a-avatar :src="(this.datauser.result.googleImage ? this.datauser.result.googleImage : require('../../assets/no_image.png'))" />
     </div>
   </div>
 </template>
