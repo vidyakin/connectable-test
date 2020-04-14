@@ -272,9 +272,7 @@ export default {
 </script>
 
 <style lang="scss">
-  .ant-popover-inner-content {
-    text-align: center;
-  }
+
 .post-comment-input {
   margin: 1rem 0 !important;
   display: flex;

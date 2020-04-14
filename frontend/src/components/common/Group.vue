@@ -1,10 +1,10 @@
 <template>
   <!-- Приватная группа, когда пользователь это ее создатель -->
   <!-- <div class="group" v-if="group.type === 2 && group.creatorId === datauser._id || userIsAdmin"> -->
-  <div class="group" v-if="groupVisible">
+  <div class="group" v-if="groupVisible" @click="redirectToGroup">
     <div class="group-header" :class="group.type === 2 ? 'private' : ''">
       <div class="group-header-content">
-        <div class="group-header-content-name" @click="redirectToGroup">{{group.name}}</div>
+        <div class="group-header-content-name">{{group.name}}</div>
         <div class="group-header-content-count">{{group.participants.length}} {{group && endingWords(group.participants.length)}}</div>
       </div>
       <div class="group-header-action" v-if="group && group.creatorId === datauser._id || userIsAdmin" >
@@ -25,7 +25,7 @@
         </a-popover>
       </div>
     </div>
-    <div class="group-content" v-if="group.participants" @click="redirectToGroup">
+    <div class="group-content" v-if="group.participants">
       <div class="group-content-participant" v-for="participant in group.participants" :key="participant._id">
         <!--<a-avatar :src="participant.googleImage"></a-avatar>-->
         <div class="group-content-participant-info">
@@ -137,7 +137,7 @@ export default {
 .group-header-action-popup-content {
   .ant-popover-inner-content {
     display: flex;
-    justify-content: center;
+    // justify-content: center;
     .ant-btn {
       border: 0;
       background-color: transparent;
@@ -153,6 +153,8 @@ export default {
   box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.15);
   margin-right: 2rem;
   margin-bottom: 2rem;
+  cursor: pointer;
+
   &-header {
     background-color: #f5f6fa;
     height: 4rem;
@@ -211,8 +213,7 @@ export default {
     height: 16rem;
     background-color: white;
     overflow: auto;
-    cursor: pointer;
-
+    
     &-participant {
       display: flex;
       padding: 5px 1rem;

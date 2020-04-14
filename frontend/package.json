@@ -10,11 +10,13 @@
   "dependencies": {
     "@casl/ability": "^3.4.0",
     "@casl/vue": "^0.5.1",
-    "ant-design-vue": "^1.5.0-rc.6",
+    "ant-design-vue": "^1.5.1",
     "axios": "^0.19.1",
     "core-js": "^2.6.11",
+    "googleapis": "^48.0.0",
     "moment": "^2.24.0",
     "query-string": "^6.9.0",
+    "socket.io": "^2.3.0",
     "textarea-caret": "^3.1.0",
     "vue": "^2.6.11",
     "vue-at": "^2.5.0-beta.2",
@@ -26,6 +28,7 @@
     "vue-orgchart": "^1.1.7",
     "vue-router": "^3.1.4",
     "vue-social-sharing": "^2.4.7",
+    "vue-socket.io": "^3.0.7",
     "vuex": "^3.1.2"
   },
   "devDependencies": {

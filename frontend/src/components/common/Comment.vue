@@ -210,9 +210,10 @@ export default {
 </script>
 
 <style lang="scss">
-  .ant-popover-inner-content {
-    text-align: center;
-  }
+  // центрируется из-за этого в других компонентах
+  // .ant-popover-inner-content {
+  //   text-align: center;
+  // }
 .comment-wrapper {
   display: flex;
   margin-top: 0.75rem;

@@ -19,7 +19,7 @@ import AppNavbar from '../components/common/Navbar.vue';
 import AppHeader from '../components/common/Header.vue';
 import AppPostEditDrawer from '../components/drawers/PostEditDrawer.vue';
 import AppCommentEditDrawer from '../components/drawers/CommentEditDrawer.vue';
-import { GET_INFO_ABOUT_USER } from '@/store/user/actions.type';
+//import { GET_INFO_ABOUT_USER } from '@/store/user/actions.type';
 import moment from 'moment';
 
 export default Vue.extend({
@@ -32,9 +32,11 @@ export default Vue.extend({
   },
   methods: {},
   beforeMount() {
-    if (localStorage.getItem('token')) {
-      this.$store.dispatch(GET_INFO_ABOUT_USER);
-    }
+    // TODO: с сервера возвращается undef, эта функция вызывается только здесь. Может этот вызов вообще не нужен?
+    // есть работающий вызов: this.$store.dispatch(GET_USER, this.$route.params._id)
+    // if (localStorage.getItem('token')) {
+    //   this.$store.dispatch(GET_INFO_ABOUT_USER);
+    // }
     moment.updateLocale('ru', {
       relativeTime: {
         future: 'in %s',

@@ -41,7 +41,7 @@ export const login = (context: any, user: any) => {
             store.commit(SET_USER_DATA, null);
             router.push('/login'); 
         } else {
-          console.log(`login: response from Axios: ${JSON.stringify(response, null, '\t')}`)
+          console.log(`login: after axios response.data is: ${JSON.stringify(response.data, null, '\t')}`)
           localStorage.setItem('authorization', 'true');
           localStorage.setItem('token', `${response.data.token}`);
           context.commit(SET_USER, response.data);
@@ -106,7 +106,11 @@ export const loginWithGoogle = (context: any, $gAuth: any) => {
 export const getInfoAboutUser = (context: any) => {
   return Vue.axios.get('/api/user/me')
     .then((response) => {
-      context.commit(SET_USER, response.data);
+      if (response.data) {
+        context.commit(SET_USER, response.data);
+      } else {
+        console.log(`getInfoAboutUser: response data from '/api/user/me' is empty`);
+      }
     });
 };
 

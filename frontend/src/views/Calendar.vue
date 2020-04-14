@@ -11,7 +11,7 @@
           <div v-for="val in getEventsForThisMonth()" :key="val.name"  v-if="getDayFromDate(value).day == getDayFromDate(val.date).day">
             <div
               class="event-wrapper"
-              v-if="getEventsForDay(value) && val.userId === userinfo._id"
+              v-if="getEventsForDay(value) && val.userId === userInfo._id"
               :style="{'background-color' : val.color,
                  'border-color':val.color}"
             >
@@ -112,31 +112,38 @@ export default Vue.extend({
         'Декабрь',
       ],
       weekday: ['ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ', 'ВС'],
-      userinfo: (store.getters.userData.result ? store.getters.userData.result : store.getters.user.result),
       locale
     };
   },
-  beforeCreate() {
+  // was - beforeCreate
+  created() {
     moment.locale('ru');
 
     if (this.userInfo) {
-      this.$store.dispatch(GET_EVENTS, this.userInfo.id);
+      this.$store.dispatch(GET_EVENTS, this.userInfo._id);
     }
 
-    console.log('beforeCreate get events')
-    const a = Vue.axios.get('/api/outlook/event')
+    if (this.userInfo.outlookId) {
+      console.log('beforeCreate get events')
+      const a = Vue.axios.get('/api/outlook/event')
         .then((response) => {
             console.log('beforeCreate resp:',response)
         }).catch((e) => {
             console.log('beforeCreate error:',e);
         });
-    return a;
+        return a;
+    } else if (this.userInfo.googleId) {
+      // 
+    }
   },
   components: {
     AppAddEventModal,
   },
   computed: {
     ...mapGetters(['user', 'events', 'userData']),
+    userInfo() {
+      return this.userData.result ? this.userData.result : this.user.result;
+    }
   },
   watch: {
     user(user) {
@@ -175,7 +182,7 @@ export default Vue.extend({
       return (
         this.events &&
         this.events.filter(event => {
-          if (event && event.userId === this.userinfo._id) {
+          if (event && event.userId === this.userInfo._id) {
             return moment(event.date).isSame(moment(), 'month');
           }
         })
@@ -192,7 +199,7 @@ export default Vue.extend({
       return (
         this.events &&
         this.events.filter( (event) => {
-          if (event && event.userId === this.userinfo._id) {
+          if (event && event.userId === this.userInfo._id) {
             return moment(event.date).isSame(moment().add(1, 'M'), 'month');
           }
         })
