@@ -30,11 +30,12 @@ export const editUser = (context: any, user: any) => {
 };
 
 export const createEvent = (context: any, event: any) => {
+  console.log(`Событие добавляется: ${JSON.stringify(event,null,3)}`);
   return Vue.axios
     .post(`api/event/`, event)
     .then((response: any) => {
       context.commit(ADD_EVENT, response.data.result);
-
+      console.log(`Событие добавлено: ${JSON.stringify(response.data.result,null,3)}`);
     });
 };
 

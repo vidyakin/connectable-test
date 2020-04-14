@@ -1,7 +1,7 @@
 const validateToken = require('./utils').validateToken;
 const cors = require('cors');
 const fileUpload = require('express-fileupload');
-var latinize = require('latinize');
+const latinize = require('latinize');
 
 const serializers = require('./serializers');
 const groupSerializer = require('./groupSerializer').groupSerializer;
@@ -29,6 +29,15 @@ const Notification = require('./models').Notification;
 const app = express();
 const port = process.env.PORT || 4000;
 
+const server = require('http').Server(app)
+const io = require('socket.io')(server);
+io.on('connection', socket=>{
+    console.log("A user connected");
+    socket.on('disconnect',()=>{
+        console.log("A user disconnected");        
+    })
+})
+
 app.use(cors());
 app.use(fileUpload({
   limits: {fileSize: 50 * 1024 * 1024},
@@ -54,11 +63,13 @@ app.use('/api/project', validateToken, require('./crud')(Project, projectSeriali
 
 app.use('/api/outlook', require('./auth/outlook/'));
 app.use('/api/outlook/event', require('./calendar'));
+app.use('/api/google/event', require('./google'));
 app.use("/role", require('./role/routes'));
 
 var userHandlers = require('./email/index.js');
+
 app.get('/', (req, res) => {
-res.send('Connectable backend says Hello!!!');
+    res.send('Connectable backend says Hello!!!');
 });
 
 app.route('/auth/forgot_password')
@@ -463,4 +474,4 @@ app.post('/api/dislike', (req, res) => {
 });
 
 
-app.listen(port, () => console.log(`[Server]: Listening on port ${port}`));
+server.listen(port, () => console.log(`[Server]: Listening on port ${port}`));

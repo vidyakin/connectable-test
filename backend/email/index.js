@@ -90,10 +90,11 @@ exports.forgot_password = function(req, res) {
     async.waterfall([
         function(done) {
             User.findOne({
-                email: req.body.email
+                email: req.body.email // надо ставить фильтр чтоб гугл-ид == undef и outlook-id тоже
             }).exec(function(err, user) {
                 if (user) {
                     done(err, user);
+                    console.log(`user found: ${JSON.stringify(user,null,3)}`)
                 } else {
                     return res.status(200).json({ status: 404, message: 'Пользователь не найден.' });
                     //done('Пользователь не найден.');
