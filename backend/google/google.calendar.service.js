@@ -6,8 +6,8 @@ const oauth2Client = new google.auth.OAuth2(
     "PBDrJ199A9eJwKRyGbpbtoX8",
     "http://localhost:8080"
   );
-const {tokens} = await oauth2Client.getToken(code)
-oauth2Client.setCredentials(tokens);
+// const {tokens} = oauth2Client.getToken(code)
+// oauth2Client.setCredentials(tokens);
 
 google.options({
     auth: oauth2Client
