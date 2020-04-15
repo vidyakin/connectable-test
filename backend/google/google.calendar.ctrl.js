@@ -12,9 +12,9 @@ const calendarService = require('./google.calendar.service')
 exports.getAllEvents = async (req, res, next) => {
   console.log('++++++++ Google calendar ctrl: getAllEvents: ++++++++')
   //console.log('HEADERS',req.headers)
-  const { data, error } = await calendarService.listEvents(req.headers.authorization)
-  console.log('>> data:',data)
-  console.log('>> error:',error)
+  // const { data, error } = await calendarService.listEvents(req.headers.authorization)
+  // console.log('>> data:',data)
+  // console.log('>> error:',error)
   console.log('+++++++++++++++++++++++++++++++++++++++++++++++++++++')
   return error ? res.sendStatus(500).json(error) : res.json(data)
 }

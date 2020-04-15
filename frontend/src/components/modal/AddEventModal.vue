@@ -260,41 +260,47 @@
         const result = [ n, options ];
         return result;
       },
-      createEvent(e) {
+      async createEvent(e) {
 
         e.preventDefault();
-        const thisform = this.form;
-        this.form.validateFields((err, formFields) => {
-          if (!err) {
-            //this.createButtonSpinning = true;
-            const event = {
-              name: formFields.name, 
-              date: formFields.dateEvent, 
-              time: formFields.timeEvent, 
-              comment: formFields.comment, 
-              color: this.currentColor.color,
-              userId: this.userInfo.result._id,
-              userEmail: this.userInfo.result.email,
-              emailSend: this.statusEmailSend,
-              attendees: (this.selectedItems ? this.selectedItems.map(el => {
-                return {'email': el.key};
-              }) : '')
-            };
-            console.log(`event is ${JSON.stringify(event,null,3)}`);
-            const calendar = google.calendar({version: 'v3', auth:""});
-            // this.$store.dispatch(CREATE_EVENT, event)
-            // .finally(() => {
-            //   thisform.setFieldsValue({
-            //     name: '',
-            //     dateEvent: moment(),
-            //     timeEvent: moment.relTime,
-            //     comment: ''
-            //   });
-            //   this.close();
-            // });
-          } else {
+        const usersData = this.usersData; // чтоб не потерять this
+        const blancDate = moment().hours(12).minutes(0).seconds(0)
+
+        let start = this.form.getFieldValue("dateEvent");
+        const t = this.form.getFieldValue("timeEvent");
+        start.hour(t.hour()).minute(t.minute()).seconds(0).utcOffset(3); // set H&m&s from time field to date field
+        console.log(`event starts at: ${start.format()}`)
+        
+        this.form.validateFields(async (err, formFields) => {
+          if (err) {
             console.log(`${err}`);
+            return;
           }
+          const keys = this.selectedItems.map(e => e.key)
+          const attendees = usersData.filter(ud => keys.includes(ud._id)).map(e => ({email: e.email}))
+          //this.createButtonSpinning = true;
+          const event = {
+            name: formFields.name, 
+            date: start, 
+            comment: formFields.comment, 
+            color: this.currentColor.color,
+            userId: this.userInfo.result._id,
+            userEmail: this.userInfo.result.email,
+            emailSend: this.statusEmailSend,
+            attendees: (this.selectedItems ? attendees : '')
+          };
+          console.log(`event is ${JSON.stringify(event,null,3)}`);
+          //const calendar = google.calendar({version: 'v3', auth:""});
+          await this.$store.dispatch(CREATE_EVENT, event)
+          //.finally(() => {
+            // this.form.setFieldsValue({
+            //   name: '',
+            //   dateEvent: blancDate,
+            //   timeEvent: blancDate,
+            //   comment: ''
+            // });
+          this.close();
+          //});
         });
       },
       handleChange(value) {
