@@ -29,13 +29,18 @@ const Notification = require('./models').Notification;
 const app = express();
 const port = process.env.PORT || 4000;
 
-const server = require('http').Server(app)
+const server = require('http').createServer(app)
 const io = require('socket.io')(server);
 io.on('connection', socket=>{
     console.log("A user connected");
     socket.on('disconnect',()=>{
         console.log("A user disconnected");        
     })
+    // Универсальное событие, что и как обрабатываетс - задается в data
+    socket.on("socketMsg", data => {
+        console.log(`SERVER Message`);
+        io.sockets.emit("socketMessage", data);
+    });
 })
 
 app.use(cors());
