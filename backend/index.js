@@ -29,19 +29,19 @@ const Notification = require('./models').Notification;
 const app = express();
 const port = process.env.PORT || 4000;
 
-const server = require('http').createServer(app)
-const io = require('socket.io')(server);
-io.on('connection', socket=>{
-    console.log("A user connected");
-    socket.on('disconnect',()=>{
-        console.log("A user disconnected");        
-    })
-    // Универсальное событие, что и как обрабатываетс - задается в data
-    socket.on("socketMsg", data => {
-        console.log(`SERVER Message`);
-        io.sockets.emit("socketMessage", data);
-    });
-})
+// const server = require('http').createServer(app)
+// const io = require('socket.io')(server);
+// io.on('connection', socket=>{
+//     console.log("A user connected");
+//     socket.on('disconnect',()=>{
+//         console.log("A user disconnected");        
+//     })
+//     // Универсальное событие, что и как обрабатываетс - задается в data
+//     socket.on("socketMsg", data => {
+//         console.log(`SERVER Message`);
+//         io.sockets.emit("socketMessage", data);
+//     });
+// })
 
 app.use(cors());
 app.use(fileUpload({
@@ -479,4 +479,4 @@ app.post('/api/dislike', (req, res) => {
 });
 
 
-server.listen(port, () => console.log(`[Server]: Listening on port ${port}`));
+app.listen(port, () => console.log(`[Server]: Listening on port ${port}`));
