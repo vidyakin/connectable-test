@@ -30,7 +30,7 @@ export const editUser = (context: any, user: any) => {
 };
 
 export const createEvent = (context: any, event: any) => {
-  console.log(`Событие добавляется: ${JSON.stringify(event,null,3)}`);
+  console.log(`createEvent starts on front: ${JSON.stringify(event,null,3)}`);
   return Vue.axios
     .post(`api/event/`, event)
     .then((response: any) => {

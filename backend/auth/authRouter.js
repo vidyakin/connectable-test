@@ -16,7 +16,7 @@ router.get('/user/me', (req, res) => {     // router = /api/user/me
   //     }
   //     return value;
   // }, 3)
-  cache = null;
+  //cache = null;
   console.log(`authRouter by /user/me req.decoded=${req.decoded}`)
   if (req.decoded == undefined) {
     res.send(undefined);

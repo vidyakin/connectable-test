@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const axios = require('axios');
 const user = require('./user');
+const { google } = require('googleapis');
 
 const environment = process.env.NODE_ENV;
 const stage = require('../config')[environment];
@@ -22,35 +23,58 @@ const eventSchema = new Schema({
 });
 /*Bearer*/
 eventSchema.pre('save', function (next) {
-  user.findOne({_id: this.userId}).catch(err => console.log(err)).then(data => {
-
+  //console.log(`events pre Save on back: this ${JSON.stringify(this,null,3)}`);
+  
+  user.findOne({_id: this.userId})
+  .catch(err => console.log(err))
+  .then(data => {
+    console.log(`Bearer ${data.googleToken}`);
+    
     const headers = {
       'Authorization': `Bearer ${data.googleToken}`,
     };
-    const targetTime = new Date(this.date.setHours(this.time.split(':')[0], this.time.split(':')[1])),
-        timeZoneFromDB = -2,
-        tzDifference = timeZoneFromDB * 60 + targetTime.getTimezoneOffset(),
-        offsetTime = new Date(targetTime.getTime() + tzDifference * 60 * 1000);
+    // const targetTime = new Date(this.date.setHours(this.time.split(':')[0], this.time.split(':')[1])),
+    //     timeZoneFromDB = -2,
+    //     tzDifference = timeZoneFromDB * 60 + targetTime.getTimezoneOffset(),
+    //     offsetTime = new Date(targetTime.getTime() + tzDifference * 60 * 1000);
     const event = {
       description: this.comment,
-      start: {'dateTime': offsetTime},
-      end: {'dateTime': offsetTime},
+      start: {'dateTime': this.date},
+      end: {'dateTime': this.date},
       summary: this.name
     };
 
-    console.log(`>> event.js: 'event' is: ${JSON.stringify(event,null,2)}`)
     if(this.attendees) event.attendees = this.attendees;
+    //console.log(`>> event.js: 'event' is: ${JSON.stringify(event,null,2)}`)
+
+    const safeStringify = val => {
+      let cache = []
+      const f = (key, value) => {
+          if (typeof value === 'object' && value !== null) {
+              if (cache.indexOf(value) !== -1) {
+                  // Duplicate reference found, discard key
+                  return;
+              }
+              // Store value in our collection
+              cache.push(value);
+          }
+          return value;
+      }
+      let strD = JSON.stringify(val, f, 3);
+      cache = null;
+      return strD;
+    }
     
     axios
       .post('https://www.googleapis.com/calendar/v3/calendars/primary/events',
         event, {headers: headers})
-      .catch(e => {
-        console.log(`>> event.js: in axios's catch error: ${JSON.stringify(e,null,2)}`)
+      .then(_d => {        
+        console.log(`>> event.js: in axios's «then» '_d' is: ${safeStringify(_d.data)}`)
+        this.googleEventId = _d.data.id;
         next();
       })
-      .then(_d => {
-        console.log(`>> event.js: in axios's «then» '_d' is: ${JSON.stringify(_d,null,2)}`)
-        this.googleEventId = _d.data.id;
+      .catch(e => {
+        console.log(`>> event.js: in axios's catch error: ${e.message}`)
         next();
       })
   })
