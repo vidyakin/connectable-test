@@ -17,9 +17,11 @@
         <a-button type="primary" @click="openCreate" >Создать группу</a-button>
       </div>
     </div>
-    <div class="groups-body">
+    <div class="groups-body" v-if="isLoaded">
       <app-group v-for="(group, index) in sortedGroup" :group="group" :key="index" ></app-group>
     </div>
+    <!-- SPINNER while loading -->
+    <a-spin size="large" v-else />
   </div>
 </template>
 <script>
@@ -38,10 +40,12 @@ export default {
   data() {
     return {
       createVisible: false,
+      isLoaded: false,
       groupsData: [],
       searchText: '',
       filterData: [],
       datauser: (store.getters.userData ? store.getters.userData.result : store.getters.user ),
+      userIsAdmin: false
     };
   },
   methods: {
@@ -62,13 +66,18 @@ export default {
       };
       return this.filterData.sort(compare);
     },
-    userIsAdmin() {
-      return this.$can('read', {'accessEmail': this.datauser.email, '__type': 'Admin'})
-    },
+    // userIsAdmin() {
+    //   return this.$can('read', {'accessEmail': this.datauser.email, '__type': 'Admin'})
+    // },
     ...mapGetters(['groups', 'userData']),
   },
   beforeCreate() {
-    this.$store.dispatch(GET_GROUPS);
+    this.$store.dispatch(GET_GROUPS)
+    .then(()=>{
+      this.isLoaded = true
+      this.userIsAdmin = this.$can('read', {'accessEmail': this.datauser.email, '__type': 'Admin'})
+      //console.log(`> befMount: currentGroup is ${JSON.stringify(this.currentGroup,null,2)}`)
+    });
   },
 
   watch: {

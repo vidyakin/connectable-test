@@ -113,6 +113,15 @@ export default {
               emailSend: this.statusEmailSend,
             })
             .finally(() => {
+              this.$socket.client.emit('to all', {
+                type: 'NEW_GROUP', 
+                val: {
+                  title: "СОВСЕМ НОВАЯ",
+                  userFrom: this.userinfo.email,
+                  text: "создал новую группу",
+                  subj: "Любители хомяков"
+                } 
+              })
               this.createButtonSpinning = false;
               this.onClose();
             });

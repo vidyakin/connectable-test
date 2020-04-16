@@ -29,19 +29,24 @@ const Notification = require('./models').Notification;
 const app = express();
 const port = process.env.PORT || 4000;
 
-// const server = require('http').createServer(app)
-// const io = require('socket.io')(server);
-// io.on('connection', socket=>{
-//     console.log("A user connected");
-//     socket.on('disconnect',()=>{
-//         console.log("A user disconnected");        
-//     })
-//     // Универсальное событие, что и как обрабатываетс - задается в data
-//     socket.on("socketMsg", data => {
-//         console.log(`SERVER Message`);
-//         io.sockets.emit("socketMessage", data);
-//     });
-// })
+const server = require('http').createServer(app)
+const io = require('socket.io')(server);
+io.on('connection', socket=>{
+    console.log("-> socket.io user connected: ", socket.id);
+    socket.on('disconnect',()=>{
+        console.log("<- socket.io user disconnected: ", socket.id);
+    })
+    // Универсальное событие для всех, что и как обрабатываетс - задается в data
+    socket.on("to all", data => {
+        console.log(`SERVER Message to all: ${data.type}`);
+        socket.broadcast.emit("socketMessage", data);
+    });
+    // Универсальное событие для одного, что и как обрабатываетс - задается в data
+    socket.on("to one", data => {
+        console.log(`SERVER Message to one: ${data.type}`);
+        socket.to(data.socket_id).emit("socketMessage", data);
+    });
+})
 
 app.use(cors());
 app.use(fileUpload({
@@ -161,12 +166,14 @@ app.delete('/api/deleteParticipant/:participantId/group/:groupId', (req, res, ne
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
+
 mongoose.connect(process.env.DB_URL, {useNewUrlParser: true});
-var db=mongoose.connection;
-db.on('error', console.log.bind(console, "connection error"));
+var db = mongoose.connection;
+db.on('error', console.log.bind(console, "> Mongo connection error"));
 db.once('open', function(callback){ 
-    console.log("connection succeeded"); 
+    console.log("> Mongo connection succeeded"); 
 });
+
 //register page
 const mail = require('./email/index');
 app.post('/api/register', function(req,res){
@@ -479,4 +486,4 @@ app.post('/api/dislike', (req, res) => {
 });
 
 
-app.listen(port, () => console.log(`[Server]: Listening on port ${port}`));
+server.listen(port, () => console.log(`[Server]: Listening on port ${port}`));

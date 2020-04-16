@@ -2,7 +2,9 @@ const mongoose = require('mongoose');
 
 const Schema = mongoose.Schema;
 //mongoose.connect('mongodb://user:secret1@ds133621.mlab.com:33621/aleseyko', {useNewUrlParser: true});
-mongoose.connect(process.env.DB_URL, {useNewUrlParser: true});
+console.log(`DB_URL: ${process.env.DB_URL}`);
+
+mongoose.connect(process.env.DB_URL || db, {useNewUrlParser: true});
 mongoose.set('useFindAndModify', false);
 
 const jokesSchema = new Schema({
