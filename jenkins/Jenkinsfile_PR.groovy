@@ -35,4 +35,11 @@ pipeline {
             }
         }
     }
+    post {
+        always {
+            script {
+                sh "docker system prune -f"
+            }
+        }
+    }
 }
