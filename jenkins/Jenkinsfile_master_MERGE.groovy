@@ -92,7 +92,7 @@ pipeline {
                 docker-compose -f docker-compose-prod.yaml up --no-deps -d connfrontend &&
                 docker-compose -f docker-compose-prod.yaml build --force-rm connbackend &&
                 docker-compose -f docker-compose-prod.yaml up --no-deps -d -V connbackend &&
-                docker system prune -f && docker volume prune
+                docker system prune -f && docker volume prune -f
                 '
                 """
                 }
@@ -132,7 +132,7 @@ pipeline {
                 cd \$HOME/${PROD_ROOT_DIR} &&
                 docker kill connbackend connfrontend &&
                 docker-compose -f docker-compose-prod.yaml up -d -V connfrontend connbackend &&
-                docker system prune -f && docker volume prune
+                docker system prune -f && docker volume prune -f
                 '
                 """
                 }
