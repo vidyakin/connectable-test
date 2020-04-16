@@ -88,10 +88,11 @@ pipeline {
                 sh """ssh -i ${SSH_KEYFILE} -o StrictHostKeyChecking=no ${SSH_USERNAME}@${SSH_PROD_IP} \
                 '
                 cd \$HOME/${PROD_ROOT_DIR} &&
-                docker-compose -f docker-compose-prod.yaml build connfrontend &&
+                docker-compose -f docker-compose-prod.yaml build --force-rm connfrontend &&
                 docker-compose -f docker-compose-prod.yaml up --no-deps -d connfrontend &&
-                docker-compose -f docker-compose-prod.yaml build connbackend &&
-                docker-compose -f docker-compose-prod.yaml up --no-deps -d connbackend
+                docker-compose -f docker-compose-prod.yaml build --force-rm connbackend &&
+                docker-compose -f docker-compose-prod.yaml up --no-deps -d -V connbackend &&
+                docker system prune -f && docker volume prune
                 '
                 """
                 }
@@ -101,17 +102,7 @@ pipeline {
     post {
         success {
             script {
-                withCredentials([sshUserPrivateKey(
-                                   credentialsId: "${SSH_PROD_CREDENTIALS}",
-                                   keyFileVariable: 'SSH_KEYFILE',
-                                   usernameVariable: 'SSH_USERNAME'
-                                 ),
-                                 usernamePassword(
-                                    credentialsId: "${GIT_CREDENTIALS}",
-                                    passwordVariable: 'GIT_PASS',
-                                    usernameVariable: 'GIT_USER'
-                                 ),
-                                 string(
+                withCredentials([string(
                                    credentialsId: "${CLOUDFLARE_TOKEN}",
                                    variable: 'CF_TOKEN'
                                  )]) {
@@ -140,7 +131,8 @@ pipeline {
                 sudo cp -r "\$HOME/${PROD_ROOT_DIR}-bak" "\$HOME/${PROD_ROOT_DIR}" &&
                 cd \$HOME/${PROD_ROOT_DIR} &&
                 docker kill connbackend connfrontend &&
-                docker-compose -f docker-compose-prod.yaml up -d connfrontend connbackend
+                docker-compose -f docker-compose-prod.yaml up -d -V connfrontend connbackend &&
+                docker system prune -f && docker volume prune
                 '
                 """
                 }
