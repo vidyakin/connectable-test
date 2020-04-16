@@ -68,6 +68,7 @@ pipeline {
                                  )]) {
                 sh """ssh -i ${SSH_KEYFILE} -o StrictHostKeyChecking=no ${SSH_USERNAME}@${SSH_PROD_IP} \
                 '
+                test -d "\$HOME/${PROD_ROOT_DIR}-bak" && sudo rm -rf "\$HOME/${PROD_ROOT_DIR}-bak" &&
                 sudo cp -r "\$HOME/${PROD_ROOT_DIR}" "\$HOME/${PROD_ROOT_DIR}-bak" &&
                 cd \$HOME/${PROD_ROOT_DIR} &&
                 git checkout . &&
@@ -128,6 +129,7 @@ pipeline {
                                  )]) {
                 sh """ssh -i ${SSH_KEYFILE} -o StrictHostKeyChecking=no ${SSH_USERNAME}@${SSH_PROD_IP} \
                 '
+                test -d "\$HOME/${PROD_ROOT_DIR}" && sudo rm -rf "\$HOME/${PROD_ROOT_DIR}" &&
                 sudo cp -r "\$HOME/${PROD_ROOT_DIR}-bak" "\$HOME/${PROD_ROOT_DIR}" &&
                 cd \$HOME/${PROD_ROOT_DIR} &&
                 docker kill connbackend connfrontend &&
