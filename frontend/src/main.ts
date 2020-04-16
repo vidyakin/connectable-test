@@ -8,6 +8,8 @@ import VuexAxios from 'vue-axios';
 import axios from 'axios';
 import ability from '../config/ability';
 import { abilitiesPlugin } from '@casl/vue';
+import VueSocketIOExt from 'vue-socket.io-extended';
+import io from 'socket.io-client';
 
 // @ts-ignore
 import VueMq from 'vue-mq';
@@ -30,6 +32,9 @@ Vue.use(abilitiesPlugin, ability);
 const SocialSharing = require('vue-social-sharing');
 Vue.use(SocialSharing);
 
+const socket = io(process.env.VUE_APP_API_URL || 'http://localhost:8080');
+
+Vue.use(VueSocketIOExt, socket);
 
 Vue.config.productionTip = false;
 if (localStorage.getItem('token')) {
@@ -38,7 +43,9 @@ if (localStorage.getItem('token')) {
 
 setAuthInterceptor();
 Vue.axios.defaults.baseURL = `${process.env.VUE_APP_API_URL}`;
+
 console.log(`backend address: ${process.env.VUE_APP_API_URL}`)
+
 setAuthToken(localStorage.getItem('token'));
 
 Vue.use(VueMq, {

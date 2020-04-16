@@ -82,6 +82,24 @@ export default {
   computed: {
     ...mapGetters(['userData', 'user', 'currentUser']),
   },
+  sockets: {
+    connect() {
+      console.log('socket connected')
+    },
+    socketMessage(payload) {
+      this.$notification['success']({
+        message: payload.type,
+        description:
+          `${JSON.stringify(payload.val,null,3)}`,
+        placement: 'topLeft'
+      });
+    }
+  },
+  created() {
+    // this.$socket.$subscribe('socketMessage', payload => {
+    //   console.log(`socketMessage fired!`)
+    // });
+  },
   methods: {
     closeImage() {
       this.$store.commit(SET_SHOW_IMAGE_HEADER, false);

@@ -1,7 +1,7 @@
 <template>
   <!-- Приватная группа, когда пользователь это ее создатель -->
   <!-- <div class="group" v-if="group.type === 2 && group.creatorId === datauser._id || userIsAdmin"> -->
-  <div class="group" v-if="groupVisible" @click="redirectToGroup">
+  <div class="group" v-if="groupVisible">
     <div class="group-header" :class="group.type === 2 ? 'private' : ''">
       <div class="group-header-content">
         <div class="group-header-content-name">{{group.name}}</div>
@@ -25,7 +25,7 @@
         </a-popover>
       </div>
     </div>
-    <div class="group-content" v-if="group.participants">
+    <div class="group-content" v-if="group.participants" @click="redirectToGroup">
       <div class="group-content-participant" v-for="participant in group.participants" :key="participant._id">
         <!--<a-avatar :src="participant.googleImage"></a-avatar>-->
         <div class="group-content-participant-info">
@@ -97,7 +97,7 @@ export default {
     ...mapGetters(['userData']),
   },
   created() {
-    console.log(`>> Group comp created: dataUser is ${JSON.stringify(this.datauser,null,3)}`);    
+    //console.log(`>> Group comp created: dataUser is ${JSON.stringify(this.datauser,null,3)}`);    
   },
   
   methods: {
@@ -135,9 +135,11 @@ export default {
 
 <style lang="scss">
 .group-header-action-popup-content {
+  text-align: center;
+  
   .ant-popover-inner-content {
     display: flex;
-    // justify-content: center;
+    justify-content: center;
     .ant-btn {
       border: 0;
       background-color: transparent;

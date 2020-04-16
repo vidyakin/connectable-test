@@ -17,10 +17,12 @@
     "moment": "^2.24.0",
     "query-string": "^6.9.0",
     "socket.io": "^2.3.0",
+    "socket.io-client": "^2.3.0",
     "textarea-caret": "^3.1.0",
     "vue": "^2.6.11",
     "vue-at": "^2.5.0-beta.2",
     "vue-axios": "^2.1.5",
+    "vue-class-component": "^7.2.3",
     "vue-context": "^5.1.0",
     "vue-dialog-loading": "^0.4.3",
     "vue-google-oauth2": "^1.4.0",
@@ -29,6 +31,7 @@
     "vue-router": "^3.1.4",
     "vue-social-sharing": "^2.4.7",
     "vue-socket.io": "^3.0.7",
+    "vue-socket.io-extended": "^4.0.1",
     "vuex": "^3.1.2"
   },
   "devDependencies": {
