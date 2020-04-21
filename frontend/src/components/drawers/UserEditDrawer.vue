@@ -18,7 +18,7 @@
                 :defaultValue="currentUser && currentUser.firstName"
                 v-decorator="['firstName', {initialValue:currentUser &&  currentUser.firstName,
                 rules: [
-                { required: true, message: 'Please input first name', }
+                { required: true, message: 'Введите имя', }
                 ]
               }]"
                 class="secondary form-input"
@@ -34,7 +34,7 @@
                 :defaultValue="currentUser && currentUser.lastName"
                 v-decorator="['lastName', {initialValue:currentUser &&  currentUser.lastName,
                 rules: [
-                { required: true, message: 'Please input last name', }
+                { required: true, message: 'Введите фамилию', }
                 ]
               }]"
                 class="secondary form-input"
@@ -50,7 +50,7 @@
                 :defaultValue="currentUser && currentUser.positions.join(',')"
                 v-decorator="['positions', {initialValue:currentUser &&  currentUser.positions.join(','),
                 rules: [
-                { required: false, message: 'Please input position', }
+                { required: false, message: 'Укажите должность', }
                 ]
               }]"
                 class="secondary form-input"
@@ -75,7 +75,7 @@
                 rules: [{
                   type: 'email', message: 'The input is not valid E-mail!',
                 }, {
-                  required: true, message: 'Please input E-mail!',
+                  required: true, message: 'Укажите E-mail!',
                 }]
               }]"
                 class="secondary form-input"
@@ -91,7 +91,7 @@
                 :defaultValue="currentUser && currentUser.phone"
                 v-decorator="['phone', {initialValue:currentUser &&  currentUser.phone,
                 rules: [{
-                  required: false, message: 'Please input Phone',
+                  required: false, message: 'Введите номер телефона',
                 }]
               }]"
                 class="secondary form-input"

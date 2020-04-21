@@ -57,8 +57,9 @@ import AppInput from '../common/Input';
 import { UPDATE_USER_INFO } from '../../store/user/actions.type';
 import ATextarea from 'ant-design-vue/es/input/TextArea';
 import { CREATE_GROUP } from '../../store/group/actions.type';
-import {GET_NOTIFICATION} from '../../store/notification/actions.type';
+import { GET_NOTIFICATION, CREATE_MESSAGE } from '../../store/notification/actions.type';
 import store from '../../store';
+import { SOCKET_NEW_MESSAGE } from '../../store/notification/mutations.type';
 export default {
   name: 'AppUserEditDrawer',
   data() {
@@ -101,34 +102,58 @@ export default {
     },
     createGroup(e) {
       e.preventDefault();
-      this.form.validateFields((err, formFields) => {
-        if (!err) {
-          this.createButtonSpinning = true;
-          this.$store
-            .dispatch(CREATE_GROUP, {
-              ...formFields,
-              type: this.type,
-              creatorId: this.userinfo._id,
-              userEmail: this.userinfo.email,
-              emailSend: this.statusEmailSend,
-            })
-            .finally(() => {
-              this.$socket.client.emit('to all', {
-                type: 'NEW_GROUP', 
-                val: {
-                  title: "СОВСЕМ НОВАЯ",
-                  userFrom: this.userinfo.email,
-                  text: "создал новую группу",
-                  subj: "Любители хомяков"
-                } 
-              })
-              this.createButtonSpinning = false;
-              this.onClose();
-            });
+      this.form.validateFields(async (err, formFields) => {
+        if (err) { console.error(err); return }
+
+        this.createButtonSpinning = true;
+        // записываем группу в БД и стор
+        const newGroup = {
+          ...formFields,
+          type: this.type,
+          creatorId: this.userinfo._id,
+          userEmail: this.userinfo.email,
+          emailSend: this.statusEmailSend,
         }
+        const newGroupId = await this.$store.dispatch(CREATE_GROUP, newGroup)
+        // объект-модель для сохранения в БД
+        const newMsg = this.newMsgForGroup(newGroup, newGroupId)
+        // Создаем сообщение в БД и сторе
+        const newMsgId = await this.$store.dispatch(CREATE_MESSAGE, newMsg)
+          //.finally(() => {
+            // посылать если только группа открытая?
+          
+        // Посылаем сообщение для всех о появлении нового сообщения
+        // с сервера придет бродкастом сообщение "socketMessage" с переданными данными
+        this.$socket.client.emit('to all', {
+          type: 'NEW_GROUP', 
+          // 1 вариант - создавать объект тут, второй - в момент приема этого сообщения в обработчике события "to all"
+          // val: {
+          //   title: "Новая группа",
+          //   userFrom: this.userinfo.firstName + ' ' + this.userinfo.lastName,
+          //   text: "создал новую группу",
+          //   subj: newGroup.name
+          // } 
+          // 2 вариант - только тип указывает что надо получить сообщения с сервера и сформировать массив сообщений 
+        })
+        this.createButtonSpinning = false;
+        this.onClose();
+        // });
       });
     },
-
+    /**
+     * Формирование объекта Message для передачи в БД
+     */
+    newMsgForGroup(newGroup,newGroupId) {
+      return {
+        msgType: "NEW_GROUP",         // тип сообщения, для разделения бизнес-логики - "NEW_GROUP","YOU_ADDED_IN_GROUP", ""
+        dateCreated: Date.now(),      // Дата создания сообщения
+        text: `<b>${this.userinfo.firstName} ${this.userinfo.lastName}</b> создал новую группу <i>${newGroup.name}</i>`,   // текст сообщения
+        senderId: newGroup.creatorId, // id отправителя
+        listenerType: "all",          // тип приемников сообщений - все, выборочно или еще как-то
+        linkedObjType: "group", // связанный объект - группа, проект, и т.д.
+        linkedObjId: newGroupId
+      }
+    },
     handleChange(e) {
       this.type = e;
     },

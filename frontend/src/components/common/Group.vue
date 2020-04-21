@@ -155,8 +155,7 @@ export default {
   box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.15);
   margin-right: 2rem;
   margin-bottom: 2rem;
-  cursor: pointer;
-
+  
   &-header {
     background-color: #f5f6fa;
     height: 4rem;
@@ -212,10 +211,11 @@ export default {
   }
 
   &-content {
-    height: 16rem;
+    // height: 16rem;
     background-color: white;
     overflow: auto;
-    
+    cursor: pointer;
+
     &-participant {
       display: flex;
       padding: 5px 1rem;

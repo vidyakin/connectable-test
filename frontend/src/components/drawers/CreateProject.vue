@@ -51,7 +51,7 @@
               :filterOption="false"
               @search="search"
               @change="handleChange"
-              :notFoundContent="'Пользователя не найдено'"
+              :notFoundContent="'Пользователь не найден'"
             >
               <a-select-option v-for="d in data" :key="d._id">{{d.firstName + ' ' + d.lastName}}</a-select-option>
             </a-select>

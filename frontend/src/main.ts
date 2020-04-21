@@ -34,7 +34,7 @@ Vue.use(SocialSharing);
 
 const socket = io(process.env.VUE_APP_API_URL || 'http://localhost:8080');
 
-Vue.use(VueSocketIOExt, socket);
+Vue.use(VueSocketIOExt, socket, { store });
 
 Vue.config.productionTip = false;
 if (localStorage.getItem('token')) {
