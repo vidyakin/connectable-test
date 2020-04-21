@@ -25,6 +25,7 @@ const ProjectParticipant = require('./models').ProjectParticipant;
 const Project = require('./models').Project;
 const Department = require('./models').Department;
 const Notification = require('./models').Notification;
+const Message = require('./models').Message;
 
 const app = express();
 const port = process.env.PORT || 4000;
@@ -70,6 +71,8 @@ app.use('/api/groupParticipant', validateToken, require('./crud')(GroupParticipa
 app.use('/api/groupInvite', validateToken, require('./crud')(GroupInvite, inviteSerializer));
 app.use('/api/projectParticipant', validateToken, require('./crud')(ProjectParticipant, serializers.serializer));
 app.use('/api/project', validateToken, require('./crud')(Project, projectSerializer));
+
+app.use('/api/message', validateToken, require('./crud')(Message, serializers.serializer));
 
 app.use('/api/outlook', require('./auth/outlook/'));
 app.use('/api/outlook/event', require('./calendar'));

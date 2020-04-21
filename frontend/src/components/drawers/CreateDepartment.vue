@@ -13,8 +13,8 @@
                     <div class="col-sm-12">
                         <a-form-item>
                             <app-input
-                                    label="Названия"
-                                    placeholder="Названия"
+                                    label="Название"
+                                    placeholder="Название"
                                     v-decorator="['name', { rules: [{ required: true, message: 'Название не может быть пустым!', }]}]"
                                     class="secondary form-input"
                             ></app-input>
@@ -32,7 +32,7 @@
                                 :filterOption="false"
                                 @search="searchdep"
                                 @change="handleChangeDep"
-                                :notFoundContent="'Раздел не найдено'"
+                                :notFoundContent="'Раздел не найден'"
                         >
                             <a-select-option v-for="d in filtered_departments" :key="d._id">{{d.name}}</a-select-option>
                         </a-select>
@@ -44,7 +44,7 @@
                             <div class="label">Участники</div>
                             <a-select v-decorator="['members']"
                                     labelInValue mode="multiple"
-                                    placeholder="Выберите пользователей" :notFoundContent="'Пользователя не найдено'"
+                                    placeholder="Выберите пользователей" :notFoundContent="'Пользователь не найден'"
                                     style="width: 100%"
                                     :filterOption="false"
                                     @search="search"

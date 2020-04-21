@@ -1,7 +1,15 @@
 <template>
   <div>
     <div class="label">{{ label }}</div>
-    <a-input v-bind="$attrs" v-on="$listeners" class="basic-input"/>
+    <!-- Модификация v-on не описана в справке, нашел на гитхабе -->
+    <a-input 
+      v-bind="$attrs" 
+      v-on="{
+          ...$listeners,
+          input: event => $emit('input', event.target.value)
+        }" 
+        class="basic-input"
+    />
   </div>
 </template>
 

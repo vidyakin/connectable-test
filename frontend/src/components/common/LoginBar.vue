@@ -16,13 +16,14 @@
                   slot="avatar"
                   src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
                 />
-                <div slot="description" class="notif-description"><b>{{item.userFrom}}</b> {{item.text}} <i>{{item.subj}}</i></div>
+                <!-- <div slot="description" class="notif-description"><b>{{item.userFrom}}</b> {{item.text}} <i>{{item.subj}}</i></div> -->
+                <div slot="description" class="notif-description" v-html="item.html"></div>
               </a-list-item-meta>
             </a-list-item>
           </a-list>
         </template>
         <!-- <span slot="title">Оповещения</span> -->
-        <a-badge count="99" title="Есть непрочитанные сообщения">
+        <a-badge :count="messages.length" title="Есть непрочитанные сообщения">
           <a-button type="primary" shape="circle" icon="bell" size="large"/>
         </a-badge>
       </a-popover>      
@@ -45,6 +46,7 @@
 
 <script>
 import { SET_SHOW_IMAGE_HEADER } from '../../store/shower/mutations.type';
+import { GET_MESSAGES } from '../../store/notification/actions.type';
 import { mapGetters } from 'vuex';
 import store from '../../store';
 import {
@@ -56,49 +58,79 @@ export default {
   data() {
     return {
       current: 1,
+      /*************************************** 
+       * Структура объекта "datauser":
+       * "result": {
+            "positions": [],
+            "followers": [],
+            "followersEmail": [],
+            "_id": "5e92702c807aa5006245cb5d",
+            "googleId": 108......,
+            "googleToken": "ya29.a0Ae4lvC0y_l...",
+            "lastName": "Vidyakin",
+            "firstName": "Sergey",
+            "email": "vidyakin.sergey@gmail.com",
+            "googleImage": "https://lh3.googleusercontent.com/a-/AOh14GiyLlRfNQLdCsrLGZrG5eIgVeW5IyM2ZlAaQmSyaQ=s96-c",
+            "password": "",
+            "__v": 0
+        },
+        "iat": 1586995323,
+        "exp": 1587081723
+       */
       datauser: (store.getters.user ? store.getters.user : store.getters.userData),
-      notifs: [
-        {
+      /***************************************
+       * Список уведомлений в выпадающем меню
+       * Привязываться напрямую к геттеру messages из стейта нельзя т.к. для разных событий возможно надо формировать разный вид сообщений
+       * Образец данных:
+       * {
           title: "Новая группа",
-          userFrom: "Василий Потапенко",
-          text: "создал новую группу",
-          subj: "Любители хомяков"
-        },
-        {
-          title: "Приглашение",
-          userFrom: "Игнатий Котопесов",
-          text: "пригласил вас на проект",
-          subj: "Разработка модуля"
-        },
-        {
-          title: "Уведомление",
-          userFrom: "",
-          text: "Всем в 17:00 собраться в переговорке Канада",
-          subj: "Обсуждение этапа"
+          text: "<b>Александр Пушкин</b>создал новую группу: <i>Стрелковый клуб</i>"
         }
-      ]
+       * 
+       */
+      notifs: [],
+      // Количество сообщений - для надписи на бейджике. Возможно не нужно отдельную переменную
+      msgCount: 0
     };
   },
   computed: {
-    ...mapGetters(['userData', 'user', 'currentUser']),
+    ...mapGetters(['userData', 'user', 'users', 'currentUser','messages']),
   },
   sockets: {
     connect() {
       console.log('socket connected')
     },
-    socketMessage(payload) {
-      this.$notification['success']({
-        message: payload.type,
-        description:
-          `${JSON.stringify(payload.val,null,3)}`,
+    /**
+     * Событие на прием сообщения с кодом "socketMessage"
+     * @param payload: object - {type, val}
+     *  type - тип сообщения для разделения логики и универсальности
+     *  val - данные, структура зависит от типа сообщения
+     */
+    async socketMessage(payload) {
+      if (payload.type === "NEW_GROUP") {
+        //this.notifs.push(payload.val);
+        //this.msgCount += 1;
+        await this.$store.dispatch(GET_MESSAGES)
+        this.fillNotificationFeed()
+      }
+      // вывод оповещения о новом оповещении
+      this.$notification['info']({
+        message: ({
+          NEW_GROUP: "Создана новая группа"
+        })[payload.type],
+        description: `Новое оповещение в ленте`,
         placement: 'topLeft'
       });
     }
   },
-  created() {
+  async created() {
+    //console.log(`LoginBar: userdata is ${JSON.stringify(this.datauser,null,3)}`);
+    await this.$store.dispatch(GET_MESSAGES) // TODO: доработать для получения только персональных и только НЕпрочитанных сообщений
+    // динамическая подписка на событие сокета, на всякий случай
     // this.$socket.$subscribe('socketMessage', payload => {
     //   console.log(`socketMessage fired!`)
     // });
+    this.fillNotificationFeed()
   },
   methods: {
     closeImage() {
@@ -108,6 +140,14 @@ export default {
       this.$store.dispatch(LOGOUT);
       this.$router.push({ name: 'login' });
     },
+    fillNotificationFeed() {
+      this.notifs = this.messages.map(msg => (
+        {
+          title: "Новая группа", // TODO: подстроить под разные типы сообщений
+          html: msg.text
+        })
+      );
+    }
   },
 };
 </script>
@@ -176,12 +216,13 @@ export default {
     padding: 0;
     height: auto;
     position: relative;
-    padding-left: 20px;
+    padding-left: 10px;
+    margin-left: 10px;
   }
   .logout::after {
     content: '';
     position: absolute;
-    left: -50px;
+    left: -60px;
     top: 0;
     height: 100%;
     width: 1px;

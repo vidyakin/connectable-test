@@ -14,7 +14,8 @@ export const createGroup = (context: any, group: any) => {
     .post(`api/group/`, group)
     .then((response: any) => {
       context.commit(ADD_GROUP, response.data.result);
-    });
+      return response.data.result._id
+    })
 };
 
 export const getGroups = (context: any, userId: any) => {
