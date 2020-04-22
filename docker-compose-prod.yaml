@@ -1,6 +1,8 @@
 version: "3.7"
 services:
   connbackend:
+    logging:
+      driver: gcplogs
     build:
       context: ./backend
       dockerfile: Dockerfile
@@ -33,6 +35,8 @@ services:
     ports:
         - 27017:27017
   connfrontend:
+    logging:
+      driver: gcplogs
     build:
       context: ./frontend
       dockerfile: Dockerfile.prod
