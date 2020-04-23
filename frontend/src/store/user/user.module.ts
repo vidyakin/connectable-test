@@ -1,6 +1,7 @@
 import {SET_SHOW_IMAGE_HEADER} from '@/store/shower/mutations.type';
 import {
   ADD_EVENT,
+  CHANGE_EVENT,
   SET_CURRENT_USER,
   SET_EVENTS,
   SET_USER,
@@ -16,20 +17,14 @@ import {
   RESET_INFO
 } from '@/store/user/mutations.type';
 import {
-  CREATE_EVENT, DELETE_EVENT,
-  GET_EVENTS,
+  GET_EVENTS, CREATE_EVENT, DELETE_EVENT, UPDATE_EVENT,
   GET_INFO_ABOUT_USER, GET_USER, GET_USERS,
-  LOGIN,
-  LOGIN_WITH_GOOGLE, LOGOUT,
-  LOGIN_WITH_OUTLOOK,
-  UPDATE_USER_INFO,
-  INSERT_USER_INFO,
-  CHECK_USER_INFO,
-  FORGOT_PASSWORD,
-  RESET_PASSWORD,
+  LOGIN, LOGIN_WITH_GOOGLE, LOGIN_WITH_OUTLOOK, LOGOUT,
+  UPDATE_USER_INFO, INSERT_USER_INFO, CHECK_USER_INFO,
+  FORGOT_PASSWORD, RESET_PASSWORD,
 } from '@/store/user/actions.type';
 import {getInfoAboutUser, login, loginWithGoogle, loginWithOutlook, logout, forgotPasword, resetPassword} from '@/services/auth/auth.service';
-import {createEvent, deleteEvent, editUser, getEvents, getUser, getUsers, insertNewUser, checkUserInfo} from '@/services/user.service';
+import {createEvent, deleteEvent, updateEvent, editUser, getEvents, getUser, getUsers, insertNewUser, checkUserInfo} from '@/services/user.service';
 
 interface State {
   user: any | null;
@@ -126,33 +121,40 @@ const mutations = {
       ];
     }
   },
-  [UPDATE_USER](state: State, user: any) {
-    if (user._id === state.user._id) {
-      state.user = user;
-    }
-    state.currentUser = user;
-    if (state.users) {
-      const userIndex = state.users!.findIndex(({_id}) => _id === user._id);
-      state.users = [
-        ...state.users!.slice(0, userIndex),
-        user,
-        ...state.users!.slice(userIndex + 1),
-      ];
-    }
-  },
+  // [UPDATE_USER](state: State, user: any) {
+  //   if (user._id === state.user._id) {
+  //     state.user = user;
+  //   }
+  //   state.currentUser = user;
+  //   if (state.users) {
+  //     const userIndex = state.users!.findIndex(({_id}) => _id === user._id);
+  //     state.users = [
+  //       ...state.users!.slice(0, userIndex),
+  //       user,
+  //       ...state.users!.slice(userIndex + 1),
+  //     ];
+  //   }
+  // },
   [SET_EVENTS](state: State, events: any[]) {
     state.events = events;
   },
   [ADD_EVENT](state: State, event: any[]) {
     state.events = [...state.events!, event];
   },
+  [CHANGE_EVENT](state: State, event: any) {
+    if (state.events) {
+      const index = state.events!.findIndex(({_id}) => _id === event._id);
+      state.events.splice(index, 1, event)
+    }
+  },
   [DELETE_EVENT](state: State, eventId: any) {
     if (state.events) {
       const index = state.events!.findIndex(({_id}) => _id === eventId);
-      state.events = [
-        ...state.events!.slice(0, index),
-        ...state.events!.slice(index + 1),
-      ];
+      state.events.splice(index, 1)
+      // state.events = [
+      //   ...state.events!.slice(0, index),
+      //   ...state.events!.slice(index + 1),
+      // ];
     }
   },
   [SET_USERS](state: State, users: any[]) {
@@ -192,6 +194,7 @@ const actions = {
   [UPDATE_USER_INFO]: editUser,
   [INSERT_USER_INFO]: insertNewUser,
   [CREATE_EVENT]: createEvent,
+  [UPDATE_EVENT]: updateEvent,
   [GET_EVENTS]: getEvents,
   [DELETE_EVENT]: deleteEvent,
   [GET_USERS]: getUsers,

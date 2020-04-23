@@ -10,12 +10,15 @@ const stage = require('../config')[environment];
 // schema maps to a collection
 const Schema = mongoose.Schema;
 
+const eventsEndPoint = 'https://www.googleapis.com/calendar/v3/calendars/primary/events';
+
 const eventSchema = new Schema({
   userId: String,
   name: String,
   date: Date,
-  time: String,
-  duration: String,
+  end: Date,
+  time: String, // вроде как не нужна, чисто декоративно выводится
+  duration: String,  // 20 minutes, 60 minutes и т.д.
   comment: String,
   color: String,
   googleEventId: String,
@@ -40,11 +43,12 @@ eventSchema.pre('save', function (next) {
     const event = {
       description: this.comment,
       start: {'dateTime': this.date},
-      end: {'dateTime': this.date},
-      summary: this.name
+      end: {'dateTime': this.end},
+      summary: this.name,
+      attendees: this.attendees ? this.attendees : []
     };
 
-    if(this.attendees) event.attendees = this.attendees;
+    //if (this.attendees) event.attendees = this.attendees;
     //console.log(`>> event.js: 'event' is: ${JSON.stringify(event,null,2)}`)
 
     const safeStringify = val => {
@@ -66,8 +70,7 @@ eventSchema.pre('save', function (next) {
     }
     
     axios
-      .post('https://www.googleapis.com/calendar/v3/calendars/primary/events',
-        event, {headers: headers})
+      .post(eventsEndPoint, event, {headers: headers})
       .then(_d => {        
         console.log(`>> event.js: in axios's «then» '_d' is: ${safeStringify(_d.data)}`)
         this.googleEventId = _d.data.id;
@@ -83,21 +86,36 @@ eventSchema.pre('save', function (next) {
 eventSchema.pre('deleteOne', { query: true, document: true }, function(next) {
   this.findOne({_id: this._conditions._id}).catch(e => {})
     .then(event => {
-      user.findOne({_id: event.userId}).catch(err => console.log(err)).then(data => {
+      user
+      .findOne({_id: event.userId}).catch(err => console.log(err))
+      .then(data => {
         const headers = {
           'Authorization': `Bearer ${data.googleToken}`,
         };
 
         axios
-          .delete('https://www.googleapis.com/calendar/v3/calendars/primary/events/' + event.googleEventId,
-            {headers: headers})
-          .catch(e => {
-            next();
-          })
-          .then((data) => {
-            next();
-          })
+          .delete(eventsEndPoint + event.googleEventId, {headers: headers})
+          .catch(e => { next(); })
+          .then((data) => { next(); })
+      })
+  });
 
+})
+
+eventSchema.pre('editOne', { query: true, document: true }, function(next) {
+  this.findOne({_id: this._conditions._id}).catch(e => {})
+    .then(event => {
+      user
+      .findOne({_id: event.userId}).catch(err => console.log(err))
+      .then(data => {
+        const headers = {
+          'Authorization': `Bearer ${data.googleToken}`,
+        };
+
+        axios
+          .put(eventsEndPoint + event.googleEventId, event, { headers })
+          .catch(e => { next() })
+          .then((data) => { next() })
       })
   });
 

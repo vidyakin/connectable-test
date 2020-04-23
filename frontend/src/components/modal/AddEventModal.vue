@@ -15,147 +15,106 @@
       :rules="rules"
       layout="vertical"
     >
-      <div class="form-row">
-        <div class="row">
-          <div class="col-sm-12">
-            <a-form-model-item prop="name">
-              <app-input v-model="theform.name" placeholder="Название" label="Название" class="secondary form-input" />
-            </a-form-model-item>
+      <!-- Название события -->
+      <a-row> 
+        <a-col :span="24">
+          <a-form-model-item prop="name">
+            <app-input v-model="theform.name" placeholder="Название" label="Название" class="secondary form-input" />
+          </a-form-model-item>
+        </a-col>
+      </a-row>
+      <!-- Дата и рамки события -->
+      <a-row>
+        <a-col :span="10">
+          <div class="label">Дата события</div>
+          <a-form-model-item prop="dateEvent">
+            <a-date-picker v-model="theform.dateEvent" :locale="locale" placeholder="Дата"/>
+          </a-form-model-item>
+        </a-col>
+        <a-col :span="7">
+          <div class="label">Начало в:</div>
+          <a-form-model-item prop="timeEvent">
+            <a-time-picker class="time-picker"
+              v-model="theform.timeEvent" format="HH:mm" :minuteStep="10" :locale="locale" placeholder="Время" />
+          </a-form-model-item>
+        </a-col>
+        <a-col :span="7">
+          <div class="label">Окончание в:</div>
+          <a-form-model-item prop="timeTo">
+            <a-time-picker class="time-picker"
+              v-model="theform.timeTo" format="HH:mm" :minuteStep="10" :locale="locale" placeholder="Время" />
+          </a-form-model-item>
+        </a-col>
+      </a-row>
+      <!-- Участники события -->
+      <a-row>
+        <a-col :span="24">
+          <div class="label">Пригласить участников</div>
+          <a-form-model-item prop="members">
+            <a-select v-model="theform.members"
+              labelInValue
+              mode="multiple"
+              placeholder="Выберите пользователей"
+              style="width: 100%"
+              :filterOption="false"
+              @search="search"
+              @change="onMembersTextChange"
+              :notFoundContent="'Пользователь не найден'"
+            >
+              <a-select-option v-for="d in usersData" :key="d._id">{{d.firstName + ' ' + d.lastName}}</a-select-option>
+            </a-select>
+          </a-form-model-item>
+        </a-col>
+      </a-row>
+      <!-- Комментарий -->
+      <a-row>
+        <a-col :span="24">
+          <a-form-model-item class="no-margin" prop="comment">
+            <app-input v-model="theform.comment"
+              placeholder="Дополнительная информация" label="Комментарий"
+              class="secondary form-input"
+            ></app-input>
+          </a-form-model-item>
+        </a-col>
+      </a-row>
+      <!-- Цвет карточки события -->
+      <a-row>
+        <a-col :span="24">
+          <div class="event-color">
+            <label>Цвет</label>
+            <svg viewBox="0 0 20 20" height="30px" width="30px" v-for="color in colors" @click="setCurrentColor(color)" :key="color.color">
+              <circle cx="10" cy="10" r="10" :fill="color.color">
+              </circle>
+              <circle cx="10" cy="10" r="7" :fill="theform.color.color === color.color ? color.color : 'white'">
+              </circle>
+            </svg>
           </div>
-          <div class="col-sm-5">
-            <div class="label">Дата события</div>
-            <a-form-model-item prop="dateEvent">
-              <a-date-picker v-model="theform.dateEvent" :locale="locale" placeholder="Дата" format="D MMMM YYYY г."/>
-            </a-form-model-item>
-          </div>
-          <div class="col-sm-5">
-            <div class="label">Начало в:</div>
-            <a-form-model-item prop="timeEvent">
-              <!-- TODO: если так, то ошибка будет появляться только когда закончится ввод времени 
-              но при валидации формы надо самому повторно перепроверять. Подумать, надо ли
-              <a-form-model-item :validate-status="timeError" :help="timeErrorHelp" @changeOpen="changeTime"-->
-              <a-time-picker v-model="theform.timeEvent" format="HH:mm" :minuteStep="10" :locale="locale" placeholder="Время" />
-            </a-form-model-item>
-          </div>
-          
-          <div class="col-sm-12">
-            <div class="label">Пригласить участников</div>
-            <a-form-model-item>
-              <a-select v-model="theform.members"
-                labelInValue
-                mode="multiple"
-                placeholder="Выберите пользователей"
-                style="width: 100%"
-                :filterOption="false"
-                @search="search"
-                @change="onMembersTextChange"
-                :notFoundContent="'Пользователь не найден'"
-              >
-                <a-select-option v-for="d in usersData" :key="d._id">{{d.firstName + ' ' + d.lastName}}</a-select-option>
-              </a-select>
-            </a-form-model-item>
-          </div>
-          <div class="col-sm-12">
-            <a-form-model-item class="no-margin">
-              <app-input v-model="theform.comment"
-                placeholder="Дополнительная информация" label="Комментарий"
-                class="secondary form-input"
-              ></app-input>
-            </a-form-model-item>
-          </div>
-          <div class="col-sm-12">
-            <div class="event-color">
-              <label>Цвет</label>
-              <svg viewBox="0 0 20 20" height="30px" width="30px" v-for="color in colors" @click="setCurrentColor(color)" :key="color.color">
-                <circle cx="10" cy="10" r="10" :fill="color.color">
-                </circle>
-                <circle cx="10" cy="10" r="7" :fill="theform.color.color === color.color ? color.color : 'white'">
-                </circle>
-              </svg>
+        </a-col>
+      </a-row>
+      <a-row>
+        <a-col :span="24">
+          <a-form-model-item>
+            <div class="action">
+              <a-button @click="createEvent">{{!event ? "Создать событие" : "Сохранить изменения" }}</a-button>
             </div>
-          </div>
-        </div>
-        <a-form-model-item>
-          <div class="action">
-            <a-button @click="createEvent">{{!event ? "Создать событие" : "Сохранить изменения" }}</a-button>
-          </div>
-        </a-form-model-item>
-      </div>
+          </a-form-model-item>
+        </a-col>
+      </a-row>
       <!-- <div>
         {{ JSON.stringify(this.theform, null, 3)}}
       </div> -->
     </a-form-model>
 
-
-
-
-    <!-- <div class="event-name form-line">
-      <label>Название</label>
-      <a-input v-model="name"></a-input>
-    </div>
-    <div class="event-date-time form-line">
-      <div class="event-date">
-        <label>Дата</label>
-        <div>
-          <a-date-picker v-model="date" :locale="locale"></a-date-picker>
-        </div>
-      </div>
-      <div class="event-time">
-        <label>Время</label>
-        <div>
-          <a-time-picker format="HH:mm" @change="changeTime" placeholder="Время"></a-time-picker>
-        </div>
-      </div>
-    </div>
-    <div class="event-name form-line">
-      <label>Пригласить участника</label>
-      <a-select v-decorator="['members']"
-                labelInValue
-                mode="multiple"
-                placeholder="Выберите пользователей"
-                style="width: 100%"
-                :filterOption="false"
-                :value="selectedItems"
-                @search="search"
-                @change="onMembersTextChange"
-                :notFoundContent="'Пользователя не найдено'"
-      >
-        <a-select-option v-for="d in usersData" :key="d._id">{{d.firstName + ' ' + d.lastName}}</a-select-option>
-      </a-select>
-    </div>
-    < !--<div class="event-name">
-      <label>Продолжительность</label>
-
-      <a-date-picker v-model="duration"></a-date-picker>
-    </div>- ->
-    <div class="event-name form-line">
-      <label>Комментарий</label>
-      <a-input v-model="comment"></a-input>
-    </div>
-    <div class="event-color">
-      <label>
-        Цвет
-      </label>
-      <svg viewBox="0 0 20 20" height="30px" width="30px" v-for="color in colors" @click="setCurrentColor(color)" :key="color.color">
-        <circle cx="10" cy="10" r="10" :fill="color.color">
-        </circle>
-        <circle cx="10" cy="10" r="7" :fill="currentColor.color === color.color ? color.color : 'white'">
-        </circle>
-      </svg>
-    </div>
-    <div class="action">
-      <a-button @click="createEvent">Создать событие</a-button>
-    </div> -->
   </a-modal>
 </template>
 
 <script>
   import {mapGetters} from 'vuex';
   import AppInput from '../common/Input';
-  import moment from 'moment';
+  import moment, { duration } from 'moment';
   import locale from 'ant-design-vue/es/date-picker/locale/ru_RU';
   
-  import {CREATE_EVENT, UPDATE_USER_INFO, GET_USERS} from '../../store/user/actions.type';
+  import {CREATE_EVENT, UPDATE_EVENT, UPDATE_USER_INFO, GET_USERS} from '../../store/user/actions.type';
   import store from '../../store';
   import {GET_NOTIFICATION} from '../../store/notification/actions.type';
   
@@ -175,7 +134,8 @@
         theform: {
           name: "",
           dateEvent: moment(),
-          timeEvent: moment(),
+          timeEvent: moment(), 
+          timeTo: moment(),
           members: [],
           comment: "",
           color: '#ff0000'
@@ -200,7 +160,6 @@
         usersData: [],
         selectedItems: [],
         date: moment(),
-        locale,
         statusEmailSend: false,
         timeError: '',
         timeErrorHelp: '',
@@ -218,6 +177,9 @@
             { required: true, message: 'Нужно указать время', trigger: 'blur'},
             { validator: this.validTime }
           ],
+          timeTo: [
+            { validator: this.validTimeTo }
+          ],
           members: [
             { required: true, message: 'Нужно выбрать участников', trigger: 'blur' }
           ]
@@ -230,25 +192,10 @@
      */
     methods: {
       setCurrentColor(color) {
-        this.theform.color = { color };
+        this.theform.color = color;
       },
       tr(v) {
         return v === undefined ? '' : v.trim()
-      },
-      changeTime(opened) {
-        if (!opened) {
-          const time = this.form.getFieldValue("timeEvent");
-          if (time !== null) {
-            const hour = time.hour();
-            if (hour > 19 || hour < 8) { // TODO: сделать настройку в компании "Рабочие часы" и определять по ней
-              this.timeError = 'error'
-              this.timeErrorHelp = 'Выберите рабочие часы'
-            } else {
-              this.timeError = ''
-              this.timeErrorHelp = ''
-            }
-          }
-        }
       },
       validDate(rule, d, callback) {
         if (d.isBefore(moment().startOf('day'))) {
@@ -269,13 +216,15 @@
           callback()
         }
       },
-      // не нужно для FormModel
-      // getDecoratorData(n) {
-      //   const options = { rules: this.rules[n] }
-      //   const result = [ n, options ];
-      //   return result;
-      // },
-
+      validTimeTo(rule, t, callback) {
+        // проверяем только время, т.к. предполагается что дата та же во время инициализации нового события
+        if (this.theform.timeTo.isBefore(this.theform.timeEvent)) {
+          callback('Неверное время окончания')
+        } else {
+          callback();
+        }
+      },
+      
       /**
        * Создание события по кнопке "Создать"
        */
@@ -285,10 +234,14 @@
         const usersData = this.usersData; // чтоб не потерять this
         const blancDate = moment().hours(12).minutes(0).seconds(0)
 
-        let start = this.theform.dateEvent //this.form.getFieldValue("dateEvent");
-        // const t = this.theform.timeEvent; // время не используем, оно в дате
-        // start.hour(t.hour()).minute(t.minute()).seconds(0).utcOffset(3); // set H&m&s from time field to date field
-        start.seconds(0).utcOffset(3); // добавляем часовой пояс и убираем секунды
+        // формируем правильные границы события на основе полей формы 
+        let start = moment(this.theform.dateEvent);
+        let end = moment(this.theform.dateEvent);
+        const t1 = this.theform.timeEvent;
+        const t2 = this.theform.timeTo;
+        start.hour(t1.hour()).minute(t1.minutes()).seconds(0).utcOffset(3); // set H&m&s from time field to date field
+        end.hour(t2.hour()).minutes(t2.minutes()).seconds(0).utcOffset(3);
+        const duration = end.diff(start,'minutes') + ' minutes'
         console.log(`event starts at: ${start.format()}`)
         
         this.$refs.eventForm.validate(async valid => {
@@ -300,11 +253,15 @@
           // Выбираем емейлы указанных в списке лиц
           const attendees = usersData.filter(ud => keys.includes(ud._id)).map(e => ({email: e.email}))
           //this.createButtonSpinning = true;
+          // Объект для передачи в Монго
           const event = {
+            _id: this.event._id,
             name: this.theform.name, 
-            date: start, 
+            date: start,
+            end,
+            duration,
             comment: this.theform.comment, 
-            color: this.theform.color,
+            color: this.theform.color.color,
             userId: this.userInfo.result._id,
             userEmail: this.userInfo.result.email,
             emailSend: this.statusEmailSend,
@@ -312,7 +269,7 @@
           };
           console.log(`event is ${JSON.stringify(event,null,3)}`);
           //const calendar = google.calendar({version: 'v3', auth:""});
-          await this.$store.dispatch(CREATE_EVENT, event)
+          await this.$store.dispatch(this.isEdit ? UPDATE_EVENT : CREATE_EVENT, event)
           //.finally(() => {
             // this.form.setFieldsValue({
             //   name: '',
@@ -352,7 +309,14 @@
       ...mapGetters(['user', 'userData', 'users', 'notification']),
       userInfo() {
         return this.userData ? this.userData : this.user;
+      },
+      locale() {
+        let loc = {...locale}
+        loc.dateFormat = "D MMMM YYYY г."
+        loc.lang.monthFormat = "MMMM"
+        return loc
       }
+        
     },
     /**
      * ХУКИ ЖИЗНЕННОГО ЦИКЛА
@@ -377,22 +341,33 @@
       },
       visible() {
         if (this.visible) {
+          this.isEdit = !!this.event // признак редактирования события
           console.log(`Форма открылась`);
-          if (!!this.event) {
+          if (this.isEdit) {
             const emails = this.event.attendees.map(att => att.email)
             this.theform = { 
               name: this.event.name,
               dateEvent: moment(this.event.date),
               timeEvent: moment(this.event.date),
+              timeTo: moment(this.event.end),
               color: { color: this.event.color },
+              // ищем юзеров с емейлами из списка и создаем массив объектов {key,label}
               members: this.users.filter(u => emails.includes(u.email)).map(e => ({key:e._id, label:`${e.firstName} ${e.lastName}`})),
               comment: this.event.comment
             }
             this.selectedItems = this.theform.members
           } else {
-            this.day.hours(12).minutes(0);
-            this.theform.dateEvent = this.day;
-            this.theform.timeEvent = this.day;
+            this.day.hours(12).minutes(0).seconds(0);
+            this.theform = {
+              name: "",
+              dateEvent: this.day,
+              timeEvent: moment(this.day), // если просто this.day, то присваивает по ссылке
+              timeTo: moment(),
+              members: [],
+              comment: "",
+              color: '#ff0000'
+            }
+            this.theform.timeTo = moment(this.day).add(1,'hour');
           }
         }
       }
@@ -409,9 +384,10 @@
 
   .add-event-modal {
     .ant-modal-content {
-      padding: 2.5rem;
-      width: 33.75rem;
-      height: 35rem;
+      padding: 1.5rem;
+      width: 37rem;
+      height: 38rem;
+      // max-width: 100%;
     }
 
     .ant-modal-header {
@@ -438,11 +414,11 @@
       }
 
     }
-    .ant-modal-content {
-      padding: 2rem;
-      width: 30rem;
-      height: auto;
-    }
+    // .ant-modal-content {
+    //   padding: 2rem;
+    //   width: 30rem;
+    //   height: auto;
+    // }
   }
 
   .ant-form-item.no-margin {
@@ -472,6 +448,10 @@
 
   }
 
+  .time-picker.ant-time-picker {
+    width: 130px;
+  }
+
   .event-color {
     display: flex;
     margin-top: 1rem;
@@ -486,9 +466,6 @@
       cursor: pointer;
       margin-right: 0.5rem;
     }
-  }
-  .add-event-modal .ant-modal-content {
-    max-width: 100%;
   }
 
   .form-line {
