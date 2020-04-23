@@ -4,6 +4,7 @@ import {
     ADD_EVENT,
     SET_CURRENT_USER,
     SET_EVENTS,
+    CHANGE_EVENT,
     SET_USER,
     SET_USERS,
     UPDATE_USER,
@@ -14,7 +15,7 @@ import {
     SUCCESS_REGISTER,
     SET_USER_DATA
 } from '@/store/user/mutations.type';
-import {DELETE_EVENT} from '@/store/user/actions.type';
+import {UPDATE_EVENT, DELETE_EVENT} from '@/store/user/actions.type';
 import {setAuthToken} from '@/services/auth/setAuthToken';
 
 
@@ -36,6 +37,16 @@ export const createEvent = (context: any, event: any) => {
     .then((response: any) => {
       context.commit(ADD_EVENT, response.data.result);
       console.log(`Событие добавлено: ${JSON.stringify(response.data.result,null,3)}`);
+    });
+};
+
+export const updateEvent = (context: any, event: any) => {
+  console.log(`updateEvent starts on front: ${JSON.stringify(event,null,3)}`);
+  return Vue.axios
+    .put(`api/event/${event._id}`, event)
+    .then((response: any) => {
+      context.commit(CHANGE_EVENT, response.data.result);
+      console.log(`Событие изменено: ${JSON.stringify(response.data.result,null,3)}`);
     });
 };
 

@@ -8,27 +8,24 @@
     <div class="calendar-body">
       <a-calendar v-model="currentDay" :locale="locale" @select="createOpen(null)">
         <template slot="dateCellRender" slot-scope="currDate">
-          <div v-for="val in getEventsForThisMonth().filter(ev => getDayFromDate(currDate).day == getDayFromDate(ev.date).day)" :key="val._id">
+          <!-- <div v-for="val in getEventsForThisMonth().filter(ev => currDate.isSame(ev.date, 'day'))" :key="val._id"> -->
+          <div v-for="val in getEventsForDay(currDate)" :key="val._id">
             <div
               class="event-wrapper"
-              v-if="getEventsForDay(currDate) && val.userId === userInfo._id"
+              v-if="val && val.userId === userInfo._id"
               :style="{'background-color' : val.color,
                 'border-color':val.color}"
-              
             >
               <div class="event-name">
                 {{getTime(val)}}  {{val.name}}
               </div>
               <div class="event-actions">
                 <a-icon type="form" @click.stop="createOpen(val)"/>
-                <a-popconfirm
-                  title="Подтверите удаление события"
-                  okText="Подтверждаю"
-                  cancelText="Отмена"
-                  @confirm="deleteEvent(val._id)"
+                <a-popconfirm title="Подтверите удаление события" okText="Подтверждаю" cancelText="Отмена"
+                  @confirm="deleteEvent(val._id)" @visibleChange="deleteConfirmVisChange"
                 >            
                   <a-icon slot="icon" type="question-circle-o" style="color: red" />
-                  <a-icon type="delete"></a-icon>
+                  <a-icon type="delete" @click.stop="startDelete"></a-icon>
                 </a-popconfirm>
               </div>
             </div>
@@ -111,6 +108,7 @@ export default Vue.extend({
       editMode: false,
       selectedEvent: null,
       createVisible: false,
+      deleting: false, // хак для подавления срабатывания @select на ячейке даты
       locale: null
     };
   },
@@ -158,7 +156,15 @@ export default Vue.extend({
     createClose() {
       this.createVisible = false;
     },
+    startDelete() {
+      this.deleting = true
+      setTimeout(()=> {
+        this.deleting = false
+      },500)
+    },
     createOpen(event) {
+      if (this.deleting) return;
+
       const dayEvents = this.events.filter( e => moment(e.date).isSame(this.currentDay, 'day') )
       this.editMode = !!event;
       if (this.editMode) {
@@ -182,16 +188,17 @@ export default Vue.extend({
         this.createVisible = true;
       }
     },
+    deleteConfirmVisChange() {
+
+    },
     isBeforeToday(c) { 
       return c.isBefore(moment().startOf('day'))
     },
-    getEventsForDay(day) {
-      return (
-        this.events &&
-        this.events.find(event => {
-          return moment(event.date).isSame(day, 'day');
-        })
-      );
+    getEventsForDay(currDate) {
+      return this.events.filter(ev => 
+          ev.userId === this.userInfo._id && 
+          moment(currDate).isSame(moment(ev.date), 'day')
+      )
     },
     getEventsForMonth(month) {
       return (
