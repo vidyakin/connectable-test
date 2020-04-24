@@ -31,7 +31,7 @@ const app = express();
 const port = process.env.PORT || 4000;
 
 const server = require('http').createServer(app)
-const io = require('socket.io')(server);
+const io = require('socket.io')(server, {'transports': ['websocket', 'polling']});
 io.on('connection', socket=>{
     console.log("-> socket.io user connected: ", socket.id);
     socket.on('disconnect',()=>{
