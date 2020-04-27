@@ -42,6 +42,11 @@
         <img src="@/assets/Icons/Structure.svg" alt />
         Структура (нов.)
       </a-menu-item>
+      <a-menu-item key="/clients" :class="{active:isActive == 'clients'}">
+        <img src="@/assets/Icons/setting.svg" alt />
+        Клиенты
+      </a-menu-item>
+      
       <!--v-if="$can('read', {'accessEmail': datauser.result.email, '__type': 'Admin'})"-->
       <a-menu-item key="/settings" class="footer"  :class="{active:isActive == 'settings'}" >
         <img src="@/assets/Icons/setting.svg" alt />
@@ -87,10 +92,13 @@
       <a-menu-item key="/structure_new">
         <img src="@/assets/Icons/Structure.svg" alt />
       </a-menu-item>
-      <a-menu-item key="/settings" class="footer"  >
+      <a-menu-item key="/clients">
         <img src="@/assets/Icons/setting.svg" alt />
       </a-menu-item>
-       <a-menu-item key="/about">
+      <a-menu-item key="/settings" class="footer">
+        <img src="@/assets/Icons/setting.svg" alt />
+      </a-menu-item>
+      <a-menu-item key="/about">
         <img src="@/assets/Icons/Structure.svg" alt />
       </a-menu-item>
     </a-menu>

@@ -1,18 +1,22 @@
 <template>
   <div class="user-bar">
-
     <div class="user-info" v-if="this.datauser.result">
-
       <a-popover placement="bottom" trigger="click">
         <template slot="content">
           <a-list itemLayout="horizontal" :dataSource="notifs" :locale="{emptyText:'Нет событий'}">
-            <a-list-item class="notif-item" 
-              slot="renderItem" slot-scope="item, index" 
-              :v-for="(item,index) in notifs" :key="index"
+            <a-list-item
+              class="notif-item"
+              slot="renderItem"
+              slot-scope="item, index"
+              :v-for="(item,index) in notifs"
+              :key="index"
             >
               <a-list-item-meta>
-                <a slot="title" class="notif-title"><b>{{item.title}}</b></a>
-                <a-avatar class="notif-avatar"
+                <a slot="title" class="notif-title">
+                  <b>{{item.title}}</b>
+                </a>
+                <a-avatar
+                  class="notif-avatar"
                   slot="avatar"
                   src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
                 />
@@ -24,37 +28,37 @@
         </template>
         <!-- <span slot="title">Оповещения</span> -->
         <a-badge :count="messages.length" title="Есть непрочитанные сообщения">
-          <a-button type="primary" shape="circle" icon="bell" size="large"/>
+          <a-button type="primary" shape="circle" icon="bell" size="large" />
         </a-badge>
-      </a-popover>      
+      </a-popover>
       <a-dropdown>
-        <a-menu slot="overlay" >
+        <a-menu slot="overlay">
           <a-menu-item key="logout" @click="logout">
             <a-icon type="logout" />Выйти
           </a-menu-item>
         </a-menu>
-        <a-button class="logout" style="margin-right: 1rem;" >
+        <a-button class="logout" style="margin-right: 1rem;">
           <!-- {{currentUser && currentUser.firstName}} {{currentUser && currentUser.lastName}} -->
-            {{ this.datauser.result.firstName + ' ' + this.datauser.result.lastName }}
-            <a-icon type="down" />
+          {{ this.datauser.result.firstName + ' ' + this.datauser.result.lastName }}
+          <a-icon type="down" />
         </a-button>
       </a-dropdown>
-      <a-avatar :src="(this.datauser.result.googleImage ? this.datauser.result.googleImage : require('../../assets/no_image.png'))" />
+      <a-avatar
+        :src="(this.datauser.result.googleImage ? this.datauser.result.googleImage : require('../../assets/no_image.png'))"
+      />
     </div>
   </div>
 </template>
 
 <script>
-import { SET_SHOW_IMAGE_HEADER } from '../../store/shower/mutations.type';
-import { GET_MESSAGES } from '../../store/notification/actions.type';
-import { mapGetters } from 'vuex';
-import store from '../../store';
-import {
-  LOGOUT,
-} from '../../store/user/actions.type';
+import { SET_SHOW_IMAGE_HEADER } from "../../store/shower/mutations.type";
+import { GET_MESSAGES } from "../../store/notification/actions.type";
+import { mapGetters } from "vuex";
+import store from "../../store";
+import { LOGOUT } from "../../store/user/actions.type";
 
 export default {
-  name: 'AppLoginBar',
+  name: "AppLoginBar",
   data() {
     return {
       current: 1,
@@ -77,7 +81,9 @@ export default {
         "iat": 1586995323,
         "exp": 1587081723
        */
-      datauser: (store.getters.user ? store.getters.user : store.getters.userData),
+      datauser: store.getters.user
+        ? store.getters.user
+        : store.getters.userData,
       /***************************************
        * Список уведомлений в выпадающем меню
        * Привязываться напрямую к геттеру messages из стейта нельзя т.к. для разных событий возможно надо формировать разный вид сообщений
@@ -94,11 +100,11 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(['userData', 'user', 'users', 'currentUser','messages']),
+    ...mapGetters(["userData", "user", "users", "currentUser", "messages"])
   },
   sockets: {
     connect() {
-      console.log('socket connected')
+      console.log("socket connected");
     },
     /**
      * Событие на прием сообщения с кодом "socketMessage"
@@ -110,27 +116,27 @@ export default {
       if (payload.type === "NEW_GROUP") {
         //this.notifs.push(payload.val);
         //this.msgCount += 1;
-        await this.$store.dispatch(GET_MESSAGES)
-        this.fillNotificationFeed()
+        await this.$store.dispatch(GET_MESSAGES);
+        this.fillNotificationFeed();
       }
       // вывод оповещения о новом оповещении
-      this.$notification['info']({
-        message: ({
+      this.$notification["info"]({
+        message: {
           NEW_GROUP: "Создана новая группа"
-        })[payload.type],
+        }[payload.type],
         description: `Новое оповещение в ленте`,
-        placement: 'topLeft'
+        placement: "topLeft"
       });
     }
   },
   async created() {
     //console.log(`LoginBar: userdata is ${JSON.stringify(this.datauser,null,3)}`);
-    await this.$store.dispatch(GET_MESSAGES) // TODO: доработать для получения только персональных и только НЕпрочитанных сообщений
+    await this.$store.dispatch(GET_MESSAGES); // TODO: доработать для получения только персональных и только НЕпрочитанных сообщений
     // динамическая подписка на событие сокета, на всякий случай
     // this.$socket.$subscribe('socketMessage', payload => {
     //   console.log(`socketMessage fired!`)
     // });
-    this.fillNotificationFeed()
+    this.fillNotificationFeed();
   },
   methods: {
     closeImage() {
@@ -138,25 +144,22 @@ export default {
     },
     logout() {
       this.$store.dispatch(LOGOUT);
-      this.$router.push({ name: 'login' });
+      this.$router.push({ name: "login" });
     },
     fillNotificationFeed() {
-      this.notifs = this.messages.map(msg => (
-        {
-          title: "Новая группа", // TODO: подстроить под разные типы сообщений
-          html: msg.text
-        })
-      );
+      this.notifs = this.messages.map(msg => ({
+        title: "Новая группа", // TODO: подстроить под разные типы сообщений
+        html: msg.text
+      }));
     }
-  },
+  }
 };
 </script>
 
 <style lang="scss">
-
-.ant-popover-inner-content {
-  padding: 5px 10px !important;
-}
+// .ant-popover-inner-content {
+//   padding: 5px 10px !important;
+// }
 
 .notif {
   &-item {
@@ -165,7 +168,7 @@ export default {
   }
   &-title {
     margin-bottom: 0;
-    font-size: 1.0rem;
+    font-size: 1rem;
   }
   &-description {
     font-size: 0.9rem;
@@ -175,8 +178,6 @@ export default {
     margin-right: 5px;
   }
 }
-
-
 
 .user-info-popover {
   .ant-btn {
@@ -195,7 +196,7 @@ export default {
 }
 
 .user-bar {
- /* height: 3.125rem;*/
+  /* height: 3.125rem;*/
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -220,7 +221,7 @@ export default {
     margin-left: 10px;
   }
   .logout::after {
-    content: '';
+    content: "";
     position: absolute;
     left: -60px;
     top: 0;
@@ -251,6 +252,6 @@ export default {
       width: 2.375rem;
       height: 2.375rem;
     }
-  }  
+  }
 }
 </style>

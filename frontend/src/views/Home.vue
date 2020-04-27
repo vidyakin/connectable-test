@@ -13,22 +13,22 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
+import Vue from "vue";
 // @ is an alias to /src
-import AppNavbar from '../components/common/Navbar.vue';
-import AppHeader from '../components/common/Header.vue';
-import AppPostEditDrawer from '../components/drawers/PostEditDrawer.vue';
-import AppCommentEditDrawer from '../components/drawers/CommentEditDrawer.vue';
+import AppNavbar from "../components/common/Navbar.vue";
+import AppHeader from "../components/common/Header.vue";
+import AppPostEditDrawer from "../components/drawers/PostEditDrawer.vue";
+import AppCommentEditDrawer from "../components/drawers/CommentEditDrawer.vue";
 //import { GET_INFO_ABOUT_USER } from '@/store/user/actions.type';
-import moment from 'moment';
+import moment from "moment";
 
 export default Vue.extend({
-  name: 'home',
+  name: "home",
   components: {
     AppNavbar,
     AppHeader,
     AppPostEditDrawer,
-    AppCommentEditDrawer,
+    AppCommentEditDrawer
   },
   methods: {},
   beforeMount() {
@@ -37,32 +37,58 @@ export default Vue.extend({
     // if (localStorage.getItem('token')) {
     //   this.$store.dispatch(GET_INFO_ABOUT_USER);
     // }
-    moment.updateLocale('ru', {
+    moment.updateLocale("ru", {
       relativeTime: {
-        future: 'in %s',
-        past: '%s ago',
-        s: 'несколько секунд',
-        ss: '%dсекунд',
-        m: 'минуту',
-        mm: '%d минут',
-        h: '1 час',
-        hh: '%dчасов',
-        d: 'день',
+        future: "in %s",
+        past: "%s ago",
+        s: "несколько секунд",
+        ss: "%dсекунд",
+        m: "минуту",
+        mm: "%d минут",
+        h: "1 час",
+        hh: "%dчасов",
+        d: "день",
         dd: `%d дня`,
-        M: 'месяц',
-        MM: '%d месяцев',
-        y: 'год',
-        yy: '%dлет',
-      },
+        M: "месяц",
+        MM: "%d месяцев",
+        y: "год",
+        yy: "%dлет"
+      }
     });
-  },
+  }
 });
 </script>
 
 <style lang="scss">
-  .ant-popover-message > .anticon {
-    left:0;
+// .ant-popover-message > .anticon {
+//   left:0;
+// }
+
+.ant-popover {
+  z-index: 1031 !important;
+
+  &-message > .anticon {
+    left: 0;
   }
+  &-title {
+    min-width: auto;
+  }
+  &-inner-content {
+    padding: 5px 10px !important;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 40px;
+    .ant-btn {
+      border: 0;
+      background-color: transparent;
+    }
+    &:empty {
+      display: none;
+    }
+  }
+}
+
 .open-action-button {
   background-color: transparent !important;
   border: 0 !important;
@@ -70,12 +96,10 @@ export default Vue.extend({
 .ant-drawer {
   z-index: 1031 !important;
 }
-.ant-popover {
-  z-index: 1031 !important;
-}
+
 .action-popup-content {
   .anticon {
-    margin: 0 1rem !important;
+    margin: 0 0.6rem !important;
     cursor: pointer !important;
   }
 }
