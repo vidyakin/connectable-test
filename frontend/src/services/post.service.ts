@@ -7,8 +7,9 @@ import {
   ADD_POST, CHANGE_POST, CHANGE_COMMENT, CHANGE_ANSWER,
   REMOVE_POST,
   REMOVE_COMMENT,
-   REMOVE_ANSWER,
+  REMOVE_ANSWER,
   SET_POSTS,
+  SET_POST
 } from '@/store/post/mutations.type';
 
 export const sendNewPost = (context: any, post: any) => {
@@ -56,54 +57,51 @@ export const editPost = (context: any, post: any) => {
   }
 };
 export const editComment = (context: any, comment: any) => {
-   return Vue.axios
-            .put('api/comment/' + comment._id, comment)
-            .then((response: any) => {
-                if (comment.status) {
-                    context.commit(CHANGE_ANSWER, response.data.result);
-                } else {
-                    context.commit(CHANGE_COMMENT, response.data.result);
-                }
-            });
-};
-export const repost = (context: any, post: any) => {
   return Vue.axios
-    .post('api/post', post)
+    .put('api/comment/' + comment._id, comment)
     .then((response: any) => {
-      return ;
+      if (comment.status) {
+        context.commit(CHANGE_ANSWER, response.data.result);
+      } else {
+        context.commit(CHANGE_COMMENT, response.data.result);
+      }
     });
 };
+export const repost = async (context: any, post: any) => {
+  const response = await Vue.axios
+    .post('api/post', post);
+  return;
+};
 
-export const getPosts = (context: any, parent: any) => {
+export const getPosts = async (context: any, parent: any) => {
   context.commit(SET_POSTS, []);
-  return Vue.axios
-    .get('api/post', {params: parent})
-    .then((response: any) => {
-      context.commit(SET_POSTS, response.data.result);
-    });
+  const response = await Vue.axios
+    .get('api/post', { params: parent });
+  context.commit(SET_POSTS, response.data.result);
 };
 
-export const sendLike = (context: any, like: any) => {
-  return Vue.axios
-    .post('api/like', like)
-    .then((response: any) => {
-      const newLike = response.data.result;
-      if (newLike.parent.type === 'post') {
-        context.commit(ADD_LIKE_FOR_POST, newLike);
-      }
-      if (newLike.parent.type === 'comment') {
-        context.commit(ADD_LIKE_FOR_COMMENT, newLike);
-      }
-    });
+export const getPost = async (context: any, postId: any) => {
+  const response = await Vue.axios
+    .get(`api/post/${postId}`);
+  context.commit(SET_POST, response.data.result);
 };
-export const dislike = (context: any, disLike: any) => {
-    return Vue.axios
-        // .delete(`api/dislike/${arrRes}`)
-        .post('api/dislike', disLike)
-        .then((response: any) => {
-            return response.data;
 
-        });
+export const sendLike = async (context: any, like: any) => {
+  const response = await Vue.axios
+    .post('api/like', like);
+  const newLike = response.data.result;
+  if (newLike.parent.type === 'post') {
+    context.commit(ADD_LIKE_FOR_POST, newLike);
+  }
+  if (newLike.parent.type === 'comment') {
+    context.commit(ADD_LIKE_FOR_COMMENT, newLike);
+  }
+};
+export const dislike = async (context: any, disLike: any) => {
+  const response = await Vue.axios
+    // .delete(`api/dislike/${arrRes}`)
+    .post('api/dislike', disLike);
+  return response.data;
 };
 
 export const sendComment = (context: any, comment: any) => {
@@ -125,15 +123,15 @@ export const deletePost = (context: any, postId: number) => {
 };
 export const deleteComment = (context: any, commentId: any) => {
   console.log(commentId);
-  
+
   return Vue.axios
     .delete('api/comment/' + commentId._id)
     .then((response: any) => {
-        if (commentId.type) {
-            context.commit(REMOVE_ANSWER, commentId);
-        } else {
-            context.commit(REMOVE_COMMENT, response.data.result);
-        }
+      if (commentId.type) {
+        context.commit(REMOVE_ANSWER, commentId);
+      } else {
+        context.commit(REMOVE_COMMENT, response.data.result);
+      }
 
     });
 };

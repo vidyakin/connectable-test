@@ -2,14 +2,14 @@ import Vue from 'vue';
 import Router from 'vue-router';
 import Home from './views/Home.vue';
 import store from './store';
-import {getInfoUser} from '@/services/auth/auth.service';
+import { getInfoUser } from '@/services/auth/auth.service';
 Vue.use(Router);
 
 const view = (name: string) => {
   return () => import(`./views/${name}.vue`);
 };
 
-export const router =  new Router({
+export const router = new Router({
   mode: 'history',
   base: process.env.BASE_URL,
   routes: [
@@ -22,6 +22,11 @@ export const router =  new Router({
           path: '/company',
           name: 'company',
           component: view('Company'),
+        },
+        {
+          path: '/post/:_id',
+          name: 'post',
+          component: view('Post'),
         },
         {
           path: '/profile/:_id',
@@ -62,6 +67,11 @@ export const router =  new Router({
           path: '/structure_new',
           name: 'structure_new',
           component: view('StructureNew'),
+        },
+        {
+          path: '/clients',
+          name: 'clients',
+          component: view('ClientsManagement'),
         },
         {
           path: '/project/:_id',
@@ -127,7 +137,7 @@ router.beforeEach((to, from, next) => {
   const loggedIn = localStorage.getItem('authorization');
   const isLoggedIn = localStorage.getItem('token');
 
-  if(localStorage.getItem('token')) {
+  if (localStorage.getItem('token')) {
     getInfoUser(localStorage.getItem('token'));
   }
 

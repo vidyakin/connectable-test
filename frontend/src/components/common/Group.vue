@@ -5,17 +5,26 @@
     <div class="group-header" :class="group.type === 2 ? 'private' : ''">
       <div class="group-header-content">
         <div class="group-header-content-name">{{group.name}}</div>
-        <div class="group-header-content-count">{{group.participants.length}} {{group && endingWords(group.participants.length)}}</div>
+        <div
+          class="group-header-content-count"
+        >{{group.participants.length}} {{group && endingWords(group.participants.length)}}</div>
       </div>
-      <div class="group-header-action" v-if="group && group.creatorId === datauser._id || userIsAdmin" >
-        <a-popover title="Действия с группой" trigger="click" overlayClassName="group-header-action-popup-content">
+      <div
+        class="group-header-action"
+        v-if="group && group.creatorId === datauser._id || userIsAdmin"
+      >
+        <a-popover
+          title="Действия с группой"
+          trigger="click"
+          overlayClassName="group-header-action-popup-content"
+        >
           <template slot="content">
             <a-popconfirm
               title="Подтверите удаление группы"
               okText="Подтверждаю"
               cancelText="Отмена"
               @confirm="deleteGroup"
-            >            
+            >
               <a-tooltip title="Удалить!">
                 <a-button icon="delete"></a-button>
               </a-tooltip>
@@ -26,10 +35,16 @@
       </div>
     </div>
     <div class="group-content" v-if="group.participants" @click="redirectToGroup">
-      <div class="group-content-participant" v-for="participant in group.participants" :key="participant._id">
+      <div
+        class="group-content-participant"
+        v-for="participant in group.participants"
+        :key="participant._id"
+      >
         <!--<a-avatar :src="participant.googleImage"></a-avatar>-->
         <div class="group-content-participant-info">
-          <div class="group-content-participant-info-name">{{participant.firstName + " " + participant.lastName}}</div>
+          <div
+            class="group-content-participant-info-name"
+          >{{participant.firstName + " " + participant.lastName}}</div>
           <div class="group-content-participant-info-positions">{{participant.positions.join(', ')}}</div>
         </div>
       </div>
@@ -70,81 +85,91 @@
         </div>
       </div>
     </div>
-  </div> -->
+  </div>-->
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
-import {
-  DELETE_GROUP,
-} from '@/store/group/actions.type';
-import store from '../../store';
+import { mapGetters } from "vuex";
+import { DELETE_GROUP } from "@/store/group/actions.type";
+import store from "../../store";
 export default {
-  name: 'AppGroup',
+  name: "AppGroup",
   data() {
     return {
-      datauser: (store.getters.userData ? store.getters.userData.result : store.getters.user ),
-      output: '',
+      datauser: store.getters.userData
+        ? store.getters.userData.result
+        : store.getters.user,
+      output: ""
     };
   },
   props: {
-    group: Object,
+    group: Object
   },
   computed: {
     userIsAdmin() {
-      return this.$can('read', {'accessEmail': this.datauser.email, '__type': 'Admin'})
+      return this.$can("read", {
+        accessEmail: this.datauser.email,
+        __type: "Admin"
+      });
     },
-    ...mapGetters(['userData']),
+    ...mapGetters(["userData"])
   },
   created() {
-    //console.log(`>> Group comp created: dataUser is ${JSON.stringify(this.datauser,null,3)}`);    
+    //console.log(`>> Group comp created: dataUser is ${JSON.stringify(this.datauser,null,3)}`);
   },
-  
+
   methods: {
     deleteGroup() {
       this.$store.dispatch(DELETE_GROUP, this.group._id).then(() => {
-        this.$notification['success']({
-          message: 'Група удалена',
-          placement: 'topRight'
+        this.$notification["success"]({
+          message: "Група удалена",
+          placement: "topRight"
         });
       });
     },
     endingWords(count) {
       if (count === 0) {
-        this.output = 'нет участников';
+        this.output = "нет участников";
       } else if (count === 1) {
-        this.output = ' участник';
-      } else if ((count > 20) && ((count % 10) === 1)) {
-        this.output = ' участник';
-      } else if (((count >= 2) && (count <= 4)) || (((count % 10) >= 2) && ((count % 10) <= 4)) && (count > 20)) {
-        this.output = ' участника';
+        this.output = " участник";
+      } else if (count > 20 && count % 10 === 1) {
+        this.output = " участник";
+      } else if (
+        (count >= 2 && count <= 4) ||
+        (count % 10 >= 2 && count % 10 <= 4 && count > 20)
+      ) {
+        this.output = " участника";
       } else {
-        this.output = ' участников';
+        this.output = " участников";
       }
       return this.output;
     },
     redirectToGroup() {
-      this.$router.push({ name: 'group', params: { _id: this.group._id } });
+      this.$router.push({ name: "group", params: { _id: this.group._id } });
     },
     groupVisible() {
-      return this.group.type !== 2 || (this.group.type === 2 && this.group.creatorId === this.datauser._id || this.userIsAdmin)
+      return (
+        this.group.type !== 2 ||
+        (this.group.type === 2 && this.group.creatorId === this.datauser._id) ||
+          this.userIsAdmin
+      );
     }
-  },
+  }
 };
 </script>
 
 <style lang="scss">
 .group-header-action-popup-content {
   text-align: center;
-  
-  .ant-popover-inner-content {
-    display: flex;
-    justify-content: center;
-    .ant-btn {
-      border: 0;
-      background-color: transparent;
-    }
-  }
+
+  // .ant-popover-inner-content {
+  // display: flex;
+  // justify-content: center;
+  // .ant-btn {
+  //   border: 0;
+  //   background-color: transparent;
+  // }
+  // }
 }
 .group {
   min-width: 16rem;
@@ -155,7 +180,7 @@ export default {
   box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.15);
   margin-right: 2rem;
   margin-bottom: 2rem;
-  
+
   &-header {
     background-color: #f5f6fa;
     height: 4rem;
@@ -188,7 +213,7 @@ export default {
         &:hover {
           cursor: pointer;
         }
-      }  
+      }
 
       &-count {
         height: 13px;
