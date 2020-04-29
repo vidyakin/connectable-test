@@ -4,28 +4,31 @@ const fileUpload = require('express-fileupload');
 const latinize = require('latinize');
 
 const serializers = require('./serializers');
-const groupSerializer = require('./groupSerializer').groupSerializer;
-const projectSerializer = require('./projectSerializer').projectSerializer;
-const inviteSerializer = require('./inviteSerializer').inviteSerializer;
+const groupSerializer = require('./serializers/groupSerializer').groupSerializer;
+const projectSerializer = require('./serializers/projectSerializer').projectSerializer;
+const inviteSerializer = require('./serializers/inviteSerializer').inviteSerializer;
 
 require('dotenv').config();
 
 const express = require('express');
 const bodyParser = require('body-parser');
 
-const User = require('./models').User;
-const Post = require('./models').Post;
-const Like = require('./models').Like;
-const Comment = require('./models').Comment;
-const Event = require('./models').Event;
-const Group = require('./models').Group;
-const GroupParticipant = require('./models').GroupParticipant;
-const GroupInvite = require('./models').GroupInvite;
-const ProjectParticipant = require('./models').ProjectParticipant;
-const Project = require('./models').Project;
-const Department = require('./models').Department;
-const Notification = require('./models').Notification;
-const Message = require('./models').Message;
+const { 
+    User,
+    Post,
+    Like,
+    Comment,
+    Event,
+    Group,
+    GroupParticipant,
+    GroupInvite,
+    ProjectParticipant,
+    Project,
+    Department,
+    Notification,
+    Message,
+    Structure
+} = require('./models')
 
 const app = express();
 const port = process.env.PORT || 4000;
@@ -73,6 +76,7 @@ app.use('/api/projectParticipant', validateToken, require('./crud')(ProjectParti
 app.use('/api/project', validateToken, require('./crud')(Project, projectSerializer));
 
 app.use('/api/message', validateToken, require('./crud')(Message, serializers.serializer));
+app.use('/api/structure', validateToken, require('./crud')(Structure, serializers.serializer));
 
 app.use('/api/outlook', require('./auth/outlook/'));
 app.use('/api/outlook/event', require('./calendar'));
@@ -324,7 +328,7 @@ app.post('/api/department', (req, res, next) => {
 
         });
     }
-   else {
+    else {
         depData.level = 1;
         Department.findOne({slug}, (error, department) => {
             if (!error && !department) {

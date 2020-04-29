@@ -64,30 +64,30 @@ export default Vue.extend({
 //   left:0;
 // }
 
-.ant-popover {
-  z-index: 1031 !important;
+// .ant-popover {
+//   z-index: 1031 !important;
 
-  &-message > .anticon {
-    left: 0;
-  }
-  &-title {
-    min-width: auto;
-  }
-  &-inner-content {
-    padding: 5px 10px !important;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 40px;
-    .ant-btn {
-      border: 0;
-      background-color: transparent;
-    }
-    &:empty {
-      display: none;
-    }
-  }
-}
+//   &-message > .anticon {
+//     left: 0;
+//   }
+//   &-title {
+//     min-width: auto;
+//   }
+//   &-inner-content {
+//     padding: 5px 10px !important;
+//     display: flex;
+//     justify-content: center;
+//     align-items: center;
+//     min-height: 40px;
+//     //.ant-btn {
+//     //border: 0;
+//     //background-color: transparent;
+//     //}
+//     &:empty {
+//       display: none;
+//     }
+//   }
+// }
 
 .open-action-button {
   background-color: transparent !important;

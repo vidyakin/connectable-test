@@ -6,6 +6,8 @@
         <div class="structure-header-deptName">{{ currentDept.text || '' }}</div>
         <a-button type="primary" v-if="test" @click="addDepartment">Добавить раздел</a-button>
         <a-button type="primary" v-else @click="openCreate">Создать проект</a-button>
+        <a-button type="primary" @click="saveStructure">Сохранить структуру</a-button>
+        <a-button type="primary" @click="restoreScale">Восстановить масштаб</a-button>
       </div>
     </div>
     <a-tabs :animated="false" :tabBarGutter="10">
@@ -59,6 +61,12 @@ export default {
      */
     setCurrentDept(deptInfo) {
       this.currentDept = deptInfo;
+    },
+    saveStructure() {
+      this.$refs.structure.save();
+    },
+    restoreScale() {
+      this.$refs.structure.restoreStructure();
     }
   }
 };
@@ -122,6 +130,10 @@ export default {
     &-search {
       display: flex;
       align-items: center;
+
+      .ant-btn {
+        margin-right: 8px;
+      }
     }
     &-deptName {
       margin-right: 20px;

@@ -7,6 +7,11 @@ export const setAuthInterceptor = () => {
   axios.interceptors.response.use((response) => {
     return response;
   }, (error) => {
+    if (error.response == undefined) {
+      const cfg = error.config
+      console.log(`${error.message} at ${cfg.method} ${cfg.url}`);
+      return
+    }
     const errData = error.response.data;
     console.log(error);
     if (error.response.status === 401) {

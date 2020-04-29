@@ -1,5 +1,5 @@
-const likeDao = require('./dao/like-dao');
-const commentDao = require('./dao/comment-dao');
+const likeDao = require('../dao/like-dao');
+const commentDao = require('../dao/comment-dao');
 
 module.exports.serializer = async (data) => {
   return data;
