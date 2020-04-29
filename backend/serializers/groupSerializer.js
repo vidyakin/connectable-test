@@ -1,5 +1,5 @@
-const groupParticipantDao = require('./dao/group-participant-dao');
-const UserDao = require('./dao/user-dao');
+const groupParticipantDao = require('../dao/group-participant-dao');
+const UserDao = require('../dao/user-dao');
 
 module.exports.groupSerializer = async (data) => {
   if (Array.isArray(data)) {

@@ -1,4 +1,4 @@
-const GroupDao = require('./dao/group-dao');
+const GroupDao = require('../dao/group-dao');
 
 module.exports.inviteSerializer = async (data) => {
   if (Array.isArray(data)) {

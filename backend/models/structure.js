@@ -9,9 +9,7 @@ const Schema = mongoose.Schema;
  */
 const structureSchema = new Schema({
   client_id: String, // код клиента
-  code: String,   // Краткий код (число или строка)
-  name: String,   // Полное наименование головного департамента
-  children: Schema.Types.Mixed // подчиненные узлы
+  orgTree: Schema.Types.Mixed // дерево структуры
 });
 
 module.exports = mongoose.model('Structure', structureSchema);

@@ -8,15 +8,19 @@
         <a-button key='3' type='primary'>Редактировать</a-button>
       </template>
     </a-page-header>-->
-    <vo-basic
-      :data="orgData"
+    <vo-edit
+      v-if="orgChart && !loading"
+      :data="orgChart"
       :zoom="true"
       :pan="true"
       :toggleCollapse="false"
       :toggleSiblingsResp="true"
       :createNode="createdNode"
-      @nodeClick="nclick"
-    ></vo-basic>
+    ></vo-edit>
+    <div v-show="false">
+      <label class="selected-node-group"></label>
+      <input type="text" id="selected-node" class="selected-node-group" />
+    </div>
     <vue-context ref="contextMenu">
       <li class="context-menu-item">
         <a @click.prevent="onClick(1)">
@@ -65,6 +69,7 @@
         </a>
       </li>
     </vue-context>
+    <!-- Диалог редактирования отдела -->
     <department-edit-form
       ref="deptEditForm"
       :visible="editVisible"
@@ -72,6 +77,16 @@
       @cancel="handleCancel"
       @create="handleCreate"
     />
+    <!-- Диалог для изменения названия -->
+    <a-modal title="Укажите новое название" v-model="dialogDeptNewName" @ok="changeDeptName">
+      <app-input
+        v-model="deptNewName"
+        placeholder="Название"
+        label="Название"
+        class="secondary form-input"
+      />
+    </a-modal>
+    <!-- Диалог для добавления нового отдела -->
     <a-modal title="Укажите новое название" v-model="dialogDeptNewName" @ok="changeDeptName">
       <app-input
         v-model="deptNewName"
@@ -84,11 +99,16 @@
 </template>
 
 <script>
-// common libs
+// vuex parts
 import { mapGetters } from "vuex";
+import {
+  GET_STRUCTURE,
+  SAVE_STRUCTURE,
+  EDIT_STRUCTURE
+} from "@/store/structure/actions.type";
 
 // external components
-import { VoBasic } from "vue-orgchart";
+import { VoBasic, VoEdit } from "vue-orgchart";
 import { VueContext } from "vue-context";
 import "vue-context/src/sass/vue-context.scss";
 import "vue-orgchart/dist/style.min.css";
@@ -108,6 +128,35 @@ function findNameById(graf, id) {
       ""
     );
   return "";
+}
+/**
+ * Ищем имя узла графа по id узла
+ */
+function findNodeById(graf, id) {
+  if (graf.id == id) return graf;
+  if (graf.children) {
+    const finded = graf.children.find(node => node.id == id);
+    if (finded != undefined) return finded;
+    else
+      return graf.children.reduce((res, node) => {
+        const f = findNodeById(node, id);
+        return f == {} ? res : f;
+      }, {});
+  }
+}
+/**
+ * Добавляем узел к указанному узлу
+ */
+function addChildToId(graf, id, child) {
+  if (graf.id == id) {
+    if (!graf.children) graf.children = [];
+    graf.children.push(child);
+    return true;
+  } else if (graf.children) {
+    let added = false;
+    graf.children.forEach(node => (added = addChildToId(node, id, child)));
+    return added;
+  } else return false;
 }
 
 /**
@@ -131,7 +180,7 @@ function changeNameById(graf, id, newName) {
 export default {
   name: "Departments",
   components: {
-    VoBasic,
+    VoEdit,
     VueContext,
     DepartmentEditForm,
     AppInput
@@ -142,9 +191,14 @@ export default {
       dataToShow: undefined,
       clickedDeptId: null,
       dialogDeptNewName: false,
+      dialogNewDept: false,
       deptNewName: "",
-      labels: ["CEO-1", "CEO-2", "CEO-3", "CEO-4"],
+      struct_id: "",
+      loading: true, // без нее не работает, it's a MAGIC!
+      labels: ["CEO-1", "CEO-2", "CEO-3", "CEO-4", "CEO-5"],
       orgChartObj: {},
+      orgchart: null,
+      chartData2: {},
       chartData: {
         id: "ceo1",
         name: "CEO",
@@ -168,44 +222,71 @@ export default {
           {
             id: "hr",
             name: "Департамент HR",
-            children: [{ name: "Preact" }]
+            children: [{ id: "preact", name: "Preact" }]
           },
           {
             id: "it",
             name: "Департамент IT",
-            children: [{ name: "Moon" }]
+            children: [{ id: "moon", name: "Moon" }]
           }
         ]
       }
     };
   },
-  created() {
+  async beforeCreate() {
+    await this.$store
+      .dispatch(GET_STRUCTURE)
+      .then(() => {
+        // 0й элемент потому что пока что возвращается массив ( все схемы ), а будет с отбором по клиенту одна
+        //this.chartData2 = this.$store.getters.structure[0].orgTree;
+        this.struct_id = this.structure[0]._id;
+        console.log(`_id of structure is ${this.struct_id}`);
+        this.loading = false; //  без этого не работает загрузка данных в схему!
+      })
+      .then(() => {
+        this.mountOrgChart();
+        let cc = document.getElementById("chart-container");
+        // выводим метки на полосах фона
+        this.labels.map((l, i) => {
+          let num = i + 1;
+          const labelDiv = document.createElement("div");
+          labelDiv.id = "label" + num;
+          labelDiv.innerText = "CEO-" + num;
+          labelDiv.classList.add("label", "label-" + num);
+          cc.firstChild.append(labelDiv);
+        });
+      });
+  },
+  async created() {
     // await this.$store.dispatch(GET_ORGCHART, this.$store.getters.GET_CURR_CLIENT) // заполнение оргструктуры для текущего клиента
     // this.chartdata = await this.$store.getters.GET_CHARTDATA // получение данных о структуре
-    this.mountOrgChart();
-    this.orgChartObj._props.data = this.orgData;
-    this.orgChartObj.initOrgChart();
+    //});
+    // let cc = document.getElementById("chart-container");
+    // if (!cc) {
+    //   console.log("Не найден блок диаграммы");
+    //   return;
+    // }
+    // this.mountOrgChart();
   },
-  mounted() {
-    let cc = document.getElementById("chart-container");
-    if (!cc) {
-      console.log("Не найден блок диаграммы");
-      return;
-    }
-    this.labels.map((l, i) => {
-      let num = i + 1;
-      const labelDiv = document.createElement("div");
-      labelDiv.id = "label" + num;
-      labelDiv.innerText = "CEO-" + num;
-      labelDiv.classList.add("label", "label-" + num);
-      cc.firstChild.append(labelDiv);
-    });
+  async mounted() {
+    // mount chartdata
+    // this.$nextTick(this.mountOrgChart());
+    //this.orgChartObj._props.data = this.orgChart;
+    //this.orgChartObj.initOrgChart();
   },
   computed: {
-    ...mapGetters(["userData", "user"]),
-    orgData() {
-      return this.chartData;
+    ...mapGetters(["userData", "user", "structure"]),
+    orgChart() {
+      if (this.structure && this.structure.length) {
+        //console.log(`orgTree: ${this.structure[0].orgTree}`);
+        return this.structure[0].orgTree;
+      } else return {};
     }
+  },
+  watch: {
+    // chartData2(response) {
+    //   this.chartData2 = response;
+    // }
   },
   methods: {
     datauser() {
@@ -214,14 +295,17 @@ export default {
     },
     mountOrgChart() {
       this.$children.forEach(item => {
-        this.orgChartObj = item;
+        item.orgchart !== undefined ? (this.orgChartObj = item) : null;
         item.orgchart !== undefined ? (this.orgchart = item.orgchart) : null;
       });
     },
     contextClick(e) {
       e.preventDefault();
       this.clickedDeptId = e.currentTarget.id;
-      this.$refs.contextMenu.open(e, e.currentTarget.id);
+      document.getElementById(
+        "selected-node"
+      ).dataset.node = this.clickedDeptId;
+      this.$refs.contextMenu.open(e, this.clickedDeptId);
     },
     onClick(data) {
       console.log(data);
@@ -241,6 +325,9 @@ export default {
     createdNode(n, d) {
       n.oncontextmenu = this.contextClick;
       n.onclick = this.nclick;
+      if (!n.id) {
+        n.id = d.id || d.Id;
+      }
     },
     /**
      * @param param Структура { type, dept }
@@ -262,12 +349,65 @@ export default {
         console.log("Received values of form: ", values);
         form.resetFields();
         this.editVisible = false;
+        // добавляем узел
+        let nodeVals = [
+          {
+            id: values.code || "dept" + Math.floor(Math.random() * 1001),
+            name: values.title
+          }
+        ];
+        let selectedNode = document.getElementById(
+          document.getElementById("selected-node").dataset.node
+        );
+        // если есть подчиненные, то не добавляем. Улучшить потом - добавлять в правый конец
+        let hasChild = selectedNode.parentNode.colSpan > 1;
+        if (!hasChild) {
+          let rel = nodeVals.length > 1 ? "110" : "100"; // одновременно несколько можно?
+          this.orgChartObj.orgchart.addChildren(selectedNode, {
+            children: nodeVals.map(item => {
+              return { name: item.name, relationship: rel, Id: item.id };
+            })
+          });
+        } else {
+          const el = findNodeById(this.chartData, this.clickedDeptId);
+          console.log(`node: ${el.name}`);
+        }
+        // добавляем в источник данных. И потом в базу
+        addChildToId(this.chartData, this.clickedDeptId, { ...nodeVals[0] });
       });
+    },
+    restoreStructure() {
+      console.log(`restore scale`);
+      this.orgchart.chart.style.transform = "";
+      this.orgChartObj.initOrgChart();
+    },
+    async save() {
+      try {
+        await this.$store.dispatch(EDIT_STRUCTURE, {
+          _id: this.struct_id,
+          client_id: "client_123123",
+          orgTree: this.orgChart
+        });
+        this.$notification["success"]({
+          message: "Сохранено",
+          description: "Структура сохранена"
+        });
+      } catch (error) {
+        this.$notification["error"]({
+          message: "Ошибка при сохранении",
+          description: error.message
+        });
+      }
     },
     addEmployee() {
       console.log("add empl to " + this.clickedDeptId);
     },
     addDepartment() {
+      const deptInfo = {
+        id: this.clickedDeptId,
+        text: findNameById(this.chartData, this.clickedDeptId)
+      };
+      this.handleShow({ type: "new", dept: deptInfo });
       console.log("add dept to" + this.clickedDeptId);
     },
     editDeptName() {
@@ -284,6 +424,12 @@ export default {
         "name changed...",
         findNameById(this.chartData, this.clickedDeptId)
       );
+      // this.orgChartObj.data = this.chartData; // не работает установка данных, надо вручную заголовок менять
+      // this.orgChartObj.initOrgChart();
+      // let dtSrc = document.getElementById(this.clickedDeptId).dataset.source // изменение датасета тоже не работает
+      document.getElementById(
+        this.clickedDeptId
+      ).children[0].innerText = this.deptNewName;
       this.dialogDeptNewName = false;
     }
   }

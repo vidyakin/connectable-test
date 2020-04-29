@@ -92,49 +92,32 @@ const mutations = {
   [SET_POSTS](state: State, posts: any[]) {
     state.posts = posts;
   },
+
   [SET_POST](state: State, post: any[]) {
     state.currentPost = post;
   },
+
   [ADD_POST](state: State, post: any) {
     state.posts = [post, ...state.posts];
   },
+
   [ADD_LIKE_FOR_POST](state: State, like: any) {
     const postIndex = state.posts.findIndex((post) => post._id === like.parent.id);
-    state.posts = [...state.posts.slice(0, postIndex),
-    {
-      ...state.posts[postIndex],
-      likes: [...state.posts[postIndex].likes, like],
-    },
-    ...state.posts.slice(postIndex + 1)];
+    state.posts[postIndex].likes.push(like)
   },
+
   [ADD_LIKE_FOR_COMMENT](state: State, like: any) {
     let commentIndex: any;
     const postIndex = state.posts.findIndex((post) => {
       commentIndex = post.comments.findIndex((comment: any) => comment._id === like.parent.id);
       return commentIndex !== -1;
     });
-    state.posts = [...state.posts.slice(0, postIndex),
-    {
-      ...state.posts[postIndex],
-      comments: [
-        ...state.posts[postIndex].comments.slice(0, commentIndex),
-        {
-          ...state.posts[postIndex].comments[commentIndex],
-          likes: [...state.posts[postIndex].comments[commentIndex].likes, like],
-        },
-        ...state.posts[postIndex].comments.slice(commentIndex + 1),
-      ],
-    },
-    ...state.posts.slice(postIndex + 1)];
+    state.posts[postIndex].comments[commentIndex].likes.push(like)
   },
+
   [ADD_COMMENT_FOR_POST](state: State, comment: any) {
     const postIndex = state.posts.findIndex((post) => post._id === comment.parent.id);
-    state.posts = [...state.posts.slice(0, postIndex),
-    {
-      ...state.posts[postIndex],
-      comments: [...state.posts[postIndex].comments, comment],
-    },
-    ...state.posts.slice(postIndex + 1)];
+    state.posts[postIndex].comments.push(comment)
   },
 
   [ADD_ANSWER_FOR_COMMENT](state: State, answer: any) {
@@ -145,48 +128,25 @@ const mutations = {
     });
     const post = state.posts[postIndex]
     const coment = post.comments[commentIndex]
-    state.posts = [...state.posts.slice(0, postIndex),
-    {
-      ...post,
-      comments: [
-        ...post.comments.slice(0, commentIndex),
-        {
-          ...coment,
-          answers: [...coment.answers, answer],
-        },
-        ...post.comments.slice(commentIndex + 1),
-      ],
-    },
-    ...state.posts.slice(postIndex + 1)];
+    state.posts[postIndex].comments[commentIndex].answers.push(answer)
   },
+
   [REMOVE_POST](state: State, postId: any) {
     if (state.posts) {
       const index = state.posts!.findIndex(({ _id }) => _id === postId);
       state.posts.splice(index, 1)
-      // state.posts = [
-      //   ...state.posts!.slice(0, index),
-      //   ...state.posts!.slice(index + 1),
-      // ];
     }
   },
+
   [REMOVE_COMMENT](state: State, commentId: any) {
     let commentIndex: any;
     const postIndex = state.posts.findIndex((post) => {
       commentIndex = post.comments.findIndex((currentComment: any) => currentComment._id === commentId);
       return commentIndex !== -1;
     });
-    const post = state.posts[postIndex]
-    //state.posts[postIndex].comments.splice(commentIndex,1) // TODO: протестить вместо всего что далее
-    state.posts = [...state.posts.slice(0, postIndex),
-    {
-      ...post,
-      comments: [
-        ...post.comments!.slice(0, commentIndex),
-        ...post.comments!.slice(commentIndex + 1),
-      ],
-    },
-    ...state.posts.slice(postIndex + 1)];
+    state.posts[postIndex].comments.splice(commentIndex, 1)
   },
+
   [REMOVE_ANSWER](state: State, answerId: any) {
     let commentIndex: any, answersIndex: any;
     const postIndex = state.posts.findIndex((post) => {
@@ -194,51 +154,25 @@ const mutations = {
       answersIndex = post.comments[commentIndex].answers.findIndex((answ: any) => answ._id === answerId._id);
       return commentIndex !== -1;
     });
-    state.posts = [...state.posts.slice(0, postIndex),
-    {
-      ...state.posts[postIndex],
-      comments: [
-        ...state.posts[postIndex].comments.slice(0, commentIndex),
-        {
-          ...state.posts[postIndex].comments[commentIndex],
-          answers: [
-            ...state.posts[postIndex].comments[commentIndex].answers!.slice(0, answersIndex),
-            ...state.posts[postIndex].comments[commentIndex].answers!.slice(answersIndex + 1),
-          ],
-        },
-        ...state.posts[postIndex].comments.slice(commentIndex + 1),
-      ],
-    },
-    ...state.posts.slice(postIndex + 1)];
+    state.posts[postIndex].comments[commentIndex].answers.splice(answersIndex, 1)
   },
 
   [CHANGE_POST](state: State, post: any) {
     if (state.posts) {
       const index = state.posts!.findIndex(({ _id }) => _id === post._id);
-      state.posts = [
-        ...state.posts!.slice(0, index),
-        post,
-        ...state.posts!.slice(index + 1),
-      ];
+      state.posts.splice(index, 1, post)
     }
   },
+
   [CHANGE_COMMENT](state: State, comment: any) {
     let commentIndex: any;
     const postIndex = state.posts.findIndex((post) => {
       commentIndex = post.comments.findIndex((currentComment: any) => currentComment._id === comment._id);
       return commentIndex !== -1;
     });
-    state.posts = [...state.posts.slice(0, postIndex),
-    {
-      ...state.posts[postIndex],
-      comments: [
-        ...state.posts[postIndex].comments!.slice(0, commentIndex),
-        comment,
-        ...state.posts[postIndex].comments!.slice(commentIndex + 1),
-      ],
-    },
-    ...state.posts.slice(postIndex + 1)];
+    state.posts[postIndex].comments.splice(commentIndex, 1, comment)
   },
+
   [CHANGE_ANSWER](state: State, answer: any) {
     /*const postIndex = state.posts.findIndex((post) => {
       commentIndex = state.posts.findIndex((comment) => {
@@ -252,33 +186,21 @@ const mutations = {
       answersIndex = post.comments[commentIndex].answers.findIndex((answ: any) => answ._id === answer._id);
       return commentIndex !== -1;
     });
-    state.posts = [...state.posts.slice(0, postIndex),
-    {
-      ...state.posts[postIndex],
-      comments: [
-        ...state.posts[postIndex].comments.slice(0, commentIndex),
-        {
-          ...state.posts[postIndex].comments[commentIndex],
-          answers: [
-            ...state.posts[postIndex].comments[commentIndex].answers!.slice(0, answersIndex),
-            answer,
-            ...state.posts[postIndex].comments[commentIndex].answers!.slice(answersIndex + 1),
-          ],
-        },
-        ...state.posts[postIndex].comments.slice(commentIndex + 1),
-      ],
-    },
-    ...state.posts.slice(postIndex + 1)];
+    state.posts[postIndex].comments[commentIndex].answers.splice(answersIndex, 1, answer)
   },
+
   [SET_POST_FOR_EDITING](state: State, post: any) {
     state.postForEditing = post;
   },
+
   [SET_COMMENT_FOR_EDITING](state: State, comment: any) {
     state.commentForEditing = comment;
   },
+
   [SET_EDIT_POST_VISIBLE](state: State, visible: any) {
     state.editPostVisible = visible;
   },
+
   [SET_EDIT_COMMENT_VISIBLE](state: State, visible: any) {
     state.editCommVisible = visible;
   },

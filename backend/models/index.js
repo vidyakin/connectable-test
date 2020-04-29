@@ -29,4 +29,5 @@ index.GroupInvite = require('./groupInvite');
 index.Department = require('./department');
 index.Notification = require('./notification');
 index.Message = require('./message');
+index.Structure = require('./structure');
 module.exports = index;
