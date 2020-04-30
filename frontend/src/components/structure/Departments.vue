@@ -77,7 +77,7 @@
       @cancel="handleCancel"
       @create="handleCreate"
     />
-    <pre>{{JSON.stringify(chartData,null,3)}}</pre>
+    <!-- <pre>{{JSON.stringify(chartData,null,3)}}</pre> -->
     <!-- Диалог для изменения названия -->
     <a-modal title="Укажите новое название" v-model="dialogDeptNewNameVisible" @ok="changeDeptName">
       <app-input
@@ -379,13 +379,14 @@ export default {
               return { name: item.name, relationship: rel, id: item.id };
             })
           });
+          // добавляем в источник данных. И потом в базу
+          addChildToId(this.chartData, this.clickedDeptId, { ...nodeVals[0] });
+          this.save(); // сохраняем в БД
         } else {
-          const el = findNodeById(this.chartData, this.clickedDeptId);
-          console.log(`node: ${el.name}`);
+          // надо найти крайнего и добавить соседа
+          //   const el = findNodeById(this.chartData, this.clickedDeptId);
+          //   console.log(`node: ${el.name}`);
         }
-        // добавляем в источник данных. И потом в базу
-        addChildToId(this.chartData, this.clickedDeptId, { ...nodeVals[0] });
-        this.save(); // сохраняем в БД
       });
     },
     restoreStructure() {
@@ -439,6 +440,7 @@ export default {
       }
       // подтверждение удаления
       const name = findNameById(this.chartData, this.clickedDeptId);
+      const orgchart = this.orgChartObj.orgchart;
       this.$confirm({
         centered: true,
         title: "Подтвердите удаление отдела",
@@ -447,7 +449,10 @@ export default {
         okText: "ОК",
         cancelText: "Отменить",
         onOk() {
-          console.log("OK");
+          let selectedNode = document.getElementById(
+            document.getElementById("selected-node").dataset.node
+          );
+          orgchart.removeNodes(selectedNode);
         },
         class: "test"
       });
