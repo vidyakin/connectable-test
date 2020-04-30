@@ -73,21 +73,13 @@
     <department-edit-form
       ref="deptEditForm"
       :visible="editVisible"
-      :dataToShow="dataToShow"
+      :editDeptDialogShow="editDeptDialogShow"
       @cancel="handleCancel"
       @create="handleCreate"
     />
+    <pre>{{JSON.stringify(chartData,null,3)}}</pre>
     <!-- Диалог для изменения названия -->
-    <a-modal title="Укажите новое название" v-model="dialogDeptNewName" @ok="changeDeptName">
-      <app-input
-        v-model="deptNewName"
-        placeholder="Название"
-        label="Название"
-        class="secondary form-input"
-      />
-    </a-modal>
-    <!-- Диалог для добавления нового отдела -->
-    <a-modal title="Укажите новое название" v-model="dialogDeptNewName" @ok="changeDeptName">
+    <a-modal title="Укажите новое название" v-model="dialogDeptNewNameVisible" @ok="changeDeptName">
       <app-input
         v-model="deptNewName"
         placeholder="Название"
@@ -188,17 +180,16 @@ export default {
   data() {
     return {
       editVisible: false,
-      dataToShow: undefined,
+      editDeptDialogShow: undefined,
       clickedDeptId: null,
-      dialogDeptNewName: false,
-      dialogNewDept: false,
+      dialogDeptNewNameVisible: false,
+      dialogDeptDeleteVisible: false,
       deptNewName: "",
       struct_id: "",
       loading: true, // без нее не работает, it's a MAGIC!
       labels: ["CEO-1", "CEO-2", "CEO-3", "CEO-4", "CEO-5"],
       orgChartObj: {},
       orgchart: null,
-      chartData2: {},
       chartData: {
         id: "ceo1",
         name: "CEO",
@@ -234,45 +225,53 @@ export default {
     };
   },
   async beforeCreate() {
-    await this.$store
-      .dispatch(GET_STRUCTURE)
-      .then(() => {
-        // 0й элемент потому что пока что возвращается массив ( все схемы ), а будет с отбором по клиенту одна
-        //this.chartData2 = this.$store.getters.structure[0].orgTree;
-        this.struct_id = this.structure[0]._id;
-        console.log(`_id of structure is ${this.struct_id}`);
-        this.loading = false; //  без этого не работает загрузка данных в схему!
-      })
-      .then(() => {
-        this.mountOrgChart();
-        let cc = document.getElementById("chart-container");
-        // выводим метки на полосах фона
-        this.labels.map((l, i) => {
-          let num = i + 1;
-          const labelDiv = document.createElement("div");
-          labelDiv.id = "label" + num;
-          labelDiv.innerText = "CEO-" + num;
-          labelDiv.classList.add("label", "label-" + num);
-          cc.firstChild.append(labelDiv);
-        });
+    try {
+      await this.$store.dispatch(GET_STRUCTURE); // TODO: добавить (на бэке) отбор по текущему клиенту
+    } catch (error) {
+      console.error(`ошибка получения данных по структуре: ${error.message}`);
+      return;
+    }
+    // Если структуры в базе нет, создаем головной элемент и сохраняем в базу
+    if (this.structure.length == 0) {
+      this.chartData = {
+        id: "ceo",
+        name: "Главное управление"
+      };
+      await this.$store.dispatch(SAVE_STRUCTURE, {
+        client_id: "client1313",
+        orgTree: this.chartData
       });
+      await this.$store.dispatch(GET_STRUCTURE);
+    }
+    // 0й элемент потому что пока что возвращается массив ( все схемы ), а будет с отбором по клиенту одна
+    this.struct_id = this.structure[0]._id;
+    this.chartData = this.structure[0].orgTree;
+    console.log(`_id of structure is ${this.struct_id}`);
+    this.loading = false; //  без этого не работает загрузка данных в схему!
+    //}
   },
   async created() {
     // await this.$store.dispatch(GET_ORGCHART, this.$store.getters.GET_CURR_CLIENT) // заполнение оргструктуры для текущего клиента
     // this.chartdata = await this.$store.getters.GET_CHARTDATA // получение данных о структуре
     //});
-    // let cc = document.getElementById("chart-container");
-    // if (!cc) {
-    //   console.log("Не найден блок диаграммы");
-    //   return;
-    // }
     // this.mountOrgChart();
   },
   async mounted() {
-    // mount chartdata
-    // this.$nextTick(this.mountOrgChart());
-    //this.orgChartObj._props.data = this.orgChart;
-    //this.orgChartObj.initOrgChart();
+    //
+  },
+  updated: function() {
+    this.$nextTick(function() {
+      // Код, который будет запущен только после
+      // обновления всех представлений
+      this.$children.forEach(child => {
+        if (child.orgchart !== undefined) {
+          this.orgChartObj = child;
+          this.orgchart = child.orgchart;
+          this.drawLevelLabels();
+          console.log(`Область диаграммы получена`);
+        }
+      });
+    });
   },
   computed: {
     ...mapGetters(["userData", "user", "structure"]),
@@ -283,22 +282,18 @@ export default {
       } else return {};
     }
   },
-  watch: {
-    // chartData2(response) {
-    //   this.chartData2 = response;
-    // }
-  },
+  watch: {},
   methods: {
     datauser() {
       // TODO: переделать везде также. Может вообще отдельный геттер сделать с этой проверкой
       return this.userData ? this.userData.result : this.user;
     },
-    mountOrgChart() {
-      this.$children.forEach(item => {
-        item.orgchart !== undefined ? (this.orgChartObj = item) : null;
-        item.orgchart !== undefined ? (this.orgchart = item.orgchart) : null;
-      });
-    },
+    // mountOrgChart() {
+    //   this.$children.forEach(item => {
+    //     item.orgchart !== undefined ? (this.orgChartObj = item) : null;
+    //     item.orgchart !== undefined ? (this.orgchart = item.orgchart) : null;
+    //   });
+    // },
     contextClick(e) {
       e.preventDefault();
       this.clickedDeptId = e.currentTarget.id;
@@ -329,12 +324,28 @@ export default {
         n.id = d.id || d.Id;
       }
     },
+    drawLevelLabels() {
+      let cc = document.getElementById("chart-container");
+      if (!cc) {
+        console.log("Не найден блок диаграммы");
+        return;
+      }
+      // выводим метки на полосах фона
+      this.labels.map((l, i) => {
+        let num = i + 1;
+        const labelDiv = document.createElement("div");
+        labelDiv.id = "label" + num;
+        labelDiv.innerText = "CEO-" + num;
+        labelDiv.classList.add("label", "label-" + num);
+        cc.firstChild.append(labelDiv);
+      });
+    },
     /**
      * @param param Структура { type, dept }
      */
     handleShow(param) {
       this.editVisible = true;
-      this.dataToShow = param;
+      this.editDeptDialogShow = param;
       console.log("Окно открыто, параметр ", param);
     },
     handleCancel() {
@@ -365,7 +376,7 @@ export default {
           let rel = nodeVals.length > 1 ? "110" : "100"; // одновременно несколько можно?
           this.orgChartObj.orgchart.addChildren(selectedNode, {
             children: nodeVals.map(item => {
-              return { name: item.name, relationship: rel, Id: item.id };
+              return { name: item.name, relationship: rel, id: item.id };
             })
           });
         } else {
@@ -374,19 +385,20 @@ export default {
         }
         // добавляем в источник данных. И потом в базу
         addChildToId(this.chartData, this.clickedDeptId, { ...nodeVals[0] });
+        this.save(); // сохраняем в БД
       });
     },
     restoreStructure() {
       console.log(`restore scale`);
       this.orgchart.chart.style.transform = "";
-      this.orgChartObj.initOrgChart();
+      //this.orgChartObj.initOrgChart();
     },
     async save() {
       try {
         await this.$store.dispatch(EDIT_STRUCTURE, {
           _id: this.struct_id,
           client_id: "client_123123",
-          orgTree: this.orgChart
+          orgTree: this.chartData // this.chartData
         });
         this.$notification["success"]({
           message: "Сохранено",
@@ -412,11 +424,33 @@ export default {
     },
     editDeptName() {
       this.deptNewName = findNameById(this.chartData, this.clickedDeptId);
-      this.dialogDeptNewName = true;
+      this.dialogDeptNewNameVisible = true;
       console.log("edit dept: " + this.clickedDeptId);
     },
     delDepartment() {
-      console.log("del dept: " + this.clickedDeptId);
+      // проверка на головной отдел
+      if (this.clickedDeptId == "ceo") {
+        this.$error({
+          centered: true,
+          title: "Ошибка удаления отдела",
+          content: "Головной отдел нельзя удалить"
+        });
+        return;
+      }
+      // подтверждение удаления
+      const name = findNameById(this.chartData, this.clickedDeptId);
+      this.$confirm({
+        centered: true,
+        title: "Подтвердите удаление отдела",
+        content: "Отдел «" + name + "» будет удален",
+        okType: "danger",
+        okText: "ОК",
+        cancelText: "Отменить",
+        onOk() {
+          console.log("OK");
+        },
+        class: "test"
+      });
     },
     changeDeptName() {
       changeNameById(this.chartData, this.clickedDeptId, this.deptNewName);
@@ -430,7 +464,7 @@ export default {
       document.getElementById(
         this.clickedDeptId
       ).children[0].innerText = this.deptNewName;
-      this.dialogDeptNewName = false;
+      this.dialogDeptNewNameVisible = false;
     }
   }
 };
