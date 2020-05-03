@@ -6,7 +6,7 @@
         <div class="structure-header-deptName">{{ currentDept.text || '' }}</div>
         <a-button type="primary" v-if="test" @click="addDepartment">Добавить раздел</a-button>
         <a-button type="primary" v-else @click="openCreate">Создать проект</a-button>
-        <a-button type="primary" @click="saveStructure">Сохранить структуру</a-button>
+        <!-- <a-button type="primary" @click="saveStructure">Сохранить структуру</a-button> -->
         <a-button type="primary" @click="restoreScale">Восстановить масштаб</a-button>
       </div>
     </div>
