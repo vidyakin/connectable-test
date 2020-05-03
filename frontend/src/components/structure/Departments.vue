@@ -17,6 +17,11 @@
       :toggleSiblingsResp="true"
       :createNode="createdNode"
     ></vo-edit>
+    <div id="replaceInfoMessage" v-show="replacingMessageVisible">Выберите отдел для переноса</div>
+    <div id="zoom-buttons">
+      <a-button icon="plus" shape="circle" @click="zoom(1)" />
+      <a-button icon="minus" shape="circle" @click="zoom(-1)" />
+    </div>
     <div v-show="false">
       <label class="selected-node-group"></label>
       <input type="text" id="selected-node" class="selected-node-group" />
@@ -41,28 +46,35 @@
         </a>
       </li>
       <li class="context-menu-item new-empl">
-        <a @click.prevent="addEmployee">
+        <a @click.prevent="addEmployeeOnClick">
           <div class="title">
             <a-icon type="user-add" />Добавить сотрудника
           </div>
         </a>
       </li>
       <li class="context-menu-item add-dept">
-        <a @click.prevent="addDepartment">
+        <a @click.prevent="addDepartmentOnClick">
           <div class="title">
             <a-icon type="usergroup-add" />Добавить отдел
           </div>
         </a>
       </li>
+      <li class="context-menu-item replace-dept">
+        <a @click.prevent="replaceDeptOnClick">
+          <div class="title">
+            <a-icon type="swap" />Перенести отдел
+          </div>
+        </a>
+      </li>
       <li class="context-menu-item ch-dept-name">
-        <a @click.prevent="editDeptName">
+        <a @click.prevent="editDeptNameOnClick">
           <div class="title">
             <a-icon type="edit" />Изменить название
           </div>
         </a>
       </li>
       <li class="context-menu-item del-dept">
-        <a @click.prevent="delDepartment">
+        <a @click.prevent="delDepartmentOnClick">
           <div class="title">
             <a-icon type="delete" />Удалить отдел
           </div>
@@ -74,12 +86,16 @@
       ref="deptEditForm"
       :visible="editVisible"
       :editDeptDialogShow="editDeptDialogShow"
-      @cancel="handleCancel"
-      @create="handleCreate"
+      @cancel="cancelCreateAction"
+      @create="createDeptAction"
     />
     <!-- <pre>{{JSON.stringify(chartData,null,3)}}</pre> -->
     <!-- Диалог для изменения названия -->
-    <a-modal title="Укажите новое название" v-model="dialogDeptNewNameVisible" @ok="changeDeptName">
+    <a-modal
+      title="Укажите новое название"
+      v-model="dialogDeptNewNameVisible"
+      @ok="changeDeptNameAction"
+    >
       <app-input
         v-model="deptNewName"
         placeholder="Название"
@@ -122,18 +138,18 @@ function findNameById(graf, id) {
   return "";
 }
 /**
- * Ищем имя узла графа по id узла
+ * Ищем весь узел графа по id узла
  */
 function findNodeById(graf, id) {
   if (graf.id == id) return graf;
   if (graf.children) {
     const finded = graf.children.find(node => node.id == id);
-    if (finded != undefined) return finded;
-    else
-      return graf.children.reduce((res, node) => {
-        const f = findNodeById(node, id);
-        return f == {} ? res : f;
-      }, {});
+    //console.log(`in ${graf.id} > finded: ${finded?.id||'no'}, ${level}`)
+    if (finded) return finded;
+    return graf.children.reduce(
+      (res, node) => res || findNodeById(node, id),
+      null
+    );
   }
 }
 /**
@@ -169,6 +185,22 @@ function changeNameById(graf, id, newName) {
   return false;
 }
 
+/**
+ * Удаление узла по ID
+ */
+function delNodeById(graf, id) {
+  const finded = graf.children.findIndex(node => node.id == id);
+  //console.log(`in ${graf.id} > finded: ${finded}, ${level}`)
+  if (finded != -1) {
+    graf.children.splice(finded, 1);
+    return true;
+  } else {
+    for (node of graf.children) {
+      if (delNodeById(node, id)) return true;
+    }
+  }
+}
+
 export default {
   name: "Departments",
   components: {
@@ -185,6 +217,7 @@ export default {
       dialogDeptNewNameVisible: false,
       dialogDeptDeleteVisible: false,
       deptNewName: "",
+      replacingMessageVisible: false,
       struct_id: "",
       loading: true, // без нее не работает, it's a MAGIC!
       labels: ["CEO-1", "CEO-2", "CEO-3", "CEO-4", "CEO-5"],
@@ -243,7 +276,7 @@ export default {
       });
       await this.$store.dispatch(GET_STRUCTURE);
     }
-    // 0й элемент потому что пока что возвращается массив ( все схемы ), а будет с отбором по клиенту одна
+    // 0-й элемент потому что пока что возвращается массив ( все схемы ), а будет с отбором по клиенту одна
     this.struct_id = this.structure[0]._id;
     this.chartData = this.structure[0].orgTree;
     console.log(`_id of structure is ${this.struct_id}`);
@@ -348,10 +381,10 @@ export default {
       this.editDeptDialogShow = param;
       console.log("Окно открыто, параметр ", param);
     },
-    handleCancel() {
+    cancelCreateAction() {
       this.editVisible = false;
     },
-    handleCreate() {
+    createDeptAction() {
       const form = this.$refs.deptEditForm.form;
       form.validateFields((err, values) => {
         if (err) {
@@ -380,19 +413,32 @@ export default {
             })
           });
           // добавляем в источник данных. И потом в базу
-          addChildToId(this.chartData, this.clickedDeptId, { ...nodeVals[0] });
-          this.save(); // сохраняем в БД
         } else {
+          let lastChild = findNodeById(
+            this.chartData,
+            this.clickedDeptId
+          ).children.slice(-1)[0];
+          lastChild = document.getElementById(lastChild.id);
           // надо найти крайнего и добавить соседа
-          //   const el = findNodeById(this.chartData, this.clickedDeptId);
-          //   console.log(`node: ${el.name}`);
+          this.orgchart.addSiblings(lastChild, {
+            siblings: nodeVals.map(item => {
+              return { ...item, relationship: "110" };
+            })
+          });
         }
+        addChildToId(this.chartData, this.clickedDeptId, { ...nodeVals[0] });
+        this.save(); // сохраняем в БД
       });
     },
     restoreStructure() {
       console.log(`restore scale`);
-      this.orgchart.chart.style.transform = "";
+      document.getElementsByClassName("orgchart")[0].style.transform = "";
+      // после добавления отдела почему то создается еще один элемент orgchart и перестает работать
+      // this.orgchart.chart.style.transform = "";
       //this.orgChartObj.initOrgChart();
+    },
+    zoom(val) {
+      document.getElementsByClassName("orgchart")[0].style.transform = "matrix";
     },
     async save() {
       try {
@@ -412,23 +458,24 @@ export default {
         });
       }
     },
-    addEmployee() {
+    addEmployeeOnClick() {
       console.log("add empl to " + this.clickedDeptId);
     },
-    addDepartment() {
+    addDepartmentOnClick() {
       const deptInfo = {
         id: this.clickedDeptId,
         text: findNameById(this.chartData, this.clickedDeptId)
       };
       this.handleShow({ type: "new", dept: deptInfo });
-      console.log("add dept to" + this.clickedDeptId);
     },
-    editDeptName() {
+    editDeptNameOnClick() {
       this.deptNewName = findNameById(this.chartData, this.clickedDeptId);
       this.dialogDeptNewNameVisible = true;
-      console.log("edit dept: " + this.clickedDeptId);
     },
-    delDepartment() {
+    replaceDeptOnClick() {
+      console.log(`replace dept`);
+    },
+    delDepartmentOnClick() {
       // проверка на головной отдел
       if (this.clickedDeptId == "ceo") {
         this.$error({
@@ -448,16 +495,18 @@ export default {
         okType: "danger",
         okText: "ОК",
         cancelText: "Отменить",
-        onOk() {
+        onOk: () => {
           let selectedNode = document.getElementById(
             document.getElementById("selected-node").dataset.node
           );
           orgchart.removeNodes(selectedNode);
+          delNodeById(this.chartData, this.clickedDeptId);
+          this.save();
         },
         class: "test"
       });
     },
-    changeDeptName() {
+    changeDeptNameAction() {
       changeNameById(this.chartData, this.clickedDeptId, this.deptNewName);
       console.log(
         "name changed...",
@@ -470,6 +519,7 @@ export default {
         this.clickedDeptId
       ).children[0].innerText = this.deptNewName;
       this.dialogDeptNewNameVisible = false;
+      this.save();
     }
   }
 };
@@ -583,5 +633,27 @@ $between: 107px;
 // Удалить отдел
 .del-dept {
   background-color: darksalmon;
+}
+.replace-dept {
+  background-color: lemonchiffon;
+}
+
+div#zoom-buttons {
+  position: absolute;
+  left: 70px;
+  top: 75px;
+
+  button {
+    margin: 3px;
+  }
+}
+
+div#replaceInfoMessage {
+  position: absolute;
+  top: 82px;
+  left: 160px;
+  font-size: 12pt;
+  font-weight: bold;
+  color: cornflowerblue;
 }
 </style>
