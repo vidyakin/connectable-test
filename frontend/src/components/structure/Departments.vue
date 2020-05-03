@@ -430,6 +430,21 @@ export default {
         this.save(); // сохраняем в БД
       });
     },
+    changeDeptNameAction() {
+      changeNameById(this.chartData, this.clickedDeptId, this.deptNewName);
+      console.log(
+        "name changed...",
+        findNameById(this.chartData, this.clickedDeptId)
+      );
+      // this.orgChartObj.data = this.chartData; // не работает установка данных, надо вручную заголовок менять
+      // this.orgChartObj.initOrgChart();
+      // let dtSrc = document.getElementById(this.clickedDeptId).dataset.source // изменение датасета тоже не работает
+      document.getElementById(
+        this.clickedDeptId
+      ).children[0].innerText = this.deptNewName;
+      this.dialogDeptNewNameVisible = false;
+      this.save();
+    },
     restoreStructure() {
       console.log(`restore scale`);
       document.getElementsByClassName("orgchart")[0].style.transform = "";
@@ -505,21 +520,6 @@ export default {
         },
         class: "test"
       });
-    },
-    changeDeptNameAction() {
-      changeNameById(this.chartData, this.clickedDeptId, this.deptNewName);
-      console.log(
-        "name changed...",
-        findNameById(this.chartData, this.clickedDeptId)
-      );
-      // this.orgChartObj.data = this.chartData; // не работает установка данных, надо вручную заголовок менять
-      // this.orgChartObj.initOrgChart();
-      // let dtSrc = document.getElementById(this.clickedDeptId).dataset.source // изменение датасета тоже не работает
-      document.getElementById(
-        this.clickedDeptId
-      ).children[0].innerText = this.deptNewName;
-      this.dialogDeptNewNameVisible = false;
-      this.save();
     }
   }
 };
