@@ -449,7 +449,7 @@ export default {
         let nodeVals = [
           {
             id: values.code || "dept" + Math.floor(Math.random() * 1001),
-            name: values.title
+            name: values.title.trim()
           }
         ];
         let selectedNode = document.getElementById(
