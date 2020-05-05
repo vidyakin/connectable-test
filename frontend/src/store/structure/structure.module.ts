@@ -1,6 +1,11 @@
 import {
     ADD_DEP,
-    SET_STRUCTURE
+    SET_STRUCTURE,
+
+    SET_DEPT_USERS,
+    ADD_DEPT_USER,
+    UPDATE_DEPT_USER,
+    REMOVE_DEPT_USER
 } from '@/store/structure/mutations.type';
 import {
     ADD_NEW_DEP,
@@ -10,7 +15,12 @@ import {
 
     GET_STRUCTURE,
     EDIT_STRUCTURE,
-    SAVE_STRUCTURE
+    SAVE_STRUCTURE,
+
+    GET_DEPT_USERS,
+    CREATE_DEPT_USER,
+    EDIT_DEPT_USER,
+    DELETE_DEPT_USER
 } from '@/store/structure/actions.type';
 
 import {
@@ -22,17 +32,23 @@ import {
 import {
     getStructure,
     saveStructure,
-    editStructure
+    editStructure,
+    getDepartmentUsers,
+    createUsersOfDepartment,
+    editUserOfDepartment,
+    delUserOfDepartment
 } from '@/services/structure.service'
 
 interface State {
     departments: any | null;
     structure: any | null;  // новая структура
+    dept_users: any | null; // сотрудники отделов клиента
 }
 
 const store: State = {
     departments: null,
-    structure: null
+    structure: null,
+    dept_users: null
 };
 
 const getters = {
@@ -41,6 +57,9 @@ const getters = {
     },
     structure(state: State) {
         return state.structure
+    },
+    dept_users(state: State) {
+        return state.dept_users || []
     }
 };
 
@@ -50,6 +69,20 @@ const mutations = {
     },
     [SET_STRUCTURE](state: State, structure: any) {
         state.structure = structure
+    },
+    [SET_DEPT_USERS](state: State, data: any) {
+        state.dept_users = data
+    },
+    [ADD_DEPT_USER](state: State, data: any) {
+        state.dept_users.push(data)
+    },
+    [UPDATE_DEPT_USER](state: State, data: any) {
+        const i = state.dept_users.findIndex((el: any) => el._id = data.id)
+        state.dept_users.splice(i, 1, data)
+    },
+    [REMOVE_DEPT_USER](state: State, id: any) {
+        const i = state.dept_users.findIndex((el: any) => el._id = id)
+        state.dept_users.splice(i, 1)
     }
 };
 
@@ -61,7 +94,12 @@ const actions = {
 
     [GET_STRUCTURE]: getStructure,
     [EDIT_STRUCTURE]: editStructure,
-    [SAVE_STRUCTURE]: saveStructure
+    [SAVE_STRUCTURE]: saveStructure,
+
+    [GET_DEPT_USERS]: getDepartmentUsers,
+    [CREATE_DEPT_USER]: createUsersOfDepartment,
+    [EDIT_DEPT_USER]: editUserOfDepartment,
+    [DELETE_DEPT_USER]: delUserOfDepartment
 };
 
 export default {

@@ -30,4 +30,5 @@ index.Department = require('./department');
 index.Notification = require('./notification');
 index.Message = require('./message');
 index.Structure = require('./structure');
+index.UsersInDepartment = require('./usersInDepartment');
 module.exports = index;

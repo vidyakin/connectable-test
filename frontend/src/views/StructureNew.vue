@@ -4,8 +4,8 @@
       <div class="structure-header-name">Структура организации {{userIsAdmin ? "(админ.)" : ""}}</div>
       <div class="structure-header-search" v-if="canEdit">
         <div class="structure-header-deptName">{{ currentDept.text || '' }}</div>
-        <a-button type="primary" v-if="test" @click="addDepartment">Добавить раздел</a-button>
-        <a-button type="primary" v-else @click="openCreate">Создать проект</a-button>
+        <!-- <a-button type="primary" @click="addDepartment">Добавить раздел</a-button> -->
+        <!-- <a-button type="primary" @click="openCreate">Создать проект</a-button> -->
         <!-- <a-button type="primary" @click="saveStructure">Сохранить структуру</a-button> -->
         <a-button type="primary" @click="restoreScale">Восстановить масштаб</a-button>
       </div>
@@ -50,12 +50,12 @@ export default {
       // TODO: переделать везде также. Может вообще отдельный геттер сделать с этой проверкой
       return this.userData ? this.userData.result : this.user;
     },
-    addDepartment() {
-      this.$refs.structure.handleShow({ type: "new", dept: this.currentDept });
-    },
-    editDepartment() {
-      this.$refs.structure.handleShow({ type: "edit", dept: this.currentDept });
-    },
+    // addDepartment() {
+    //   this.$refs.structure.handleShow({ type: "new", dept: this.currentDept });
+    // },
+    // editDepartment() {
+    //   this.$refs.structure.handleShow({ type: "edit", dept: this.currentDept });
+    // },
     /**
      * @param deptInfo Данные о выбранном департаменте, структура { id, text }
      */
