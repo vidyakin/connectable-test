@@ -63,7 +63,7 @@ const actions = {
   [DELETE_GROUP]: deleteGroup,
   [EDIT_GROUP]: editGroup,
   [CREATE_PARTICIPANT]: createParticipant,
-  [GET_PARTICIPANTS_REQUEST ]: getParticipantsRequest,
+  [GET_PARTICIPANTS_REQUEST]: getParticipantsRequest,
   [APPROVE_PARTICIPANTS_REQUEST]: approveParticipantsRequest,
   [APPROVE_PARTICIPANTS_REQUEST]: approveParticipantsRequest,
   [DELETE_PARTICIPANT]: deleteParticipant,
@@ -85,22 +85,24 @@ const mutations = {
   },
   [REMOVE_GROUP](state: State, groupId: any) {
     if (state.groups) {
-      const index = state.groups.findIndex(({_id}) => _id === groupId);
-      state.groups = [
-        ...state.groups.slice(0, index),
-        ...state.groups.slice(index + 1),
-      ];
+      const index = state.groups.findIndex(({ _id }) => _id === groupId);
+      state.groups.splice(index, 1)
+      // state.groups = [
+      //   ...state.groups.slice(0, index),
+      //   ...state.groups.slice(index + 1),
+      // ];
     }
   },
   [UPDATE_GROUP](state: State, group: any) {
     state.currentGroup = group;
     if (state.groups) {
-      const index = state.groups.findIndex(({_id}) => _id === group._id);
-      state.groups = [
-        ...state.groups.slice(0, index),
-        group,
-        ...state.groups.slice(index + 1),
-      ];
+      const index = state.groups.findIndex(({ _id }) => _id === group._id);
+      state.groups.splice(index, 1, group)
+      // state.groups = [
+      //   ...state.groups.slice(0, index),
+      //   group,
+      //   ...state.groups.slice(index + 1),
+      // ];
     }
   },
   [SET_PARTICIPANTS_REQUEST](state: State, req: boolean) {

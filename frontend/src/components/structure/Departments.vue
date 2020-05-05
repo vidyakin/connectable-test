@@ -11,7 +11,6 @@
     <vo-edit
       v-if="orgChart && !loading"
       :data="orgChart"
-      :zoom="true"
       :pan="true"
       :toggleCollapse="false"
       :toggleSiblingsResp="true"
@@ -21,19 +20,20 @@
     <div id="zoom-buttons">
       <a-button icon="plus" shape="circle" @click="zoom(1)" />
       <a-button icon="minus" shape="circle" @click="zoom(-1)" />
+      <a-button icon="reload" shape="circle" @click="zoom(0)" />
     </div>
     <div v-show="false">
       <label class="selected-node-group"></label>
       <input type="text" id="selected-node" class="selected-node-group" />
     </div>
     <vue-context ref="contextMenu">
-      <li class="context-menu-item">
+      <li class="context-menu-item" v-for="empl of employeesOfDept(clickedDeptId)" :key="empl._id">
         <a @click.prevent="onClick(1)">
           <div class="title">Иван Иванов</div>
           <div class="subtitle">Начальник подразделения</div>
         </a>
       </li>
-      <li class="context-menu-item">
+      <!-- <li class="context-menu-item">
         <a @click.prevent="onClick(2)">
           <div class="title">Петр Васильев</div>
           <div class="subtitle">Менеджер по продажам</div>
@@ -44,7 +44,7 @@
           <div class="title">Наталья Нетопырева</div>
           <div class="subtitle">Бухгалтер</div>
         </a>
-      </li>
+      </li>-->
       <li class="context-menu-item new-empl">
         <a @click.prevent="addEmployeeOnClick">
           <div class="title">
@@ -84,10 +84,14 @@
     <!-- Диалог редактирования отдела -->
     <department-edit-form
       ref="deptEditForm"
-      :visible="editVisible"
-      :editDeptDialogShow="editDeptDialogShow"
-      @cancel="cancelCreateAction"
+      :visible="editDepartmentVisible"
+      :dataToShow="dataForDepartment"
       @create="createDeptAction"
+      @cancel="cancelCreateAction"
+    />
+    <department-edit-employees
+      :visible="dialogDeptEmployeesVisible"
+      :dept-id="clickedDeptId || 'no'"
     />
     <!-- <pre>{{JSON.stringify(chartData,null,3)}}</pre> -->
     <!-- Диалог для изменения названия -->
@@ -112,7 +116,11 @@ import { mapGetters } from "vuex";
 import {
   GET_STRUCTURE,
   SAVE_STRUCTURE,
-  EDIT_STRUCTURE
+  EDIT_STRUCTURE,
+  GET_DEPT_USERS,
+  EDIT_DEPT_USER,
+  DELETE_DEPT_USER,
+  CREATE_DEPT_USER
 } from "@/store/structure/actions.type";
 
 // external components
@@ -123,6 +131,7 @@ import "vue-orgchart/dist/style.min.css";
 
 // internal components
 import DepartmentEditForm from "./DepartmentEditForm";
+import DepartmentEditEmployees from "./DepartmentEditEmployees";
 import AppInput from "../common/Input";
 
 /**
@@ -189,13 +198,14 @@ function changeNameById(graf, id, newName) {
  * Удаление узла по ID
  */
 function delNodeById(graf, id) {
+  if (!graf.children) return false;
   const finded = graf.children.findIndex(node => node.id == id);
   //console.log(`in ${graf.id} > finded: ${finded}, ${level}`)
   if (finded != -1) {
     graf.children.splice(finded, 1);
     return true;
-  } else {
-    for (node of graf.children) {
+  } else if (graf.children) {
+    for (let node of graf.children) {
       if (delNodeById(node, id)) return true;
     }
   }
@@ -207,20 +217,25 @@ export default {
     VoEdit,
     VueContext,
     DepartmentEditForm,
+    DepartmentEditEmployees,
     AppInput
   },
   data() {
     return {
-      editVisible: false,
-      editDeptDialogShow: undefined,
+      editDepartmentVisible: false,
+      dataForDepartment: undefined,
       clickedDeptId: null,
       dialogDeptNewNameVisible: false,
       dialogDeptDeleteVisible: false,
+      dialogDeptEmployeesVisible: false,
       deptNewName: "",
+      employeesOfDepts: {},
       replacingMessageVisible: false,
+      replacingDeptId: null,
       struct_id: "",
       loading: true, // без нее не работает, it's a MAGIC!
       labels: ["CEO-1", "CEO-2", "CEO-3", "CEO-4", "CEO-5"],
+      zoomLevel: 0,
       orgChartObj: {},
       orgchart: null,
       chartData: {
@@ -281,7 +296,10 @@ export default {
     this.chartData = this.structure[0].orgTree;
     console.log(`_id of structure is ${this.struct_id}`);
     this.loading = false; //  без этого не работает загрузка данных в схему!
-    //}
+    // заполняем пользователей
+    this.dept_users.forEach(({ dept_id, users }) => {
+      this.employeesOfDepts.dept_id = users;
+    });
   },
   async created() {
     // await this.$store.dispatch(GET_ORGCHART, this.$store.getters.GET_CURR_CLIENT) // заполнение оргструктуры для текущего клиента
@@ -292,7 +310,7 @@ export default {
   async mounted() {
     //
   },
-  updated: function() {
+  updated() {
     this.$nextTick(function() {
       // Код, который будет запущен только после
       // обновления всех представлений
@@ -307,7 +325,7 @@ export default {
     });
   },
   computed: {
-    ...mapGetters(["userData", "user", "structure"]),
+    ...mapGetters(["userData", "user", "users", "structure", "dept_users"]),
     orgChart() {
       if (this.structure && this.structure.length) {
         //console.log(`orgTree: ${this.structure[0].orgTree}`);
@@ -327,6 +345,9 @@ export default {
     //     item.orgchart !== undefined ? (this.orgchart = item.orgchart) : null;
     //   });
     // },
+    employeesOfDept(n) {
+      return [];
+    },
     contextClick(e) {
       e.preventDefault();
       this.clickedDeptId = e.currentTarget.id;
@@ -343,6 +364,45 @@ export default {
       const id = e.toElement.parentNode.id;
       const pos = { x: e.pageX, y: e.pageY };
       console.log(`CLICKed on id: ${id}, at ${pos.x}:${pos.y}`);
+      // если в момент клика есть перемещаемый отдел, текущий отдел делается его родителем
+      if (this.replacingDeptId !== null) {
+        // запоминаем данные
+        const replacingNode = findNodeById(
+          this.chartData,
+          this.replacingDeptId
+        );
+        // удаляем из старого места
+        this.orgChartObj.orgchart.removeNodes(
+          document.getElementById(this.replacingDeptId)
+        );
+        delNodeById(this.chartData, this.replacingDeptId);
+        // помещаем как подчиненный отдел
+        let selectedNode = document.getElementById(id);
+        let hasChild = selectedNode.parentNode.colSpan > 1;
+        const nodeVals = [{ ...replacingNode }];
+        if (!hasChild) {
+          //let rel = nodeVals.length > 1 ? "110" : "100"; // одновременно несколько можно?
+          this.orgChartObj.orgchart.addChildren(selectedNode, {
+            children: nodeVals.map(item => {
+              return { ...item, relationship: "100" };
+            })
+          });
+          // добавляем в источник данных. И потом в базу
+        } else {
+          let lastChild = findNodeById(this.chartData, id).children.slice(
+            -1
+          )[0];
+          lastChild = document.getElementById(lastChild.id);
+          // надо найти крайнего и добавить соседа
+          this.orgchart.addSiblings(lastChild, {
+            siblings: nodeVals.map(item => {
+              return { ...item, relationship: "110" };
+            })
+          });
+        }
+        this.replacingDeptId = null;
+        this.replacingMessageVisible = false;
+      }
       this.$emit("changeCurrDept", { id, text: e.toElement.innerText });
     },
     hide() {
@@ -373,16 +433,8 @@ export default {
         cc.firstChild.append(labelDiv);
       });
     },
-    /**
-     * @param param Структура { type, dept }
-     */
-    handleShow(param) {
-      this.editVisible = true;
-      this.editDeptDialogShow = param;
-      console.log("Окно открыто, параметр ", param);
-    },
     cancelCreateAction() {
-      this.editVisible = false;
+      this.editDepartmentVisible = false;
     },
     createDeptAction() {
       const form = this.$refs.deptEditForm.form;
@@ -392,7 +444,7 @@ export default {
         }
         console.log("Received values of form: ", values);
         form.resetFields();
-        this.editVisible = false;
+        this.editDepartmentVisible = false;
         // добавляем узел
         let nodeVals = [
           {
@@ -453,7 +505,25 @@ export default {
       //this.orgChartObj.initOrgChart();
     },
     zoom(val) {
-      document.getElementsByClassName("orgchart")[0].style.transform = "matrix";
+      const orgchart = document.getElementsByClassName("orgchart")[0];
+      if (val == 0) {
+        this.zoomLevel = 0;
+        orgchart.style.transform = "";
+        return;
+      }
+      const newZoom = parseFloat(this.zoomLevel || 1) + val / 10;
+      if (newZoom <= 0.2) return;
+      this.zoomLevel = newZoom.toFixed(1);
+      let trData = orgchart.style.transform
+        .substring(7, orgchart.style.transform.length - 1)
+        .split(", ");
+      if (trData.length == 1) {
+        trData = ["" + this.zoomLevel, "0", "0", "" + this.zoomLevel, "0", "0"];
+      } else {
+        trData[0] = trData[3] = this.zoomLevel;
+      }
+      console.log("zoom:", this.zoomLevel);
+      orgchart.style.transform = "matrix(" + trData.join(", ") + ")";
     },
     async save() {
       try {
@@ -474,6 +544,7 @@ export default {
       }
     },
     addEmployeeOnClick() {
+      this.dialogDeptEmployeesVisible = true;
       console.log("add empl to " + this.clickedDeptId);
     },
     addDepartmentOnClick() {
@@ -481,13 +552,18 @@ export default {
         id: this.clickedDeptId,
         text: findNameById(this.chartData, this.clickedDeptId)
       };
-      this.handleShow({ type: "new", dept: deptInfo });
+      this.editDepartmentVisible = true;
+      this.dataForDepartment = { type: "new", dept: deptInfo };
+      //console.log("Окно открыто, параметр ", param);
+      //this.showAddDepartmentDialog({ type: "new", dept: deptInfo });
     },
     editDeptNameOnClick() {
       this.deptNewName = findNameById(this.chartData, this.clickedDeptId);
       this.dialogDeptNewNameVisible = true;
     },
     replaceDeptOnClick() {
+      this.replacingMessageVisible = true;
+      this.replacingDeptId = this.clickedDeptId;
       console.log(`replace dept`);
     },
     delDepartmentOnClick() {
@@ -516,10 +592,23 @@ export default {
           );
           orgchart.removeNodes(selectedNode);
           delNodeById(this.chartData, this.clickedDeptId);
+          this.$emit("changeCurrDept", {});
           this.save();
         },
         class: "test"
       });
+    },
+    /**
+     * @param param Структура { type, dept }
+     */
+    showAddDepartmentDialog(param) {},
+    /**
+     * @param param Структура { type, dept }
+     */
+    showAddEmployeeToDepartmentDialog(param) {
+      this.editDepartmentVisible = true;
+      this.dataForDepartment = param;
+      console.log("Окно открыто, параметр ", param);
     }
   }
 };
