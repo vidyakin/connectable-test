@@ -55,7 +55,7 @@ export const editUserOfDepartment = (context: any, data: any) => {
   console.log('EDIT empl data:', JSON.stringify(data, null, 2));
 
   return Vue.axios
-    .put(`api/dept_users`, { data })
+    .put(`api/dept_users`, data)
     .then((response: any) => {
       context.commit(UPDATE_DEPT_USER, response.data);
     })

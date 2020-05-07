@@ -455,11 +455,11 @@ app.delete('/api/dept_users', (req,res)=>{
 // установка начальника отдела
 app.put('/api/dept_users', (req, res) => {
     // В теле должны быть указаны client_id, dept_id и user_id
+    console.log(`edit dept_users API: ${JSON.stringify(req.body,null,2)}`);
     const q = {
         client_id: req.body.client_id, 
         dept_id: req.body.dept_id
     }
-    console.log(`edit dept_users API: ${JSON.stringify(q,null,2)}`);
     UsersInDepartment.findOne(q, (err, dept_users)=>{
         if (err) return res.status(500).send("Error during find employees in department to set chief");
         dept_users.headUser = req.body.user_id
