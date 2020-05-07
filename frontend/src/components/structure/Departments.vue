@@ -32,6 +32,7 @@
         <a :href="'/profile/'+empl._id">
           <div class="title">{{empl.name}}</div>
           <div class="subtitle">{{empl.position}}</div>
+          <a-icon type="crown" class="chief-crown" v-show="empl.isChief" />
         </a>
       </li>
       <!-- Пункты меню для действий -->
@@ -373,8 +374,15 @@ export default {
           .map(u => ({
             _id: u._id,
             name: u.firstName + " " + u.lastName,
+            isChief: u._id == dept_data.headUser,
             position: u.positions[0] || "должность не указана"
           }));
+        const chief_i = this.employeesOfDept.findIndex(e => e.isChief);
+        if (chief_i != -1) {
+          this.employeesOfDept.unshift(
+            this.employeesOfDept.splice(chief_i, 1)[0]
+          );
+        }
       } else {
         this.employeesOfDept = [];
       }
@@ -852,7 +860,13 @@ $between: 107px;
 .replace-dept {
   background-color: lemonchiffon;
 }
-
+.chief-crown {
+  position: absolute;
+  top: 13px;
+  right: 10px;
+  font-size: 14pt;
+  color: goldenrod;
+}
 div#zoom-buttons {
   position: absolute;
   left: 70px;
