@@ -3,7 +3,7 @@ import {
     SET_STRUCTURE,
 
     SET_DEPT_USERS,
-    ADD_DEPT_USER,
+    ADD_DEPT_USERS,
     UPDATE_DEPT_USER,
     REMOVE_DEPT_USER
 } from '@/store/structure/mutations.type';
@@ -18,7 +18,7 @@ import {
     SAVE_STRUCTURE,
 
     GET_DEPT_USERS,
-    CREATE_DEPT_USER,
+    SAVE_DEPT_USERS,
     EDIT_DEPT_USER,
     DELETE_DEPT_USER
 } from '@/store/structure/actions.type';
@@ -34,7 +34,7 @@ import {
     saveStructure,
     editStructure,
     getDepartmentUsers,
-    createUsersOfDepartment,
+    saveUsersOfDepartment,
     editUserOfDepartment,
     delUserOfDepartment
 } from '@/services/structure.service'
@@ -73,13 +73,15 @@ const mutations = {
     [SET_DEPT_USERS](state: State, data: any) {
         state.dept_users = data
     },
-    [ADD_DEPT_USER](state: State, data: any) {
+    [ADD_DEPT_USERS](state: State, data: any) {
         state.dept_users.push(data)
     },
+    // переписать для обновления одного сотрудника а не всей записи
     [UPDATE_DEPT_USER](state: State, data: any) {
         const i = state.dept_users.findIndex((el: any) => el._id = data.id)
         state.dept_users.splice(i, 1, data)
     },
+    // переписать под удаление одного сотрудника, а не всей записи
     [REMOVE_DEPT_USER](state: State, id: any) {
         const i = state.dept_users.findIndex((el: any) => el._id = id)
         state.dept_users.splice(i, 1)
@@ -97,7 +99,7 @@ const actions = {
     [SAVE_STRUCTURE]: saveStructure,
 
     [GET_DEPT_USERS]: getDepartmentUsers,
-    [CREATE_DEPT_USER]: createUsersOfDepartment,
+    [SAVE_DEPT_USERS]: saveUsersOfDepartment,
     [EDIT_DEPT_USER]: editUserOfDepartment,
     [DELETE_DEPT_USER]: delUserOfDepartment
 };

@@ -4,7 +4,7 @@ import {
   SET_STRUCTURE,
 
   SET_DEPT_USERS,
-  ADD_DEPT_USER,
+  ADD_DEPT_USERS,
   UPDATE_DEPT_USER,
   REMOVE_DEPT_USER
 } from '@/store/structure/mutations.type'
@@ -34,25 +34,28 @@ export const editStructure = (context: any, structure: any) => {
 
 //// действия со списком сотрудников отдела
 
+// получение сотрудников всех отделов, отбор по клиенту
 export const getDepartmentUsers = async (context: any, clientId: String) => {
   const response = await Vue.axios
-    .get('api/dept_users', { params: clientId });
-  context.commit(SET_DEPT_USERS, response.data.result);
+    .get('api/dept_users/' + clientId);
+  context.commit(SET_DEPT_USERS, response.data);
 }
 
-export const createUsersOfDepartment = (context: any, data: any) => {
+// сохранение сотрудников одного отдела (добавление)
+export const saveUsersOfDepartment = (context: any, data: any) => {
   return Vue.axios
-    .post(`api/dept_users`, data)
+    .post(`api/dept_users/${data.client_id}/${data.dept_id}`, { users: data.users })
     .then((response: any) => {
-      context.commit(ADD_DEPT_USER, response.data.result);
+      getDepartmentUsers(context, data.client_id);
     });
 }
 
+// Изменение сотрудника
 export const editUserOfDepartment = (context: any, data: any) => {
   return Vue.axios
     .put(`api/dept_users/${data._id}`, data)
     .then((response: any) => {
-      context.commit(UPDATE_DEPT_USER, response.data.result);
+      context.commit(UPDATE_DEPT_USER, response.data);
     });
 }
 
@@ -60,6 +63,6 @@ export const delUserOfDepartment = (context: any, recId: number) => {
   return Vue.axios
     .delete(`api/dept_users/${recId}`)
     .then((response: any) => {
-      context.commit(REMOVE_DEPT_USER, response.data.result);
+      context.commit(REMOVE_DEPT_USER, response.data);
     });
 };

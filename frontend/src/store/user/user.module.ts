@@ -1,4 +1,4 @@
-import {SET_SHOW_IMAGE_HEADER} from '@/store/shower/mutations.type';
+import { SET_SHOW_IMAGE_HEADER } from '@/store/shower/mutations.type';
 import {
   ADD_EVENT,
   CHANGE_EVENT,
@@ -23,8 +23,8 @@ import {
   UPDATE_USER_INFO, INSERT_USER_INFO, CHECK_USER_INFO,
   FORGOT_PASSWORD, RESET_PASSWORD,
 } from '@/store/user/actions.type';
-import {getInfoAboutUser, login, loginWithGoogle, loginWithOutlook, logout, forgotPasword, resetPassword} from '@/services/auth/auth.service';
-import {createEvent, deleteEvent, updateEvent, editUser, getEvents, getUser, getUsers, insertNewUser, checkUserInfo} from '@/services/user.service';
+import { getInfoAboutUser, login, loginWithGoogle, loginWithOutlook, logout, forgotPasword, resetPassword } from '@/services/auth/auth.service';
+import { createEvent, deleteEvent, updateEvent, editUser, getEvents, getUser, getUsers, insertNewUser, checkUserInfo } from '@/services/user.service';
 
 interface State {
   user: any | null;
@@ -113,12 +113,13 @@ const mutations = {
     }
     state.currentUser = user;
     if (state.users) {
-      const userIndex = state.users!.findIndex(({_id}) => _id === user._id);
-      state.users = [
-        ...state.users!.slice(0, userIndex),
-        user,
-        ...state.users!.slice(userIndex + 1),
-      ];
+      const userIndex = state.users!.findIndex(({ _id }) => _id === user._id);
+      state.users.splice(userIndex, 1, user)
+      // state.users = [
+      //   ...state.users!.slice(0, userIndex),
+      //   user,
+      //   ...state.users!.slice(userIndex + 1),
+      // ];
     }
   },
   // [UPDATE_USER](state: State, user: any) {
@@ -143,13 +144,13 @@ const mutations = {
   },
   [CHANGE_EVENT](state: State, event: any) {
     if (state.events) {
-      const index = state.events!.findIndex(({_id}) => _id === event._id);
+      const index = state.events!.findIndex(({ _id }) => _id === event._id);
       state.events.splice(index, 1, event)
     }
   },
   [DELETE_EVENT](state: State, eventId: any) {
     if (state.events) {
-      const index = state.events!.findIndex(({_id}) => _id === eventId);
+      const index = state.events!.findIndex(({ _id }) => _id === eventId);
       state.events.splice(index, 1)
       // state.events = [
       //   ...state.events!.slice(0, index),

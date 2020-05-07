@@ -27,56 +27,23 @@
       <input type="text" id="selected-node" class="selected-node-group" />
     </div>
     <vue-context ref="contextMenu">
-      <li class="context-menu-item" v-for="empl of employeesOfDept(clickedDeptId)" :key="empl._id">
-        <a @click.prevent="onClick(1)">
-          <div class="title">Иван Иванов</div>
-          <div class="subtitle">Начальник подразделения</div>
+      <!-- Пункты меню для сотрудников -->
+      <li class="context-menu-item" v-for="empl of employeesOfDept" :key="empl._id">
+        <a :href="'/profile/'+empl._id">
+          <div class="title">{{empl.name}}</div>
+          <div class="subtitle">{{empl.position}}</div>
         </a>
       </li>
-      <!-- <li class="context-menu-item">
-        <a @click.prevent="onClick(2)">
-          <div class="title">Петр Васильев</div>
-          <div class="subtitle">Менеджер по продажам</div>
-        </a>
-      </li>
-      <li class="context-menu-item">
-        <a @click.prevent="onClick(3)">
-          <div class="title">Наталья Нетопырева</div>
-          <div class="subtitle">Бухгалтер</div>
-        </a>
-      </li>-->
-      <li class="context-menu-item new-empl">
-        <a @click.prevent="addEmployeeOnClick">
+      <!-- Пункты меню для действий -->
+      <li
+        :class="'context-menu-item ' + item.style"
+        v-for="item of contextMenuItems"
+        :key="item.name"
+      >
+        <a @click.prevent="item.clickHandler">
           <div class="title">
-            <a-icon type="user-add" />Добавить сотрудника
-          </div>
-        </a>
-      </li>
-      <li class="context-menu-item add-dept">
-        <a @click.prevent="addDepartmentOnClick">
-          <div class="title">
-            <a-icon type="usergroup-add" />Добавить отдел
-          </div>
-        </a>
-      </li>
-      <li class="context-menu-item replace-dept">
-        <a @click.prevent="replaceDeptOnClick">
-          <div class="title">
-            <a-icon type="swap" />Перенести отдел
-          </div>
-        </a>
-      </li>
-      <li class="context-menu-item ch-dept-name">
-        <a @click.prevent="editDeptNameOnClick">
-          <div class="title">
-            <a-icon type="edit" />Изменить название
-          </div>
-        </a>
-      </li>
-      <li class="context-menu-item del-dept">
-        <a @click.prevent="delDepartmentOnClick">
-          <div class="title">
-            <a-icon type="delete" />Удалить отдел
+            <a-icon :type="item.icon" />
+            {{item.name}}
           </div>
         </a>
       </li>
@@ -87,16 +54,22 @@
       :visible="editDepartmentVisible"
       :dataToShow="dataForDepartment"
       @create="createDeptAction"
-      @cancel="cancelCreateAction"
+      @cancel="cancelCreateDeptAction"
     />
     <department-edit-employees
       :visible="dialogDeptEmployeesVisible"
+      :mode="dialogEmplMode"
       :dept-id="clickedDeptId || 'no'"
+      :employees="employeesOfDept"
+      @create="addEmployeesToDeptAction"
+      @cancel="cancelAddEmployeesToDeptAction"
+      @deleteEmpl="deleteEmployee"
     />
     <!-- <pre>{{JSON.stringify(chartData,null,3)}}</pre> -->
     <!-- Диалог для изменения названия -->
     <a-modal
       title="Укажите новое название"
+      centered
       v-model="dialogDeptNewNameVisible"
       @ok="changeDeptNameAction"
     >
@@ -117,11 +90,14 @@ import {
   GET_STRUCTURE,
   SAVE_STRUCTURE,
   EDIT_STRUCTURE,
-  GET_DEPT_USERS,
-  EDIT_DEPT_USER,
-  DELETE_DEPT_USER,
+  GET_DEPT_USERS, // получение данных по всем отделам
+  SAVE_DEPT_USERS, // изменение сотрудника отдела
+  DELETE_DEPT_USER, // удалить сотрудника из отдела
   CREATE_DEPT_USER
 } from "@/store/structure/actions.type";
+
+// actions & mutations
+import { GET_USERS } from "@/store/user/actions.type";
 
 // external components
 import { VoBasic, VoEdit } from "vue-orgchart";
@@ -225,11 +201,12 @@ export default {
       editDepartmentVisible: false,
       dataForDepartment: undefined,
       clickedDeptId: null,
+      dialogEmplMode: "",
       dialogDeptNewNameVisible: false,
       dialogDeptDeleteVisible: false,
       dialogDeptEmployeesVisible: false,
       deptNewName: "",
-      employeesOfDepts: {},
+      employeesOfDept: [],
       replacingMessageVisible: false,
       replacingDeptId: null,
       struct_id: "",
@@ -238,38 +215,51 @@ export default {
       zoomLevel: 0,
       orgChartObj: {},
       orgchart: null,
-      chartData: {
-        id: "ceo1",
-        name: "CEO",
-        children: [
-          {
-            id: "depm",
-            name: "Департамент маркетинга",
-            children: [
-              { id: "offlm", name: "Отдел оффлайн маркетинга" },
-              {
-                id: "onlm",
-                name: "Отдел онлайн маркетинга",
-                children: [
-                  { id: "rrc", name: "Группа PPC" },
-                  { id: "seo", name: "Группа SEO" },
-                  { id: "fb", name: "Группа Facebook" }
-                ]
-              }
-            ]
-          },
-          {
-            id: "hr",
-            name: "Департамент HR",
-            children: [{ id: "preact", name: "Preact" }]
-          },
-          {
-            id: "it",
-            name: "Департамент IT",
-            children: [{ id: "moon", name: "Moon" }]
-          }
-        ]
-      }
+      chartData: {},
+      contextMenuItems: [
+        {
+          name: "Добавить сотрудников",
+          icon: "user-add",
+          style: "new-empl",
+          clickHandler: this.showAddEmployeeToDepartmentDialog
+        },
+        {
+          name: "Выбрать руководителя",
+          icon: "crown",
+          style: "set-chief",
+          clickHandler: this.showSelectDeptChiefDialog
+        },
+        {
+          name: "Удалить сотрудника",
+          icon: "user-delete",
+          style: "del-empl",
+          clickHandler: this.showDelEmployeeOfDepartmentDialog
+        },
+        {
+          name: "Добавить отдел",
+          icon: "usergroup-add",
+          style: "add-dept",
+          clickHandler: this.addDepartmentOnClick
+        },
+        {
+          name: "Изменить название",
+          icon: "edit",
+          style: "ch-dept-name",
+          clickHandler: this.editDeptNameOnClick
+        },
+        {
+          name: "Перенести отдел",
+          icon: "swap",
+          style: "replace-dept",
+          clickHandler: this.replaceDeptOnClick
+        },
+        {
+          name: "Удалить отдел",
+          icon: "delete",
+          style: "del-dept",
+          clickHandler: this.delDepartmentOnClick
+        }
+      ]
     };
   },
   async beforeCreate() {
@@ -289,17 +279,24 @@ export default {
         client_id: "client1313",
         orgTree: this.chartData
       });
-      await this.$store.dispatch(GET_STRUCTURE);
+      await this.$store.dispatch(GET_STRUCTURE); // обновление стора надо бы засунуть в SAVE_STRUCTURE
     }
     // 0-й элемент потому что пока что возвращается массив ( все схемы ), а будет с отбором по клиенту одна
     this.struct_id = this.structure[0]._id;
     this.chartData = this.structure[0].orgTree;
     console.log(`_id of structure is ${this.struct_id}`);
     this.loading = false; //  без этого не работает загрузка данных в схему!
+
     // заполняем пользователей
-    this.dept_users.forEach(({ dept_id, users }) => {
-      this.employeesOfDepts.dept_id = users;
-    });
+    // try {
+    //   await this.$store.dispatch(GET_DEPT_USERS, "client1");
+    //   //this.dept_users.forEach(({ dept_id, users }) => {
+    //   //   this.employeesOfDepts.dept_id = users;
+    //   // });
+    // } catch (error) {
+    //   console.error(`ошибка получения данных по сотрудникам: ${error.message}`);
+    //   return;
+    // }
   },
   async created() {
     // await this.$store.dispatch(GET_ORGCHART, this.$store.getters.GET_CURR_CLIENT) // заполнение оргструктуры для текущего клиента
@@ -308,7 +305,8 @@ export default {
     // this.mountOrgChart();
   },
   async mounted() {
-    //
+    await this.$store.dispatch(GET_USERS);
+    await this.$store.dispatch(GET_DEPT_USERS, "client1");
   },
   updated() {
     this.$nextTick(function() {
@@ -345,15 +343,28 @@ export default {
     //     item.orgchart !== undefined ? (this.orgchart = item.orgchart) : null;
     //   });
     // },
-    employeesOfDept(n) {
-      return [];
-    },
     contextClick(e) {
       e.preventDefault();
       this.clickedDeptId = e.currentTarget.id;
       document.getElementById(
         "selected-node"
       ).dataset.node = this.clickedDeptId;
+      // выбираем сотрудников отдела
+      const dept_data = this.dept_users.find(
+        e => e != null && e.dept_id == this.clickedDeptId
+      );
+      if (dept_data) {
+        this.employeesOfDept = this.users
+          .filter(u => dept_data.users.includes(u._id))
+          .map(u => ({
+            _id: u._id,
+            name: u.firstName + " " + u.lastName,
+            position: u.positions[0] || "должность не указана"
+          }));
+      } else {
+        this.employeesOfDept = [];
+      }
+      // открываем само меню
       this.$refs.contextMenu.open(e, this.clickedDeptId);
     },
     onClick(data) {
@@ -433,7 +444,7 @@ export default {
         cc.firstChild.append(labelDiv);
       });
     },
-    cancelCreateAction() {
+    cancelCreateDeptAction() {
       this.editDepartmentVisible = false;
     },
     createDeptAction() {
@@ -497,6 +508,36 @@ export default {
       this.dialogDeptNewNameVisible = false;
       this.save();
     },
+    addEmployeesToDeptAction(selected_empls) {
+      this.dialogDeptEmployeesVisible = false;
+      const data = {
+        client_id: "client1",
+        dept_id: this.clickedDeptId,
+        users: selected_empls.map(emp => emp._id),
+        headUser: ""
+      };
+      this.$store.dispatch(SAVE_DEPT_USERS, data);
+      // this.$message('success'){}
+      console.log(
+        "Сотрудники отдела выбраны\n" + JSON.stringify(data, null, 2)
+      );
+    },
+    deleteEmployee(d) {
+      this.dialogDeptEmployeesVisible = false;
+      this.$confirm({
+        centered: true,
+        title: "Подтвердите удаление сотрудника",
+        content: "Сотрудник «" + d.name + "» будет удален",
+        okType: "danger",
+        okText: "ОК",
+        cancelText: "Отменить",
+        onOk: () => {
+          console.log(JSON.stringify(d, null, 2));
+        },
+        class: "test"
+      });
+    },
+
     restoreStructure() {
       console.log(`restore scale`);
       document.getElementsByClassName("orgchart")[0].style.transform = "";
@@ -543,9 +584,29 @@ export default {
         });
       }
     },
-    addEmployeeOnClick() {
+    showAddEmployeeToDepartmentDialog() {
+      this.dialogEmplMode = "select";
       this.dialogDeptEmployeesVisible = true;
       console.log("add empl to " + this.clickedDeptId);
+    },
+    showDelEmployeeOfDepartmentDialog() {
+      this.dialogEmplMode = "delete";
+      const dept_data = this.dept_users.find(
+        e => e != null && e.dept_id == this.clickedDeptId
+      );
+      if (!dept_data || dept_data.users.length == 0) {
+        this.$error({
+          centered: true,
+          title: "Ошибка",
+          content: "В данном отделе нет сотрудников"
+        });
+        return;
+      }
+      this.dialogDeptEmployeesVisible = true;
+    },
+    showSelectDeptChiefDialog() {
+      this.dialogEmplMode = "chief";
+      this.dialogDeptEmployeesVisible = true;
     },
     addDepartmentOnClick() {
       const deptInfo = {
@@ -555,7 +616,6 @@ export default {
       this.editDepartmentVisible = true;
       this.dataForDepartment = { type: "new", dept: deptInfo };
       //console.log("Окно открыто, параметр ", param);
-      //this.showAddDepartmentDialog({ type: "new", dept: deptInfo });
     },
     editDeptNameOnClick() {
       this.deptNewName = findNameById(this.chartData, this.clickedDeptId);
@@ -573,6 +633,20 @@ export default {
           centered: true,
           title: "Ошибка удаления отдела",
           content: "Головной отдел нельзя удалить"
+        });
+        return;
+      }
+      // проверка на наличие сотрудников
+      const dept_data = this.dept_users.find(
+        e => e != null && e.dept_id == this.clickedDeptId
+      );
+      if (dept_data && dept_data.users.length) {
+        this.$error({
+          centered: true,
+          title: "Ошибка удаления отдела",
+          content: `В отделе есть ${dept_data.users.length} сотрудник${this.skl(
+            dept_data.users.length
+          )}`
         });
         return;
       }
@@ -598,17 +672,12 @@ export default {
         class: "test"
       });
     },
-    /**
-     * @param param Структура { type, dept }
-     */
-    showAddDepartmentDialog(param) {},
-    /**
-     * @param param Структура { type, dept }
-     */
-    showAddEmployeeToDepartmentDialog(param) {
-      this.editDepartmentVisible = true;
-      this.dataForDepartment = param;
-      console.log("Окно открыто, параметр ", param);
+    cancelAddEmployeesToDeptAction() {
+      this.dialogDeptEmployeesVisible = false;
+    },
+    skl(n) {
+      // простое склонение по числам
+      return ["ов", "", "а", "а", "а", "ов", "ов", "ов", "ов", "ов"][n % 10];
     }
   }
 };
@@ -673,20 +742,10 @@ $between: 107px;
   font-weight: bold;
   color: darkgray;
 
-  &-1 {
-    top: $top + 0;
-  }
-  &-2 {
-    top: $top + $between;
-  }
-  &-3 {
-    top: $top + $between * 2;
-  }
-  &-4 {
-    top: $top + $between * 3;
-  }
-  &-5 {
-    top: $top + $between * 4;
+  @for $i from 0 through 4 {
+    &-#{$i + 1} {
+      top: $top + $between * $i;
+    }
   }
 }
 
@@ -711,6 +770,12 @@ $between: 107px;
 .new-empl {
   background-color: lavender;
 }
+.del-empl {
+  background-color: lightsteelblue;
+}
+.set-chief {
+  background-color: gold;
+}
 // Добавить отдел
 .add-dept {
   background-color: bisque;
@@ -730,10 +795,12 @@ $between: 107px;
 div#zoom-buttons {
   position: absolute;
   left: 70px;
-  top: 75px;
+  top: 64px;
+  display: flex;
+  flex-direction: column;
 
   button {
-    margin: 3px;
+    margin: 1px;
   }
 }
 

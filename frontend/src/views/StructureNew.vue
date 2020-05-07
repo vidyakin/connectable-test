@@ -7,7 +7,7 @@
         <!-- <a-button type="primary" @click="addDepartment">Добавить раздел</a-button> -->
         <!-- <a-button type="primary" @click="openCreate">Создать проект</a-button> -->
         <!-- <a-button type="primary" @click="saveStructure">Сохранить структуру</a-button> -->
-        <a-button type="primary" @click="restoreScale">Восстановить масштаб</a-button>
+        <!-- <a-button type="primary" @click="restoreScale">Восстановить масштаб</a-button> -->
       </div>
     </div>
     <a-tabs :animated="false" :tabBarGutter="10">
