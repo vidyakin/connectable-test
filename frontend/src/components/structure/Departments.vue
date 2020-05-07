@@ -39,12 +39,19 @@
         :class="'context-menu-item ' + item.style"
         v-for="item of contextMenuItems"
         :key="item.name"
+        v-show="userIsAdmin"
       >
         <a @click.prevent="item.clickHandler">
           <div class="title">
             <a-icon :type="item.icon" />
             {{item.name}}
           </div>
+        </a>
+      </li>
+      <li class="context-menu-item" v-show="!userIsAdmin && employeesOfDept.length == 0">
+        <a href>
+          <div class="title">Нет сотрудников</div>
+          <div class="subtitle"></div>
         </a>
       </li>
     </vue-context>
@@ -330,6 +337,12 @@ export default {
         //console.log(`orgTree: ${this.structure[0].orgTree}`);
         return this.structure[0].orgTree;
       } else return {};
+    },
+    userIsAdmin() {
+      return this.$can("read", {
+        accessEmail: this.datauser().email,
+        __type: "Admin"
+      });
     }
   },
   watch: {},
