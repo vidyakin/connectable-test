@@ -438,12 +438,33 @@ app.delete('/api/dept_users', (req,res)=>{
         client_id: req.body.client_id, 
         dept_id: req.body.dept_id
     }
+    
     UsersInDepartment.findOne(q, (err, dept_users)=>{
         if (err) return res.status(500).send("Error during find employees in department to delete one");
-        const i = dept_users.users.findIndex(u => u._id = req.body.user_id)
+        if (dept_users == null) return res.status(404).send(`No data found by client id='${q.client_id}' and dept_id ='${q.dept_id}'`)
+
+        const i = dept_users.users.indexOf(req.body.user_id)
         dept_users.users.splice(i,1)
         UsersInDepartment.findByIdAndUpdate(dept_users._id, dept_users, (err, data)=>{
             if (err) return res.status(500).send("Error during update employees in department after delete");
+            res.status(200).send(data)
+        })
+    })
+})
+
+// установка начальника отдела
+app.put('/api/dept_users', (req, res) => {
+    // В теле должны быть указаны client_id, dept_id и user_id
+    const q = {
+        client_id: req.body.client_id, 
+        dept_id: req.body.dept_id
+    }
+    console.log(`edit dept_users API: ${JSON.stringify(q,null,2)}`);
+    UsersInDepartment.findOne(q, (err, dept_users)=>{
+        if (err) return res.status(500).send("Error during find employees in department to set chief");
+        dept_users.headUser = req.body.user_id
+        UsersInDepartment.findByIdAndUpdate(dept_users._id, dept_users, (err, data)=>{
+            if (err) return res.status(500).send("Error during set employee as chief in the department");
             res.status(200).send(data)
         })
     })

@@ -30,7 +30,7 @@
               <a-icon
                 type="crown"
                 theme="filled"
-                @click.stop="setAsLeader(item._id)"
+                @click.stop="setAsLeader({id: item._id, name: item.firstName+' '+item.lastName})"
                 style="font-size:14pt; color: darkorange"
                 v-show="mode == 'chief'"
               />
@@ -76,6 +76,7 @@ export default {
   computed: {
     ...mapGetters(["users"]),
     dataList() {
+      if (!this.mode) return "";
       const empl_ids = this.employees.map(e => e._id);
       if (this.mode == "delete") {
         return this.users.filter(u => empl_ids.includes(u._id));
@@ -105,6 +106,9 @@ export default {
 
     startDeleteEmployee(d) {
       this.$emit("deleteEmpl", d);
+    },
+    setAsLeader(d) {
+      this.$emit("setEmplAsChief", d);
     }
   }
 };

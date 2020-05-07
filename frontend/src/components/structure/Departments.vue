@@ -64,6 +64,7 @@
       @create="addEmployeesToDeptAction"
       @cancel="cancelAddEmployeesToDeptAction"
       @deleteEmpl="deleteEmployee"
+      @setEmplAsChief="setEmployeeAsDeptChief"
     />
     <!-- <pre>{{JSON.stringify(chartData,null,3)}}</pre> -->
     <!-- Диалог для изменения названия -->
@@ -93,7 +94,7 @@ import {
   GET_DEPT_USERS, // получение данных по всем отделам
   SAVE_DEPT_USERS, // изменение сотрудника отдела
   DELETE_DEPT_USER, // удалить сотрудника из отдела
-  CREATE_DEPT_USER
+  EDIT_DEPT_USER // изменение данныз - в частности установка начальника
 } from "@/store/structure/actions.type";
 
 // actions & mutations
@@ -508,7 +509,7 @@ export default {
       this.dialogDeptNewNameVisible = false;
       this.save();
     },
-    addEmployeesToDeptAction(selected_empls) {
+    async addEmployeesToDeptAction(selected_empls) {
       this.dialogDeptEmployeesVisible = false;
       const data = {
         client_id: "client1",
@@ -516,7 +517,18 @@ export default {
         users: selected_empls.map(emp => emp._id),
         headUser: ""
       };
-      this.$store.dispatch(SAVE_DEPT_USERS, data);
+      try {
+        await this.$store.dispatch(SAVE_DEPT_USERS, data);
+        this.$notification["success"]({
+          message: "Сотрудник добавлен",
+          description: `Сотрудник(и) добавлен(ы) в отдел`
+        });
+      } catch (error) {
+        this.$notification["error"]({
+          message: "Сотрудник не добавлен",
+          description: `${error}`
+        });
+      }
       // this.$message('success'){}
       console.log(
         "Сотрудники отдела выбраны\n" + JSON.stringify(data, null, 2)
@@ -531,11 +543,46 @@ export default {
         okType: "danger",
         okText: "ОК",
         cancelText: "Отменить",
-        onOk: () => {
+        onOk: async () => {
+          try {
+            const resp = await this.$store.dispatch(DELETE_DEPT_USER, {
+              client_id: "client1",
+              dept_id: this.clickedDeptId,
+              user_id: d.id
+            });
+            this.$notification["success"]({
+              message: "Сотрудник удален",
+              description: `${d.name} удален из отдела`
+            });
+          } catch (error) {
+            this.$notification["error"]({
+              message: "Сотрудник не удален",
+              description: `${error}`
+            });
+          }
           console.log(JSON.stringify(d, null, 2));
         },
         class: "test"
       });
+    },
+    async setEmployeeAsDeptChief(d) {
+      const data = {
+        client_id: "client1",
+        dept_id: this.clickedDeptId,
+        user_id: d.id
+      };
+      try {
+        const resp = await this.$store.dispatch(EDIT_DEPT_USER, data);
+        this.$notification["success"]({
+          message: "Руководитель установлен",
+          description: `Руководитель отдела теперь ${d.name}`
+        });
+      } catch (error) {
+        this.$notification["error"]({
+          message: "Ошибка выбора руководителя",
+          description: `${error}`
+        });
+      }
     },
 
     restoreStructure() {
