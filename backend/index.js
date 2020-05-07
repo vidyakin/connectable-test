@@ -78,7 +78,7 @@ app.use('/api/project', validateToken, require('./crud')(Project, projectSeriali
 
 app.use('/api/message', validateToken, require('./crud')(Message, serializers.serializer));
 app.use('/api/structure', validateToken, require('./crud')(Structure, serializers.serializer));
-app.use('/api/dept_users', validateToken, require('./crud')(UsersInDepartment, serializers.serializer));
+//app.use('/api/dept_users', validateToken, require('./crud')(UsersInDepartment, serializers.serializer));
 
 app.use('/api/outlook', require('./auth/outlook/'));
 app.use('/api/outlook/event', require('./calendar'));
@@ -393,6 +393,62 @@ app.put('/api/department', (req, res) => {
 
 });
 //app.put('/api/department', validateToken, require('./crud')(Department, serializers.serializer));
+
+// Сотрудники в отделах клиента
+app.get('/api/dept_users/:client_id', validateToken, (req,res) => {
+    UsersInDepartment.find({client_id: req.params.client_id}, (err, users_in_depts) => {
+        if (err) return res.status(500).send("Error during getting employees in departments");
+        if (users_in_depts == null)
+            res.status(404).send("No users in depts for client "+req.params.client_id)
+        else
+            res.status(200).send(users_in_depts) 
+    })
+})
+
+// Добавление сотрудников в отдел клиента
+app.post('/api/dept_users/:client_id/:dept_id', (req,res) => {
+    // пытаемся найти запись о сотрудниках данного отдела
+    UsersInDepartment.findOne({...req.params}, (err, users_in_dept) => {
+        if (err) return res.status(500).send("Error during find employees in department");
+        // если не нашли - создаем новую запись
+        if (users_in_dept == null)
+            UsersInDepartment.create({
+                ...req.params,
+                users: req.body.users, // список сотрудников должен быть передан в теле
+                headUser: ""
+            }, (err,data) => {
+                if (err) return res.status(500).send('Error of create employees in dept: '+err)
+                res.status(200).send(data)
+            })
+            //res.status(404).send("No users in depts for client "+req.params.client_id)
+        else {
+            users_in_dept.users = [...new Set(users_in_dept.users.concat(req.body.users))] // trick for unduplicate itemsafter concat
+            UsersInDepartment.findOneAndUpdate({...req.params}, users_in_dept, {new: true}, (err, data) => {
+                if (!err) res.status(200).send(data)
+                else res.status(500).send("Error when update emloyees for dept "+req.params.dept_id+": "+err)
+            })
+        }
+    })
+})
+
+// удаление сотрудника из отдела
+app.delete('/api/dept_users', (req,res)=>{
+    // В теле должны быть указаны client_id, dept_id и user_id
+    const q = {
+        client_id: req.body.client_id, 
+        dept_id: req.body.dept_id
+    }
+    UsersInDepartment.findOne(q, (err, dept_users)=>{
+        if (err) return res.status(500).send("Error during find employees in department to delete one");
+        const i = dept_users.users.findIndex(u => u._id = req.body.user_id)
+        dept_users.users.splice(i,1)
+        UsersInDepartment.findByIdAndUpdate(dept_users._id, dept_users, (err, data)=>{
+            if (err) return res.status(500).send("Error during update employees in department after delete");
+            res.status(200).send(data)
+        })
+    })
+})
+
 //put notifications
 app.post('/api/notification', (req, res, next) => {
     let notifi =req.body,

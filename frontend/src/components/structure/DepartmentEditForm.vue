@@ -16,7 +16,7 @@
           v-decorator="[
               'title',
               {
-                rules: [{ required: true, message: 'Пожалуйста, введите название отдела' }],
+                rules: [{ required: true, message: 'Пожалуйста, введите название отдела', transform: this.tr }],
               }
             ]"
         />
@@ -63,6 +63,11 @@ export default {
   computed: {
     deptText() {
       return this.dataToShow && this.dataToShow.dept.text;
+    }
+  },
+  methods: {
+    tr(v) {
+      return v === undefined ? "" : v.trim();
     }
   }
 };

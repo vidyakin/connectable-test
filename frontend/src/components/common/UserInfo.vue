@@ -2,84 +2,105 @@
   <div class="user-info-wrapper">
     <app-user-edit-drawer :close="closeEditDrawer" :visible="editDrawerVisible"></app-user-edit-drawer>
     <div class="user-info-avatar">
-      <a-avatar :src=" (currentUser && currentUser.googleImage ? currentUser.googleImage : require('../../assets/no_image.png')) "></a-avatar>
+      <a-avatar
+        :src=" (currentUser && currentUser.googleImage ? currentUser.googleImage : require('../../assets/no_image.png')) "
+      ></a-avatar>
 
-      <a-button v-model="statusFollow" v-if="this.$route.params._id != datauser._id" :class="{'is-active' : followIds.includes(datauser._id)}" @click="handleFollowClick(currentUser._id, datauser._id, datauser.email, followIds.includes(datauser._id))">
-        {{ followIds.includes(datauser._id) ? 'Уже подписаны' : 'Подписаться' }}
-      </a-button>
+      <a-button
+        v-model="statusFollow"
+        v-if="this.$route.params._id != datauser._id"
+        :class="{'is-active' : followIds.includes(datauser._id)}"
+        @click="handleFollowClick(currentUser._id, datauser._id, datauser.email, followIds.includes(datauser._id))"
+      >{{ followIds.includes(datauser._id) ? 'Уже подписаны' : 'Подписаться' }}</a-button>
     </div>
 
     <div class="user-info-content">
-      <div class="user-info-content-name">
-        {{currentUser && currentUser.firstName}} {{currentUser && currentUser.lastName}}
-      </div>
-      <div class="user-info-content-positions">
-        {{currentUser && currentUser.positions && currentUser.positions.join(', ')}}
-      </div>
+      <div
+        class="user-info-content-name"
+      >{{currentUser && currentUser.firstName}} {{currentUser && currentUser.lastName}}</div>
+      <div
+        class="user-info-content-positions"
+      >{{currentUser && currentUser.positions && currentUser.positions.join(', ')}}</div>
       <div class="user-info-content-telephone">{{currentUser && currentUser.phone}}</div>
       <div class="user-info-content-email">{{currentUser && currentUser.email}}</div>
     </div>
 
-    <div class="user-info-edit" v-if="datauser._id == this.$route.params._id || $can('read', {'accessEmail': datauser.email, '__type': 'Admin'})">
+    <div
+      class="user-info-edit"
+      v-if="datauser._id == this.$route.params._id || $can('read', {'accessEmail': datauser.email, '__type': 'Admin'})"
+    >
       <a-button icon="edit" @click="editDrawerVisible = true"></a-button>
     </div>
   </div>
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
-import AppLoginBar from './LoginBar';
-import AppUserEditDrawer from '../drawers/UserEditDrawer';
-import { SEND_NEW_POST } from '../../store/post/actions.type';
-import { GET_USER } from '../../store/user/actions.type';
-import store from '../../store';
-import {USER_FOLLOW, USER_UNFOLLOW} from '../../store/followers/actions.type';
+import store from "../../store";
+import { mapGetters } from "vuex";
+
+import { GET_USER } from "../../store/user/actions.type";
+import { SEND_NEW_POST } from "../../store/post/actions.type";
+import { USER_FOLLOW, USER_UNFOLLOW } from "../../store/followers/actions.type";
+
+import AppLoginBar from "./LoginBar";
+import AppUserEditDrawer from "../drawers/UserEditDrawer";
+
 export default {
-  name: 'AppUserInfo',
+  name: "AppUserInfo",
   components: {
     AppLoginBar,
-    AppUserEditDrawer,
+    AppUserEditDrawer
   },
   data() {
     return {
-      current: '',
+      current: "",
       editDrawerVisible: false,
       statusFollow: false,
       followIds: [],
       userinfo: [],
-      datauser: (store.getters.userData ? store.getters.userData.result : store.getters.user ),
+      datauser: store.getters.userData
+        ? store.getters.userData.result
+        : store.getters.user
     };
   },
   computed: {
-    ...mapGetters(['currentUser', 'userData']),
+    ...mapGetters(["currentUser", "userData"])
   },
   methods: {
     closeEditDrawer() {
       this.editDrawerVisible = false;
     },
-    handleFollowClick(user_id, current_user_id, current_user_email, follow_status) {
+    handleFollowClick(
+      user_id,
+      current_user_id,
+      current_user_email,
+      follow_status
+    ) {
       let eventName;
-      if(!follow_status) {
+      if (!follow_status) {
         this.statusFollow = true;
         eventName = USER_FOLLOW;
-      }
-      else {
+      } else {
         this.statusFollow = false;
         eventName = USER_UNFOLLOW;
       }
 
       this.$store
-      .dispatch(eventName, {userID: user_id, curentUserID: current_user_id, userEmail: current_user_email})
-      .finally(() => {
-        this.$store.dispatch(GET_USER, this.$route.params._id);
-      });
+        .dispatch(eventName, {
+          userID: user_id,
+          curentUserID: current_user_id,
+          userEmail: current_user_email
+        })
+        .finally(() => {
+          this.$store.dispatch(GET_USER, this.$route.params._id);
+        });
     }
   },
   watch: {
     currentUser(currentUser) {
       this.followIds = currentUser.followers;
       this.userinfo = currentUser._id;
-    },
+    }
   }
 };
 </script>
@@ -177,7 +198,6 @@ export default {
     }
   }
   .user-info-edit {
-
     @media (max-width: 767px) {
       position: absolute;
       top: 0;

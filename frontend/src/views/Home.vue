@@ -60,6 +60,10 @@ export default Vue.extend({
 </script>
 
 <style lang="scss">
+pre {
+  font-family: "Fira Code", "Consolas", monospace !important;
+  font-size: 9pt !important;
+}
 // .ant-popover-message > .anticon {
 //   left:0;
 // }
@@ -88,6 +92,10 @@ export default Vue.extend({
 //     }
 //   }
 // }
+
+.ant-checkbox-group {
+  display: block !important;
+}
 
 .open-action-button {
   background-color: transparent !important;

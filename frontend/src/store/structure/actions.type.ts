@@ -8,7 +8,8 @@ export const GET_STRUCTURE = 'GET_STRUCTURE';
 export const SAVE_STRUCTURE = 'SAVE_STRUCTURE';
 export const EDIT_STRUCTURE = 'EDIT_STRUCTURE';
 // операции с сотрудниками отделов
-export const GET_DEPT_USERS = 'GET_DEPT_USERS';
-export const CREATE_DEPT_USER = 'ADD_DEPT_USER';
-export const DELETE_DEPT_USER = 'REMOVE_DEPT_USER';
-export const EDIT_DEPT_USER = 'EDIT_DEPT_USER';
+export const GET_DEPT_USERS = 'GET_DEPT_USERS';  // получить всех сотрудников всех отделов по клиенту
+export const CREATE_DEPT_USER = 'CREATE_DEPT_USER'; // добавить одного сотрудника в отдел
+export const SAVE_DEPT_USERS = 'SAVE_DEPT_USERS';  // сохранение всех сотрудников отдела разом
+export const DELETE_DEPT_USER = 'DELETE_DEPT_USER'; // удалить одного сотрудника из отдела
+export const EDIT_DEPT_USER = 'EDIT_DEPT_USER'; // изменить сотрудника в отделе (например сделать главным)
