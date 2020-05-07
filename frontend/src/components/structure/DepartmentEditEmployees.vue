@@ -78,9 +78,9 @@ export default {
     dataList() {
       if (!this.mode) return "";
       const empl_ids = this.employees.map(e => e._id);
-      if (this.mode == "delete") {
-        return this.users.filter(u => empl_ids.includes(u._id));
-      } else return this.users.filter(u => !empl_ids.includes(u._id));
+      if (this.mode == "select") {
+        return this.users.filter(u => !empl_ids.includes(u._id));
+      } else return this.users.filter(u => empl_ids.includes(u._id));
     },
     title() {
       if (this.mode == "select") return "Выберите новых сотрудников";

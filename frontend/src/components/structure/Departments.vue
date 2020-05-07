@@ -545,7 +545,7 @@ export default {
         cancelText: "Отменить",
         onOk: async () => {
           try {
-            const resp = await this.$store.dispatch(DELETE_DEPT_USER, {
+            await this.$store.dispatch(DELETE_DEPT_USER, {
               client_id: "client1",
               dept_id: this.clickedDeptId,
               user_id: d.id
@@ -566,13 +566,14 @@ export default {
       });
     },
     async setEmployeeAsDeptChief(d) {
+      this.dialogDeptEmployeesVisible = false;
       const data = {
         client_id: "client1",
         dept_id: this.clickedDeptId,
         user_id: d.id
       };
       try {
-        const resp = await this.$store.dispatch(EDIT_DEPT_USER, data);
+        await this.$store.dispatch(EDIT_DEPT_USER, data);
         this.$notification["success"]({
           message: "Руководитель установлен",
           description: `Руководитель отдела теперь ${d.name}`
