@@ -52,17 +52,20 @@ export const saveUsersOfDepartment = (context: any, data: any) => {
 
 // Изменение сотрудника
 export const editUserOfDepartment = (context: any, data: any) => {
+  console.log('EDIT empl data:', JSON.stringify(data, null, 2));
+
   return Vue.axios
-    .put(`api/dept_users/${data._id}`, data)
+    .put(`api/dept_users`, { data })
     .then((response: any) => {
       context.commit(UPDATE_DEPT_USER, response.data);
-    });
+    })
+    .then(_ => getDepartmentUsers(context, data.client_id));
 }
 
-export const delUserOfDepartment = (context: any, recId: number) => {
+export const delUserOfDepartment = (context: any, data: any) => {
   return Vue.axios
-    .delete(`api/dept_users/${recId}`)
+    .delete(`api/dept_users`, { data })
     .then((response: any) => {
       context.commit(REMOVE_DEPT_USER, response.data);
-    });
+    }).then(_ => getDepartmentUsers(context, data.client_id));
 };
