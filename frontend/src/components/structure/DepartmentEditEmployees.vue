@@ -7,6 +7,7 @@
     cancelText="Отменить"
     @cancel="() => { $emit('cancel') }"
     @ok="() => { $emit('create', checkedEmpls) }"
+    :ok-button-props="{ props: { disabled: mode=='chief', type: mode == 'chief' ? 'link' : 'primary' } }"
   >
     <div class="container">
       <a-checkbox-group @change="onChange">
@@ -85,7 +86,8 @@ export default {
     title() {
       if (this.mode == "select") return "Выберите новых сотрудников";
       if (this.mode == "delete") return "Выберите сотрудника для удаления";
-      if (this.mode == "chief") return "Выберите начальника отдела";
+      if (this.mode == "chief")
+        return "Выберите начальника отдела нажатием на иконку в списке";
     }
   },
   beforeCreate() {
