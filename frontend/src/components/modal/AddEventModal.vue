@@ -138,19 +138,19 @@
 </template>
 
 <script>
+import store from "../../store";
 import { mapGetters } from "vuex";
-import AppInput from "../common/Input";
 import moment, { duration } from "moment";
 import locale from "ant-design-vue/es/date-picker/locale/ru_RU";
 
 import {
   CREATE_EVENT,
   UPDATE_EVENT,
-  UPDATE_USER_INFO,
   GET_USERS
 } from "../../store/user/actions.type";
-import store from "../../store";
 import { GET_NOTIFICATION } from "../../store/notification/actions.type";
+
+import AppInput from "../common/Input";
 
 export default {
   props: {

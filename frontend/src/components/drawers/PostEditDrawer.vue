@@ -61,31 +61,31 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
-import AppInput from '../common/Input';
-import { UPDATE_USER_INFO } from '../../store/user/actions.type';
-import ATextarea from 'ant-design-vue/es/input/TextArea';
-import { CREATE_GROUP, EDIT_GROUP } from '../../store/group/actions.type';
-import { SET_EDIT_POST_VISIBLE } from '../../store/post/mutations.type';
-import { EDIT_POST } from '../../store/post/actions.type';
+import { mapGetters } from "vuex";
+import { CREATE_GROUP, EDIT_GROUP } from "../../store/group/actions.type";
+import { SET_EDIT_POST_VISIBLE } from "../../store/post/mutations.type";
+import { EDIT_POST } from "../../store/post/actions.type";
+
+import AppInput from "../common/Input";
+import ATextarea from "ant-design-vue/es/input/TextArea";
 
 export default {
-  name: 'AppPostEditDrawer',
+  name: "AppPostEditDrawer",
   data() {
     return {
-      current: '',
+      current: "",
       createButtonSpinning: false,
       type: 1,
       fileList: [],
-      currentAttachment: true,
+      currentAttachment: true
     };
   },
   components: {
     ATextarea,
-    AppInput,
+    AppInput
   },
   computed: {
-    ...mapGetters(['user', 'postForEditing', 'editPostVisible']),
+    ...mapGetters(["user", "postForEditing", "editPostVisible"])
   },
   methods: {
     changeAttachment() {
@@ -106,7 +106,7 @@ export default {
       if (fileList.length > 0) {
         const formData = new FormData();
         fileList.forEach(file => {
-          formData.append('files', file);
+          formData.append("files", file);
         });
         this.fileList = [];
         return formData;
@@ -125,7 +125,7 @@ export default {
           const post = {
             ...this.postForEditing,
             message: formFields.message,
-            formData: this.handleUpload(),
+            formData: this.handleUpload()
           };
 
           this.$store.dispatch(EDIT_POST, post).finally(() => {
@@ -137,16 +137,16 @@ export default {
     },
     handleChange(e) {
       this.type = e;
-    },
+    }
   },
   watch: {
     postForEditing(val) {
       this.currentAttachment = true;
-    },
+    }
   },
   beforeCreate() {
     this.form = this.$form.createForm(this);
-  },
+  }
 };
 </script>
 

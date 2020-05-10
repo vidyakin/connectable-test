@@ -2,7 +2,7 @@ export const LOGIN = 'LOGIN';
 export const LOGIN_WITH_GOOGLE = 'LOGIN_WITH_GOOGLE';
 export const LOGIN_WITH_OUTLOOK = 'LOGIN_WITH_OUTLOOK';
 export const GET_INFO_ABOUT_USER = 'GET_INFO_ABOUT_USER';
-export const UPDATE_USER_INFO = 'UPDATE_USER_INFO';
+export const EDIT_USER = 'EDIT_USER';
 
 export const CREATE_EVENT = 'CREATE_EVENT';
 export const UPDATE_EVENT = 'UPDATE_EVENT';

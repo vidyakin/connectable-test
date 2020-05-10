@@ -68,35 +68,40 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
-import AppInput from '../common/Input';
-import { GET_USERS, UPDATE_USER_INFO } from '../../store/user/actions.type';
-import ATextarea from 'ant-design-vue/es/input/TextArea';
-import { CREATE_GROUP } from '../../store/group/actions.type';
+import store from "../../store";
+import { mapGetters } from "vuex";
+
+import { CREATE_GROUP } from "../../store/group/actions.type";
 import {
   CREATE_PROJECT,
   CREATE_PROJECT_PARTICIPANT,
-  GET_PROJECTS,
-} from '../../store/project/actions.type';
-import store from '../../store';
+  GET_PROJECTS
+} from "../../store/project/actions.type";
+import { GET_USERS } from "../../store/user/actions.type";
+
+import AppInput from "../common/Input";
+import ATextarea from "ant-design-vue/es/input/TextArea";
+
 export default {
-  name: 'AppCreateProject',
+  name: "AppCreateProject",
   data() {
     return {
-      current: '',
+      current: "",
       createButtonSpinning: false,
       buttonSpinning: false,
       data: [],
       value: [],
-      userinfo: (store.getters.userData.result ? store.getters.userData.result : store.getters.user.result),
+      userinfo: store.getters.userData.result
+        ? store.getters.userData.result
+        : store.getters.user.result
     };
   },
   components: {
     ATextarea,
-    AppInput,
+    AppInput
   },
   computed: {
-    ...mapGetters(['user', 'users', 'userData']),
+    ...mapGetters(["user", "users", "userData"])
   },
   methods: {
     onClose() {
@@ -110,16 +115,16 @@ export default {
           this.$store
             .dispatch(CREATE_PROJECT, {
               ...formFields,
-              creatorId: this.userinfo._id,
+              creatorId: this.userinfo._id
             })
             .then(data => {
               Promise.all(
                 this.value.map(userId => {
                   this.$store.dispatch(CREATE_PROJECT_PARTICIPANT, {
                     participantId: userId.key,
-                    projectId: data._id,
+                    projectId: data._id
                   });
-                }),
+                })
               );
             })
             .finally(() => {
@@ -136,29 +141,29 @@ export default {
         return (
           el.firstName.toLowerCase().indexOf(text) !== -1 ||
           el.lastName.toLowerCase().indexOf(text) !== -1 ||
-          (el.firstName + ' ' + el.lastName).toLowerCase().indexOf(text) !==
+          (el.firstName + " " + el.lastName).toLowerCase().indexOf(text) !==
             -1 ||
-          (el.lastName + ' ' + el.firstName).toLowerCase().indexOf(text) !== -1
+          (el.lastName + " " + el.firstName).toLowerCase().indexOf(text) !== -1
         );
       });
     },
     handleChange(value) {
       Object.assign(this, {
         value,
-        data: [],
+        data: []
       });
-    },
+    }
   },
   props: {
     close: Function,
-    visible: Boolean,
+    visible: Boolean
   },
   beforeCreate() {
     this.form = this.$form.createForm(this);
   },
   mounted() {
     this.$store.dispatch(GET_USERS);
-  },
+  }
 };
 </script>
 

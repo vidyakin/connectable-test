@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { SET_USER } from '@/store/user/mutations.type';
+import { SET_USER_DATA } from '@/store/user/mutations.type';
 import { router } from '../../router';
 import store from '../../store';
 
@@ -16,7 +16,8 @@ export const setAuthInterceptor = () => {
     console.log(error);
     if (error.response.status === 401) {
       localStorage.removeItem('authorization');
-      store.commit(SET_USER, null);
+      //store.commit(SET_USER, null);
+      store.commit(SET_USER_DATA, null); // для теста - чтобы убрать везде SET_USER_
       router.push('/login');
     } else if (errData && errData.message) {
       console.error((errData.name ? errData.name + ': ' : '') + errData.message);

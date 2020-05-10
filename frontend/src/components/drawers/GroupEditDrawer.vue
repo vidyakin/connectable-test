@@ -12,44 +12,44 @@
         <div class="row">
           <div class="col-sm-12">
             <div class="label">Название</div>
-        <a-form-item>
-          <app-input
-            placeholder="Название"
-            :defaultValue="currentGroup && currentGroup.name"
-            v-decorator="['name', {
+            <a-form-item>
+              <app-input
+                placeholder="Название"
+                :defaultValue="currentGroup && currentGroup.name"
+                v-decorator="['name', {
             initialValue:currentGroup && currentGroup.name,
             rules: [
             { required: true, message: 'Название не может быть пустым!', }
             ]
           }]"
-            class="secondary form-input"
-          ></app-input>
-        </a-form-item>
+                class="secondary form-input"
+              ></app-input>
+            </a-form-item>
           </div>
           <div class="col-sm-12">
-        <div class="label">Описание</div>
-        <a-form-item>
-          <a-textarea
-            placeholder="Описание"
-            v-decorator="['description', {
+            <div class="label">Описание</div>
+            <a-form-item>
+              <a-textarea
+                placeholder="Описание"
+                v-decorator="['description', {
             initialValue:currentGroup && currentGroup.description,
             rules: [
             { required: true, message: 'Описание не может быть пустым!', }
             ]
           }]"
-            class="secondary form-input"
-          ></a-textarea>
-        </a-form-item>
+                class="secondary form-input"
+              ></a-textarea>
+            </a-form-item>
           </div>
           <div class="col-sm-12">
-        <div class="label">Тип</div>
-        <a-select @change="handleChange" :defaultValue="currentGroup && currentGroup.type">
-          <a-select-option :value="0">Открытая</a-select-option>
-          <a-select-option :value="1">Закрытая</a-select-option>
-          <a-select-option :value="2">Приватная</a-select-option>
-        </a-select>
+            <div class="label">Тип</div>
+            <a-select @change="handleChange" :defaultValue="currentGroup && currentGroup.type">
+              <a-select-option :value="0">Открытая</a-select-option>
+              <a-select-option :value="1">Закрытая</a-select-option>
+              <a-select-option :value="2">Приватная</a-select-option>
+            </a-select>
           </div>
-          </div>
+        </div>
       </div>
       <a-form-item class="create-group-button-wrapper">
         <a-spin :spinning="createButtonSpinning">
@@ -61,27 +61,27 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
-import AppInput from '../common/Input';
-import { UPDATE_USER_INFO } from '../../store/user/actions.type';
-import ATextarea from 'ant-design-vue/es/input/TextArea';
-import { CREATE_GROUP, EDIT_GROUP } from '../../store/group/actions.type';
+import { mapGetters } from "vuex";
+import { CREATE_GROUP, EDIT_GROUP } from "../../store/group/actions.type";
+
+import AppInput from "../common/Input";
+import ATextarea from "ant-design-vue/es/input/TextArea";
 
 export default {
-  name: 'AppUserEditDrawer',
+  name: "AppUserEditDrawer",
   data() {
     return {
-      current: '',
+      current: "",
       createButtonSpinning: false,
-      type: 1,
+      type: 1
     };
   },
   components: {
     ATextarea,
-    AppInput,
+    AppInput
   },
   computed: {
-    ...mapGetters(['user', 'currentGroup']),
+    ...mapGetters(["user", "currentGroup"])
   },
   methods: {
     onClose() {
@@ -96,7 +96,7 @@ export default {
             .dispatch(EDIT_GROUP, {
               ...formFields,
               type: this.type,
-              _id: this.currentGroup._id,
+              _id: this.currentGroup._id
             })
             .finally(() => {
               this.createButtonSpinning = false;
@@ -107,15 +107,15 @@ export default {
     },
     handleChange(e) {
       this.type = e;
-    },
+    }
   },
   props: {
     close: Function,
-    visible: Boolean,
+    visible: Boolean
   },
   beforeCreate() {
     this.form = this.$form.createForm(this);
-  },
+  }
 };
 </script>
 
