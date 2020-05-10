@@ -1,6 +1,7 @@
 <template>
   <div class="user-bar">
-    <div class="user-info" v-if="this.datauser.result">
+    <div class="user-info" v-if="userData">
+      <!-- Список сообщений -->
       <a-popover placement="bottom" trigger="click">
         <template slot="content">
           <a-list itemLayout="horizontal" :dataSource="notifs" :locale="{emptyText:'Нет событий'}">
@@ -31,6 +32,7 @@
           <a-button type="primary" shape="circle" icon="bell" size="large" />
         </a-badge>
       </a-popover>
+      <!-- Меню действий пользователя -->
       <a-dropdown>
         <a-menu slot="overlay">
           <a-menu-item key="logout" @click="logout">
@@ -38,14 +40,12 @@
           </a-menu-item>
         </a-menu>
         <a-button class="logout" style="margin-right: 1rem;">
-          <!-- {{currentUser && currentUser.firstName}} {{currentUser && currentUser.lastName}} -->
-          {{ this.datauser.result.firstName + ' ' + this.datauser.result.lastName }}
+          {{ loggedUserFullName() }}
           <a-icon type="down" />
         </a-button>
       </a-dropdown>
-      <a-avatar
-        :src="(this.datauser.result.googleImage ? this.datauser.result.googleImage : require('../../assets/no_image.png'))"
-      />
+      <!-- Аватарка -->
+      <a-avatar :src="loggedUserAvatar()" />
     </div>
   </div>
 </template>
@@ -81,9 +81,9 @@ export default {
         "iat": 1586995323,
         "exp": 1587081723
        */
-      datauser: store.getters.user
-        ? store.getters.user
-        : store.getters.userData,
+      // datauser: store.getters.user
+      //   ? store.getters.user
+      //   : store.getters.userData,
       /***************************************
        * Список уведомлений в выпадающем меню
        * Привязываться напрямую к геттеру messages из стейта нельзя т.к. для разных событий возможно надо формировать разный вид сообщений
@@ -100,7 +100,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(["userData", "user", "users", "currentUser", "messages"])
+    ...mapGetters(["userData", "users", "messages"])
   },
   sockets: {
     connect() {
@@ -139,6 +139,20 @@ export default {
     this.fillNotificationFeed();
   },
   methods: {
+    // datauser() {
+    //   // TODO: переделать везде также. Может вообще отдельный геттер сделать с этой проверкой
+    //   return this.userData ? this.userData.result : this.user;
+    // },
+    loggedUserFullName() {
+      return (
+        this.userData.result.firstName + " " + this.userData.result.lastName
+      );
+    },
+    loggedUserAvatar() {
+      return this.userData.result.googleImage
+        ? this.userData.result.googleImage
+        : require("../../assets/no_image.png");
+    },
     closeImage() {
       this.$store.commit(SET_SHOW_IMAGE_HEADER, false);
     },

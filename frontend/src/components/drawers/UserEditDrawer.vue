@@ -61,9 +61,7 @@
       </div>
 
       <div class="form-row">
-
         <div class="row">
-
           <div class="col-sm-12">
             <a-form-item>
               <app-input
@@ -106,28 +104,27 @@
           <a-button type="primary" html-type="submit">Сохранить</a-button>
         </a-spin>
       </a-form-item>
-
     </a-form>
   </a-drawer>
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
-import AppInput from '../common/Input';
-import { UPDATE_USER_INFO } from '../../store/user/actions.type';
+import { mapGetters } from "vuex";
+import AppInput from "../common/Input";
+import { EDIT_USER } from "../../store/user/actions.type";
 export default {
-  name: 'AppUserEditDrawer',
+  name: "AppUserEditDrawer",
   data() {
     return {
-      current: '',
-      editButtonSpinning: false,
+      current: "",
+      editButtonSpinning: false
     };
   },
   components: {
-    AppInput,
+    AppInput
   },
   computed: {
-    ...mapGetters(['currentUser']),
+    ...mapGetters(["currentUser"])
   },
   methods: {
     onClose() {
@@ -139,10 +136,10 @@ export default {
         if (!err) {
           this.editButtonSpinning = true;
           this.$store
-            .dispatch(UPDATE_USER_INFO, {
+            .dispatch(EDIT_USER, {
               ...formFields,
               _id: this.currentUser._id,
-              positions: formFields.positions.split(','),
+              positions: formFields.positions.split(",")
             })
             .finally(() => {
               this.editButtonSpinning = false;
@@ -150,22 +147,22 @@ export default {
             });
         }
       });
-    },
+    }
   },
   props: {
     close: Function,
-    visible: Boolean,
+    visible: Boolean
   },
   beforeCreate() {
     this.form = this.$form.createForm(this);
-  },
+  }
 };
 </script>
 
 <style lang="scss">
-  .user-info .row {
-    height: 100%;
-  }
+.user-info .row {
+  height: 100%;
+}
 .user-edit-drawer {
   .ant-drawer-content-wrapper {
     width: 20rem !important;

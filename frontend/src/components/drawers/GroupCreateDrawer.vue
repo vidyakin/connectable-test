@@ -14,7 +14,8 @@
           <div class="col-sm-12">
             <a-form-item>
               <app-input
-                placeholder="Название" label="Название"
+                placeholder="Название"
+                label="Название"
                 v-decorator="getDecoratorData('name')"
                 class="secondary form-input"
               ></app-input>
@@ -52,58 +53,84 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
-import AppInput from '../common/Input';
-import { UPDATE_USER_INFO } from '../../store/user/actions.type';
-import ATextarea from 'ant-design-vue/es/input/TextArea';
-import { CREATE_GROUP } from '../../store/group/actions.type';
-import { GET_NOTIFICATION, CREATE_MESSAGE } from '../../store/notification/actions.type';
-import store from '../../store';
-import { SOCKET_NEW_MESSAGE } from '../../store/notification/mutations.type';
+import store from "../../store";
+import { mapGetters } from "vuex";
+
+import { CREATE_GROUP } from "../../store/group/actions.type";
+import {
+  GET_NOTIFICATION,
+  CREATE_MESSAGE
+} from "../../store/notification/actions.type";
+import { SOCKET_NEW_MESSAGE } from "../../store/notification/mutations.type";
+
+import AppInput from "../common/Input";
+import ATextarea from "ant-design-vue/es/input/TextArea";
+
 export default {
-  name: 'AppUserEditDrawer',
+  name: "AppUserEditDrawer",
   data() {
     return {
-      current: '',
+      current: "",
       createButtonSpinning: false,
       type: 1,
       statusEmailSend: false,
-      userinfo: (store.getters.userData.result ? store.getters.userData.result : store.getters.user.result),
+      userinfo: store.getters.userData.result
+        ? store.getters.userData.result
+        : store.getters.user.result,
       rules: {
         name: [
-          { required: true, message: 'Название не может быть пустым!', transform: this.tr },
-          { max:50, message: 'Максимальная длина заголовка - 50 символов', transform: this.tr }
+          {
+            required: true,
+            message: "Название не может быть пустым!",
+            transform: this.tr
+          },
+          {
+            max: 50,
+            message: "Максимальная длина заголовка - 50 символов",
+            transform: this.tr
+          }
         ],
         description: [
-          { required: true, message: 'Описание не может быть пустым!', transform: this.tr },
-          { max: 250, message: 'Максимальная длина описания - 250 символов', transform: this.tr }
+          {
+            required: true,
+            message: "Описание не может быть пустым!",
+            transform: this.tr
+          },
+          {
+            max: 250,
+            message: "Максимальная длина описания - 250 символов",
+            transform: this.tr
+          }
         ],
-        type: [{ required: true, message: 'Тип группы не может быть пустым!'}]
+        type: [{ required: true, message: "Тип группы не может быть пустым!" }]
       }
     };
   },
   components: {
     ATextarea,
-    AppInput,
+    AppInput
   },
   computed: {
-    ...mapGetters(['user', 'userData', 'notification']),
+    ...mapGetters(["user", "userData", "notification"])
   },
   methods: {
     onClose() {
       this.close();
     },
     tr(v) {
-      return v === undefined ? '' : v.trim()
+      return v === undefined ? "" : v.trim();
     },
     getDecoratorData(n) {
-      const result = [ n, { rules: this.rules[n] } ];
+      const result = [n, { rules: this.rules[n] }];
       return result;
     },
     createGroup(e) {
       e.preventDefault();
       this.form.validateFields(async (err, formFields) => {
-        if (err) { console.error(err); return }
+        if (err) {
+          console.error(err);
+          return;
+        }
 
         this.createButtonSpinning = true;
         // записываем группу в БД и стор
@@ -112,29 +139,29 @@ export default {
           type: this.type,
           creatorId: this.userinfo._id,
           userEmail: this.userinfo.email,
-          emailSend: this.statusEmailSend,
-        }
-        const newGroupId = await this.$store.dispatch(CREATE_GROUP, newGroup)
+          emailSend: this.statusEmailSend
+        };
+        const newGroupId = await this.$store.dispatch(CREATE_GROUP, newGroup);
         // объект-модель для сохранения в БД
-        const newMsg = this.newMsgForGroup(newGroup, newGroupId)
+        const newMsg = this.newMsgForGroup(newGroup, newGroupId);
         // Создаем сообщение в БД и сторе
-        const newMsgId = await this.$store.dispatch(CREATE_MESSAGE, newMsg)
-          //.finally(() => {
-            // посылать если только группа открытая?
-          
+        const newMsgId = await this.$store.dispatch(CREATE_MESSAGE, newMsg);
+        //.finally(() => {
+        // посылать если только группа открытая?
+
         // Посылаем сообщение для всех о появлении нового сообщения
         // с сервера придет бродкастом сообщение "socketMessage" с переданными данными
-        this.$socket.client.emit('to all', {
-          type: 'NEW_GROUP', 
+        this.$socket.client.emit("to all", {
+          type: "NEW_GROUP"
           // 1 вариант - создавать объект тут, второй - в момент приема этого сообщения в обработчике события "to all"
           // val: {
           //   title: "Новая группа",
           //   userFrom: this.userinfo.firstName + ' ' + this.userinfo.lastName,
           //   text: "создал новую группу",
           //   subj: newGroup.name
-          // } 
-          // 2 вариант - только тип указывает что надо получить сообщения с сервера и сформировать массив сообщений 
-        })
+          // }
+          // 2 вариант - только тип указывает что надо получить сообщения с сервера и сформировать массив сообщений
+        });
         this.createButtonSpinning = false;
         this.onClose();
         // });
@@ -143,24 +170,24 @@ export default {
     /**
      * Формирование объекта Message для передачи в БД
      */
-    newMsgForGroup(newGroup,newGroupId) {
+    newMsgForGroup(newGroup, newGroupId) {
       return {
-        msgType: "NEW_GROUP",         // тип сообщения, для разделения бизнес-логики - "NEW_GROUP","YOU_ADDED_IN_GROUP", ""
-        dateCreated: Date.now(),      // Дата создания сообщения
-        text: `<b>${this.userinfo.firstName} ${this.userinfo.lastName}</b> создал новую группу <i>${newGroup.name}</i>`,   // текст сообщения
+        msgType: "NEW_GROUP", // тип сообщения, для разделения бизнес-логики - "NEW_GROUP","YOU_ADDED_IN_GROUP", ""
+        dateCreated: Date.now(), // Дата создания сообщения
+        text: `<b>${this.userinfo.firstName} ${this.userinfo.lastName}</b> создал новую группу <i>${newGroup.name}</i>`, // текст сообщения
         senderId: newGroup.creatorId, // id отправителя
-        listenerType: "all",          // тип приемников сообщений - все, выборочно или еще как-то
+        listenerType: "all", // тип приемников сообщений - все, выборочно или еще как-то
         linkedObjType: "group", // связанный объект - группа, проект, и т.д.
         linkedObjId: newGroupId
-      }
+      };
     },
     handleChange(e) {
       this.type = e;
-    },
+    }
   },
   props: {
     close: Function,
-    visible: Boolean,
+    visible: Boolean
   },
   beforeCreate() {
     this.form = this.$form.createForm(this);
@@ -169,9 +196,13 @@ export default {
 
   watch: {
     notification(notification) {
-      this.statusEmailSend = (notification && notification.userId === store.getters.userData.result._id ? notification.publications : false);
+      this.statusEmailSend =
+        notification &&
+        notification.userId === store.getters.userData.result._id
+          ? notification.publications
+          : false;
     }
-  },
+  }
 };
 </script>
 
