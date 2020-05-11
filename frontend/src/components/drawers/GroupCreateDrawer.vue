@@ -35,11 +35,13 @@
 
           <div class="col-sm-12">
             <div class="label">Тип</div>
-            <a-select @change="handleChange" defaultValue="0">
-              <a-select-option value="0">Открытая</a-select-option>
-              <a-select-option value="1">Закрытая</a-select-option>
-              <a-select-option value="2">Приватная</a-select-option>
-            </a-select>
+            <a-form-item>
+              <a-select @change="groupTypeOnChange" v-decorator="getDecoratorData('type')">
+                <a-select-option value="0">Открытая</a-select-option>
+                <a-select-option value="1">Закрытая</a-select-option>
+                <a-select-option value="2">Приватная</a-select-option>
+              </a-select>
+            </a-form-item>
           </div>
         </div>
       </div>
@@ -56,15 +58,15 @@
 import store from "../../store";
 import { mapGetters } from "vuex";
 
-import { CREATE_GROUP } from "../../store/group/actions.type";
+import { CREATE_GROUP } from "@/store/group/actions.type";
 import {
   GET_NOTIFICATION,
   CREATE_MESSAGE
-} from "../../store/notification/actions.type";
-import { SOCKET_NEW_MESSAGE } from "../../store/notification/mutations.type";
+} from "@/store/notification/actions.type";
+import { SOCKET_NEW_MESSAGE } from "@/store/notification/mutations.type";
 
 import AppInput from "../common/Input";
-import ATextarea from "ant-design-vue/es/input/TextArea";
+//import ATextarea from "ant-design-vue/es/input/TextArea";
 
 export default {
   name: "AppUserEditDrawer",
@@ -72,7 +74,6 @@ export default {
     return {
       current: "",
       createButtonSpinning: false,
-      type: 1,
       statusEmailSend: false,
       userinfo: store.getters.userData.result
         ? store.getters.userData.result
@@ -102,12 +103,16 @@ export default {
             transform: this.tr
           }
         ],
-        type: [{ required: true, message: "Тип группы не может быть пустым!" }]
+        type: [
+          {
+            required: true,
+            message: "Тип группы не может быть пустым!"
+          }
+        ]
       }
     };
   },
   components: {
-    ATextarea,
     AppInput
   },
   computed: {
@@ -121,7 +126,9 @@ export default {
       return v === undefined ? "" : v.trim();
     },
     getDecoratorData(n) {
-      const result = [n, { rules: this.rules[n] }];
+      const result = [n];
+      if (n == "type") result.push({ initialValue: "0" }); // дефолтное значение должно идти перед правилами
+      result.push({ rules: this.rules[n] }); // правила проверки данных
       return result;
     },
     createGroup(e) {
@@ -136,7 +143,7 @@ export default {
         // записываем группу в БД и стор
         const newGroup = {
           ...formFields,
-          type: this.type,
+          //type: this.type,
           creatorId: this.userinfo._id,
           userEmail: this.userinfo.email,
           emailSend: this.statusEmailSend
@@ -181,8 +188,8 @@ export default {
         linkedObjId: newGroupId
       };
     },
-    handleChange(e) {
-      this.type = e;
+    groupTypeOnChange(e) {
+      //this.type = e;
     }
   },
   props: {

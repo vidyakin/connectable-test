@@ -4,7 +4,7 @@
   <div class="group" v-if="groupVisible">
     <div class="group-header" :class="group.type === 2 ? 'private' : ''">
       <div class="group-header-content">
-        <div class="group-header-content-name">{{group.name}}</div>
+        <div class="group-header-content-name" @click="redirectToGroup">{{group.name}}</div>
         <div
           class="group-header-content-count"
         >{{group.participants.length}} {{group && endingWords(group.participants.length)}}</div>
@@ -151,7 +151,7 @@ export default {
       return (
         this.group.type !== 2 ||
         (this.group.type === 2 && this.group.creatorId === this.datauser._id) ||
-          this.userIsAdmin
+        this.userIsAdmin
       );
     }
   }

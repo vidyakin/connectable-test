@@ -24,13 +24,14 @@
   </div>
 </template>
 <script>
-import AppGroupCreateDrawer from "../components/drawers/GroupCreateDrawer";
-// import AppSearchForm from '../components/common/SearchForm';
-
+import store from "../store";
 import { mapGetters } from "vuex";
 import { GET_GROUPS } from "../store/group/actions.type";
+
+// import AppSearchForm from '../components/common/SearchForm';
 import AppGroup from "../components/common/Group";
-import store from "../store";
+import AppGroupCreateDrawer from "../components/drawers/GroupCreateDrawer";
+
 export default {
   components: {
     AppGroupCreateDrawer,
