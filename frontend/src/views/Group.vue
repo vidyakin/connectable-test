@@ -2,23 +2,25 @@
   <div id="profile" class="group-view">
     <app-group-edit-drawer :visible="editVisible" :close="closeEdit" />
     <!-- запросы на вступление могут видеть в закрытых группых -->
-    <app-requests-drawer v-if="isLoaded"
+    <app-requests-drawer
+      v-if="isLoaded"
       :visible="requestVisible && currentGroup.type === 1"
       :close="closeRequests"
     />
     <!-- приглашать можно в закрытых и приватных -->
-    <app-invite-drawer v-if="isLoaded"
-      :visible="invitesVisible"
-      :close="closeInvites"
-    />
+    <app-invite-drawer v-if="isLoaded" :visible="invitesVisible" :close="closeInvites" />
 
     <div class="group-body" v-if="isLoaded">
       <div class="group-body-info">
         <div class="group-body-info-header">
           <div class="group-body-info-header-content">
             <div class="group-body-info-header-content-name">{{currentGroup.name}}</div>
-            <div class="group-body-info-type">{{['Открытая','Закрытая','Приватная'][currentGroup.type] }} группа</div>
-            <div class="group-body-info-header-content-participants">{{currentGroup.participants.length}} {{endingWords(currentGroup.participants.length)}}</div>            
+            <div
+              class="group-body-info-type"
+            >{{['Открытая','Закрытая','Приватная'][currentGroup.type] }} группа</div>
+            <div
+              class="group-body-info-header-content-participants"
+            >{{currentGroup.participants.length}} {{endingWords(currentGroup.participants.length)}}</div>
           </div>
           <div class="group-body-info-header-action">
             <a-popover
@@ -45,7 +47,7 @@
                 <a-tooltip title="Пригласить" v-if="currentGroup.type >= 1">
                   <a-button icon="plus" @click="openInvites"></a-button>
                 </a-tooltip>
-                <a-tooltip title="Заявки"  v-if="currentGroup.type === 1">
+                <a-tooltip title="Заявки" v-if="currentGroup.type === 1">
                   <a-badge :count="currentGroup.requests.length" @click="hide">
                     <a-button icon="team" @click="openRequests"></a-button>
                   </a-badge>
@@ -56,15 +58,18 @@
           </div>
         </div>
         <div class="group-body-info-description">{{currentGroup.description}}</div>
-        
       </div>
       <!-- УЧАСТНИКИ -->
       <div class="group-body-participants" v-if="currentGroup">
         <div class="group-body-participants-header">Участники ({{currentGroup.participants.length}})</div>
-        <div class="group-body-participants-participant"
-          v-for="(participant, index) in currentGroup.participants" :key="index"
+        <div
+          class="group-body-participants-participant"
+          v-for="(participant, index) in currentGroup.participants"
+          :key="index"
         >
-          <a-avatar :src="(participant.googleImage ? participant.googleImage : require('../assets/no_image.png'))"></a-avatar>
+          <a-avatar
+            :src="(participant.googleImage ? participant.googleImage : require('../assets/no_image.png'))"
+          ></a-avatar>
           <div class="group-body-participants-participant-info">
             <div
               class="group-body-participants-participant-info-name"
@@ -74,25 +79,31 @@
             >{{participant.positions.join(', ')}}</div>
           </div>
         </div>
-        
       </div>
     </div>
     <!-- SPINNER while loading -->
     <a-spin size="large" v-else />
-    <template v-if="isLoaded && (currentGroup.type === 0 ||currentGroup.participants.findIndex(({_id}) => _id === userinfo._id) !== -1)">
+    <template
+      v-if="isLoaded && (currentGroup.type === 0 ||currentGroup.participants.findIndex(({_id}) => _id === userinfo._id) !== -1)"
+    >
       <app-comment-input :parent="{type: 'group', id: currentGroup._id}" />
-        <app-post v-for="(post, index) in posts" :post="post" :key="index" />
+      <app-post v-for="(post, index) in posts" :post="post" :key="index" />
     </template>
     <template class="btn-additional">
-      <a-button type="primary" @click="createParticipant"
+      <a-button
+        type="primary"
+        @click="createParticipant"
         v-if="currentGroup.type === 0 && currentGroup.participants && currentGroup.participants.findIndex(({_id}) =>_id === userinfo._id) === -1"
       >Вступить</a-button>
-      <a-button type="primary" @click="createParticipantsRequest"
+      <a-button
+        type="primary"
+        @click="createParticipantsRequest"
         v-if="currentGroup.type === 1
               && currentGroup.participants && currentGroup.participants.findIndex(({_id}) =>_id === userinfo._id) === -1
               && !participantsRequest"
       >Подать заявку</a-button>
-      <a-button type="primary"
+      <a-button
+        type="primary"
         @click="deleteParticipant"
         v-if="currentGroup.type === 1   
             && currentGroup.participants 
@@ -100,32 +111,34 @@
             && participantsRequest"
       >Отменить заявку</a-button>
     </template>
-    
   </div>
 </template>
 <script>
-import { mapGetters } from 'vuex';
-import { GET_POSTS } from '../store/post/actions.type';
-import AppCommentInput from '../components/common/CommentInput';
-import AppPost from '../components/common/Post';
+import store from "../store";
+import { mapGetters } from "vuex";
+
+import { GET_POSTS } from "../store/post/actions.type";
 import {
   CREATE_PARTICIPANT,
   DELETE_GROUP,
   DELETE_PARTICIPANT,
   GET_CURRENT_GROUP,
-  GET_PARTICIPANTS_REQUEST,
-} from '../store/group/actions.type';
-import AppGroupEditDrawer from '../components/drawers/GroupEditDrawer';
-import AppRequestsDrawer from '../components/drawers/RequestsDrawer';
-import AppInviteDrawer from '../components/drawers/InviteDrawer';
-import store from '../store';
+  GET_PARTICIPANTS_REQUEST
+} from "../store/group/actions.type";
+
+import AppCommentInput from "../components/common/CommentInput";
+import AppPost from "../components/common/Post";
+import AppGroupEditDrawer from "../components/drawers/GroupEditDrawer";
+import AppRequestsDrawer from "../components/drawers/RequestsDrawer";
+import AppInviteDrawer from "../components/drawers/InviteDrawer";
+
 export default {
   components: {
     AppCommentInput,
     AppPost,
     AppGroupEditDrawer,
     AppRequestsDrawer,
-    AppInviteDrawer,
+    AppInviteDrawer
   },
   data() {
     return {
@@ -134,23 +147,28 @@ export default {
       requestVisible: false,
       invitesVisible: false,
       visible: false,
-      output: '',
-      userinfo: (store.getters.userData.result ? store.getters.userData.result : store.getters.user.result),
+      output: "",
+      userinfo: store.getters.userData.result
+        ? store.getters.userData.result
+        : store.getters.user.result,
       userIsAdmin: false
     };
   },
   methods: {
     endingWords(count) {
       if (count === 0) {
-        this.output = 'нет участников';
+        this.output = "нет участников";
       } else if (count === 1) {
-        this.output = ' участник';
-      } else if ((count > 20) && ((count % 10) === 1)) {
-        this.output = ' участник';
-      } else if (((count >= 2) && (count <= 4)) || (((count % 10) >= 2) && ((count % 10) <= 4)) && (count > 20)) {
-        this.output = ' участника';
+        this.output = " участник";
+      } else if (count > 20 && count % 10 === 1) {
+        this.output = " участник";
+      } else if (
+        (count >= 2 && count <= 4) ||
+        (count % 10 >= 2 && count % 10 <= 4 && count > 20)
+      ) {
+        this.output = " участника";
       } else {
-        this.output = ' участников';
+        this.output = " участников";
       }
       return this.output;
     },
@@ -174,7 +192,7 @@ export default {
     },
     deleteGroup() {
       this.$store.dispatch(DELETE_GROUP, this.currentGroup._id).then(() => {
-        this.$router.push({ name: 'groups' });
+        this.$router.push({ name: "groups" });
       });
     },
     closeEdit() {
@@ -186,14 +204,14 @@ export default {
     createParticipant() {
       this.$store.dispatch(CREATE_PARTICIPANT, {
         participantId: this.userinfo._id,
-        groupId: this.currentGroup._id,
+        groupId: this.currentGroup._id
       });
     },
     deleteParticipant() {
       this.$store
         .dispatch(DELETE_PARTICIPANT, {
           participantId: this.userinfo._id,
-          groupId: this.currentGroup._id,
+          groupId: this.currentGroup._id
         })
         .then(() => this.checkParticipants());
     },
@@ -202,50 +220,54 @@ export default {
         .dispatch(CREATE_PARTICIPANT, {
           participantId: this.userinfo._id,
           groupId: this.currentGroup._id,
-          approved: false,
+          approved: false
         })
         .then(() => this.checkParticipants());
     },
     checkParticipants() {
       this.$store.dispatch(GET_PARTICIPANTS_REQUEST, {
         groupId: this.currentGroup._id,
-        participantId: this.userinfo._id,
+        participantId: this.userinfo._id
       });
-    },
+    }
   },
-  beforeMount() {
-    const vm = this
-    this.$store.dispatch(GET_CURRENT_GROUP, this.$route.params._id)
-    .then(() => {
-      this.checkParticipants();
-      this.$store.dispatch(GET_POSTS, {
-        filter: {
-          parent: {
-            type: 'group',
-            id: this.currentGroup._id,
-          },
-        },
-      });
-    })
-    .then(()=>{
-      vm.isLoaded = true
-      vm.userIsAdmin = vm.$can('read', {'accessEmail': vm.userinfo.email, '__type': 'Admin'})
-      //console.log(`> befMount: currentGroup is ${JSON.stringify(this.currentGroup,null,2)}`)
+  async beforeMount() {
+    const vm = this;
+    await this.$store.dispatch(GET_CURRENT_GROUP, this.$route.params._id);
+    //console.log(`curr. group: ${this.currentGroup?._id}`);
+
+    this.checkParticipants();
+    await this.$store.dispatch(GET_POSTS, {
+      filter: {
+        parent: {
+          type: "group",
+          id: this.currentGroup._id
+        }
+      }
+    });
+    this.isLoaded = true;
+    this.userIsAdmin = this.$can("read", {
+      accessEmail: this.userinfo.email,
+      __type: "Admin"
     });
   },
-  created() {
-    
-  },
+  created() {},
   computed: {
-    ...mapGetters(['posts', 'currentGroup', 'user', 'userData', 'participantsRequest']),
-  },
+    ...mapGetters([
+      "posts",
+      "currentGroup",
+      "user",
+      "userData",
+      "participantsRequest"
+    ])
+  }
 };
 </script>
 
 <style lang="scss">
-  .group-view .group-body-participants {
-    overflow-y: scroll;
-  }
+.group-view .group-body-participants {
+  overflow-y: scroll;
+}
 .groups-header {
   display: flex;
   margin: 1.5rem 0 1rem 0;
@@ -272,10 +294,10 @@ export default {
 
   &-header {
     display: flex;
-      margin: 1.5rem 3.125rem 1rem 3.125rem;
-      justify-content: space-between;
+    margin: 1.5rem 3.125rem 1rem 3.125rem;
+    justify-content: space-between;
 
-      &-name {
+    &-name {
       height: 31px;
       font-size: 24px;
       font-weight: normal;
@@ -305,7 +327,7 @@ export default {
 
       @media (max-width: 767px) {
         width: 100%;
-       margin-bottom: 1rem;
+        margin-bottom: 1rem;
       }
 
       &-header {
