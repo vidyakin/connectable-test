@@ -115,6 +115,7 @@ export const getInfoAboutUser = (context: any) => {
     });
 };
 
+// процедура проверки актуальности токена, вызывается при каждом переходе по ссылке, из роутера
 export const getInfoUser = (token: any) => {
   const jsonPayload = decodeToken(token);
   const payload = JSON.parse(jsonPayload);
