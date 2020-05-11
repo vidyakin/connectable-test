@@ -14,7 +14,7 @@
           <!-- изображение не меняется на SIMPLE несмотря на код как в справке -->
           <a-empty description="Сотрудники не найдены" :image="imgEmpty" />
         </template>
-        
+
         <a-table
           v-if="users"
           :locale="{filterReset:'Сброс'}"
@@ -34,81 +34,71 @@
   </div>
 </template>
 <script>
-import { Empty } from 'ant-design-vue';
-import { GET_USERS } from '../store/user/actions.type';
-import { mapGetters } from 'vuex';
+import { Empty } from "ant-design-vue";
+import { GET_USERS } from "../store/user/actions.type";
+import { mapGetters } from "vuex";
 
 const columns = [
   {
-    title: 'Сотрудник',
-    dataIndex: 'name',
-    scopedSlots: { customRender: 'name' },
+    title: "Сотрудник",
+    dataIndex: "name",
+    scopedSlots: { customRender: "name" }
   },
   {
-    title: 'Должность',
-    dataIndex: 'positions',
-    filters: [
-      {
-        text: 'Менеджер',
-        value: 'Менеджер',
-      },
-      {
-        text: 'Лидер отдела продаж',
-        value: 'Лидер отдела продаж',
-      },
-    ],
+    title: "Должность",
+    dataIndex: "positions",
     filterMultiple: true,
-    onFilter: (value, record) => record.positions.indexOf(value) !== -1,
+    onFilter: (value, record) => record.positions.indexOf(value) !== -1
   },
   {
-    title: 'Телефон',
-    dataIndex: 'phone',
+    title: "Телефон",
+    dataIndex: "phone"
   },
   {
-    title: 'Почта',
-    dataIndex: 'email',
-  },
+    title: "Почта",
+    dataIndex: "email"
+  }
 ];
 
-const data = [
+const testData = [
   {
-    key: '1',
-    name: 'John Brown',
+    key: "1",
+    name: "John Brown",
     age: 32,
-    address: 'New York No. 1 Lake Park',
+    address: "New York No. 1 Lake Park"
   },
   {
-    key: '2',
-    name: 'Jim Green',
+    key: "2",
+    name: "Jim Green",
     age: 42,
-    address: 'London No. 1 Lake Park',
+    address: "London No. 1 Lake Park"
   },
   {
-    key: '3',
-    name: 'Joe Black',
+    key: "3",
+    name: "Joe Black",
     age: 32,
-    address: 'Sidney No. 1 Lake Park',
+    address: "Sidney No. 1 Lake Park"
   },
   {
-    key: '4',
-    name: 'Jim Red',
+    key: "4",
+    name: "Jim Red",
     age: 32,
-    address: 'London No. 2 Lake Park',
-  },
+    address: "London No. 2 Lake Park"
+  }
 ];
 
 function onChange(pagination, filters, sorter) {
-  console.log('params', pagination, filters, sorter);
+  console.log("params", pagination, filters, sorter);
 }
 
 export default {
-  name: 'AppAddress',
+  name: "AppAddress",
   data() {
     return {
       data: [],
       columns,
-      searchText: '',
-      imgEmpty: ''
+      searchText: "",
+      imgEmpty: ""
     };
   },
   components: { Empty },
@@ -118,18 +108,17 @@ export default {
       console.log(this.searchText);
     },
     goTo(id) {
-      this.$router.push({ name: 'profile', params: { _id: id } });
-    },
+      this.$router.push({ name: "profile", params: { _id: id } });
+    }
   },
   computed: {
-    ...mapGetters(['users'])
+    ...mapGetters(["users"])
   },
   beforeCreate() {
     this.imgEmpty = Empty.PRESENTED_IMAGE_SIMPLE;
   },
   beforeMount() {
     this.$store.dispatch(GET_USERS);
-    
   },
   watch: {
     users(users) {
@@ -137,27 +126,39 @@ export default {
         const { googleImage, firstName, lastName, positions, phone, email } = e;
         const row = {};
         row.name = { googleImage, firstName, lastName, id: e._id };
-        row.positions = positions.join(', ');
+        row.positions = positions.join(", ");
         row.phone = phone;
         row.email = email;
         row.key = e._id;
         return row;
       });
+      // соберем все должности и уберем пустые
+      this.columns[1].filters = this.data
+        .map(e => e.positions)
+        .filter(e => !!e)
+        .map(e => ({ text: e, value: e }));
+      // уберем дубли превратив в множество и потом назад в массив
+      this.columns[1].filters = [...new Set(this.columns[1].filters)];
       this.fullData = [...this.data];
     },
     searchText(text) {
       this.data = this.fullData.filter(el => {
-        let strs = [].concat(el.name.firstName, el.name.lastName, el.name.firstName + ' ' + el.name.lastName, el.name.lastName + ' ' + el.name.firstName);
+        let strs = [].concat(
+          el.name.firstName,
+          el.name.lastName,
+          el.name.firstName + " " + el.name.lastName,
+          el.name.lastName + " " + el.name.firstName
+        );
         strs = strs.join("$").toLowerCase();
         return strs.indexOf(text.toLowerCase().trim()) !== -1;
       });
-    },
-  },
+    }
+  }
 };
 </script>
 
 <style lang="scss">
-.is-hide-img-header{
+.is-hide-img-header {
   .address {
     height: calc(100vh - 50px);
   }
@@ -201,7 +202,7 @@ export default {
       }
     }
 
-    &-search{
+    &-search {
       @media (max-width: 567px) {
         flex: 1 0 100%;
       }
@@ -266,11 +267,11 @@ export default {
   }
 }
 
-  .address-body .ant-table-thead th {
-    width: 14.5rem;
-  }
-.address-body .ant-table-thead th:first-child, .address-body .ant-table-thead th:nth-child(2) {
+.address-body .ant-table-thead th {
+  width: 14.5rem;
+}
+.address-body .ant-table-thead th:first-child,
+.address-body .ant-table-thead th:nth-child(2) {
   width: 18rem;
 }
-
 </style>
