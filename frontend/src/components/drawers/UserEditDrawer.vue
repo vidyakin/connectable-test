@@ -71,7 +71,7 @@
                 :defaultValue="currentUser && currentUser.email"
                 v-decorator="['email', {initialValue:currentUser &&  currentUser.email,
                 rules: [{
-                  type: 'email', message: 'The input is not valid E-mail!',
+                  type: 'email', message: 'Укажите корректный E-mail!',
                 }, {
                   required: true, message: 'Укажите E-mail!',
                 }]

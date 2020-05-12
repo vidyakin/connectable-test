@@ -24,6 +24,13 @@
           :pagination="false"
           size="small"
         >
+          <a-icon
+            slot="filterIcon"
+            slot-scope="filtered"
+            type="filter"
+            title="Отбор по должности"
+            :style="{ color: filtered ? '#108ee9' : undefined }"
+          />
           <div slot="name" slot-scope="text" class="table-row-name" @click="goTo(text.id)">
             <a-avatar :src="text.googleImage"></a-avatar>
             {{text.firstName}} {{text.lastName}}
@@ -48,6 +55,7 @@ const columns = [
     title: "Должность",
     dataIndex: "positions",
     filterMultiple: true,
+    scopedSlots: { filterIcon: "filterIcon" }, // обязательно тут указывать, самого по себе слота в шаблона мало
     onFilter: (value, record) => record.positions.indexOf(value) !== -1
   },
   {

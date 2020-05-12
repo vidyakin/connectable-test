@@ -51,11 +51,12 @@
 </template>
 
 <script>
+import store from "../../store";
+import { mapGetters } from "vuex";
+
+import { LOGOUT } from "../../store/user/actions.type";
 import { SET_SHOW_IMAGE_HEADER } from "../../store/shower/mutations.type";
 import { GET_MESSAGES } from "../../store/notification/actions.type";
-import { mapGetters } from "vuex";
-import store from "../../store";
-import { LOGOUT } from "../../store/user/actions.type";
 
 export default {
   name: "AppLoginBar",
@@ -100,7 +101,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(["userData", "users", "messages"])
+    ...mapGetters(["userData", "user", "users", "messages"])
   },
   sockets: {
     connect() {
