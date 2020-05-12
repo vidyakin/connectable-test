@@ -1,14 +1,15 @@
 <template>
   <div id="profile" class="group-view">
-    <app-group-edit-drawer :visible="editVisible" :close="closeEdit" />
-    <!-- запросы на вступление могут видеть в закрытых группых -->
-    <app-requests-drawer
-      v-if="isLoaded"
-      :visible="requestVisible && currentGroup.type === 1"
-      :close="closeRequests"
-    />
-    <!-- приглашать можно в закрытых и приватных -->
-    <app-invite-drawer v-if="isLoaded" :visible="invitesVisible" :close="closeInvites" />
+    <template v-if="isLoaded">
+      <app-group-edit-drawer :visible="editVisible" :close="closeEdit" />
+      <!-- запросы на вступление могут видеть в закрытых группых -->
+      <app-requests-drawer
+        :visible="requestVisible && currentGroup.type === 1"
+        :close="closeRequests"
+      />
+      <!-- приглашать можно в закрытых и приватных -->
+      <app-invite-drawer :visible="invitesVisible" :close="closeInvites" />
+    </template>
 
     <div class="group-body" v-if="isLoaded">
       <div class="group-body-info">
@@ -60,7 +61,7 @@
         <div class="group-body-info-description">{{currentGroup.description}}</div>
       </div>
       <!-- УЧАСТНИКИ -->
-      <div class="group-body-participants" v-if="currentGroup">
+      <div class="group-body-participants">
         <div class="group-body-participants-header">Участники ({{currentGroup.participants.length}})</div>
         <div
           class="group-body-participants-participant"
@@ -83,31 +84,32 @@
     </div>
     <!-- SPINNER while loading -->
     <a-spin size="large" v-else />
+    <!-- Блок из поля ввода комментария и постов -->
     <template
-      v-if="isLoaded && (currentGroup.type === 0 ||currentGroup.participants.findIndex(({_id}) => _id === userinfo._id) !== -1)"
+      v-if="isLoaded && (currentGroup.type === 0 || currentGroup.participants.findIndex(i => i._id === userinfo._id) !== -1)"
     >
       <app-comment-input :parent="{type: 'group', id: currentGroup._id}" />
       <app-post v-for="(post, index) in posts" :post="post" :key="index" />
     </template>
-    <template class="btn-additional">
+    <!-- Блок кнопок для вступления в группу -->
+    <template class="btn-additional" v-if="isLoaded">
       <a-button
         type="primary"
         @click="createParticipant"
-        v-if="currentGroup.type === 0 && currentGroup.participants && currentGroup.participants.findIndex(({_id}) =>_id === userinfo._id) === -1"
+        v-if="currentGroup.type === 0 && isAuthor"
       >Вступить</a-button>
       <a-button
         type="primary"
         @click="createParticipantsRequest"
         v-if="currentGroup.type === 1
-              && currentGroup.participants && currentGroup.participants.findIndex(({_id}) =>_id === userinfo._id) === -1
+              && isAuthor
               && !participantsRequest"
       >Подать заявку</a-button>
       <a-button
         type="primary"
         @click="deleteParticipant"
         v-if="currentGroup.type === 1   
-            && currentGroup.participants 
-            && currentGroup.participants.findIndex(({_id}) =>_id === userinfo._id) === -1
+            && isAuthor
             && participantsRequest"
       >Отменить заявку</a-button>
     </template>
@@ -148,6 +150,7 @@ export default {
       invitesVisible: false,
       visible: false,
       output: "",
+      //currentGroup: null,
       userinfo: store.getters.userData.result
         ? store.getters.userData.result
         : store.getters.user.result,
@@ -231,9 +234,10 @@ export default {
       });
     }
   },
-  async beforeMount() {
-    const vm = this;
+  async beforeMount() {},
+  async beforeCreate() {
     await this.$store.dispatch(GET_CURRENT_GROUP, this.$route.params._id);
+    //this.currentGroup = this.$store.getters.currentGroup;
     //console.log(`curr. group: ${this.currentGroup?._id}`);
 
     this.checkParticipants();
@@ -250,16 +254,27 @@ export default {
       accessEmail: this.userinfo.email,
       __type: "Admin"
     });
+    console.log(`before create`);
   },
-  created() {},
   computed: {
     ...mapGetters([
       "posts",
-      "currentGroup",
       "user",
+      "currentGroup",
       "userData",
       "participantsRequest"
-    ])
+    ]),
+    getGroupProp(f) {
+      return this.currentGroup[f];
+    },
+    isAuthor() {
+      return (
+        this.currentGroup.participants &&
+        this.currentGroup.participants.findIndex(
+          i => i._id === this.userinfo._id
+        ) === -1
+      );
+    }
   }
 };
 </script>

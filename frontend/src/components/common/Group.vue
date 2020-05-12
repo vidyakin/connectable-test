@@ -37,7 +37,7 @@
     <div class="group-content" v-if="group.participants" @click="redirectToGroup">
       <div
         class="group-content-participant"
-        v-for="participant in group.participants"
+        v-for="participant in group.participants.filter(e => !!e)"
         :key="participant._id"
       >
         <!--<a-avatar :src="participant.googleImage"></a-avatar>-->
@@ -102,6 +102,21 @@ export default {
       output: ""
     };
   },
+  beforeCreate() {
+    console.log(`before create`);
+  },
+  created() {
+    console.log(`created`);
+  },
+  beforeMount() {
+    const null_prt = this.group.participants.findIndex(e => e == null);
+    console.log(
+      `before mount, ${null_prt != -1 ? "есть пустые участники группы" : ""}`
+    );
+  },
+  mounted() {
+    console.log(`mounted`);
+  },
   props: {
     group: Object
   },
@@ -114,9 +129,15 @@ export default {
     },
     ...mapGetters(["userData"])
   },
-  created() {
-    //console.log(`>> Group comp created: dataUser is ${JSON.stringify(this.datauser,null,3)}`);
-  },
+  // created() {
+  //   console.log(
+  //     `>> Group created: dataUser is ${JSON.stringify(
+  //       this.datauser,
+  //       null,
+  //       3
+  //     )}, group: ${this.group}`
+  //   );
+  // },
 
   methods: {
     deleteGroup() {

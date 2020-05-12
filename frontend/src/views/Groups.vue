@@ -21,6 +21,8 @@
     </div>
     <!-- SPINNER while loading -->
     <a-spin size="large" v-else />
+    <!-- Оповещение об отсутствии групп -->
+    <a-empty description="Пока еще нет ни одной группы" v-if="groups.length == 0" />
   </div>
 </template>
 <script>
@@ -73,20 +75,18 @@ export default {
     // },
     ...mapGetters(["groups", "userData"])
   },
-  beforeCreate() {
-    this.$store
-      .dispatch(GET_GROUPS)
-      .then(() => {
-        this.isLoaded = true;
-        this.userIsAdmin = this.$can("read", {
-          accessEmail: this.datauser.email,
-          __type: "Admin"
-        });
-        //console.log(`> befMount: currentGroup is ${JSON.stringify(this.currentGroup,null,2)}`)
-      })
-      .catch(e => {
-        console.log(`Ошибка при получении групп: ${e}`);
+  async beforeCreate() {
+    try {
+      await this.$store.dispatch(GET_GROUPS);
+      this.isLoaded = true;
+      this.userIsAdmin = this.$can("read", {
+        accessEmail: this.datauser.email,
+        __type: "Admin"
       });
+      console.log(`Число групп: ${this.groups.length}`);
+    } catch (e) {
+      console.log(`Ошибка при получении групп: ${e}`);
+    }
   },
 
   watch: {

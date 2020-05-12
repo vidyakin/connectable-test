@@ -28,10 +28,10 @@ export const editUser = (context: any, user: any) => {
       if (context.state.userData.result._id == response.data.result._id) {
         const userData = { ...context.state.userData, result: response.data.result }
         context.commit(SET_USER_DATA, userData);
+        localStorage.setItem('token', response.data.token);
+        setAuthToken(response.data.token);
       }
       context.commit(SET_CURRENT_USER, response.data.result);
-      localStorage.setItem('token', response.data.token);
-      setAuthToken(response.data.token);
     });
 };
 
