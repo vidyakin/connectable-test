@@ -109,13 +109,16 @@
 
 <script>
 import Vue from "vue";
+import store from "../store";
+import { mapGetters } from "vuex";
+import { DELETE_EVENT, GET_EVENTS } from "../store/user/actions.type";
+
 import moment from "moment";
 import "moment/locale/ru";
 import locale from "ant-design-vue/es/date-picker/locale/ru_RU";
+
 import AppAddEventModal from "../components/modal/AddEventModal.vue";
-import { DELETE_EVENT, GET_EVENTS } from "../store/user/actions.type";
-import { mapGetters } from "vuex";
-import store from "../store";
+
 export default Vue.extend({
   data() {
     return {
@@ -123,8 +126,8 @@ export default Vue.extend({
       editMode: false,
       selectedEvent: null,
       createVisible: false,
-      deleting: false, // хак для подавления срабатывания @select на ячейке даты
-      locale: null
+      locale: locale,
+      deleting: false // хак для подавления срабатывания @select на ячейке датыы
     };
   },
   // was - beforeCreate

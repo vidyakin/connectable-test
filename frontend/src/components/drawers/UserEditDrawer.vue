@@ -14,6 +14,7 @@
             <a-form-item>
               <app-input
                 label="Имя"
+                :disabled="!userIsAdmin"
                 placeholder="Имя"
                 :defaultValue="currentUser && currentUser.firstName"
                 v-decorator="['firstName', {initialValue:currentUser &&  currentUser.firstName,
@@ -30,6 +31,7 @@
             <a-form-item>
               <app-input
                 label="Фамилия"
+                :disabled="!userIsAdmin"
                 placeholder="Фамилия"
                 :defaultValue="currentUser && currentUser.lastName"
                 v-decorator="['lastName', {initialValue:currentUser &&  currentUser.lastName,
@@ -124,7 +126,13 @@ export default {
     AppInput
   },
   computed: {
-    ...mapGetters(["currentUser"])
+    userIsAdmin() {
+      return this.$can("read", {
+        accessEmail: this.userData.result.email,
+        __type: "Admin"
+      });
+    },
+    ...mapGetters(["currentUser", "userData"])
   },
   methods: {
     onClose() {
