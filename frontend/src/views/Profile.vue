@@ -1,9 +1,12 @@
 <template>
   <div id="profile" class="profile">
-    <app-user-info></app-user-info>
+    <app-user-info v-if="isLoaded"></app-user-info>
+    <!-- SPINNER while loading -->
+    <a-spin size="large" v-else />
     <pre>Служебная инфа: 
 userData: {{JSON.stringify(userData,null,2)}}
 currentUser: {{JSON.stringify(currentUser,null,2)}}
+{{userIsAdmin ? "Есть права администратора" : ""}}
     </pre>
     <!-- <app-comment-input :parent="{type: 'user', id: datauser && datauser._id}" v-if="datauser._id == $route.params._id" /> -->
 
@@ -33,9 +36,10 @@ export default Vue.extend({
   data() {
     return {
       content: "",
-      datauser: store.getters.userData
-        ? store.getters.userData.result
-        : store.getters.user
+      isLoaded: false
+      // datauser: store.getters.userData
+      //   ? store.getters.userData.result
+      //   : store.getters.user
     };
   },
   components: {
@@ -43,30 +47,30 @@ export default Vue.extend({
     AppPost,
     AppUserInfo
   },
-  beforeMount() {
-    this.$store.dispatch(GET_USER, this.$route.params._id).then(() => {
-      this.$store.dispatch(GET_POSTS, {
-        filter: {
-          parent: {
-            type: "user",
-            id: this.$route.params._id
-          }
+  async beforeMount() {
+    await this.$store.dispatch(GET_USER, this.$route.params._id);
+    await this.$store.dispatch(GET_POSTS, {
+      filter: {
+        parent: {
+          type: "user",
+          id: this.$route.params._id
         }
-      });
+      }
     });
+    this.isLoaded = true;
   },
   mounted() {
-    const v = store.getters.userData ? "userData.result" : "user";
-    const d = store.getters.userData
-      ? store.getters.userData.result
-      : store.getters.user;
-    console.log(
-      `Profile, variant: ${v} userData is: ${JSON.stringify(
-        store.getters.userData
-      )}`
-    );
+    // console.log(
+    //   `Profile mounted, userData is: ${JSON.stringify(this.userData)}`
+    // );
   },
   computed: {
+    userIsAdmin() {
+      return this.$can("read", {
+        accessEmail: this.userData.result.email,
+        __type: "Admin"
+      });
+    },
     ...mapGetters(["posts", "user", "currentUser", "userData"])
   },
   methods: {},

@@ -4,7 +4,12 @@
       <!-- Список сообщений -->
       <a-popover placement="bottom" trigger="click">
         <template slot="content">
-          <a-list itemLayout="horizontal" :dataSource="notifs" :locale="{emptyText:'Нет событий'}">
+          <a-list
+            itemLayout="horizontal"
+            :dataSource="notifs"
+            :locale="{emptyText:'Нет событий'}"
+            class="list-container"
+          >
             <a-list-item
               class="notif-item"
               slot="renderItem"
@@ -210,6 +215,11 @@ export default {
   }
 }
 
+.list-container {
+  height: 400px;
+  overflow: auto;
+}
+
 .user-bar {
   /* height: 3.125rem;*/
   display: flex;
@@ -233,12 +243,12 @@ export default {
     height: auto;
     position: relative;
     padding-left: 10px;
-    margin-left: 10px;
+    margin-left: 15px;
   }
   .logout::after {
     content: "";
     position: absolute;
-    left: -60px;
+    left: -70px;
     top: 0;
     height: 100%;
     width: 1px;
