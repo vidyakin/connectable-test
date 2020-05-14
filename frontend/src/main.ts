@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import App from './App.vue';
-import {router} from './router';
+import { router } from './router';
 import store from './store';
 import Antd from 'ant-design-vue';
 import 'ant-design-vue/dist/antd.css';
@@ -14,10 +14,10 @@ import io from 'socket.io-client';
 // @ts-ignore
 import VueMq from 'vue-mq';
 
-import {setAuthInterceptor} from '@/services/auth/authInterceptor';
-import {setAuthToken} from '@/services/auth/setAuthToken';
+import { setAuthInterceptor } from '@/services/auth/authInterceptor';
+import { setAuthToken } from '@/services/auth/setAuthToken';
 import GAuth from 'vue-google-oauth2';
-import {getInfoUser} from '@/services/auth/auth.service';
+import { getInfoUser } from '@/services/auth/auth.service';
 
 const gauthOption = {
   clientId: '303964737986-rrtn3uic2fecmflemndjd8a1v4pjn76g.apps.googleusercontent.com',
@@ -32,7 +32,7 @@ Vue.use(abilitiesPlugin, ability);
 const SocialSharing = require('vue-social-sharing');
 Vue.use(SocialSharing);
 
-const socket = io(process.env.VUE_APP_API_URL || 'http://localhost:8080', {'transports': ['websocket', 'polling']});
+const socket = io(process.env.VUE_APP_API_URL || 'http://localhost:8080');
 
 Vue.use(VueSocketIOExt, socket, { store });
 

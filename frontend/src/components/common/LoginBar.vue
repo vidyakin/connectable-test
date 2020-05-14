@@ -119,6 +119,7 @@ export default {
      *  val - данные, структура зависит от типа сообщения
      */
     async socketMessage(payload) {
+      console.log(`socket message received`);
       if (payload.type === "NEW_GROUP") {
         //this.notifs.push(payload.val);
         //this.msgCount += 1;

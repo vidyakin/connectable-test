@@ -35,7 +35,7 @@ const app = express();
 const port = process.env.PORT || 4000;
 
 const server = require('http').createServer(app)
-const io = require('socket.io')(server, {'transports': ['websocket', 'polling']});
+const io = require('socket.io')(server);
 io.on('connection', socket=>{
     console.log("-> socket.io user connected: ", socket.id);
     socket.on('disconnect',()=>{
@@ -43,12 +43,12 @@ io.on('connection', socket=>{
     })
     // Универсальное событие для всех, что и как обрабатываетс - задается в data
     socket.on("to all", data => {
-        console.log(`SERVER Message to all: ${data.type}`);
+        console.log(`${new Date().toLocaleString()}: SERVER Message to all: ${data.type} `);
         socket.broadcast.emit("socketMessage", data);
     });
     // Универсальное событие для одного, что и как обрабатываетс - задается в data
     socket.on("to one", data => {
-        console.log(`SERVER Message to one: ${data.type}`);
+        console.log(`${new Date().toLocaleString()}: SERVER Message to one: ${data.type}`);
         socket.to(data.socket_id).emit("socketMessage", data);
     });
 })
@@ -570,6 +570,24 @@ app.post('/api/dislike', (req, res) => {
         }
     });
 });
+
+  
+// Поиск событий где пользователь и автор и участник
+app.get('/api/events/:email', async (req,res) => {
+    const user = await User.findOne({email: req.params.email}, '_id')
+    console.log((new Date()).toLocaleString() + ' , user:'+user);    
+    try {
+        const docs = await Event.find()
+            .or([
+                {"userId": user._id}, 
+                {"attendees.email": {$eq: req.params.email}}
+            ])
+        console.log('docs:', docs.length);
+        res.status(200).send(docs)
+    } catch (err) {
+        return res.status(500).send("Error while getting events as author: "+err.message)
+    }
+})
 
 
 server.listen(port, () => console.log(`[Server]: Listening on port ${port}`));

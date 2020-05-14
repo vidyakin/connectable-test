@@ -9,7 +9,7 @@
     :bodyStyle="{height:'auto', padding:'0'}"
   >
     <div slot="title">
-      <h3>{{ event == undefined ? "Новое событие" : "Изменение события" }}</h3>
+      <h3>{{ event == undefined ? "Новое событие" : event.userId === userData.result._id ? "Изменение события" : "Событие" }}</h3>
     </div>
     <a-form-model ref="eventForm" :model="theform" :rules="rules" layout="vertical">
       <!-- Название события -->
@@ -21,12 +21,13 @@
               placeholder="Название"
               label="Название"
               class="secondary form-input"
+              :readOnly="event && event.userId !== userData.result._id"
             />
           </a-form-model-item>
         </a-col>
       </a-row>
-      <!-- Дата и рамки события -->
-      <a-row>
+      <!-- Дата и рамки события, для редактирования -->
+      <a-row v-if="!event || event && event.userId === userData.result._id">
         <a-col :span="10">
           <div class="label">Дата события</div>
           <a-form-model-item prop="dateEvent">
@@ -60,9 +61,19 @@
           </a-form-model-item>
         </a-col>
       </a-row>
+      <!-- Блок с информацией о времени, только для просмотра -->
+      <a-row v-else class="date-readonly">
+        <a-col>
+          Дата проведения:
+          <b>{{theform.dateEvent.format("D MMMM YYYY г.")}}</b>
+          <br />Время с
+          <span class="time-info">{{theform.timeEvent.format("HH:mm")}}</span> по
+          <span class="time-info">{{theform.timeTo.format("HH:mm")}}</span>
+        </a-col>
+      </a-row>
       <!-- Участники события -->
       <a-row>
-        <a-col :span="24">
+        <a-col :span="24" v-if="!event || event && event.userId === userData.result._id">
           <div class="label">Пригласить участников</div>
           <a-form-model-item prop="members">
             <a-select
@@ -83,6 +94,12 @@
             </a-select>
           </a-form-model-item>
         </a-col>
+        <a-col v-else>
+          Участники:
+          <ul>
+            <li v-for="m of theform.members" :key="m.key">{{m.label}}</li>
+          </ul>
+        </a-col>
       </a-row>
       <!-- Комментарий -->
       <a-row>
@@ -93,6 +110,7 @@
               placeholder="Дополнительная информация"
               label="Комментарий"
               class="secondary form-input"
+              :readOnly="event && event.userId !== userData.result._id"
             ></app-input>
           </a-form-model-item>
         </a-col>
@@ -125,20 +143,22 @@
         <a-col :span="24">
           <a-form-model-item>
             <div class="action">
-              <a-button @click="createEvent">{{!event ? "Создать событие" : "Сохранить изменения" }}</a-button>
+              <a-button @click="close" v-if="event && event.userId !== userData.result._id">Закрыть</a-button>
+              <a-button
+                @click="createEvent"
+                v-else
+              >{{!event ? "Создать событие" : "Сохранить изменения" }}</a-button>
             </div>
           </a-form-model-item>
         </a-col>
       </a-row>
-      <!-- <div>
-        {{ JSON.stringify(this.theform, null, 3)}}
-      </div>-->
+      <!-- <div>{{ JSON.stringify(this.theform.members, null, 3)}}</div> -->
     </a-form-model>
   </a-modal>
 </template>
 
 <script>
-import store from "../../store";
+import store from "@/store";
 import { mapGetters } from "vuex";
 import moment, { duration } from "moment";
 import locale from "ant-design-vue/es/date-picker/locale/ru_RU";
@@ -147,8 +167,8 @@ import {
   CREATE_EVENT,
   UPDATE_EVENT,
   GET_USERS
-} from "../../store/user/actions.type";
-import { GET_NOTIFICATION } from "../../store/notification/actions.type";
+} from "@/store/user/actions.type";
+import { GET_NOTIFICATION } from "@/store/notification/actions.type";
 
 import AppInput from "../common/Input";
 
@@ -243,7 +263,11 @@ export default {
    */
   methods: {
     setCurrentColor(color) {
-      this.theform.color = color;
+      if (
+        !this.event ||
+        (this.event && this.event.userId === this.userData.result._id)
+      )
+        this.theform.color = color;
     },
     tr(v) {
       return v === undefined ? "" : v.trim();
@@ -542,5 +566,14 @@ export default {
 
 .form-line {
   margin-top: 0.6rem;
+}
+.date-readonly {
+  margin-bottom: 30px;
+  border: 1px solid dodgerblue;
+  padding: 10px;
+
+  .time-info {
+    color: blue;
+  }
 }
 </style>

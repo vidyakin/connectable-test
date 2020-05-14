@@ -17,13 +17,18 @@
           <div v-for="val in getEventsForDay(currDate)" :key="val._id">
             <div
               class="event-wrapper"
-              v-if="val && val.userId === userInfo._id"
-              :style="{'background-color' : val.color,
-                'border-color':val.color}"
+              :style="{
+                'background-color' : val.color,
+                'border-color': val.userId === userInfo._id ? 'blue' : val.color,
+                'border-width': val.userId === userInfo._id ? 2 : 1
+              }"
             >
               <div class="event-name">{{getTime(val)}} {{val.name}}</div>
               <div class="event-actions">
-                <a-icon type="form" @click.stop="createOpen(val)" />
+                <a-icon
+                  :type="val.userId === userInfo._id ? 'form' : 'eye'"
+                  @click.stop="createOpen(val)"
+                />
                 <a-popconfirm
                   title="Подтверите удаление события"
                   okText="Подтверждаю"
@@ -32,7 +37,11 @@
                   @visibleChange="deleteConfirmVisChange"
                 >
                   <a-icon slot="icon" type="question-circle-o" style="color: red" />
-                  <a-icon type="delete" @click.stop="startDelete"></a-icon>
+                  <a-icon
+                    type="delete"
+                    @click.stop="startDelete"
+                    v-if="val.userId === userInfo._id"
+                  ></a-icon>
                 </a-popconfirm>
               </div>
             </div>
@@ -135,8 +144,10 @@ export default Vue.extend({
     moment.locale("ru");
 
     if (this.userInfo) {
-      await this.$store.dispatch(GET_EVENTS, this.userInfo._id);
+      await this.$store.dispatch(GET_EVENTS, this.userInfo.email);
     }
+
+    //let april_events = this.getEventsForMonth(moment().subtract(1, "M"));
 
     if (this.userInfo.outlookId) {
       console.log("beforeCreate get events");
@@ -184,7 +195,7 @@ export default Vue.extend({
   watch: {
     user(user) {
       if (user) {
-        this.$store.dispatch(GET_EVENTS, user.id);
+        this.$store.dispatch(GET_EVENTS, user.email);
       }
     }
   },
@@ -230,11 +241,14 @@ export default Vue.extend({
       return c.isBefore(moment().startOf("day"));
     },
     getEventsForDay(currDate) {
-      return this.events.filter(
-        ev =>
-          ev.userId === this.userInfo._id &&
-          moment(currDate).isSame(moment(ev.date), "day")
-      );
+      const events = !this.events
+        ? []
+        : this.events.filter(ev =>
+            moment(currDate).isSame(moment(ev.date), "day")
+          );
+      if (events.length)
+        console.log(`get ev 4day: ${currDate}, ev: ${events.length}`);
+      return events;
     },
     getEventsForMonth(month) {
       return (
@@ -248,14 +262,14 @@ export default Vue.extend({
       return this.months[moment().month()];
     },
     getEventsForThisMonth() {
-      return (
-        this.events &&
-        this.events.filter(event => {
-          if (event && event.userId === this.userInfo._id) {
-            return moment(event.date).isSame(moment(), "month");
-          }
-        })
-      );
+      return !this.events
+        ? []
+        : this.events &&
+            this.events.filter(event => {
+              if (event && event.userId === this.userInfo._id) {
+                return moment(event.date).isSame(moment(), "month");
+              }
+            });
     },
     getNextMonthName() {
       if (moment().month() === 11) {
@@ -266,20 +280,25 @@ export default Vue.extend({
     },
     getEventsForNextMonth() {
       return (
-        this.events &&
-        this.events.filter(event => {
-          if (event && event.userId === this.userInfo._id) {
-            return moment(event.date).isSame(moment().add(1, "M"), "month");
-          }
-        })
+        (this.events &&
+          this.events.filter(event => {
+            if (event && event.userId === this.userInfo._id) {
+              return moment(event.date).isSame(moment().add(1, "M"), "month");
+            }
+          })) ||
+        []
       );
     },
     getEventsForPrevMonth() {
       return (
-        this.events &&
-        this.events.filter(event => {
-          return moment(event.date).isSame(moment().subtract(1, "M"), "month");
-        })
+        (this.events &&
+          this.events.filter(event => {
+            return moment(event.date).isSame(
+              moment().subtract(1, "M"),
+              "month"
+            );
+          })) ||
+        []
       );
     },
     getDayFromDate(date) {

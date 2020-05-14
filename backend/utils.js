@@ -21,3 +21,21 @@ module.exports.validateToken = (req, res, next) => {
             res.status(401).send(result);
         }
 };
+
+// Вывод объекта с защитой от цикличных ключей
+module.exports.jsonstr = obj => {
+    let cache = []
+    let strReq = JSON.stringify(obj, (key, value) => {
+        if (typeof value === 'object' && value !== null) {
+            if (cache.indexOf(value) !== -1) {
+                // Duplicate reference found, discard key
+                return;
+            }
+            // Store value in our collection
+            cache.push(value);
+        }
+        return value;
+    }, 2)
+    cache = null;
+    return strReq
+}

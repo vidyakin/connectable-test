@@ -55,12 +55,13 @@ export const updateEvent = (context: any, event: any) => {
     });
 };
 
-export const getEvents = (context: any, userId: any) => {
+export const getEvents = (context: any, email: any) => {
 
   return Vue.axios
-    .get(`api/event/`, { params: { filter: { userId } } })
+    //.get(`api/event/`, { params: { filter: { userId } } })
+    .get(`api/events/` + email)
     .then((response: any) => {
-      context.commit(SET_EVENTS, response.data.result);
+      context.commit(SET_EVENTS, response.data);
     });
 };
 

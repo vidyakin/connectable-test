@@ -3,6 +3,7 @@
     <div class="input-label">{{ label }}</div>
     <!-- Модификация v-on не описана в справке, нашел на гитхабе -->
     <a-input
+      v-if="!readOnly"
       v-bind="$attrs"
       v-on="{
           ...$listeners,
@@ -10,6 +11,7 @@
         }"
       class="basic-input"
     />
+    <div class="readonly-field" v-else>{{$attrs.value}}</div>
   </div>
 </template>
 
@@ -18,7 +20,11 @@ import Vue from "vue";
 export default Vue.extend({
   name: "AppInput",
   props: {
-    label: String
+    label: String,
+    readOnly: Boolean
+  },
+  mounted() {
+    console.log("input mounted");
   }
 });
 </script>
@@ -35,5 +41,9 @@ export default Vue.extend({
   box-shadow: -2px 2px 8px rgba(0, 0, 0, 0.08);
   line-height: 2.5rem;
   width: 100%;
+}
+.readonly-field {
+  font-size: 12pt;
+  font-weight: bold;
 }
 </style>
