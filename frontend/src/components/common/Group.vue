@@ -102,12 +102,6 @@ export default {
       output: ""
     };
   },
-  beforeCreate() {
-    console.log(`before create`);
-  },
-  created() {
-    console.log(`created`);
-  },
   beforeMount() {
     const null_prt = this.group.participants.findIndex(e => e == null);
     console.log(
@@ -115,7 +109,7 @@ export default {
     );
   },
   mounted() {
-    console.log(`mounted`);
+    //console.log(`mounted`);
   },
   props: {
     group: Object
