@@ -69,6 +69,11 @@ export const router = new Router({
           component: view('StructureNew'),
         },
         {
+          path: '/employees/',
+          name: 'employees',
+          component: view('Employees'),
+        },
+        {
           path: '/clients',
           name: 'clients',
           component: view('ClientsManagement'),

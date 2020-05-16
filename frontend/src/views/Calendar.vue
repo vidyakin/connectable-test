@@ -246,8 +246,6 @@ export default Vue.extend({
         : this.events.filter(ev =>
             moment(currDate).isSame(moment(ev.date), "day")
           );
-      if (events.length)
-        console.log(`get ev 4day: ${currDate}, ev: ${events.length}`);
       return events;
     },
     getEventsForMonth(month) {

@@ -41,7 +41,6 @@
   </div>
 </template>
 <script>
-import { Empty } from "ant-design-vue";
 import { GET_USERS } from "../store/user/actions.type";
 import { mapGetters } from "vuex";
 
@@ -109,7 +108,7 @@ export default {
       imgEmpty: ""
     };
   },
-  components: { Empty },
+  components: {},
   methods: {
     onChange,
     pressEnter() {

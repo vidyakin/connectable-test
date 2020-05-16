@@ -34,28 +34,30 @@
         <img src="@/assets/Icons/calendar.svg" alt />
         Календарь
       </a-menu-item>
-      <a-menu-item key="/structure" :class="{active:isActive == 'structure'}">
+      <!-- <a-menu-item key="/structure" :class="{active:isActive == 'structure'}">
         <img src="@/assets/Icons/Structure.svg" alt />
         Структура
-      </a-menu-item>
+      </a-menu-item>-->
       <a-menu-item key="/structure_new" :class="{active:isActive == 'structure_new'}">
         <img src="@/assets/Icons/Structure.svg" alt />
         Структура (нов.)
       </a-menu-item>
-      <a-menu-item key="/clients" :class="{active:isActive == 'clients'}">
-        <img src="@/assets/Icons/setting.svg" alt />
-        Клиенты
+      <a-menu-item key="/employees" :class="{active:isActive == 'employees'}">
+        <a-icon type="idcard" style="color: #A5A4BF; font-size: 16px" />Сотрудники
       </a-menu-item>
-      
+      <a-menu-item key="/clients" :class="{active:isActive == 'clients'}">
+        <a-icon type="solution" style="color: #A5A4BF; font-size: 16px" />Клиенты
+      </a-menu-item>
+
       <!--v-if="$can('read', {'accessEmail': datauser.result.email, '__type': 'Admin'})"-->
-      <a-menu-item key="/settings" class="footer"  :class="{active:isActive == 'settings'}" >
+      <a-menu-item key="/settings" class="footer" :class="{active:isActive == 'settings'}">
         <img src="@/assets/Icons/setting.svg" alt />
         Настройки
       </a-menu-item>
       <a-menu-item key="/about" :class="{active:isActive == 'about'}">
         <img src="@/assets/Icons/Structure.svg" alt />
         О нас
-      </a-menu-item>      
+      </a-menu-item>
     </a-menu>
 
     <a-menu
@@ -66,7 +68,8 @@
       @click="goToPage"
       v-if="$mq==='tablet'"
     >
-      <a-menu-item key="/" class="header"><img src="@/assets/logo.svg" class="logo" alt />
+      <a-menu-item key="/" class="header">
+        <img src="@/assets/logo.svg" class="logo" alt />
         <span class="logo-mob circle-1"></span>
         <span class="logo-mob circle-2"></span>
         <span class="logo-mob circle-3"></span>
@@ -86,11 +89,14 @@
       <a-menu-item key="/calendar">
         <img src="@/assets/Icons/calendar.svg" alt />
       </a-menu-item>
-      <a-menu-item key="/structure">
+      <!-- <a-menu-item key="/structure">
         <img src="@/assets/Icons/Structure.svg" alt />
-      </a-menu-item>
+      </a-menu-item>-->
       <a-menu-item key="/structure_new">
         <img src="@/assets/Icons/Structure.svg" alt />
+      </a-menu-item>
+      <a-menu-item key="/employees">
+        <img src="@/assets/Icons/calendar.svg" alt />
       </a-menu-item>
       <a-menu-item key="/clients">
         <img src="@/assets/Icons/setting.svg" alt />
@@ -106,72 +112,78 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
-import store from '../../store';
+import { mapGetters } from "vuex";
+import store from "../../store";
 export default {
-  name: 'Navbar',
+  name: "Navbar",
   mounted() {
     //console.log(`datauser: ${JSON.stringify(this.datauser)}`);
   },
   data() {
     return {
       current: 1,
-      datauser: (store.getters.user ? store.getters.user : store.getters.userData),
-      isActive: this.$route.path.split('/')[1],
+      datauser: store.getters.user
+        ? store.getters.user
+        : store.getters.userData,
+      isActive: this.$route.path.split("/")[1]
     };
   },
   methods: {
     goToPage(e) {
-      if(this.$route.path != e.key) {
+      if (this.$route.path != e.key) {
         this.$router.push({ path: e.key });
       }
-      this.isActive = e.key.split('/')[1];
-    },
-
-  },
-  computed: {
-    ...mapGetters(['user','userData']),
-    userKey: function() {
-      return this.datauser && this.datauser.result !== undefined && `/profile/${this.datauser.result._id}` || 'nouser';
+      this.isActive = e.key.split("/")[1];
     }
   },
+  computed: {
+    ...mapGetters(["user", "userData"]),
+    userKey: function() {
+      return (
+        (this.datauser &&
+          this.datauser.result !== undefined &&
+          `/profile/${this.datauser.result._id}`) ||
+        "nouser"
+      );
+    }
+  }
 };
 </script>
 
 <style lang="scss">
-  .logo-mob {
+.logo-mob {
+  display: none;
+  width: 6.3px;
+  height: 6.3px;
+  border-radius: 50%;
+  margin-right: 2px;
+
+  @media (max-width: 1023px) {
+    display: inline-block;
+  }
+}
+.circle-1 {
+  background-color: #ff1d25;
+}
+.circle-2 {
+  background-color: #7ac943;
+}
+.circle-3 {
+  background-color: #3fa9f5;
+}
+.navbar .ant-menu .ant-menu-item img.logo {
+  width: 94px;
+  max-width: 100%;
+  height: 20.5px;
+  object-fit: contain;
+  display: block;
+  margin-right: 0;
+  margin: 14px auto;
+
+  @media (max-width: 1023px) {
     display: none;
-    width: 6.3px;
-    height: 6.3px;
-    border-radius: 50%;
-    margin-right: 2px;
-
-    @media (max-width: 1023px) {
-      display: inline-block;
-    }
   }
-  .circle-1 {
-    background-color: #ff1d25;
-  }
-  .circle-2 {
-    background-color: #7ac943;
-  }
-  .circle-3 {
-    background-color: #3fa9f5;
-  }
-  .navbar .ant-menu .ant-menu-item img.logo {
-    width: 94px;
-    max-width: 100%;
-    height: 20.5px;
-    object-fit: contain;
-    display: block;
-    margin-right: 0;
-    margin: 14px auto;
-
-    @media (max-width: 1023px) {
-      display: none;
-    }
-  }
+}
 .navbar {
   padding: 0;
   height: 100%;
@@ -194,7 +206,7 @@ export default {
       text-align: left;
 
       @media (max-width: 1023px) {
-        padding-left: 10px!important;
+        padding-left: 10px !important;
         padding-right: 10px;
         text-align: center;
         border-left: 5px solid transparent !important;
@@ -234,7 +246,7 @@ export default {
       transform: scaleY(1);
       background: #000000;
       z-index: 1;
-      opacity: .3;
+      opacity: 0.3;
     }
   }
 }
