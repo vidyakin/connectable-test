@@ -36,11 +36,11 @@ export default Vue.extend({
   text-align: left;
 }
 .basic-input {
-  height: 2.5rem;
-  border-radius: 0;
+  // height: 2.5rem;
+  // border-radius: 0;
   box-shadow: -2px 2px 8px rgba(0, 0, 0, 0.08);
-  line-height: 2.5rem;
-  width: 100%;
+  // line-height: 2.5rem;
+  // width: 100%;
 }
 .readonly-field {
   font-size: 12pt;
