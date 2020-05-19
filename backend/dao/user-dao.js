@@ -12,9 +12,6 @@ module.exports.findById = async (id) => {
   })
 };
 
-
-
-
 module.exports.findUsersByIds = async (userIds) => {
   return new Promise((resolve, rejected) => {
     const result = [];
@@ -26,5 +23,19 @@ module.exports.findUsersByIds = async (userIds) => {
       .catch(e => {
         rejected(e);
       });
+  })
+}
+
+module.exports.delUserById = (req, res) => {
+  User.findByIdAndUpdate(req.params.userId, {$set: {deletion_mark: true}}, {new: true}, (error,doc) => {
+    if (error) return res.status(500).send("There was a problem deleting the user");
+    res.status(200).send(doc)
+  })
+}
+
+module.exports.undelUserById = (req, res) => {
+  User.findByIdAndUpdate(req.params.userId, {$set: {deletion_mark: false}}, {new: true}, (error,doc) => {
+    if (error) return res.status(500).send("There was a problem undeleting the user");
+    res.status(200).send(doc)
   })
 }

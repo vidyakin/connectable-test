@@ -86,6 +86,10 @@ app.use('/api/google/event', require('./google'));
 app.use("/role", require('./role/routes'));
 
 var userHandlers = require('./email/index.js');
+var userDAO = require('./dao/user-dao');
+
+app.put('/api/user/delete/:userId', userDAO.delUserById)
+app.put('/api/user/undelete/:userId', userDAO.undelUserById)
 
 app.get('/', (req, res) => {
     res.send('Connectable backend says Hello!!!');
@@ -199,7 +203,7 @@ app.post('/api/register', function(req,res){
         };
     let result = {};
     let status = 200;
-
+    
     User.findOne({email}, (err, user) => {
         if (!err && user) {
             bcrypt.compare(password, user.password).then(match => {
@@ -225,7 +229,8 @@ app.post('/api/register', function(req,res){
                     db.collection('users').insertOne(data,function(err, collection){
                         if (err) return res.status(500).send("There was a problem registering the user.");
                     });
-                    if(emailSend) {
+                    if (emailSend) {
+                        console.log(`>> '/api/register' sending email to ${email}`);
                         mail.NewUser(email, `https://connectable.pro/login/`, {email:email, password:password});
                     }
 

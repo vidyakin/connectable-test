@@ -129,16 +129,25 @@ export default {
   },
   watch: {
     users(users) {
-      this.data = users.map(e => {
-        const { googleImage, firstName, lastName, positions, phone, email } = e;
-        const row = {};
-        row.name = { googleImage, firstName, lastName, id: e._id };
-        row.positions = positions.join(", ");
-        row.phone = phone;
-        row.email = email;
-        row.key = e._id;
-        return row;
-      });
+      this.data = users
+        .filter(u => !u.deletion_mark)
+        .map(e => {
+          const {
+            googleImage,
+            firstName,
+            lastName,
+            positions,
+            phone,
+            email
+          } = e;
+          const row = {};
+          row.name = { googleImage, firstName, lastName, id: e._id };
+          row.positions = positions.join(", ");
+          row.phone = phone;
+          row.email = email;
+          row.key = e._id;
+          return row;
+        });
       // соберем все должности и уберем пустые
       this.columns[1].filters = this.data
         .map(e => e.positions)

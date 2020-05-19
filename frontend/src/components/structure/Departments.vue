@@ -370,12 +370,13 @@ export default {
       );
       if (dept_data) {
         this.employeesOfDept = this.users
-          .filter(u => dept_data.users.includes(u._id))
+          .filter(u => dept_data.users.includes(u._id) && !u.deletion_mark)
           .map(u => ({
             _id: u._id,
             name: u.firstName + " " + u.lastName,
             isChief: u._id == dept_data.headUser,
-            position: u.positions[0] || "должность не указана"
+            position: u.positions[0] || "должность не указана",
+            del: u.deletion_mark
           }));
         const chief_i = this.employeesOfDept.findIndex(e => e.isChief);
         if (chief_i != -1) {
