@@ -134,3 +134,19 @@ export const checkUserInfo = (context: any, dataUser: any) => {
       localStorage.removeItem('CurrentUserData');
     });
 };
+
+export const markUserAsDeleted = (context: any, userId: string) => {
+  return Vue.axios
+    .put(`api/user/delete/${userId}`)
+    .then((res: any) => {
+      context.commit(UPDATE_USER, res.data.result)
+    })
+}
+
+export const unmarkUserAsDeleted = (context: any, userId: string) => {
+  return Vue.axios
+    .put(`api/user/undelete/${userId}`)
+    .then((res: any) => {
+      context.commit(UPDATE_USER, res.data.result)
+    })
+}

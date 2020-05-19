@@ -33,6 +33,10 @@ const userSchema = new Schema({
     },
     reset_password_expires: {
         type: Date
+    },
+    deletion_mark: { 
+        type: Boolean, 
+        default: false 
     }
 });
 

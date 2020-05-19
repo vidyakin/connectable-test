@@ -46,6 +46,7 @@ module.exports.NewUser = async(to, url, dataUser) => {
         subject: "Регистрация нового пользователя", // Subject line
         text: `Новый пользователь был зарегистрирован. Email: ${dataUser.email} Password:${dataUser.password} . Для входа на сайт перейдите по ссылке: ${url}`, // plain text body
     });
+    console.log(`>> Registration e-mail was sended to ${dataUser.email}`);
 };
 //when user added to group
 module.exports.AddUserInGroup = async(to, url, groupData) => {
@@ -187,3 +188,24 @@ exports.reset_password = function(req, res, next) {
         }
     });
 };
+
+/**
+ * Notification about registration 
+ */
+exports.reg_email_notify = (req, res) => {
+    User.findById(req.body.userId, (error, user) => {
+        if (error) return res.status(500).send('Error while finding user to send him e-mail about registration')
+        const email_data = {
+            to: user.email,
+            from: '"Connectable" <mail@connectable.pro>',
+            subject: 'Регистрация',
+            html:''+
+                '<h3>Уважаемый '+user.firstName+',</h3>'+
+                '<p>Ваш пароль был успешно сброшен, теперь вы можете войти с новым паролем.</p>',
+        };
+        transporter.sendMail(email_data, function(err) {
+            if (err) return res.status(500).send('Error while email sending')
+            return res.status(200).send('Ваш пароль был успешно сброшен');
+        });
+    })
+}

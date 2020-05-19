@@ -22,9 +22,10 @@ import {
   LOGIN, LOGIN_WITH_GOOGLE, LOGIN_WITH_OUTLOOK, LOGOUT,
   EDIT_USER, INSERT_USER_INFO, CHECK_USER_INFO,
   FORGOT_PASSWORD, RESET_PASSWORD,
+  MARK_USER_DELETED, UNMARK_USER_DELETED
 } from '@/store/user/actions.type';
 import { getInfoAboutUser, login, loginWithGoogle, loginWithOutlook, logout, forgotPasword, resetPassword } from '@/services/auth/auth.service';
-import { createEvent, deleteEvent, updateEvent, editUser, getEvents, getUser, getUsers, insertNewUser, checkUserInfo } from '@/services/user.service';
+import { createEvent, deleteEvent, updateEvent, editUser, getEvents, getUser, getUsers, insertNewUser, checkUserInfo, markUserAsDeleted, unmarkUserAsDeleted } from '@/services/user.service';
 
 interface State {
   user: any | null;
@@ -187,7 +188,9 @@ const actions = {
   [GET_USERS]: getUsers,
   [GET_USER]: getUser,
   [LOGOUT]: logout,
-  [CHECK_USER_INFO]: checkUserInfo
+  [CHECK_USER_INFO]: checkUserInfo,
+  [MARK_USER_DELETED]: markUserAsDeleted,
+  [UNMARK_USER_DELETED]: unmarkUserAsDeleted
 };
 
 export default {

@@ -11,24 +11,34 @@
         <a-button key="2" @click="reload">Обновить</a-button>
         <!-- <a-button key="2">Operation</a-button>    -->
       </template>
-      <a-descriptions size="small" :column="3">
+      <a-descriptions size="small" :column="4">
         <a-descriptions-item label="Всего сотрудников">{{employees && employees.length}}</a-descriptions-item>
         <a-descriptions-item label="Ген.директор">Иванов Борис</a-descriptions-item>
         <a-descriptions-item label="Зам. директора">Смирнова Светлана</a-descriptions-item>
+        <a-descriptions-item label="Показывать удаленных">
+          <a-switch size="small" default-checked @change="chkd => {this.showDeleted = chkd}" />
+        </a-descriptions-item>
       </a-descriptions>
     </a-page-header>
 
-    <a-table :columns="cols" :dataSource="employees" size="small" :loading="tblLoading">
+    <a-table
+      :columns="cols"
+      :dataSource="employees"
+      size="small"
+      :loading="tblLoading"
+      :rowClassName="rowStyling"
+    >
       <div slot="fio" slot-scope="text" class="table-row-name" @click="goTo(text.id)">
         <a-avatar :src="text.googleImage"></a-avatar>
-        <span class="a">{{text.firstName}} {{text.lastName}}</span>
+        <span :class="['a', text.mark_del ? 'deleted' : '']">{{text.firstName}} {{text.lastName}}</span>
       </div>
       <span slot="role" slot-scope="role">
         <a-tag :color="roleView(role).color">{{ roleView(role).text.toUpperCase() }}</a-tag>
       </span>
-      <span slot="actions" class="action-buttons">
-        <a-button size="small">
-          <a-icon type="delete" />Удалить
+      <span slot="actions" slot-scope="text, record" class="action-buttons">
+        <a-button size="small" @click="deleteEmployee(record)">
+          <a-icon type="delete" />
+          {{ record.mark_del ? 'Восстановить' : 'Удалить' }}
         </a-button>
         <a-button size="small">
           <a-icon type="unlock" />Сбросить пароль
@@ -38,7 +48,7 @@
         </a-button>
       </span>
     </a-table>
-    <!-- <pre style="font-size:8pt !important">{{JSON.stringify(users.map(_=>_.firstName+' '+_.lastName),null,2)}}</pre> -->
+    <!-- <pre style="font-size:8pt !important; height: 300px">{{JSON.stringify(users.map(_=> ({name: _.firstName+' '+_.lastName, del: _.deletion_mark})),null,2)}}</pre> -->
     <!-- Модальное окно создания сотрудника -->
     <add-employee-modal :visible="newEmplVisible" :close="newEmplClose" @create="createEmployee" />
   </div>
@@ -46,7 +56,12 @@
 
 <script>
 import { mapGetters, mapState } from "vuex";
-import { GET_USERS, INSERT_USER_INFO } from "@/store/user/actions.type";
+import {
+  GET_USERS,
+  INSERT_USER_INFO,
+  MARK_USER_DELETED,
+  UNMARK_USER_DELETED
+} from "@/store/user/actions.type";
 
 import AddEmployeeModal from "@/components/modal/AddEmployeeModal";
 
@@ -55,38 +70,38 @@ const cols = [
     title: "ФИО",
     dataIndex: "fio",
     key: "fio",
-    width: 100,
+    width: 150,
     scopedSlots: { customRender: "fio" }
   },
   {
     title: "e-mail",
     dataIndex: "email",
     key: "email",
-    width: 90
+    width: 120
   },
   {
     title: "Должности",
     dataIndex: "positions",
     key: "positions",
-    width: 100
+    width: 90
   },
   {
     title: "Телефон",
     dataIndex: "phone",
     key: "phone",
-    width: 100
+    width: 70
   },
   {
     title: "Роль",
     dataIndex: "role",
     key: "role",
-    width: 120,
+    width: 10,
     scopedSlots: { customRender: "role" }
   },
   {
     title: "Действия",
     key: "actions",
-    width: 100,
+    width: 220,
     scopedSlots: { customRender: "actions" }
   }
 ];
@@ -96,24 +111,35 @@ export default {
     return {
       tblLoading: false,
       cols: cols,
-      newEmplVisible: false
+      newEmplVisible: false,
+      showDeleted: true
     };
   },
   computed: {
     employees() {
       if (!this.users) return [];
-      return this.users.map(e => {
-        const { googleImage, firstName, lastName, positions, phone, email } = e;
-        const row = {
-          fio: { googleImage, firstName, lastName, id: e._id },
-          positions: positions.join(", "),
-          phone,
-          email,
-          role: e._id == "5e91f258c76c6d002b496472" ? "admin" : "-",
-          key: e._id
-        };
-        return row;
-      });
+      return this.users
+        .map(e => {
+          const {
+            googleImage,
+            firstName,
+            lastName,
+            positions,
+            phone,
+            email
+          } = e;
+          const row = {
+            fio: { googleImage, firstName, lastName, id: e._id },
+            positions: positions.join(", "),
+            phone,
+            email,
+            role: e.email == "w.project.portal3@gmail.com" ? "admin" : "-",
+            key: e._id,
+            mark_del: e.deletion_mark
+          };
+          return row;
+        })
+        .filter(e => (!this.showDeleted && !e.mark_del) || this.showDeleted);
     },
     ...mapGetters(["errorRegister"]),
     ...mapState({
@@ -133,6 +159,9 @@ export default {
   methods: {
     goTo(id) {
       this.$router.push({ name: "profile", params: { _id: id } });
+    },
+    rowStyling(rec, index) {
+      return rec.mark_del ? "deleted" : "";
     },
     roleView(r) {
       switch (r) {
@@ -162,7 +191,7 @@ export default {
           lastName: empl_data.surname,
           email: empl_data.email,
           password: empl_data.password,
-          emailSend: false
+          emailSend: true
         })
         .then(() => {
           if (!this.errorRegister) {
@@ -190,6 +219,43 @@ export default {
         .finally(() => {
           this.tblLoading = false;
         });
+    },
+    deleteEmployee(empl_data) {
+      const fio = empl_data.fio.firstName + " " + empl_data.fio.lastName;
+      const title = !empl_data.mark_del
+        ? "Подтвердите удаление сотрудника"
+        : "Восстановить удаленного сотрудника";
+      const content =
+        `Сотрудник «${fio}» будет ` +
+        (!empl_data.mark_del ? "удален" : "восстановлен");
+      // TODO: добавить проверку на текущего пользователя, чтобы нельзя было удалить себя, и на администратора
+      this.$confirm({
+        centered: true,
+        title,
+        content,
+        okType: "danger",
+        okText: "ОК",
+        cancelText: "Отменить",
+        onOk: () => {
+          this.deleteEmployeeAction(empl_data, !empl_data.mark_del);
+        },
+        class: "test"
+      });
+    },
+    async deleteEmployeeAction(d, deleting_mark) {
+      const disp_name = deleting_mark ? MARK_USER_DELETED : UNMARK_USER_DELETED,
+        del_type = deleting_mark ? "удален" : "восстановлен",
+        fio = d.fio.firstName + " " + d.fio.lastName;
+      console.log(`Deleting empl ${fio} with id ${d.key}`);
+      try {
+        await this.$store.dispatch(disp_name, d.key);
+        await this.$store.dispatch(GET_USERS);
+        this.$success({
+          centered: true,
+          title: "Сотруник " + del_type,
+          content: `Сотрудник ${empl_data.name} ${empl_data.surname} ${del_type}`
+        });
+      } catch (error) {}
     }
   },
   created() {
@@ -217,5 +283,11 @@ export default {
 }
 .action-buttons .ant-btn {
   margin: 0 5px;
+}
+
+tr.ant-table-row.deleted {
+  background-color: lightgray;
+  color: dimgray;
+  text-decoration: line-through;
 }
 </style>
