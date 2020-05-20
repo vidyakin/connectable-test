@@ -258,12 +258,11 @@ app.post('/api/register', function(req,res){
 app.post('/api/loginPage', function(req,res){
 
     let { email,password } = req.body
-    
     User.findOne({email}, (err, user) => {
-        let result = {}
-
+        let result = {};
         if (!err && user && user.deletion_mark) {
-            result = { status: 403, deleted: true, error: `Enter not allowed - you are not a user of system yet`}
+            result = { status: 202, deleted: true, error: `Enter not allowed - you are not a user of system yet`}
+            res.status(result.status).send(result);
         } else if (!err && user) {
             
             bcrypt.compare(password, user.password)
