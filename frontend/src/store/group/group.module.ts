@@ -7,6 +7,7 @@ import {
   EDIT_GROUP,
   GET_CURRENT_GROUP,
   GET_GROUPS, GET_INVITE, GET_PARTICIPANTS_REQUEST,
+  DISPLACE_GROUPS_OWNER
 } from '@/store/group/actions.type';
 import {
   approveInvite,
@@ -17,6 +18,7 @@ import {
   editGroup,
   getCurrentGroup,
   getGroups, getInvite, getParticipantsRequest,
+  displaceGroupsOwner
 } from '@/services/group.service';
 import {
   ADD_GROUP,
@@ -71,6 +73,7 @@ const actions = {
   [GET_INVITE]: getInvite,
   [APPROVE_INVITE]: approveInvite,
   [CANCEL_INVITE]: cancelInvite,
+  [DISPLACE_GROUPS_OWNER]: displaceGroupsOwner
 };
 
 const mutations = {

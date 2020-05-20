@@ -16,6 +16,8 @@ export const GET_INVITE = 'GET_INVITE';
 export const APPROVE_INVITE = 'APPROVE_INVITE';
 export const CANCEL_INVITE = 'CANCEL_INVITE';
 
+// сместить владельца групп
+export const DISPLACE_GROUPS_OWNER = 'DISPLACE_GROUPS_OWNER'
 
 
 

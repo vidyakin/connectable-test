@@ -18,7 +18,7 @@
             >
               <a
                 slot="title"
-                :href="'/user/'+item._id"
+                :href="'/profile/'+item._id"
                 class="empl-title"
               >{{ item.firstName+' '+item.lastName }}</a>
               <a-avatar
@@ -80,7 +80,9 @@ export default {
       if (!this.mode) return "";
       const empl_ids = this.employees.map(e => e._id);
       if (this.mode == "select") {
-        return this.users.filter(u => !empl_ids.includes(u._id));
+        return this.users.filter(
+          u => !empl_ids.includes(u._id) && !u.deletion_mark
+        );
       } else return this.users.filter(u => empl_ids.includes(u._id));
     },
     title() {

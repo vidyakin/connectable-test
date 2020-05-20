@@ -42,7 +42,7 @@
         <img src="@/assets/Icons/Structure.svg" alt />
         Структура (нов.)
       </a-menu-item>
-      <a-menu-item key="/employees" :class="{active:isActive == 'employees'}">
+      <a-menu-item key="/employees" :class="{active:isActive == 'employees'}" v-if="userIsAdmin">
         <a-icon type="idcard" style="color: #A5A4BF; font-size: 16px" />Сотрудники
       </a-menu-item>
       <a-menu-item key="/clients" :class="{active:isActive == 'clients'}">
@@ -95,7 +95,7 @@
       <a-menu-item key="/structure_new">
         <img src="@/assets/Icons/Structure.svg" alt />
       </a-menu-item>
-      <a-menu-item key="/employees">
+      <a-menu-item key="/employees" v-if="userIsAdmin">
         <img src="@/assets/Icons/calendar.svg" alt />
       </a-menu-item>
       <a-menu-item key="/clients">
@@ -138,6 +138,12 @@ export default {
   },
   computed: {
     ...mapGetters(["user", "userData"]),
+    userIsAdmin() {
+      return this.$can("read", {
+        accessEmail: this.datauser.result.email,
+        __type: "Admin"
+      });
+    },
     userKey: function() {
       return (
         (this.datauser &&

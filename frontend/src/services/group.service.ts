@@ -7,7 +7,7 @@ import {
   SET_PARTICIPANTS_REQUEST,
   UPDATE_GROUP,
 } from '@/store/group/mutations.type';
-import {GET_CURRENT_GROUP} from '@/store/group/actions.type';
+import { GET_CURRENT_GROUP } from '@/store/group/actions.type';
 
 export const createGroup = (context: any, group: any) => {
   return Vue.axios
@@ -107,4 +107,9 @@ export const approveInvite = (context: any, id: string) => {
 export const cancelInvite = (context: any, id: string) => {
   return Vue.axios
     .post(`api/cancelInvite/${id}`);
+};
+
+export const displaceGroupsOwner = (context: any, userId: string) => {
+  return Vue.axios
+    .post(`api/group/displace_owner/${userId}`);
 };
