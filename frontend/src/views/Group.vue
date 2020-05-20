@@ -23,6 +23,7 @@
               class="group-body-info-header-content-participants"
             >{{currentGroup.participants.length}} {{endingWords(currentGroup.participants.length)}}</div>
           </div>
+          <!-- Заголовок группы с действиями -->
           <div class="group-body-info-header-action">
             <a-popover
               title="Действия с группой"
@@ -32,6 +33,7 @@
               v-if="currentGroup.creatorId === userinfo._id || userIsAdmin"
             >
               <template slot="content">
+                <!-- Удаление группы -->
                 <a-popconfirm
                   title="Подтверите удаление"
                   okText="Подтверждаю"
@@ -42,16 +44,23 @@
                     <a-button icon="delete"></a-button>
                   </a-tooltip>
                 </a-popconfirm>
+                <!-- Редактирование -->
                 <a-tooltip title="Редактировать">
                   <a-button icon="edit" @click="editGroup"></a-button>
                 </a-tooltip>
+                <!-- Приглашение в закрытую или приватную группу -->
                 <a-tooltip title="Пригласить" v-if="currentGroup.type >= 1">
                   <a-button icon="plus" @click="openInvites"></a-button>
                 </a-tooltip>
+                <!-- Список заявок в закрытую группу -->
                 <a-tooltip title="Заявки" v-if="currentGroup.type === 1">
                   <a-badge :count="currentGroup.requests.length" @click="hide">
                     <a-button icon="team" @click="openRequests"></a-button>
                   </a-badge>
+                </a-tooltip>
+                <!-- Смена владельца группы (администратора) -->
+                <a-tooltip title="Изменить владельца" v-if="userIsAdmin">
+                  <a-button icon="team" @click="openOwnerChange"></a-button>
                 </a-tooltip>
               </template>
               <a-button icon="menu" class="open-action-button"></a-button>
@@ -113,6 +122,12 @@
             && participantsRequest"
       >Отменить заявку</a-button>
     </template>
+    <!-- Диалог изменения владельца -->
+    <group-owner-change-dialog
+      :visible="changeOwnerVisible"
+      @close="closeOwnerChange"
+      :group="currentGroup"
+    />
   </div>
 </template>
 <script>
@@ -133,6 +148,7 @@ import AppPost from "../components/common/Post";
 import AppGroupEditDrawer from "../components/drawers/GroupEditDrawer";
 import AppRequestsDrawer from "../components/drawers/RequestsDrawer";
 import AppInviteDrawer from "../components/drawers/InviteDrawer";
+import GroupOwnerChangeDialog from "../components/modal/ChangeGroupOwner";
 
 export default {
   components: {
@@ -140,7 +156,8 @@ export default {
     AppPost,
     AppGroupEditDrawer,
     AppRequestsDrawer,
-    AppInviteDrawer
+    AppInviteDrawer,
+    GroupOwnerChangeDialog
   },
   data() {
     return {
@@ -148,7 +165,9 @@ export default {
       editVisible: false,
       requestVisible: false,
       invitesVisible: false,
+      changeOwnerVisible: false,
       visible: false,
+      hovered: false,
       output: "",
       //currentGroup: null,
       userinfo: store.getters.userData.result
@@ -156,6 +175,26 @@ export default {
         : store.getters.user.result,
       userIsAdmin: false
     };
+  },
+  computed: {
+    ...mapGetters([
+      "posts",
+      "user",
+      "currentGroup",
+      "userData",
+      "participantsRequest"
+    ]),
+    getGroupProp(f) {
+      return this.currentGroup[f];
+    },
+    isAuthor() {
+      return (
+        this.currentGroup.participants &&
+        this.currentGroup.participants.findIndex(
+          i => i._id === this.userinfo._id
+        ) === -1
+      );
+    }
   },
   methods: {
     endingWords(count) {
@@ -204,6 +243,14 @@ export default {
     openEdit() {
       this.editVisible = true;
     },
+    openOwnerChange() {
+      this.visible = false;
+      this.changeOwnerVisible = true;
+    },
+    closeOwnerChange() {
+      this.changeOwnerVisible = false;
+    },
+    // Работа с участниками группы
     createParticipant() {
       this.$store.dispatch(CREATE_PARTICIPANT, {
         participantId: this.userinfo._id,
@@ -255,26 +302,6 @@ export default {
       __type: "Admin"
     });
     console.log(`before create`);
-  },
-  computed: {
-    ...mapGetters([
-      "posts",
-      "user",
-      "currentGroup",
-      "userData",
-      "participantsRequest"
-    ]),
-    getGroupProp(f) {
-      return this.currentGroup[f];
-    },
-    isAuthor() {
-      return (
-        this.currentGroup.participants &&
-        this.currentGroup.participants.findIndex(
-          i => i._id === this.userinfo._id
-        ) === -1
-      );
-    }
   }
 };
 </script>

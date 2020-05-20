@@ -64,6 +64,8 @@ import {
   UNMARK_USER_DELETED
 } from "@/store/user/actions.type";
 
+import { DISPLACE_GROUPS_OWNER } from "@/store/group/action.type";
+
 import AddEmployeeModal from "@/components/modal/AddEmployeeModal";
 
 const cols = [
@@ -244,13 +246,19 @@ export default {
       console.log(`Deleting empl ${fio} with id ${d.key}`);
       try {
         await this.$store.dispatch(disp_name, d.key);
+        //await this.$store.dispatch(DISPLACE_GROUPS_OWNER, d.key);
         await this.$store.dispatch(GET_USERS);
         this.$success({
           centered: true,
           title: "Сотруник " + del_type,
           content: `Сотрудник ${empl_data.name} ${empl_data.surname} ${del_type}`
         });
-      } catch (error) {}
+      } catch (error) {
+        this.$error({
+          title: "Ошибка при удалении сотрудника",
+          content: error.message
+        });
+      }
     }
   },
   created() {
