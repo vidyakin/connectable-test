@@ -13,3 +13,4 @@ export const CREATE_DEPT_USER = 'CREATE_DEPT_USER'; // добавить одно
 export const SAVE_DEPT_USERS = 'SAVE_DEPT_USERS';  // сохранение всех сотрудников отдела разом
 export const DELETE_DEPT_USER = 'DELETE_DEPT_USER'; // удалить одного сотрудника из отдела
 export const EDIT_DEPT_USER = 'EDIT_DEPT_USER'; // изменить сотрудника в отделе (например сделать главным)
+export const CLEAR_HEAD_OF_DEPTS = 'CLEAR_HEAD_OF_DEPTS'; // очистить начальника в группах, где это определенный сотрудник
