@@ -25,6 +25,7 @@
       :columns="cols"
       :dataSource="employees"
       size="small"
+      class="empl_table"
       :loading="tblLoading"
       :rowClassName="rowStyling"
     >
@@ -70,38 +71,32 @@ const cols = [
     title: "ФИО",
     dataIndex: "fio",
     key: "fio",
-    width: 150,
     scopedSlots: { customRender: "fio" }
   },
   {
     title: "e-mail",
     dataIndex: "email",
-    key: "email",
-    width: 120
+    key: "email"
   },
   {
     title: "Должности",
     dataIndex: "positions",
-    key: "positions",
-    width: 90
+    key: "positions"
   },
   {
     title: "Телефон",
     dataIndex: "phone",
-    key: "phone",
-    width: 70
+    key: "phone"
   },
   {
     title: "Роль",
     dataIndex: "role",
     key: "role",
-    width: 10,
     scopedSlots: { customRender: "role" }
   },
   {
     title: "Действия",
     key: "actions",
-    width: 220,
     scopedSlots: { customRender: "actions" }
   }
 ];
@@ -266,7 +261,11 @@ export default {
 
 <style lang="scss">
 .page {
-  margin: 30px;
+  margin: 5px 30px;
+}
+
+.empl_table table tr.ant-table-row td {
+  padding: 5px 8px !important;
 }
 
 .table-row-name {

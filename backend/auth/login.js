@@ -8,7 +8,10 @@ module.exports = (req, res) => {
     let result = {};
     let status = 200;
     User.findOne({username}, (err, user) => {
-      if (!err && user) {
+      if (!err && user && user.deletion_mark) {
+        result.status = 403;
+        result.error = `Enter not allowed - you are not a user of system yet`;
+      } else if (!err && user) {
         bcrypt.compare(password, user.password).then(match => {
           if (match) {
             status = 200;
@@ -24,19 +27,20 @@ module.exports = (req, res) => {
             result.status = status;
             result.error = `Authentication error`;
           }
-          res.status(status).send(result);
+          //res.status(status).send(result);
         }).catch(err => {
           status = 500;
           result.status = status;
           result.error = err;
-          res.status(status).send(result);
+          //res.status(status).send(result);
         });
       } else {
         status = 404;
         result.status = status;
         result.error = err;
-        res.status(status).send(result);
+        //res.status(status).send(result);
       }
+      res.status(status).send(result);
     });
   }
   else if (outlookId) {
