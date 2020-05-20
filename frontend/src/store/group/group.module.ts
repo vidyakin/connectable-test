@@ -7,7 +7,7 @@ import {
   EDIT_GROUP,
   GET_CURRENT_GROUP,
   GET_GROUPS, GET_INVITE, GET_PARTICIPANTS_REQUEST,
-  DISPLACE_GROUPS_OWNER
+  REPLACE_GROUPS_OWNER
 } from '@/store/group/actions.type';
 import {
   approveInvite,
@@ -18,7 +18,7 @@ import {
   editGroup,
   getCurrentGroup,
   getGroups, getInvite, getParticipantsRequest,
-  displaceGroupsOwner
+  replaceGroupsOwner
 } from '@/services/group.service';
 import {
   ADD_GROUP,
@@ -73,7 +73,7 @@ const actions = {
   [GET_INVITE]: getInvite,
   [APPROVE_INVITE]: approveInvite,
   [CANCEL_INVITE]: cancelInvite,
-  [DISPLACE_GROUPS_OWNER]: displaceGroupsOwner
+  [REPLACE_GROUPS_OWNER]: replaceGroupsOwner
 };
 
 const mutations = {
@@ -90,10 +90,6 @@ const mutations = {
     if (state.groups) {
       const index = state.groups.findIndex(({ _id }) => _id === groupId);
       state.groups.splice(index, 1)
-      // state.groups = [
-      //   ...state.groups.slice(0, index),
-      //   ...state.groups.slice(index + 1),
-      // ];
     }
   },
   [UPDATE_GROUP](state: State, group: any) {
@@ -101,11 +97,6 @@ const mutations = {
     if (state.groups) {
       const index = state.groups.findIndex(({ _id }) => _id === group._id);
       state.groups.splice(index, 1, group)
-      // state.groups = [
-      //   ...state.groups.slice(0, index),
-      //   group,
-      //   ...state.groups.slice(index + 1),
-      // ];
     }
   },
   [SET_PARTICIPANTS_REQUEST](state: State, req: boolean) {

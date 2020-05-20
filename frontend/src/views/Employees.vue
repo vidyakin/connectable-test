@@ -64,7 +64,8 @@ import {
   UNMARK_USER_DELETED
 } from "@/store/user/actions.type";
 
-import { DISPLACE_GROUPS_OWNER } from "@/store/group/action.type";
+import { REPLACE_GROUPS_OWNER } from "@/store/group/actions.type";
+import { CLEAR_HEAD_OF_DEPTS } from "@/store/structure/actions.type";
 
 import AddEmployeeModal from "@/components/modal/AddEmployeeModal";
 
@@ -245,9 +246,10 @@ export default {
         fio = d.fio.firstName + " " + d.fio.lastName;
       console.log(`Deleting empl ${fio} with id ${d.key}`);
       try {
-        await this.$store.dispatch(disp_name, d.key);
-        //await this.$store.dispatch(DISPLACE_GROUPS_OWNER, d.key);
-        await this.$store.dispatch(GET_USERS);
+        await this.$store.dispatch(disp_name, d.key); // помечаем как удаленного или восстанавливаем
+        await this.$store.dispatch(REPLACE_GROUPS_OWNER, d.key); // заменяем создателя в группах на админа
+        await this.$store.dispatch(CLEAR_HEAD_OF_DEPTS, d.key); // убираем из начальников отделов
+        await this.$store.dispatch(GET_USERS); // получаем список сотрудников для обновления таблицы
         this.$success({
           centered: true,
           title: "Сотруник " + del_type,

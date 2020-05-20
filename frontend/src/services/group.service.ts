@@ -109,7 +109,7 @@ export const cancelInvite = (context: any, id: string) => {
     .post(`api/cancelInvite/${id}`);
 };
 
-export const displaceGroupsOwner = (context: any, userId: string) => {
+export const replaceGroupsOwner = (context: any, userId: string) => {
   return Vue.axios
-    .post(`api/group/displace_owner/${userId}`);
+    .post(`api/group/replace_owner/${userId}`);
 };

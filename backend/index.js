@@ -463,6 +463,19 @@ app.put('/api/dept_users', (req, res) => {
     })
 })
 
+// удаление сотрудника из статуса начальника отделов при увольнении
+app.put(`/api/dept_users/clear_chief/:empl_id`, (req,res) => {
+    console.log('clear ', req.params.empl_id);
+    
+    UsersInDepartment.updateMany({headUser: req.params.empl_id}, {headUser: ''}, (error, docs) => {
+        if (error) res.status(500).send('Error while clearing chief:', error)
+        else {
+          console.log(`chief was cleared in ${docs.nModified} depts`);
+          res.status(200).send(docs)
+        }
+    })
+})
+
 //put notifications
 app.post('/api/notification', (req, res, next) => {
     let notifi =req.body,
@@ -564,6 +577,28 @@ app.post('/api/dislike', (req, res) => {
     });
 });
 
+app.post('/api/group/replace_owner/:userId', async (req,res) => {
+    // ищем админа, пока хардкодом, потом надо брать первого в списке админов конкретного клиента
+    const admin = await User.findOne({ email: "w.project.portal3@gmail.com" }, '_id')
+    // ищем группы где создатель это переданный userId сотрудника
+    await Group.find({creatorId: req.params.userId}, (err, groups) => {
+        groups.forEach(group => {
+            // заменяем создателя группы
+            group.creatorId = admin._id
+            // заменяем участника
+            const prt_i = group.participants.findIndex(p => p._id == req.params.userId)
+            if (prt_i != -1) {
+                group.participants.splice(prt_i, 1, admin)
+            }
+            group.save()
+            console.log(`creator of group ${group.name} was changed`);
+            
+        })
+    })
+    // удаляем участника в отдельной коллекции участников, мидлварь создаст новую запись сама
+    await GroupParticipant.deleteOne({participantId: req.params.userId})
+    res.status(200).send('Employees was replaced to admin in all groups')
+})
   
 // Поиск событий где пользователь и автор и участник
 app.get('/api/events/:email', async (req,res) => {
@@ -581,6 +616,7 @@ app.get('/api/events/:email', async (req,res) => {
         return res.status(500).send("Error while getting events as author: "+err.message)
     }
 })
+
 
 
 server.listen(port, () => console.log(`[Server]: Listening on port ${port}`));

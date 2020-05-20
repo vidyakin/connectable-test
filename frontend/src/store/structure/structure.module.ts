@@ -20,7 +20,8 @@ import {
     GET_DEPT_USERS,
     SAVE_DEPT_USERS,
     EDIT_DEPT_USER,
-    DELETE_DEPT_USER
+    DELETE_DEPT_USER,
+    CLEAR_HEAD_OF_DEPTS
 } from '@/store/structure/actions.type';
 
 import {
@@ -36,7 +37,8 @@ import {
     getDepartmentUsers,
     saveUsersOfDepartment,
     editUserOfDepartment,
-    delUserOfDepartment
+    delUserOfDepartment,
+    clearHeadOfDepartaments
 } from '@/services/structure.service'
 
 interface State {
@@ -101,7 +103,8 @@ const actions = {
     [GET_DEPT_USERS]: getDepartmentUsers,
     [SAVE_DEPT_USERS]: saveUsersOfDepartment,
     [EDIT_DEPT_USER]: editUserOfDepartment,
-    [DELETE_DEPT_USER]: delUserOfDepartment
+    [DELETE_DEPT_USER]: delUserOfDepartment,
+    [CLEAR_HEAD_OF_DEPTS]: clearHeadOfDepartaments
 };
 
 export default {

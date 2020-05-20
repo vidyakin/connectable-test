@@ -69,3 +69,8 @@ export const delUserOfDepartment = (context: any, data: any) => {
       context.commit(REMOVE_DEPT_USER, response.data);
     }).then(_ => getDepartmentUsers(context, data.client_id));
 };
+
+export const clearHeadOfDepartaments = (context: any, userId: string) => {
+  return Vue.axios
+    .put(`api/dept_users/clear_chief/${userId}`)
+};
