@@ -264,41 +264,48 @@ app.post('/api/loginPage', function(req,res){
         invalidFields = {};
 
     User.findOne({email}, (err, user) => {
+        if (!err && user && user.deletion_mark) {
+            result = { status: 403, deleted: true, error: `Enter not allowed - you are not a user of system yet`}
+        } else 
         if (!err && user) {
             bcrypt.compare(password, user.password).then(match => {
                 if (match) {
-                    status = 200;
+                    //status = 200;
                     user.password = '';
                     const payload = {result: user};
                     const secret = process.env.JWT_SECRET;
                     const token = jwt.sign(payload, secret, {
                         expiresIn: 86400 // expires in 24 hours
                     });
-
-                    result.token = token;
-                    result.status = status;
-                    result.result = user;
+                    result = {token, status: 200, result: user}
+                    // result.token = token;
+                    // result.status = status;
+                    // result.result = user;
                 } else {
-                    status = 202;
-                    result.status = status;
-                    result.error = `Authentication error`;
-                    result.password = password;
+                    result = { status: 202, password, error: 'Authentication error' }
+                    // status = 202;
+                    // result.status = status;
+                    // result.error = `Authentication error`;
+                    // result.password = password;
                 }
 
-                res.status(status).send(result);
-            }).catch(err => {
-                status = 500;
-                result.status = status;
-                result.error = err;
-                res.status(status).send(result);
+                //res.status(status).send(result);
+            }).catch(error => {
+                result = { status: 500, error }
+                // status = 500;
+                // result.status = status;
+                // result.error = error;
+                //res.status(status).send(result);
             });
         } else {
-            status = 202;
-            result.status = status;
-            result.error = `Authentication error`;
-            result.email = email;
-            res.status(status).send(result);
+            result = { status: 202, email, error: 'Authentication error' }
+            // status = 202;
+            // result.status = status;
+            // result.error = `Authentication error`;
+            // result.email = email;
+            //res.status(status).send(result);
         }
+        res.status(status).send(result);
     });
 });
 //Section Structure

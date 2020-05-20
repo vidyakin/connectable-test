@@ -127,6 +127,8 @@ export const checkUserInfo = (context: any, dataUser: any) => {
         setAuthToken(response.data.token);
       } else if (response.data.status === 202) {
         context.commit(ERROR_LOGIN, response.data);
+      } else if (response.data.status === 403) {
+        context.commit(ERROR_LOGIN, response.data);
       }
     }).catch(err => {
       localStorage.removeItem('authorization');
