@@ -257,20 +257,17 @@ app.post('/api/register', function(req,res){
 //login page
 app.post('/api/loginPage', function(req,res){
 
-    let email =req.body.email,
-        password = req.body.password,
-        result = {},
-        status = 200,
-        invalidFields = {};
-
+    let { email,password } = req.body
     User.findOne({email}, (err, user) => {
+        let result = {};
         if (!err && user && user.deletion_mark) {
-            result = { status: 403, deleted: true, error: `Enter not allowed - you are not a user of system yet`}
-        } else 
-        if (!err && user) {
-            bcrypt.compare(password, user.password).then(match => {
+            result = { status: 202, deleted: true, error: `Enter not allowed - you are not a user of system yet`}
+            res.status(result.status).send(result);
+        } else if (!err && user) {
+            
+            bcrypt.compare(password, user.password)
+            .then(match => {
                 if (match) {
-                    //status = 200;
                     user.password = '';
                     const payload = {result: user};
                     const secret = process.env.JWT_SECRET;
@@ -278,34 +275,18 @@ app.post('/api/loginPage', function(req,res){
                         expiresIn: 86400 // expires in 24 hours
                     });
                     result = {token, status: 200, result: user}
-                    // result.token = token;
-                    // result.status = status;
-                    // result.result = user;
                 } else {
                     result = { status: 202, password, error: 'Authentication error' }
-                    // status = 202;
-                    // result.status = status;
-                    // result.error = `Authentication error`;
-                    // result.password = password;
                 }
-
-                //res.status(status).send(result);
+                res.status(result.status).send(result);
             }).catch(error => {
                 result = { status: 500, error }
-                // status = 500;
-                // result.status = status;
-                // result.error = error;
-                //res.status(status).send(result);
+                res.status(result.status).send(result);
             });
         } else {
             result = { status: 202, email, error: 'Authentication error' }
-            // status = 202;
-            // result.status = status;
-            // result.error = `Authentication error`;
-            // result.email = email;
-            //res.status(status).send(result);
+            res.status(result.status).send(result);
         }
-        res.status(status).send(result);
     });
 });
 //Section Structure
