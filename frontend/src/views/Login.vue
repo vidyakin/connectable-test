@@ -52,9 +52,9 @@
       </div>
       <div class="row">
         <app-login-google />
+        <app-login-microsoft />
 
-        <div class="login-page">
-          <!-- <a class="f6 link dim br2 ph3 pv2 mb2 dib white bg-dark-blue" v-bind:href="outlookUrl">Войти через учетную запись Microsoft</a> -->
+        <!-- <div class="login-page">
           <a :href="outlookUrl">
             <svg xmlns="http://www.w3.org/2000/svg" width="215" height="41" viewBox="0 0 215 41">
               <title>Войти с учетной записью Microsoft</title>
@@ -142,7 +142,7 @@
               <rect x="23" y="21" width="9" height="9" fill="#ffb900" />
             </svg>
           </a>
-        </div>
+        </div>-->
 
         <div class="col-sm-4 offset-sm-4">
           <fieldset>
@@ -174,7 +174,7 @@ import { CHECK_USER_INFO } from "../store/user/actions.type";
 import { SUCCESS_REGISTER } from "@/store/user/mutations.type";
 
 import AppLoginGoogle from "../components/common/LoginBarGoogle.vue";
-import AppLoginOutlook from "../components/common/LoginBarOutlook.vue";
+import AppLoginMicrosoft from "../components/common/LoginBarMicrosoft.vue";
 import AppSuccessRegister from "../components/notification/SuccessRegister.vue";
 
 export default Vue.extend({
@@ -199,7 +199,7 @@ export default Vue.extend({
   components: {
     AppSuccessRegister,
     AppLoginGoogle,
-    AppLoginOutlook
+    AppLoginMicrosoft
   },
   computed: {
     ...mapGetters(["errorLogin"])

@@ -9,7 +9,7 @@
     @ok="() => { $emit('create', checkedEmpls) }"
     :ok-button-props="{ props: { disabled: mode=='chief', type: mode == 'chief' ? 'link' : 'primary' } }"
   >
-    <div class="container">
+    <div class="dept-empl-edit-container">
       <a-checkbox-group @change="onChange">
         <a-list :data-source="dataList" size="small">
           <a-list-item slot="renderItem" slot-scope="item">
@@ -119,7 +119,7 @@ export default {
 </script>
 
 <style lang="scss">
-.container {
+.dept-empl-edit-container {
   border: 1px solid #e8e8e8;
   border-radius: 4px;
   overflow: auto;

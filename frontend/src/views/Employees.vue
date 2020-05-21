@@ -245,20 +245,23 @@ export default {
         del_type = deleting_mark ? "удален" : "восстановлен",
         fio = d.fio.firstName + " " + d.fio.lastName;
       console.log(`Deleting empl ${fio} with id ${d.key}`);
+      let step = del_type + "ие";
       try {
         await this.$store.dispatch(disp_name, d.key); // помечаем как удаленного или восстанавливаем
+        step = "Замена в группах";
         await this.$store.dispatch(REPLACE_GROUPS_OWNER, d.key); // заменяем создателя в группах на админа
+        step = "Удаление как начальника";
         await this.$store.dispatch(CLEAR_HEAD_OF_DEPTS, d.key); // убираем из начальников отделов
         await this.$store.dispatch(GET_USERS); // получаем список сотрудников для обновления таблицы
         this.$success({
           centered: true,
           title: "Сотруник " + del_type,
-          content: `Сотрудник ${empl_data.name} ${empl_data.surname} ${del_type}`
+          content: `Сотрудник ${fio} был ${del_type}`
         });
       } catch (error) {
         this.$error({
           title: "Ошибка при удалении сотрудника",
-          content: error.message
+          content: "Шаг: " + step + " \n" + error.stack
         });
       }
     }

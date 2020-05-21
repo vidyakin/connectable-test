@@ -1,19 +1,17 @@
 <template>
   <a-modal
+    closable
     :visible="visible"
-    :footer="null"
+    destroyOnClose
     centered
+    :footer="null"
     title="Выберите нового владельца группы"
     okText="Выбрать"
     cancelText="Отменить"
-    @cancel="() => { $emit('cancel') }"
+    @cancel="() => { $emit('close') }"
     @ok="() => { $emit('create', checkedEmpls) }"
   >
-    <div class="container">
-      <div class="group-header">
-        Группа:
-        <b>{{group && group.name}}</b>
-      </div>
+    <div class="group-owner-change-container">
       <a-list :data-source="dataList" size="small">
         <a-list-item slot="renderItem" slot-scope="item">
           <a-list-item-meta
@@ -106,5 +104,5 @@ export default {
 };
 </script>
 
-<style lang="">
+<style lang="scss">
 </style>
