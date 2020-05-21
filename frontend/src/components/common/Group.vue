@@ -36,7 +36,7 @@
     </div>
     <div class="group-content" v-if="group.participants" @click="redirectToGroup">
       <div
-        class="group-content-participant"
+        :class="['group-content-participant', participant._id == group.creatorId ? 'creator' : '']"
         v-for="participant in group.participants.filter(e => !!e)"
         :key="participant._id"
       >
@@ -47,6 +47,7 @@
           >{{participant.firstName + " " + participant.lastName}}</div>
           <div class="group-content-participant-info-positions">{{participant.positions.join(', ')}}</div>
         </div>
+        <a-icon class="img-creator" type="star" v-if="participant._id == group.creatorId" />
       </div>
     </div>
   </div>
@@ -252,6 +253,7 @@ export default {
 
   &-content {
     // height: 16rem;
+    position: relative;
     background-color: white;
     overflow: auto;
     cursor: pointer;
@@ -287,6 +289,15 @@ export default {
           color: #808495;
         }
       }
+
+      &.creator {
+        background-color: lavender;
+      }
+    }
+    .img-creator {
+      position: absolute;
+      top: 15px;
+      right: 15px;
     }
   }
 }

@@ -40,7 +40,7 @@ export default {
     }
   },
   beforeCreate() {
-    const a = Vue.axios
+    const a = this.$axios
       .get("/")
       .then(response => {
         this.outlookUrl = response.data.response.signInUrl;
