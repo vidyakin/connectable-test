@@ -71,8 +71,8 @@ pipeline {
                 test -d "\$HOME/${PROD_ROOT_DIR}-bak" && sudo rm -rf "\$HOME/${PROD_ROOT_DIR}-bak" &&
                 sudo cp -r "\$HOME/${PROD_ROOT_DIR}" "\$HOME/${PROD_ROOT_DIR}-bak" &&
                 cd \$HOME/${PROD_ROOT_DIR} &&
-                git checkout . &&
-                git pull origin master &&
+                sudo git checkout . &&
+                sudo git pull origin master &&
                 cat \$HOME/${PROD_ENV_FILE} >> \$HOME/${PROD_ROOT_DIR}/${PROD_ENV_FILE}
                 '
                 """
