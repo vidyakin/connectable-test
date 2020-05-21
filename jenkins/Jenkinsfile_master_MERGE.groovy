@@ -73,6 +73,7 @@ pipeline {
                 cd \$HOME/${PROD_ROOT_DIR} &&
                 sudo git checkout . &&
                 sudo git pull origin master &&
+                sudo chown -R tech:tech \$HOME/${PROD_ROOT_DIR} &&
                 sudo cat \$HOME/${PROD_ENV_FILE} >> \$HOME/${PROD_ROOT_DIR}/${PROD_ENV_FILE}
                 '
                 """
