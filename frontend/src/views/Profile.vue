@@ -3,19 +3,24 @@
     <app-user-info v-if="isLoaded"></app-user-info>
     <!-- SPINNER while loading -->
     <a-spin size="large" v-else />
-    <pre>Служебная инфа: 
-userData: {{JSON.stringify(userData,null,2)}}
-currentUser: {{JSON.stringify(currentUser,null,2)}}
-{{userIsAdmin ? "Есть права администратора" : ""}}
-    </pre>
-    <!-- <app-comment-input :parent="{type: 'user', id: datauser && datauser._id}" v-if="datauser._id == $route.params._id" /> -->
 
+    <app-comment-input
+      :parent="{type: 'user', id: userData && userData.result._id}"
+      v-if="userData.result._id == $route.params._id"
+    />
     <!-- убрано: v-if="(post && post.author._id == $route.params._id)" -->
     <app-post
       v-for="(post, index) in posts.filter(p => p.author._id == $route.params._id)"
       :post="post"
       :key="index"
     />
+
+    <pre v-if="userIsAdmin">Служебная инфа: 
+    $route.params._id = {{$route.params._id}}
+userData: {{JSON.stringify(userData,null,2)}}
+currentUser: {{JSON.stringify(currentUser,null,2)}}
+{{userIsAdmin ? "Есть права администратора" : ""}}
+    </pre>
   </div>
 </template>
 

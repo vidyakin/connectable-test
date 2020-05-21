@@ -596,7 +596,7 @@ app.post('/api/group/replace_owner/:userId', async (req,res) => {
         })
     })
     // удаляем участника в отдельной коллекции участников, мидлварь создаст новую запись сама
-    await GroupParticipant.deleteOne({participantId: req.params.userId})
+    await GroupParticipant.deleteMany({participantId: req.params.userId})
     res.status(200).send('Employees was replaced to admin in all groups')
 })
   
