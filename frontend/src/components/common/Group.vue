@@ -47,7 +47,7 @@
           >{{participant.firstName + " " + participant.lastName}}</div>
           <div class="group-content-participant-info-positions">{{participant.positions.join(', ')}}</div>
         </div>
-        <a-icon class="img-creator" type="star" v-if="participant._id == group.creatorId" />
+        <a-icon class="img-creator" type="crown" v-if="participant._id == group.creatorId" />
       </div>
     </div>
   </div>
@@ -253,13 +253,13 @@ export default {
 
   &-content {
     // height: 16rem;
-    position: relative;
     background-color: white;
     overflow: auto;
     cursor: pointer;
 
     &-participant {
       display: flex;
+      position: relative;
       padding: 5px 1rem;
 
       &-info {

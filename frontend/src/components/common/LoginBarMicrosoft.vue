@@ -8,6 +8,7 @@
 </template>
 
 <script>
+import Vue from "vue";
 import { SET_SHOW_IMAGE_HEADER } from "../../store/shower/mutations.type";
 import { mapGetters } from "vuex";
 
@@ -40,7 +41,7 @@ export default {
     }
   },
   beforeCreate() {
-    const a = this.$axios
+    const a = Vue.axios
       .get("/")
       .then(response => {
         this.outlookUrl = response.data.response.signInUrl;
