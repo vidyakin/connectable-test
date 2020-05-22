@@ -60,7 +60,7 @@
                 </a-tooltip>
                 <!-- Смена владельца группы (администратора) -->
                 <a-tooltip title="Изменить владельца" v-if="userIsAdmin">
-                  <a-button icon="team" @click="openOwnerChange"></a-button>
+                  <a-button icon="crown" @click="openOwnerChange"></a-button>
                 </a-tooltip>
               </template>
               <a-button icon="menu" class="open-action-button"></a-button>

@@ -9,30 +9,42 @@
   >
     <div class="requests-wrapper">
       <div class="request" v-for="participant in currentGroup.requests" :key="participant._id">
-        <a-avatar
-          :src="(participant.googleImage ? participant.googleImage : require('../../assets/no_image.png'))"
-        ></a-avatar>
-        <div class="request-info">
-          <div class="request-info-name">{{participant.firstName + " " + participant.lastName}}</div>
-          <div class="request-info-positions">{{participant.positions.join(', ')}}</div>
+        <div style="display: flex; margin: 5px 0;">
+          <a-avatar
+            :src="(participant.googleImage ? participant.googleImage : require('../../assets/no_image.png'))"
+          ></a-avatar>
+          <div class="request-info">
+            <div class="request-info-name">{{participant.firstName + " " + participant.lastName}}</div>
+            <div class="request-info-positions">{{participant.positions.join(', ')}}</div>
+          </div>
         </div>
         <div class="request-actions">
-          <a-popover
+          <div class="user-action" slot="content">
+            <a-button type="primary" icon="check" size="small" @click="approve(participant._id)"></a-button>
+            <a-button
+              type="danger"
+              icon="close"
+              size="small"
+              @click="deleteParticipant(participant._id)"
+            ></a-button>
+          </div>
+          <!-- <a-popover
             title="Действия с пользователем"
+            v-model="popoverVisible"
+            placement="bottomRight"
             trigger="click"
-            overlayClassName="user-action-wrap"
+            overlayClassName="user-action-popover"
           >
-            <template slot="content">
-              <div class="user-action">
-                <a-button type="primary" icon="check" @click="approve(participant._id)"></a-button>
-                <a-button type="danger" icon="close" @click="deleteParticipant(participant._id)"></a-button>
-              </div>
-            </template>
-            <a-button icon="menu" class="open-action-button"></a-button>
-          </a-popover>
+            <div class="user-action" slot="content">
+              <a-button type="primary" icon="check" @click="approve(participant._id)"></a-button>
+              <a-button type="danger" icon="close" @click="deleteParticipant(participant._id)"></a-button>
+            </div>
+            <a-button icon="menu"></a-button> 
+          </a-popover>-->
         </div>
       </div>
-      <div v-if="currentGroup.requests">Нет заявок на вступление в группу</div>
+
+      <div v-if="!currentGroup.requests.length">Нет заявок на вступление в группу</div>
     </div>
   </a-drawer>
 </template>
@@ -58,19 +70,20 @@ import AppInput from "../common/Input";
 import ATextarea from "ant-design-vue/es/input/TextArea";
 
 export default {
-  name: "AppUserEditDrawer",
+  name: "AppRequestsDrawer",
   data() {
     return {
       current: "",
       createButtonSpinning: false,
       type: 1,
+      popoverVisible: false,
       userinfo: store.getters.userData.result
         ? store.getters.userData.result
         : store.getters.user.result
     };
   },
   mounted() {
-    console.log("Заявки ", this.currentGroup.participants);
+    console.log("Заявки ", this.currentGroup.requests);
   },
   components: {
     ATextarea,
@@ -117,10 +130,16 @@ export default {
 <style lang="scss">
 .user-action {
   display: flex;
+  // justify-content: center;
+  margin-left: 35px;
+
+  &-popover {
+    z-index: 200;
+  }
 }
 .user-action button {
   display: block;
-  margin: 0 auto;
+  // margin: 0 auto;
 }
 .requests-wrapper {
   .ant-btn {
@@ -129,8 +148,9 @@ export default {
 
   .request {
     display: flex;
+    flex-direction: column;
     padding: 0.5rem;
-    justify-content: space-between;
+    // justify-content: space-between;
     .ant-avatar {
       margin-right: 10px;
     }
