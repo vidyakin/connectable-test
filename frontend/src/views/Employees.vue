@@ -49,7 +49,7 @@
         </a-button>
       </span>
     </a-table>
-    <!-- <pre style="font-size:8pt !important; height: 300px">{{JSON.stringify(users.map(_=> ({name: _.firstName+' '+_.lastName, del: _.deletion_mark})),null,2)}}</pre> -->
+    <pre style="font-size:8pt !important; height: 300px">{{JSON.stringify(userData.result._id,null,2)}}</pre>
     <!-- Модальное окно создания сотрудника -->
     <add-employee-modal :visible="newEmplVisible" :close="newEmplClose" @create="createEmployee" />
   </div>
@@ -139,7 +139,7 @@ export default {
         })
         .filter(e => (!this.showDeleted && !e.mark_del) || this.showDeleted);
     },
-    ...mapGetters(["errorRegister"]),
+    ...mapGetters(["errorRegister", "userData"]),
     ...mapState({
       users: state => state.auth.users
     })
@@ -219,6 +219,26 @@ export default {
         });
     },
     deleteEmployee(empl_data) {
+      // Предварительные проверки на самого себя и админа
+      if (
+        this.$can("read", { accessEmail: empl_data.email, __type: "Admin" })
+      ) {
+        this.$error({
+          centered: true,
+          title: "Ошибка при удалении",
+          content: "Невозможно удалить администратора"
+        });
+        return;
+      }
+      if (empl_data.key == this.userData.result._id) {
+        this.$error({
+          centered: true,
+          title: "Ошибка при удалении",
+          content: "Невозможно удалить самого себя"
+        });
+        return;
+      }
+
       const fio = empl_data.fio.firstName + " " + empl_data.fio.lastName;
       const title = !empl_data.mark_del
         ? "Подтвердите удаление сотрудника"
