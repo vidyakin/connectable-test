@@ -28,6 +28,7 @@
     "vue-google-oauth2": "^1.4.0",
     "vue-mq": "^1.0.1",
     "vue-orgchart": "^1.1.7",
+    "vue-phone-number-input": "^1.1.9",
     "vue-router": "^3.1.4",
     "vue-social-sharing": "^2.4.7",
     "vue-socket.io": "^3.0.7",
@@ -43,7 +44,7 @@
     "@vue/cli-service": "^3.12.1",
     "babel-loader": "^8.1.0",
     "babel-plugin-import": "^1.13.0",
-    "node-sass": "^4.13.0",
+    "node-sass": "^4.14.1",
     "sass-loader": "^7.3.1",
     "typescript": "^3.7.4",
     "vue-template-compiler": "^2.6.11"

@@ -174,6 +174,9 @@ export default {
           content: "При проверке данных обнаружены ошибки"
         });
       }
+    },
+    tr(v) {
+      return v === undefined ? "" : v.trim();
     }
   }
 };
