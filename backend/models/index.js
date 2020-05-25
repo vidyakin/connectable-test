@@ -31,4 +31,5 @@ index.Notification = require('./notification');
 index.Message = require('./message');
 index.Structure = require('./structure');
 index.UsersInDepartment = require('./usersInDepartment');
+index.Client = require('./client');
 module.exports = index;

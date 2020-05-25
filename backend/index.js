@@ -28,7 +28,8 @@ const {
     Notification,
     Message,
     Structure,
-    UsersInDepartment
+    UsersInDepartment,
+    Client
 } = require('./models')
 
 const app = express();
@@ -78,6 +79,7 @@ app.use('/api/project', validateToken, require('./crud')(Project, projectSeriali
 
 app.use('/api/message', validateToken, require('./crud')(Message, serializers.serializer));
 app.use('/api/structure', validateToken, require('./crud')(Structure, serializers.serializer));
+app.use('/api/clients', validateToken, require('./crud')(Client, serializers.serializer));
 //app.use('/api/dept_users', validateToken, require('./crud')(UsersInDepartment, serializers.serializer));
 
 app.use('/api/outlook', require('./auth/outlook/'));

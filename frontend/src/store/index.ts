@@ -8,6 +8,7 @@ import project from './project/project.module';
 import structure from './structure/structure.module';
 import notification from './notification/notification.module';
 import follower from './followers/follower.module';
+import client from './client/client.module';
 Vue.use(Vuex);
 export default new Vuex.Store({
   modules: {
@@ -19,5 +20,6 @@ export default new Vuex.Store({
     structure,
     notification,
     follower,
+    client
   },
 });

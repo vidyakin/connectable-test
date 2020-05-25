@@ -83,6 +83,13 @@ module.exports = (req, res) => {
     let status = 200;
     User.findOne({googleId: googleId}, (err, user) => {
       if (!err && user) {
+        // защита от логина удаленного сотрудника через гугл
+        if (user.deletion_mark) {
+          result.status = 403;
+          result.error = `Authentication error, you are fired`;
+          return res.status(403).send(result);
+        }
+        
         status = 200;
         user.password = '';
         const payload = {result: user};
