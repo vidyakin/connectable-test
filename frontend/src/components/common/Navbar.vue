@@ -45,7 +45,7 @@
       <a-menu-item key="/employees" :class="{active:isActive == 'employees'}" v-if="userIsAdmin">
         <a-icon type="idcard" style="color: #A5A4BF; font-size: 16px" />Сотрудники
       </a-menu-item>
-      <a-menu-item key="/clients" :class="{active:isActive == 'clients'}">
+      <a-menu-item key="/clients" :class="{active:isActive == 'clients'}" v-if="userIsAdmin">
         <a-icon type="solution" style="color: #A5A4BF; font-size: 16px" />Клиенты
       </a-menu-item>
 
@@ -98,7 +98,7 @@
       <a-menu-item key="/employees" v-if="userIsAdmin">
         <img src="@/assets/Icons/calendar.svg" alt />
       </a-menu-item>
-      <a-menu-item key="/clients">
+      <a-menu-item key="/clients" v-if="userIsAdmin">
         <img src="@/assets/Icons/setting.svg" alt />
       </a-menu-item>
       <a-menu-item key="/settings" class="footer">
