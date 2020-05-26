@@ -27,8 +27,8 @@
           <a-form-model-item prop="code">
             <app-input
               v-model="theform.code"
-              placeholder="Введите краткое название"
-              label="Краткое название"
+              placeholder="Введите краткий код"
+              label="Код (workspace) клиента"
             />
           </a-form-model-item>
         </a-col>
@@ -140,6 +140,21 @@ function getBase64(img, callback) {
   reader.readAsDataURL(img);
 }
 
+function cleanForm() {
+  return {
+    code: "",
+    name: "",
+    country: "",
+    city: "",
+    address: "",
+    phone: "",
+    director: "",
+    logo: "",
+    has_access: true,
+    comment: ""
+  };
+}
+
 export default {
   name: "ClientEditDialog",
   components: { AppInput, VuePhoneNumberInput },
@@ -150,18 +165,7 @@ export default {
   },
   data() {
     return {
-      theform: {
-        code: "",
-        name: "",
-        country: "",
-        city: "",
-        address: "",
-        phone: "",
-        director: "",
-        logo: "",
-        has_access: true,
-        comment: ""
-      },
+      theform: {},
       phone_data: "",
       loading: false,
       imageUrl: "",
@@ -170,6 +174,26 @@ export default {
           {
             required: true,
             message: "Необходимо указать название компании",
+            transform: this.tr,
+            trigger: "blur"
+          },
+          {
+            max: 100,
+            message: "Название должно быть не более 100 символов",
+            transform: this.tr,
+            trigger: "blur"
+          }
+        ],
+        code: [
+          {
+            required: true,
+            message: "Необходимо указать код клиента",
+            transform: this.tr,
+            trigger: "blur"
+          },
+          {
+            max: 50,
+            message: "Не более 25 символов",
             transform: this.tr,
             trigger: "blur"
           }
@@ -182,7 +206,8 @@ export default {
   methods: {
     // проверка корректности и отправка данных
     async sendClientData() {
-      if (this.$refs.clientForm.validate()) {
+      try {
+        const valid = await this.$refs.clientForm.validate();
         // передача в родительский компонент
         // this.$emit("save", this.theform);
         try {
@@ -203,12 +228,13 @@ export default {
           });
         }
         this.$emit("save", this.theform);
-      } else {
+      } catch (error) {
         this.$error({
+          centered: true,
           title: "Ошибка в данных",
           content: "При проверке данных обнаружены ошибки"
         });
-        this.$emit("cancel");
+        //this.$emit("cancel");
       }
     },
     close() {
@@ -254,9 +280,9 @@ export default {
   },
   watch: {
     visible(val, oldVal) {
-      if (val && this.editMode) {
-        this.theform = { ...this.client };
-        console.log("OKEY");
+      if (val) {
+        this.theform = this.editMode ? { ...this.client } : cleanForm();
+        console.log("dialog was shown");
       }
     }
   }
