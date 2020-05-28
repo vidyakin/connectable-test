@@ -249,6 +249,16 @@ export default Vue.extend({
       }
     }
   },
+  watch: {
+    errorLogin(val) {
+      if (!val) return;
+      this.$error({
+        centered: true,
+        title: "Ошибка входа",
+        content: "Ваша учетная запись заблокирована"
+      });
+    }
+  },
   beforeCreate() {
     const a = Vue.axios
       .get("/api/outlook/login-url")

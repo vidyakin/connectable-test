@@ -2,41 +2,14 @@
   <div class="user-bar">
     <div class="user-info" v-if="userData">
       <!-- Список сообщений -->
-      <a-popover placement="bottom" trigger="click">
+      <!-- <a-popover placement="bottom" trigger="click">
         <template slot="content">
-          <a-list
-            itemLayout="horizontal"
-            :dataSource="notifs"
-            :locale="{emptyText:'Нет событий'}"
-            class="list-container"
-          >
-            <a-list-item
-              class="notif-item"
-              slot="renderItem"
-              slot-scope="item, index"
-              :v-for="(item,index) in notifs"
-              :key="index"
-            >
-              <a-list-item-meta>
-                <a slot="title" class="notif-title">
-                  <b>{{item.title}}</b>
-                </a>
-                <a-avatar
-                  class="notif-avatar"
-                  slot="avatar"
-                  src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
-                />
-                <!-- <div slot="description" class="notif-description"><b>{{item.userFrom}}</b> {{item.text}} <i>{{item.subj}}</i></div> -->
-                <div slot="description" class="notif-description" v-html="item.html"></div>
-              </a-list-item-meta>
-            </a-list-item>
-          </a-list>
+          <NotificationList @count="setNtfCounter" />
         </template>
-        <!-- <span slot="title">Оповещения</span> -->
-        <a-badge :count="messages.length" title="Есть непрочитанные сообщения">
+        <a-badge :count="notifCount" title="Есть непрочитанные сообщения">
           <a-button type="primary" shape="circle" icon="bell" size="large" />
         </a-badge>
-      </a-popover>
+      </a-popover>-->
       <!-- Меню действий пользователя -->
       <a-dropdown>
         <a-menu slot="overlay">
@@ -61,13 +34,17 @@ import { mapGetters } from "vuex";
 
 import { LOGOUT } from "../../store/user/actions.type";
 import { SET_SHOW_IMAGE_HEADER } from "../../store/shower/mutations.type";
-import { GET_MESSAGES } from "../../store/notification/actions.type";
+
+import NotificationList from "@/components/common/NotificationList";
 
 export default {
   name: "AppLoginBar",
+  components: {
+    NotificationList
+  },
   data() {
     return {
-      current: 1,
+      current: 1
       /*************************************** 
        * Структура объекта "datauser":
        * "result": {
@@ -100,13 +77,10 @@ export default {
         }
        * 
        */
-      notifs: [],
-      // Количество сообщений - для надписи на бейджике. Возможно не нужно отдельную переменную
-      msgCount: 0
     };
   },
   computed: {
-    ...mapGetters(["userData", "user", "users", "messages"])
+    ...mapGetters(["userData", "user", "users"])
   },
   sockets: {
     connect() {
@@ -124,7 +98,7 @@ export default {
         //this.notifs.push(payload.val);
         //this.msgCount += 1;
         await this.$store.dispatch(GET_MESSAGES);
-        this.fillNotificationFeed();
+        //this.fillNotificationFeed();
       }
       // вывод оповещения о новом оповещении
       this.$notification["info"]({
@@ -136,15 +110,6 @@ export default {
       });
     }
   },
-  async created() {
-    //console.log(`LoginBar: userdata is ${JSON.stringify(this.datauser,null,3)}`);
-    await this.$store.dispatch(GET_MESSAGES); // TODO: доработать для получения только персональных и только НЕпрочитанных сообщений
-    // динамическая подписка на событие сокета, на всякий случай
-    // this.$socket.$subscribe('socketMessage', payload => {
-    //   console.log(`socketMessage fired!`)
-    // });
-    this.fillNotificationFeed();
-  },
   methods: {
     // datauser() {
     //   // TODO: переделать везде также. Может вообще отдельный геттер сделать с этой проверкой
@@ -155,6 +120,10 @@ export default {
         this.userData.result.firstName + " " + this.userData.result.lastName
       );
     },
+    // установка счетчика сообщений из дочернего компонента
+    // setNtfCounter(n) {
+    //   this.notifCount = n;
+    // },
     loggedUserAvatar() {
       return this.userData.result.googleImage
         ? this.userData.result.googleImage
@@ -182,24 +151,6 @@ export default {
 //   padding: 5px 10px !important;
 // }
 
-.notif {
-  &-item {
-    width: 350px;
-    padding: 5px 0 !important;
-  }
-  &-title {
-    margin-bottom: 0;
-    font-size: 1rem;
-  }
-  &-description {
-    font-size: 0.9rem;
-    color: rgba(17, 12, 62, 0.6);
-  }
-  &-avatar {
-    margin-right: 5px;
-  }
-}
-
 .user-info-popover {
   .ant-btn {
     border: 0;
@@ -214,11 +165,6 @@ export default {
   &:hover {
     cursor: pointer;
   }
-}
-
-.list-container {
-  height: 400px;
-  overflow: auto;
 }
 
 .user-bar {
@@ -249,7 +195,7 @@ export default {
   .logout::after {
     content: "";
     position: absolute;
-    left: -70px;
+    left: -10px;
     top: 0;
     height: 100%;
     width: 1px;
