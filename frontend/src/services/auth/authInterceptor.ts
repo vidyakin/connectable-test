@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { SET_USER_DATA } from '@/store/user/mutations.type';
+import { SET_USER_DATA, ERROR_LOGIN } from '@/store/user/mutations.type';
 import { router } from '../../router';
 import store from '../../store';
 
@@ -19,6 +19,10 @@ export const setAuthInterceptor = () => {
       //store.commit(SET_USER, null);
       store.commit(SET_USER_DATA, null); // для теста - чтобы убрать везде SET_USER_
       router.push('/login');
+    } else if (error.response.status === 403) {
+      console.error('Вход заблокирован')
+      store.commit(ERROR_LOGIN, 'Вход заблокирован')
+      return Promise.resolve(error)
     } else if (errData && errData.message) {
       console.error((errData.name ? errData.name + ': ' : '') + errData.message);
     } else if (error instanceof Error) {
