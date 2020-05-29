@@ -144,7 +144,29 @@ exports.forgot_password_old = function(req, res) {
     });
 };
 
+exports.testMail = function(req, res) {
+    const data = {
+        to: 'vidyakin.sergey@gmail.com',
+        from: '"Connectable" <mail@connectable.pro>',
+        subject: 'тестовое письмо',
+        html: "Проверка отправки письма"
+    }
+    console.log('TEST EMAIL WILL SEND');
+    
+    transporter.sendMail(data, function(err) {
+        if (!err) {
+            console.log(`TEST EMAIL: sent OK`);                
+            return res.status(200).json({ status: 200, message: 'Тестовое письмо отправлено успешно' });
+        } else {
+            console.log(`TEST EMAIL: Error `,err);
+            return res.status(422).json({message: err});
+        }
+    });
+}
+
 exports.forgot_password = async (req, res) => {
+    console.log('FORGOT START:',req.body);
+
     const user = await User.findOne({ email: req.body.email }); // надо ставить фильтр чтоб гугл-ид == undef и outlook-id тоже
     if (!user) {
         console.log(`user who forget was not found`)
