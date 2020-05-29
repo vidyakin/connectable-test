@@ -95,7 +95,7 @@ app.use('/api/outlook/event', require('./calendar'));
 app.use('/api/google/event', require('./google'));
 app.use("/role", require('./role/routes'));
 
-var userHandlers = require('./email/index.js');
+var userHandlers = require('./email/index');
 var userDAO = require('./dao/user-dao');
 
 app.put('/api/user/delete/:userId', userDAO.delUserById)
@@ -108,6 +108,9 @@ app.get('/', (req, res) => {
 app.route('/auth/forgot_password')
     .get(userHandlers.render_forgot_password_template)
     .post(userHandlers.forgot_password);
+
+app.post('/test_email', userHandlers.testMail)
+
 app.route('/auth/reset_password/:token')
     .get(userHandlers.render_reset_password_template)
     .post(userHandlers.reset_password);
