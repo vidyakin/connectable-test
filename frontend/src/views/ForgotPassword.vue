@@ -7,16 +7,7 @@
           <a-form-model ref="forgotForm" :model="theform" :rules="rules">
             <legend>Восстановление пароля</legend>
             <a-form-model-item prop="email">
-              <app-input
-                v-model="theform.email"
-                placeholder="Введите e-mail"
-                label="E-mail"
-                :class="{ 'is-invalid': submitted && !theform.email }"
-              />
-              <div
-                v-show="submitted && !theform.email"
-                class="invalid-feedback"
-              >Это поле обязательно</div>
+              <app-input v-model="theform.email" placeholder="Введите e-mail" label="E-mail" />
             </a-form-model-item>
             <a-form-model-item>
               <a-button
@@ -57,7 +48,6 @@ export default {
       theform: {
         email: ""
       },
-      submitted: false,
       disabled: false,
       error: {
         email: false
@@ -66,7 +56,8 @@ export default {
         email: [
           {
             required: true,
-            message: "Это поле обязательно"
+            message: "Это поле обязательно",
+            trigger: "blur"
           }
         ]
       }
@@ -77,7 +68,7 @@ export default {
   },
   methods: {
     async handleSubmit(e) {
-      this.submitted = true;
+      console.log("submit forgeting:", this.theform);
       try {
         this.disabled = true;
         const valid = await this.$refs.forgotForm.validate();
@@ -85,9 +76,8 @@ export default {
           email: this.theform.email
         });
       } catch (error) {
-        console.log(error);
+        console.log("submit error:", error);
       } finally {
-        this.submitted = false;
         this.disabled = false;
         if (this.forgotInfo && this.forgotInfo.status !== 404)
           this.theform.email = "";
