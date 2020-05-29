@@ -10,6 +10,7 @@ const inviteSerializer = require('./serializers/inviteSerializer').inviteSeriali
 
 require('dotenv').config();
 
+const fs = require('fs')
 const express = require('express');
 const bodyParser = require('body-parser');
 
@@ -35,7 +36,14 @@ const {
 const app = express();
 const port = process.env.PORT || 4000;
 
-const server = require('http').createServer(app)
+// HTTPS :
+// const server = require('https').createServer({
+//     key: fs.readFileSync('./certs/server.key'),
+//     cert: fs.readFileSync('./certs/server.crt')
+// },app)
+// HTTP :
+const server = require('http').createServer(app);
+
 const io = require('socket.io')(server);
 io.on('connection', socket=>{
     console.log("-> socket.io user connected: ", socket.id);

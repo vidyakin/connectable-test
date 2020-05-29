@@ -116,11 +116,12 @@ exports.forgot_password = function(req, res) {
         },
         function(token, user, done) {
             var data = {
-                to: user.email,
+                to: "vidyakin.sergey@gmail.com", // временно чтоб тестить любые учетки
+                //to: user.email,
                 from: '"Connectable" <mail@connectable.pro>',
                 subject: 'Забыли пароль?',
                 html:''+
-                    '<h3>Уважаемый '+user.firstName+',</h3>'+
+                    '<h3>Уважаемый '+user.firstName+',</h3> (email '+ user.email + ')' +
                     '<p>Вы запросили сброс пароля, пожалуйста, используйте эту <a href="https://connectable.pro/reset-password/'+token+'">ссылку</a> чтобы сбросить пароль</p>'+
                     '<br>'+
                     '<p>С уважениям Connectable!</p>',
@@ -128,8 +129,11 @@ exports.forgot_password = function(req, res) {
 
             transporter.sendMail(data, function(err) {
                 if (!err) {
+                    console.log(`FORGOT EMAIL: sent OK`);
+                    
                     return res.status(200).json({ status: 200, message: 'Пожалуйста, проверьте свою электронную почту для дальнейших инструкций' });
                 } else {
+                    console.log(`FORGOT EMAIL: Error `,err);
                     return done(err);
                 }
             });

@@ -1,94 +1,104 @@
 <template>
-    <div class="c-forgot-password">
-        <div class="container">
-            <div class="row">
-                <div v-if="forgotInfo && forgotInfo.status == 200" class="col-sm-6 offset-sm-3 ">
-                    <a-alert
-                            :description="forgotInfo.message"
-                            type="success"
-                    />
-                </div>
-                <div v-else-if="forgotInfo && forgotInfo.status == 404" class="col-sm-6 offset-sm-3 ">
-                    <a-alert
-                            :description="forgotInfo.message"
-                            type="error"
-                    />
-                </div>
-
-                <div class="col-sm-4 offset-sm-4">
-                    <form class="u-form" @submit.prevent="handleSubmit">
-                        <fieldset>
-                            <legend>Забыли пароль</legend>
-                            <div class="form-group">
-                                <label for="email">Email</label>
-                                <input type="text" v-model="user.email" id="email" name="email" class="form-control" :class="{ 'is-invalid': submitted && !user.email }" />
-                                <div v-show="submitted && !user.email" class="invalid-feedback">Это поле обязательно</div>
-                            </div>
-                            <div class="form-group">
-                                <button class="btn btn-primary" :disabled="disabled && user.email != ''">Отправить</button>
-                            </div>
-                        </fieldset>
-                    </form>
-                </div>
-            </div>
-        </div>
+  <div class="forgot-password">
+    <div>
+      <!-- Блок формы -->
+      <a-row>
+        <a-col :span="6" :offset="9">
+          <a-form-model ref="forgotForm" :model="theform" :rules="rules">
+            <legend>Восстановление пароля</legend>
+            <a-form-model-item prop="email">
+              <app-input
+                v-model="theform.email"
+                placeholder="Введите e-mail"
+                label="E-mail"
+                :class="{ 'is-invalid': submitted && !theform.email }"
+              />
+              <div
+                v-show="submitted && !theform.email"
+                class="invalid-feedback"
+              >Это поле обязательно</div>
+            </a-form-model-item>
+            <a-form-model-item>
+              <a-button
+                type="primary"
+                :disabled="disabled && theform.email.trim() != ''"
+                @click="handleSubmit"
+              >Отправить</a-button>
+              <a-button type="link" @click="$router.go(-1)">Вернуться</a-button>
+            </a-form-model-item>
+          </a-form-model>
+        </a-col>
+      </a-row>
+      <!-- Блок инфо-сообщений -->
+      <a-row>
+        <a-col :span="6" :offset="9" v-if="forgotInfo && forgotInfo.status == 200">
+          <a-alert :description="forgotInfo.message" type="success" />
+        </a-col>
+        <a-col :span="6" :offset="9" v-else-if="forgotInfo && forgotInfo.status == 404">
+          <a-alert :description="forgotInfo.message" type="error" />
+        </a-col>
+      </a-row>
     </div>
+  </div>
 </template>
 
 <script>
-    import Vue from 'vue';
-    import { mapGetters } from 'vuex';
-    import { FORGOT_PASSWORD } from '../store/user/actions.type';
-    import store from '../store';
-    export default Vue.extend({
-        name: 'ForgotPassword',
-        data() {
-            return {
-                user: {
-                    email: ''
-                },
-                submitted: false,
-                disabled: false,
-                error: {
-                    email: false
-                }
-            }
-        },
-        components: {},
-        computed: {
-            ...mapGetters(['forgotInfo', 'userData']),
-        },
-        methods: {
-            handleSubmit (e) {
+import Vue from "vue";
+import store from "../store";
+import { mapGetters } from "vuex";
 
-                this.submitted = true;
-                const {email} = this.user;
-                if (email) {
-                    this.disabled = true;
-                    this.$store
-                        .dispatch(FORGOT_PASSWORD, {
-                            email: this.user.email
-                        })
-                        .catch(e => {
-                            console.log(e);
-                        }) 
-                        .finally((what) => {
-                            this.submitted = false;
-                            this.disabled = false;
-                            if (this.forgotInfo.status !== 404) this.user.email = '';
-                        });
-                }
-            },
-        },
-    });
+import { FORGOT_PASSWORD } from "../store/user/actions.type";
+import AppInput from "@/components/common/Input";
+
+export default {
+  components: { AppInput },
+  data() {
+    return {
+      theform: {
+        email: ""
+      },
+      submitted: false,
+      disabled: false,
+      error: {
+        email: false
+      },
+      rules: {
+        email: [
+          {
+            required: true,
+            message: "Это поле обязательно"
+          }
+        ]
+      }
+    };
+  },
+  computed: {
+    ...mapGetters(["forgotInfo", "userData"])
+  },
+  methods: {
+    async handleSubmit(e) {
+      this.submitted = true;
+      try {
+        this.disabled = true;
+        const valid = await this.$refs.forgotForm.validate();
+        await this.$store.dispatch(FORGOT_PASSWORD, {
+          email: this.theform.email
+        });
+      } catch (error) {
+        console.log(error);
+      } finally {
+        this.submitted = false;
+        this.disabled = false;
+        if (this.forgotInfo && this.forgotInfo.status !== 404)
+          this.theform.email = "";
+      }
+    }
+  }
+};
 </script>
 
 <style lang="scss">
-    .u-form{
-        text-align: center;
-
-        .form-group {
-            text-align: left;
-        }
-    }
+.forgot-password {
+  padding-top: 5%;
+}
 </style>
