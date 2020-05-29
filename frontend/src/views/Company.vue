@@ -97,6 +97,8 @@ export default Vue.extend({
   background-color: #f0f0f7;
   height: calc(100vh - 210px);
   overflow: auto;
+  width: 100%;
+  position: fixed;
 
   @media (max-width: 767px) {
     padding: 20px 15px;

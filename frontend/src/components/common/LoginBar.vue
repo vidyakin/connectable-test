@@ -1,6 +1,7 @@
 <template>
   <div class="user-bar">
     <div class="user-info" v-if="userData">
+      <div style="align-self: center;">{{getSubdomain()}}</div>
       <!-- Список сообщений -->
       <!-- <a-popover placement="bottom" trigger="click">
         <template slot="content">
@@ -11,19 +12,21 @@
         </a-badge>
       </a-popover>-->
       <!-- Меню действий пользователя -->
-      <a-dropdown>
-        <a-menu slot="overlay">
-          <a-menu-item key="logout" @click="logout">
-            <a-icon type="logout" />Выйти
-          </a-menu-item>
-        </a-menu>
-        <a-button class="logout" style="margin-right: 1rem;">
-          {{ loggedUserFullName() }}
-          <a-icon type="down" />
-        </a-button>
-      </a-dropdown>
-      <!-- Аватарка -->
-      <a-avatar :src="loggedUserAvatar()" />
+      <div>
+        <a-dropdown>
+          <a-menu slot="overlay">
+            <a-menu-item key="logout" @click="logout">
+              <a-icon type="logout" />Выйти
+            </a-menu-item>
+          </a-menu>
+          <a-button class="logout" style="margin-right: 1rem;">
+            {{ loggedUserFullName() }}
+            <a-icon type="down" />
+          </a-button>
+        </a-dropdown>
+        <!-- Аватарка -->
+        <a-avatar :src="loggedUserAvatar()" />
+      </div>
     </div>
   </div>
 </template>
@@ -120,6 +123,12 @@ export default {
         this.userData.result.firstName + " " + this.userData.result.lastName
       );
     },
+    getSubdomain() {
+      return window.location.href
+        .replace(/https?:\/\//, "")
+        .split("/")[0]
+        .split(".")[0];
+    },
     // установка счетчика сообщений из дочернего компонента
     // setNtfCounter(n) {
     //   this.notifCount = n;
@@ -203,7 +212,7 @@ export default {
   }
   .user-info {
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
     /*margin-right: 30px;*/
     padding: 10px 15px;
 
