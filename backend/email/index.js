@@ -87,7 +87,7 @@ exports.render_reset_password_template = function(req, res) {
 /**
  * Forgot password
  */
-exports.forgot_password = function(req, res) {
+exports.forgot_password_old = function(req, res) {
     async.waterfall([
         function(done) {
             User.findOne({
@@ -143,6 +143,42 @@ exports.forgot_password = function(req, res) {
         return res.status(422).json({ message: err });
     });
 };
+
+exports.forgot_password = async (req, res) => {
+    const user = await User.findOne({ email: req.body.email }); // надо ставить фильтр чтоб гугл-ид == undef и outlook-id тоже
+    if (!user) {
+        console.log(`user who forget was not found`)
+        return res.status(200).json({ status: 404, message: 'Пользователь не найден.' });
+    }
+    console.log(`user who forget was found: ${JSON.stringify(user,null,3)}`)
+    // generate token and write it to the same field in user
+    crypto.randomBytes(20, async function(err, buffer) {
+        const token = buffer.toString('hex');
+        const new_user = await User.findByIdAndUpdate({ _id: user._id }, { reset_password_token: token, reset_password_expires: Date.now() + 86400000 }, { upsert: true, new: true })
+        var data = {
+            to: "vidyakin.sergey@gmail.com", // временно чтоб тестить любые учетки
+            //to: user.email,
+            from: '"Connectable" <mail@connectable.pro>',
+            subject: 'Забыли пароль?',
+            html:''+
+                '<h3>Уважаемый '+new_user.firstName+',</h3> (email '+ new_user.email + ')' +
+                '<p>Вы запросили сброс пароля, пожалуйста, используйте эту <a href="https://connectable.pro/reset-password/'+token+'">ссылку</a> чтобы сбросить пароль</p>'+
+                '<br>'+
+                '<p>С уважениям Connectable!</p>',
+        };
+
+        transporter.sendMail(data, function(err) {
+            if (!err) {
+                console.log(`FORGOT EMAIL: sent OK`);                
+                return res.status(200).json({ status: 200, message: 'Пожалуйста, проверьте свою электронную почту для дальнейших инструкций' });
+            } else {
+                console.log(`FORGOT EMAIL: Error `,err);
+                return res.status(422).json({message: err});
+            }
+        });
+    });        
+
+}
 
 /**
  * Reset password
