@@ -45,6 +45,7 @@ const port = process.env.PORT || 4000;
 const server = require('http').createServer(app);
 
 const io = require('socket.io')(server);
+io.set('transports', ["websocket", "polling"]);
 io.on('connection', socket=>{
     console.log("-> socket.io user connected: ", socket.id);
     socket.on('disconnect',()=>{
@@ -109,14 +110,28 @@ app.route('/auth/forgot_password')
     .get(userHandlers.render_forgot_password_template)
     .post(userHandlers.forgot_password);
 
+/**
+ * testing
+ */
 app.post('/test', (req, res) => {
-    if (res.body.action == 'test_email') {
+    if (req.body.action == 'test_email') {
         userHandlers.testMail(req, res)
     } else {
         res.status(200).send('test path was requested, body is: '+JSON.stringify(req.body,null,3))
     }
     
 })
+
+app.post('/api/test', validateToken, (req, res) => {
+    if (req.body.action == 'test_email') {
+        userHandlers.testMail(req, res)
+    } else {
+        res.status(200).send('protected test path was requested, body is: '+JSON.stringify(req.body,null,3))
+    }
+    
+})
+
+// == == end of test
 
 app.route('/auth/reset_password/:token')
     .get(userHandlers.render_reset_password_template)
