@@ -5,7 +5,7 @@
       <a-row>
         <a-col :span="6" :offset="9">
           <a-form-model ref="forgotForm" :model="theform" :rules="rules">
-            <legend>Восстановление пароля fix #4</legend>
+            <legend>Восстановление пароля fix #5</legend>
             <a-form-model-item prop="email">
               <app-input v-model="theform.email" placeholder="Введите e-mail" label="E-mail" />
             </a-form-model-item>
