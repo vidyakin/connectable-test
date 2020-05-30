@@ -109,7 +109,14 @@ app.route('/auth/forgot_password')
     .get(userHandlers.render_forgot_password_template)
     .post(userHandlers.forgot_password);
 
-app.post('/test_email', userHandlers.testMail)
+app.post('/test', (req, res) => {
+    if (res.body.action == 'test_email') {
+        userHandlers.testMail(req, res)
+    } else {
+        res.status(200).send('test path was requested, body is: '+JSON.stringify(req.body,null,3))
+    }
+    
+})
 
 app.route('/auth/reset_password/:token')
     .get(userHandlers.render_reset_password_template)
