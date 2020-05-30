@@ -144,7 +144,7 @@ exports.forgot_password_old = function(req, res) {
     });
 };
 
-exports.testMail = function(req, res) {
+module.exports.testMail = function(req, res) {
     const data = {
         to: 'vidyakin.sergey@gmail.com',
         from: '"Connectable" <mail@connectable.pro>',
@@ -164,7 +164,7 @@ exports.testMail = function(req, res) {
     });
 }
 
-exports.forgot_password = async (req, res) => {
+module.exports.forgot_password = async (req, res) => {
     console.log('FORGOT START:',req.body);
 
     const user = await User.findOne({ email: req.body.email }); // надо ставить фильтр чтоб гугл-ид == undef и outlook-id тоже
