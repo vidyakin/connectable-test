@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const gISchema = new Schema({
+  clientId: String,       // код клиента
   userId: String,
   groupId: String,
   created: {

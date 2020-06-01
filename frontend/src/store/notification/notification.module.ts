@@ -9,16 +9,17 @@ import {
 import {
   PUT_NOTIFICATION,
   GET_NOTIFICATION,
-  socket_newMessage,
   CREATE_MESSAGE,
-  GET_MESSAGES
+  GET_MESSAGES,
+  READ_MESSAGES
 } from '@/store/notification/actions.type';
 
 import {
-  postNotification, 
-  getNotification, 
+  postNotification,
+  getNotification,
   createMessage,
-  getMessages
+  getMessages,
+  markMessagesAsRead
 } from '@/services/notification.service';
 
 interface State {
@@ -60,7 +61,8 @@ const actions = {
   [PUT_NOTIFICATION]: postNotification,
   [GET_NOTIFICATION]: getNotification,
   [CREATE_MESSAGE]: createMessage,
-  [GET_MESSAGES]: getMessages
+  [GET_MESSAGES]: getMessages,
+  [READ_MESSAGES]: markMessagesAsRead
   //[socket_newMessage]: newMessage,    // помещение сообщения в БД и далее вызов SOCKET_NEW_MESSAGE
 };
 

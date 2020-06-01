@@ -6,3 +6,6 @@ export const socket_newMessage = 'socket_newMessage';
 // добавление сообщений в стор
 export const CREATE_MESSAGE = 'CREATE_MESSAGE';
 export const GET_MESSAGES = 'GET_MESSAGES';
+
+// прочитанность сообщений
+export const READ_MESSAGES = 'READ_MESSAGES'

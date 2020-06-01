@@ -70,10 +70,10 @@ export default {
 </script>
 
 <style lang="scss">
-// .list-container {
-//   height: 400px;
-//   overflow: auto;
-// }
+.list-container {
+  overflow-y: scroll;
+  max-height: calc(100vh - 20rem);
+}
 
 .notif {
   &-item {

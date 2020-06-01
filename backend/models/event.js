@@ -13,6 +13,7 @@ const Schema = mongoose.Schema;
 const eventsEndPoint = 'https://www.googleapis.com/calendar/v3/calendars/primary/events';
 
 const eventSchema = new Schema({
+  client_id: String,       // код клиента
   userId: String,
   name: String,
   date: Date,
@@ -24,6 +25,25 @@ const eventSchema = new Schema({
   googleEventId: String,
   attendees: Array
 });
+
+const safeStringify = val => {
+  let cache = []
+  const f = (key, value) => {
+      if (typeof value === 'object' && value !== null) {
+          if (cache.indexOf(value) !== -1) {
+              // Duplicate reference found, discard key
+              return;
+          }
+          // Store value in our collection
+          cache.push(value);
+      }
+      return value;
+  }
+  let strD = JSON.stringify(val, f, 3);
+  cache = null;
+  return strD;
+}
+
 /*Bearer*/
 eventSchema.pre('save', function (next) {
   //console.log(`events pre Save on back: this ${JSON.stringify(this,null,3)}`);
@@ -51,24 +71,6 @@ eventSchema.pre('save', function (next) {
     //if (this.attendees) event.attendees = this.attendees;
     //console.log(`>> event.js: 'event' is: ${JSON.stringify(event,null,2)}`)
 
-    const safeStringify = val => {
-      let cache = []
-      const f = (key, value) => {
-          if (typeof value === 'object' && value !== null) {
-              if (cache.indexOf(value) !== -1) {
-                  // Duplicate reference found, discard key
-                  return;
-              }
-              // Store value in our collection
-              cache.push(value);
-          }
-          return value;
-      }
-      let strD = JSON.stringify(val, f, 3);
-      cache = null;
-      return strD;
-    }
-    
     axios
       .post(eventsEndPoint, event, {headers: headers})
       .then(_d => {        
@@ -102,22 +104,31 @@ eventSchema.pre('deleteOne', { query: true, document: true }, function(next) {
 
 })
 
-eventSchema.pre('editOne', { query: true, document: true }, function(next) {
-  this.findOne({_id: this._conditions._id}).catch(e => {})
-    .then(event => {
-      user
-      .findOne({_id: event.userId}).catch(err => console.log(err))
-      .then(data => {
-        const headers = {
-          'Authorization': `Bearer ${data.googleToken}`,
-        };
-
-        axios
-          .put(eventsEndPoint + event.googleEventId, event, { headers })
-          .catch(e => { next() })
-          .then((data) => { next() })
-      })
-  });
+eventSchema.pre('updateOne', { query: true, document: true }, async function(next) {
+  try {
+    // "this" is a huge JSON object of 4.5k lines
+    // const theevent = this._update
+    // Чтобы не делать лишний запрос данные о событии есть в поле "this._update",
+    // но почему-то там нет поля googleToken, приходится делать запроск базе
+    const theevent = await this.findOne({_id: this._conditions._id})
+    const thisuser = await user.findOne({_id: theevent.userId})
+    const headers = {
+      'Authorization': `Bearer ${thisuser.googleToken}`,
+    };
+    const event = {
+      description: theevent.comment,
+      start: {'dateTime': theevent.date},
+      end: {'dateTime': theevent.end},
+      summary: theevent.name,
+      attendees: theevent.attendees ? theevent.attendees : []
+    };
+    await axios.put(eventsEndPoint+'/'+theevent.googleEventId, event, { headers })
+    console.log(`Event was updated normally`);
+    next()
+  } catch (error) {
+    console.log(`Error while update event in Google: ${error}`);            
+    next() 
+  }
 
 })
 

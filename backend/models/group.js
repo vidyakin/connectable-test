@@ -5,21 +5,22 @@ const groupParticipant = require('./groupParticipant');
 const Schema = mongoose.Schema;
 
 const groupSchema = new Schema({
-    name: String,
-    description: String,
-    type: Number,
-    created: {
-        type: Date,
-        default: Date.now(),
-    },
-    creatorId: String,
-    participants: Array,
-    requests: Array,
+  client_id: String,       // код клиента
+  name: String,
+  description: String,
+  type: Number,
+  created: {
+    type: Date,
+    default: Date.now(),
+  },
+  creatorId: String,
+  participants: Array,
+  requests: Array,
 });
 
 groupSchema.pre('save', function (next) {
-    groupParticipant.create({groupId: this._id, participantId: this.creatorId});
-    next();
+  groupParticipant.create({groupId: this._id, participantId: this.creatorId});
+  next();
 });
 
 module.exports = mongoose.model('Group', groupSchema);

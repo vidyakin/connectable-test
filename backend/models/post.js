@@ -5,6 +5,7 @@ const likeDao = require('../dao/like-dao');
 const Schema = mongoose.Schema;
 
 const postSchema = new Schema({
+  clientId: String,       // код клиента
   parent: Object,
   message: String,
   author: Object,
