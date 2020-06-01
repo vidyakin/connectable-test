@@ -1,0 +1,101 @@
+name: MERGE MASTER
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: SET GLOBAL ENV VARS
+      # ::set-env name={name}::{value}
+      run: |
+        echo "::set-env name=PROD_ENV_FILE::.env.prod"
+        echo "::set-env name=PROD_ROOT_DIR::connectable"
+    - name: PREPARE PROD ENV
+      uses: appleboy/ssh-action@master
+      env:
+        MONGO_INITDB_ROOT_USERNAME: "connroot"
+        MONGO_INITDB_ROOT_PASSWORD: ${{ secrets.MONGO_INITDB_ROOT_PASSWORD }}
+        MONGO_USER: "connapp"
+        MONGO_PASS:  ${{ secrets.MONGO_PASS }}
+        PROD_ENV_FILE: ${{ env.PROD_ENV_FILE }}
+        PROD_ROOT_DIR: ${{ env.PROD_ROOT_DIR }}
+      with:
+        host: ${{ secrets.HOST_GCP }}
+        username: ${{ secrets.USERNAME_GCP }}
+        key: ${{ secrets.PRIVATE_KEY_GCP }}
+        script_stop: true
+        envs: MONGO_INITDB_ROOT_USERNAME,MONGO_INITDB_ROOT_PASSWORD,MONGO_USER,MONGO_PASS,PROD_ROOT_DIR,PROD_ENV_FILE
+        script: |
+          echo "MONGO_INITDB_ROOT_USERNAME=$MONGO_INITDB_ROOT_USERNAME" > $PROD_ENV_FILE
+          echo "MONGO_INITDB_ROOT_PASSWORD=$MONGO_INITDB_ROOT_PASSWORD" >> $PROD_ENV_FILE
+          echo "MONGO_USER=$MONGO_USER" >> $PROD_ENV_FILE
+          echo "MONGO_PASS=$MONGO_PASS" >> $PROD_ENV_FILE
+          echo "DB_URL=mongodb://$MONGO_USER:$MONGO_PASS@mongodb:27017/connectable" >> $PROD_ENV_FILE
+    - name: FETCH PROD UPDATES
+      uses: appleboy/ssh-action@master
+      env:
+        PROD_ENV_FILE: ${{ env.PROD_ENV_FILE }}
+        PROD_ROOT_DIR: ${{ env.PROD_ROOT_DIR }}
+      with:
+        host: ${{ secrets.HOST_GCP }}
+        username: ${{ secrets.USERNAME_GCP }}
+        key: ${{ secrets.PRIVATE_KEY_GCP }}
+        script_stop: true
+        envs: PROD_ENV_FILE, PROD_ROOT_DIR
+        script: |
+          test -d "$HOME/$PROD_ROOT_DIR-bak" && sudo rm -rf "$HOME/$PROD_ROOT_DIR-bak" && \
+          sudo cp -r "$HOME/$PROD_ROOT_DIR" "$HOME/$PROD_ROOT_DIR-bak" && \
+          sudo chown -R tech:tech "$HOME/$PROD_ROOT_DIR" && \
+          cd "$HOME/$PROD_ROOT_DIR" &&
+          git checkout . &&
+          git pull origin master &&
+          cat "$HOME/$PROD_ENV_FILE" >> "$HOME/$PROD_ROOT_DIR/$PROD_ENV_FILE"
+    - name: DEPLOY PROD
+      uses: appleboy/ssh-action@master
+      env:
+        PROD_ROOT_DIR: ${{ env.PROD_ROOT_DIR }}
+      with:
+        host: ${{ secrets.HOST_GCP }}
+        username: ${{ secrets.USERNAME_GCP }}
+        key: ${{ secrets.PRIVATE_KEY_GCP }}
+        script_stop: true
+        envs: PROD_ROOT_DIR
+        script: |
+          cd "$HOME/$PROD_ROOT_DIR" && \
+          docker-compose -f docker-compose-prod.yaml build --force-rm connfrontend && \
+          docker-compose -f docker-compose-prod.yaml up --no-deps -d connfrontend && \
+          docker-compose -f docker-compose-prod.yaml build --force-rm connbackend && \
+          docker-compose -f docker-compose-prod.yaml up --no-deps -d -V connbackend && \
+          docker system prune -f && docker volume prune -f
+    - name: INVALIDATE CLOUDFLARE CACHE
+      if: ${{ success() }}
+      env:
+        CF_TOKEN: ${{ secrets.CF_TOKEN }}
+      run: |
+        curl -X POST "https://api.cloudflare.com/client/v4/zones/3eb26a729ba17d1d214910633e1204cb/purge_cache" \
+            -H "Authorization: Bearer $CF_TOKEN" \
+            -H "Content-Type:application/json" \
+            --data '{"purge_everything":true}'
+    - name: FAILURE ROLLBACK
+      if: ${{ failure() }}
+      uses: appleboy/ssh-action@master
+      env:
+        PROD_ROOT_DIR: ${{ env.PROD_ROOT_DIR }}
+      with:
+        host: ${{ secrets.HOST_GCP }}
+        username: ${{ secrets.USERNAME_GCP }}
+        key: ${{ secrets.PRIVATE_KEY_GCP }}
+        script_stop: true
+        envs: PROD_ROOT_DIR
+        script: |
+          test -d "$HOME/$PROD_ROOT_DIR" && sudo rm -rf "$HOME/$PROD_ROOT_DIR" && \
+          sudo cp -r "$HOME/$PROD_ROOT_DIR-bak" "$HOME/$PROD_ROOT_DIR" && \
+          cd "$HOME/$PROD_ROOT_DIR" && \
+          docker kill connbackend connfrontend && \
+          docker-compose -f docker-compose-prod.yaml up -d -V connfrontend connbackend && \
+          docker system prune -f && docker volume prune -f
