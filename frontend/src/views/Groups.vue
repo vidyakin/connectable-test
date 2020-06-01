@@ -75,9 +75,9 @@ export default {
     // },
     ...mapGetters(["groups", "userData"])
   },
-  async beforeCreate() {
+  async beforeMount() {
     try {
-      await this.$store.dispatch(GET_GROUPS);
+      await this.$store.dispatch(GET_GROUPS, this.userData.result._id);
       this.isLoaded = true;
       this.userIsAdmin = this.$can("read", {
         accessEmail: this.datauser.email,

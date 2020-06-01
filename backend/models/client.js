@@ -17,7 +17,7 @@ const clientSchema = new Schema({
     director: String, // директор компании
     logo: String,       // путь к логотипу компании
     colors: Array,  // массив корпоративных цветов,
-    has_access: { type: Boolean, default: true },
+    has_access: { type: Boolean, default: true },   // наличие доступа клиента к системе
     comment: String // дополнительная информация, примечания
 });
 

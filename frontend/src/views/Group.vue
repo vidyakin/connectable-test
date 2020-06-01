@@ -69,24 +69,51 @@
         </div>
         <div class="group-body-info-description">{{currentGroup.description}}</div>
       </div>
-      <!-- УЧАСТНИКИ -->
-      <div class="group-body-participants">
-        <div class="group-body-participants-header">Участники ({{currentGroup.participants.length}})</div>
-        <div
-          class="group-body-participants-participant"
-          v-for="(participant, index) in currentGroup.participants"
-          :key="index"
-        >
-          <a-avatar
-            :src="(participant.googleImage ? participant.googleImage : require('../assets/no_image.png'))"
-          ></a-avatar>
-          <div class="group-body-participants-participant-info">
-            <div
-              class="group-body-participants-participant-info-name"
-            >{{participant.firstName + " " + participant.lastName}}</div>
-            <div
-              class="group-body-participants-participant-info-positions"
-            >{{participant.positions.join(', ')}}</div>
+      <!-- ПРАВАЯ ПАНЕЛь -->
+      <div>
+        <!-- УЧАСТНИКИ -->
+        <div class="group-body-items">
+          <div class="group-body-items-header">Участники ({{currentGroup.participants.length}})</div>
+          <div
+            class="group-body-items-item"
+            v-for="(participant, index) in currentGroup.participants"
+            :key="index"
+          >
+            <a-avatar
+              :src="(participant.googleImage ? participant.googleImage : require('../assets/no_image.png'))"
+            ></a-avatar>
+            <div class="group-body-items-item-info">
+              <div
+                class="group-body-items-item-info-name"
+              >{{participant.firstName + " " + participant.lastName}}</div>
+              <div class="group-body-items-item-info-positions">{{participant.positions.join(', ')}}</div>
+            </div>
+          </div>
+        </div>
+        <!-- ЗАЯВКИ -->
+        <div class="group-body-items" v-if="currentGroup.requests.length">
+          <div class="group-body-items-header">Заявки ({{currentGroup.requests.length}})</div>
+          <div
+            class="group-body-items-item"
+            v-for="(req, index) in currentGroup.requests"
+            :key="index"
+          >
+            <a-avatar
+              :src="(req.googleImage ? req.googleImage : require('../assets/no_image.png'))"
+            ></a-avatar>
+            <div class="group-body-items-item-info">
+              <div class="group-body-items-item-info-name">{{req.firstName + " " + req.lastName}}</div>
+              <div class="group-body-items-item-info-positions">{{req.positions.join(', ')}}</div>
+              <div class="req-buttons">
+                <a-button type="primary" icon="check" size="small" @click="approve(req._id)"></a-button>
+                <a-button
+                  type="danger"
+                  icon="close"
+                  size="small"
+                  @click="deleteParticipant(req._id)"
+                ></a-button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -116,7 +143,7 @@
       >Подать заявку</a-button>
       <a-button
         type="primary"
-        @click="deleteParticipant"
+        @click="deleteOwnParticipant"
         v-if="currentGroup.type === 1   
             && isAuthor
             && participantsRequest"
@@ -140,6 +167,7 @@ import {
   DELETE_GROUP,
   DELETE_PARTICIPANT,
   GET_CURRENT_GROUP,
+  APPROVE_PARTICIPANTS_REQUEST,
   GET_PARTICIPANTS_REQUEST
 } from "../store/group/actions.type";
 
@@ -257,7 +285,7 @@ export default {
         groupId: this.currentGroup._id
       });
     },
-    deleteParticipant() {
+    deleteOwnParticipant() {
       this.$store
         .dispatch(DELETE_PARTICIPANT, {
           participantId: this.userinfo._id,
@@ -271,6 +299,20 @@ export default {
           participantId: this.userinfo._id,
           groupId: this.currentGroup._id,
           approved: false
+        })
+        .then(() => this.checkParticipants());
+    },
+    approve(participantId) {
+      this.$store.dispatch(APPROVE_PARTICIPANTS_REQUEST, {
+        groupId: this.currentGroup._id,
+        participantId
+      });
+    },
+    deleteParticipant(participantId) {
+      this.$store
+        .dispatch(DELETE_PARTICIPANT, {
+          participantId: participantId,
+          groupId: this.currentGroup._id
         })
         .then(() => this.checkParticipants());
     },
@@ -430,13 +472,14 @@ export default {
       }
     }
 
-    &-participants {
+    &-items {
       min-width: 15rem;
       width: 22rem;
       background-color: white;
-      height: 19rem;
+      // height: 19rem;
       border-radius: 0.25rem;
       padding: 1rem;
+      margin-bottom: 5px;
       box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.15);
 
       &-header {
@@ -450,7 +493,7 @@ export default {
         width: 100%;
       }
 
-      &-participant {
+      &-item {
         display: flex;
         margin-bottom: 10px;
 
@@ -464,7 +507,6 @@ export default {
             font-style: normal;
             font-stretch: normal;
             line-height: 1.85;
-            letter-spacing: normal;
             text-align: left;
             color: #4d565c;
           }
@@ -476,7 +518,6 @@ export default {
             font-style: normal;
             font-stretch: normal;
             line-height: 1.18;
-            letter-spacing: normal;
             text-align: left;
             color: #808495;
           }
@@ -488,6 +529,10 @@ export default {
   .btn-additional {
     justify-self: left;
     display: flex;
+  }
+
+  .req-buttons button {
+    margin-right: 10px;
   }
 }
 </style>

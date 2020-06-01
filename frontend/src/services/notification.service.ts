@@ -1,7 +1,7 @@
 import Vue from 'vue';
-import {SET_NOTIFICATION, SET_MESSAGES, ADD_MESSAGE} from '@/store/notification/mutations.type';
+import { SET_NOTIFICATION, SET_MESSAGES, ADD_MESSAGE } from '@/store/notification/mutations.type';
 
-export const postNotification = (context: any, notificationInfo : any) => {
+export const postNotification = (context: any, notificationInfo: any) => {
     return Vue.axios
         .post(`api/notification`, notificationInfo).then((response: any) => {
             console.log(response.data);
@@ -13,7 +13,7 @@ export const postNotification = (context: any, notificationInfo : any) => {
 };
 export const getNotification = (context: any, userId: any) => {
     return Vue.axios
-        .get(`api/notification/${userId}` )
+        .get(`api/notification/${userId}`)
         .then((response: any) => {
             context.commit(SET_NOTIFICATION, response.data.result);
         });
@@ -29,8 +29,16 @@ export const createMessage = async (context: any, msg: any) => {
 // TODO: пока без userId, надо сделать несколько вариантов получения сообщений
 export const getMessages = (context: any) => {
     return Vue.axios
-        .get(`api/message` )
+        .get(`api/message`)
         .then((response: any) => {
             context.commit(SET_MESSAGES, response.data.result);
         });
 };
+
+export const markMessagesAsRead = (context: any) => {
+    return Vue.axios
+        .put('/api/message/read_all')
+        .then(res => {
+            context.commit(SET_MESSAGES, res.data.resuls)
+        })
+}

@@ -8,8 +8,8 @@ const Schema = mongoose.Schema;
  * Описывает структуру отделов клиента
  */
 const structureSchema = new Schema({
-  client_id: String, // код клиента
-  orgTree: Schema.Types.Mixed // дерево структуры
+  client_id: String,       // код клиента
+  orgTree: Schema.Types.Mixed // дерево структуры целиком
 });
 
 module.exports = mongoose.model('Structure', structureSchema);

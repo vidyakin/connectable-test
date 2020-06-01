@@ -96,8 +96,9 @@ app.use('/api/outlook/event', require('./calendar'));
 app.use('/api/google/event', require('./google'));
 app.use("/role", require('./role/routes'));
 
-var userHandlers = require('./email/index');
+var mailer = require('./email/index');
 var userDAO = require('./dao/user-dao');
+const groupParticipantDAO = require('./dao/group-participant-dao')
 
 app.put('/api/user/delete/:userId', userDAO.delUserById)
 app.put('/api/user/undelete/:userId', userDAO.undelUserById)
@@ -107,15 +108,15 @@ app.get('/', (req, res) => {
 });
 
 app.route('/auth/forgot_password')
-    .get(userHandlers.render_forgot_password_template)
-    .post(userHandlers.forgot_password);
+    .get(mailer.render_forgot_password_template)
+    .post(mailer.forgot_password);
 
 /**
  * testing
  */
 app.post('/test', (req, res) => {
     if (req.body.action == 'test_email') {
-        userHandlers.testMail(req, res)
+        mailer.testMail(req, res)
     } else {
         res.status(200).send('test path was requested, body is: '+JSON.stringify(req.body,null,3))
     }
@@ -124,7 +125,7 @@ app.post('/test', (req, res) => {
 
 app.post('/api/test', validateToken, (req, res) => {
     if (req.body.action == 'test_email') {
-        userHandlers.testMail(req, res)
+        mailer.testMail(req, res)
     } else {
         res.status(200).send('protected test path was requested, body is: '+JSON.stringify(req.body,null,3))
     }
@@ -134,8 +135,8 @@ app.post('/api/test', validateToken, (req, res) => {
 // == == end of test
 
 app.route('/auth/reset_password/:token')
-    .get(userHandlers.render_reset_password_template)
-    .post(userHandlers.reset_password);
+    .get(mailer.render_reset_password_template)
+    .post(mailer.reset_password);
 
 app.post('/api/upload', (req, res, next) => {
   let imageFile = req.files.files;
@@ -223,7 +224,7 @@ db.once('open', function(callback){
 });
 
 //register page
-const mail = require('./email/index');
+
 app.post('/api/register', function(req,res){
     let firstName = req.body.firstName,
         lastname = req.body.lastName,
@@ -266,7 +267,7 @@ app.post('/api/register', function(req,res){
                     });
                     if (emailSend) {
                         console.log(`>> '/api/register' sending email to ${email}`);
-                        mail.NewUser(email, `https://connectable.pro/login/`, {email:email, password:password});
+                        mailer.NewUser(email, `https://connectable.pro/login/`, {email:email, password:password});
                     }
 
                 }
@@ -633,6 +634,18 @@ app.post('/api/group/replace_owner/:userId', async (req,res) => {
     // удаляем участника в отдельной коллекции участников, мидлварь создаст новую запись сама
     await GroupParticipant.deleteMany({participantId: req.params.userId})
     res.status(200).send('Employees was replaced to admin in all groups')
+})
+
+app.get('/api/group/byUser/:userId', async (req,res) => {
+    const groups = await groupParticipantDAO.findGroupsByUserId(req.params.userId)
+    const grMin = groups.map(g => ({name: g.name, t: g.type}))
+    console.log(`>> groups fro user ${req.params.userId} are: ${JSON.stringify(grMin,null,3)}`);
+    const data = {
+        status: 201,
+        result: await groupSerializer(groups)
+    }
+    if (groups) res.status(200).send(data)
+    else res(404).send("Error while getting groups for the user")
 })
   
 // Поиск событий где пользователь и автор и участник

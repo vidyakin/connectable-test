@@ -20,7 +20,7 @@ export const createGroup = (context: any, group: any) => {
 
 export const getGroups = (context: any, userId: any) => {
   return Vue.axios
-    .get(`api/group/`)
+    .get(`api/group/byUser/${userId}`)
     .then((response: any) => {
       context.commit(SET_GROUPS, response.data.result);
     });

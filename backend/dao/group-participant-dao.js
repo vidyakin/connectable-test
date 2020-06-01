@@ -1,4 +1,7 @@
+const mongoose = require('mongoose');
 const GroupParticipant = require('../models/groupParticipant');
+const Group = require('../models/group');
+const User = require('../models/user');
 
 module.exports.findByGroupId = async (groupId) => {
   return new Promise((resolve, rejected) => {
@@ -24,14 +27,36 @@ module.exports.findRequestsByGroupId = async (groupId) => {
   })
 };
 
-module.exports.findByUserId = async (userId) => {
-  return new Promise((resolve, rejected) => {
-    GroupParticipant.find({participantId: userId}, (err, data) => {
-      if (err) {
-        rejected(err)
-      } else {
-        resolve(data)
-      }
-    })
-  })
+module.exports.findGroupsByUserId = async (userId) => {
+  // return new Promise((resolve, rejected) => {
+  //   GroupParticipant.find({participantId: userId}, (err, data) => {
+  //     if (err) {
+  //       rejected(err)
+  //     } else {
+  //       resolve(data)
+  //     }
+  //   })
+  // })
+  try {
+    const user = await User.findOne({_id: userId})
+    // TODO: добавить отбор по клиенту
+    // TODO: добавить проверку роли когда они будут в пользователях
+    if (user.email == "w.project.portal3@gmail.com") {
+      return await Group.find()      
+    } else {
+      let groupIds = await GroupParticipant.find()
+        .where('participantId').equals(userId)
+        .select('groupId')    
+      groupIds = groupIds.map(_ => mongoose.Types.ObjectId(_.groupId))
+      const groups = await Group.find()
+        .or([
+          { type: { $in: [0,1] }}, // открытые и закрытые видно, но в закрытых не должно быть видно посты и участников (?)
+          { _id: { $in: groupIds} } // приватные не видно
+        ])
+      return groups
+    }
+  } catch (error) {
+    return error
+  }
+  
 };
