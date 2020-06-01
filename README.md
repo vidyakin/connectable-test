@@ -62,9 +62,9 @@ $ docker logs <container_name>
 
 ## CI/CD with GitHub & Jenkins
 
-Jenkins server is available at: http://34.66.39.81:8080  
+Jenkins server is available at: http://35.225.90.137:8080  
 
-#### 1.Each Pull Request to  ***Master*** branch is checked by this job: http://34.66.39.81:8080/blue/organizations/jenkins/connectable/pr
+#### 1.Each Pull Request to  ***Master*** branch is checked by this job: http://35.225.90.137:8080/blue/organizations/jenkins/connectable/pr
 Jenkins checks that:  
 * it is possible to build Frontend with NPM
 * it is possible to build Backend with NPM
@@ -76,7 +76,7 @@ Pull Requests will have Green/Red status from Jenkins in GitHub on PullRequest p
 ![PR-status](jenkins/misc/pr-status.png)
 
 #### 2.Each merge to ***Master*** branch triggers ***DEPLOY TO PRODUCTION***.
-Jenkins will run this Job: http://34.66.39.81:8080/blue/organizations/jenkins/connectable-MERGE-MASTER/branches
+Jenkins will run this Job: http://35.225.90.137:8080/blue/organizations/jenkins/connectable-MERGE-MASTER/branches
 
 The job is doing the following:
 - pull master changes to local server (prod)
@@ -91,15 +91,15 @@ You can see the job status on the main page after merge:
 
 #### 3.How to start Job manually
 If you need to manually deploy prod, or you want to restart any job:
-* login to Jenkins here: http://34.66.39.81:8080/
+* login to Jenkins here: http://35.225.90.137:8080/
 * user = conndev, pass = (ask Jenkins admin)
-* Open 'Jobs' page http://34.66.39.81:8080/blue/organizations/jenkins/pipelines
+* Open 'Jobs' page http://35.225.90.137:8080/blue/organizations/jenkins/pipelines
 * Choose a job you want to start/re-start
 
 
 For example, to manually re-deploy prod:
 - login to Jenkins
-- go to the Job Page http://34.66.39.81:8080/blue/organizations/jenkins/connectable-MERGE-MASTER/branches
+- go to the Job Page http://35.225.90.137:8080/blue/organizations/jenkins/connectable-MERGE-MASTER/branches
 - click on 'Run' button
 - the latest updates will be uploaded and deployed to prod
 
