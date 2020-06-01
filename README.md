@@ -78,8 +78,8 @@ GitHub Actions will run this Job: https://github.com/connectable-project/connect
 
 The job is doing the following:
 - pull master changes to local server (prod)
-- re-build docker containers for Front and Back (mongo remains the same)
-You can see the job status on the main page after merge:
+- re-build docker containers for Front and Back (mongo remains the same)  
+You can see the job status in the commit tree after merge:
 
 ![Merged-status](.github/images/merged-status.png)
 
