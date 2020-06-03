@@ -1,7 +1,7 @@
 <template>
   <div class="user-bar">
     <div class="user-info" v-if="userData">
-      <div style="align-self: center;">{{getSubdomain()}}</div>
+      <div style="align-self: center;">{{getClientInfo()}}</div>
       <!-- Список сообщений -->
       <!-- <a-popover placement="bottom" trigger="click">
         <template slot="content">
@@ -83,7 +83,13 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(["userData", "user", "users"])
+    ...mapGetters(["userData", "user", "users", "currentClient"]),
+    isSuperAdmin() {
+      return this.$can("manage", {
+        accessEmail: this.userData.result.email,
+        __type: "Client"
+      });
+    }
   },
   sockets: {
     connect() {
@@ -128,6 +134,10 @@ export default {
         .replace(/https?:\/\//, "")
         .split("/")[0]
         .split(".")[0];
+    },
+    getClientInfo() {
+      if (this.isSuperAdmin && this.currentClient)
+        return this.currentClient.name;
     },
     // установка счетчика сообщений из дочернего компонента
     // setNtfCounter(n) {

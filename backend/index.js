@@ -639,7 +639,6 @@ app.post('/api/group/replace_owner/:userId', async (req,res) => {
 app.get('/api/group/byUser/:userId', async (req,res) => {
     const groups = await groupParticipantDAO.findGroupsByUserId(req.params.userId)
     const grMin = groups.map(g => ({name: g.name, t: g.type}))
-    console.log(`>> groups fro user ${req.params.userId} are: ${JSON.stringify(grMin,null,3)}`);
     const data = {
         status: 201,
         result: await groupSerializer(groups)

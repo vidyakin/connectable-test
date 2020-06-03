@@ -75,7 +75,7 @@ export const loginWithOutlook = (context: any, params: any) => {
       };
       console.log(response);
       context.dispatch(LOGIN, userForLogin).finally(() => {
-        router.push('/about');
+        router.push('/company');
       });
     }).catch(e => {
       console.log(e);
@@ -97,7 +97,7 @@ export const loginWithGoogle = (context: any, $gAuth: any) => {
       };
       console.log('auth.service.ts:loginWithGoogle, userForLogin =', JSON.stringify(userForLogin, null, '\t'))
       context.dispatch(LOGIN, userForLogin).finally(() => {
-        router.push('/about');
+        router.push('/company');
         // this.$router.push({ name: 'about' });
       });
     });
