@@ -218,7 +218,7 @@ export default Vue.extend({
           })
           .finally(() => {
             if (!this.errorLogin) {
-              this.$router.push("about");
+              this.$router.push("company");
             } else {
               console.log("errorLogin:", this.errorLogin);
               this.submitted = true;
@@ -231,32 +231,32 @@ export default Vue.extend({
                 this.error.password = true;
               }
               if (this.errorLogin.deleted) {
-                this.msgError = "Ошибка входа";
-                this.fullErrorMsg = "Пользователь удален";
-                //this.showError = true;
-                this.msgStyle = "scale-in-vertical";
-                setTimeout(() => {
-                  this.msgStyle = "scale-out-vertical";
-                  this.showError = false;
-                }, 3000);
-                // this.$warning({
-                //   title: "Ошибка входа",
-                //   content: "Пользователь удален"
-                // });
+                this.showErrorUserBlocked();
               }
             }
           });
       }
+    },
+    showErrorUserBlocked() {
+      this.msgError = "Ошибка входа";
+      this.fullErrorMsg = "Пользователь удален";
+      //this.showError = true;
+      this.msgStyle = "scale-in-vertical";
+      setTimeout(() => {
+        this.msgStyle = "scale-out-vertical";
+        this.showError = false;
+      }, 3000);
     }
   },
   watch: {
     errorLogin(val) {
       if (!val) return;
-      this.$error({
-        centered: true,
-        title: "Ошибка входа",
-        content: "Ваша учетная запись заблокирована"
-      });
+      this.showErrorUserBlocked();
+      // this.$error({
+      //   centered: true,
+      //   title: "Ошибка входа",
+      //   content: "Ваша учетная запись заблокирована"
+      // });
     }
   },
   beforeCreate() {

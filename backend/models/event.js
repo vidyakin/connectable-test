@@ -110,7 +110,10 @@ eventSchema.pre('updateOne', { query: true, document: true }, async function(nex
     // const theevent = this._update
     // Чтобы не делать лишний запрос данные о событии есть в поле "this._update",
     // но почему-то там нет поля googleToken, приходится делать запроск базе
-    const theevent = await this.findOne({_id: this._conditions._id})
+    let theevent = await this.findOne({_id: this._conditions._id})
+    const event_id = theevent.googleEventId
+    theevent = this._update // берем данные из поступивших данных, а не найденных в базе
+    // берем токен
     const thisuser = await user.findOne({_id: theevent.userId})
     const headers = {
       'Authorization': `Bearer ${thisuser.googleToken}`,
@@ -122,12 +125,12 @@ eventSchema.pre('updateOne', { query: true, document: true }, async function(nex
       summary: theevent.name,
       attendees: theevent.attendees ? theevent.attendees : []
     };
-    await axios.put(eventsEndPoint+'/'+theevent.googleEventId, event, { headers })
+    await axios.put(eventsEndPoint+'/'+ event_id, event, { headers })
     console.log(`Event was updated normally`);
     next()
   } catch (error) {
     console.log(`Error while update event in Google: ${error}`);            
-    next() 
+    next(error) 
   }
 
 })
