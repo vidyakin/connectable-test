@@ -1,5 +1,5 @@
 const nodemailer = require("nodemailer");
-const UserDao = require('../dao/user-dao');
+const UserDao = require('../modules/users/user-dao');
 const User = require('../models').User;
 const async = require('async');
 const bcrypt = require('bcrypt');

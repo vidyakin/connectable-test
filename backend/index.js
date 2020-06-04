@@ -74,8 +74,10 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static('static'));
 
 app.use('/api', require('./auth/authRouter')); // ???
-app.use('/api/user/me', validateToken, require('./auth/authRouter'));
-app.use('/api/user', validateToken, require('./crud')(User, serializers.serializer));
+//app.use('/api/user/me', validateToken, require('./auth/authRouter'));
+//app.use('/api/user', validateToken, require('./crud')(User, serializers.serializer));
+app.use('/api/user', validateToken, require('./modules/users'))
+
 app.use('/api/group', validateToken, require('./crud')(Group, groupSerializer));
 app.use('/api/post', validateToken, require('./crud')(Post, serializers.postSerializer));
 app.use('/api/like', validateToken, require('./crud')(Like, serializers.serializer));
@@ -97,11 +99,11 @@ app.use('/api/google/event', require('./google'));
 app.use("/role", require('./role/routes'));
 
 var mailer = require('./email/index');
-var userDAO = require('./dao/user-dao');
 const groupParticipantDAO = require('./dao/group-participant-dao')
 
-app.put('/api/user/delete/:userId', userDAO.delUserById)
-app.put('/api/user/undelete/:userId', userDAO.undelUserById)
+// var userDAO = require('./modules/users/user-dao');
+// app.put('/api/user/delete/:userId', userDAO.delUserById)
+// app.put('/api/user/undelete/:userId', userDAO.undelUserById)
 
 app.get('/', (req, res) => {
     res.send('Connectable backend says Hello!!!');
@@ -112,7 +114,7 @@ app.route('/auth/forgot_password')
     .post(mailer.forgot_password);
 
 /**
- * testing
+ * test sending mail
  */
 app.post('/test', (req, res) => {
     if (req.body.action == 'test_email') {
@@ -226,16 +228,13 @@ db.once('open', function(callback){
 //register page
 
 app.post('/api/register', function(req,res){
-    let firstName = req.body.firstName,
-        lastname = req.body.lastName,
-        email = req.body.email,
-        password = req.body.password,
-        emailSend = req.body.emailSend,
+    let { firstName, lastName, email, password, emailSend } = req.body;
         data = {
-            "firstName": firstName,
-            "lastName":lastname,
-            "email":email,
-            "password":password,
+            firstName,
+            lastName,
+            email,
+            password,
+            client_id: req.body.workspace
         };
     let result = {};
     let status = 200;
@@ -291,26 +290,54 @@ app.post('/api/register', function(req,res){
 
 });
 //login page
-app.post('/api/loginPage', function(req,res){
+app.post('/api/loginPage', async function(req,res){
 
-    let { email,password } = req.body
+    let { email,password,workspace } = req.body
+    // workspace can be empty only for superadmin
+    if (workspace) {
+        const user = await User.findOne({client_id: workspace})
+        if (!user) {
+            result = { status: 202, workspace: true, error: `Нет компании с таким кодом`}
+            return res.status(202).send(result)
+        }
+    }
     User.findOne({email}, (err, user) => {
         let result = {};
-        if (!err && user && user.deletion_mark) {
-            result = { status: 202, deleted: true, error: `Enter not allowed - you are not a user of system yet`}
-            res.status(result.status).send(result);
-        } else if (!err && user) {
-            
+        if (!err && user) {
+            // TODO: реализовать нормальное определение роли
+            const isSuperAdmin = user.email == 'w.project.portal3@gmail.com'
+            console.log(`wp: '${workspace}', user.wp: '${user.client_id}'`);
+            // check user deletion mark
+            if (user.deletion_mark) {
+                result = { status: 202, deleted: true, error: `Enter not allowed - you are not a user of system yet`}
+                return res.status(result.status).send(result);
+            }
+            // If workspace is blank and user is not superadmin - it is error
+            if (!isSuperAdmin) {
+                if (!workspace) {
+                    result = { status: 202, workspace: true, error: `Нужно указать код компании`}
+                    return res.status(202).send(result);
+                }
+                // check user workspace
+                if (user.client_id != workspace) {
+                    result = { status: 202, workspace: true, error: `Неверный код компании`}
+                    return res.status(202).send(result);
+                }
+            } 
+
             bcrypt.compare(password, user.password)
             .then(match => {
                 if (match) {
                     user.password = '';
+                    if (isSuperAdmin) user.roles.push('superadmin'); // по идее тут уже в базе будет роль
                     const payload = {result: user};
                     const secret = process.env.JWT_SECRET;
                     const token = jwt.sign(payload, secret, {
                         expiresIn: 86400 // expires in 24 hours
                     });
                     result = {token, status: 200, result: user}
+                    console.log('token: ', token);
+                    //console.log('user: ', user);
                 } else {
                     result = { status: 202, password, error: 'Authentication error' }
                 }
@@ -664,6 +691,17 @@ app.get('/api/events/:email', async (req,res) => {
     }
 })
 
+// Поиск клиента по workspace
+app.get('/api/client_by_ws/:wspace', async (req, res) => {
+    try {
+        const client = await Client.findOne({workspace: req.params.wspace})
+        //console.log('client:',client);
+        res.status(200).send(client)
+    } catch (error) {
+        res.status(404).send("No client with sent workspace: "+req.params.wspace)
+    }
+    
+})
 
 
 server.listen(port, () => console.log(`[Server]: Listening on port ${port}`));

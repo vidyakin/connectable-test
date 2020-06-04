@@ -114,6 +114,11 @@ export const router = new Router({
       component: view('Login'),
     },
     {
+      path: '/login_new/',
+      name: 'login_new',
+      component: view('LoginNew'),
+    },
+    {
       name: 'authorize',
       path: '/authorize',
       component: view('Authorize'),
@@ -136,7 +141,7 @@ export const router = new Router({
   ],
 });
 router.beforeEach((to, from, next) => {
-  const publicPages = ['/login', '/register', '/forgot-password', '/authorize'];
+  const publicPages = ['/login', '/login_new', '/register', '/forgot-password', '/authorize'];
   const authRequired = !publicPages.includes(to.path);
   const resetPas = location.pathname;
   const loggedIn = localStorage.getItem('authorization');

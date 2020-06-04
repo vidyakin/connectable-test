@@ -1,4 +1,4 @@
-const User = require('../models/user');
+const User = require('../../models/user');
 
 module.exports.findById = async (id) => {
   return new Promise((resolve, rejected) => {

@@ -8,6 +8,25 @@
             <fieldset>
               <legend>Авторизоваться</legend>
               <div class="form-group">
+                <label for="workspace">Workspace</label>
+                <input
+                  type="text"
+                  v-model="user.workspace"
+                  id="workspace"
+                  name="workspace"
+                  class="form-control"
+                  :class="{ 'is-invalid': submitted && !user.workspace }"
+                />
+                <div
+                  v-show="submitted && !user.workspace"
+                  class="invalid-feedback"
+                >Это поле обязательно</div>
+                <div
+                  v-show="submitted && user.workspace && error.workspace"
+                  class="invalid-feedback"
+                >{{workspaceErrMsg}}</div>
+              </div>
+              <div class="form-group">
                 <label for="email">Email</label>
                 <input
                   type="text"
@@ -172,6 +191,7 @@ import { mapGetters } from "vuex";
 
 import { CHECK_USER_INFO } from "../store/user/actions.type";
 import { SUCCESS_REGISTER } from "@/store/user/mutations.type";
+import { ENTER_CLIENT } from "../store/client/actions.type";
 
 import AppLoginGoogle from "../components/common/LoginBarGoogle.vue";
 import AppLoginMicrosoft from "../components/common/LoginBarMicrosoft.vue";
@@ -184,12 +204,15 @@ export default Vue.extend({
       msgStyle: "invisible",
       msgError: "",
       fullErrorMsg: "",
+      workspaceErrMsg: "",
       user: {
+        workspace: "",
         email: "",
         password: ""
       },
       submitted: false,
       error: {
+        workspace: false,
         email: false,
         password: false
       },
@@ -205,41 +228,68 @@ export default Vue.extend({
     ...mapGetters(["errorLogin"])
   },
   methods: {
-    handleSubmit(e) {
+    async handleSubmit(e) {
       this.submitted = true;
       this.error.email = false;
       this.error.password = false;
       const { email, password } = this.user;
       if (email && password) {
-        this.$store
-          .dispatch(CHECK_USER_INFO, {
+        try {
+          await this.$store.dispatch(CHECK_USER_INFO, {
             email: this.user.email,
-            password: this.user.password
-          })
-          .finally(() => {
-            if (!this.errorLogin) {
-              this.$router.push("company");
-            } else {
-              console.log("errorLogin:", this.errorLogin);
-              this.submitted = true;
-              if (this.errorLogin.email) {
-                document.getElementById("email").classList.add("is-invalid");
-                this.error.email = true;
-              }
-              if (this.errorLogin.password) {
-                document.getElementById("password").classList.add("is-invalid");
-                this.error.password = true;
-              }
-              if (this.errorLogin.deleted) {
-                this.showErrorUserBlocked();
-              }
-            }
+            password: this.user.password,
+            workspace: this.user.workspace
           });
+        } catch (error) {
+          this.$error({
+            title: "ошибка входа",
+            content: error,
+            centered: true
+          });
+        } finally {
+          if (!this.errorLogin) {
+            const user = this.$store.getters.userData.result;
+            if (!user.roles.includes("superadmin")) {
+              this.$store.dispatch(ENTER_CLIENT, this.user.workspace);
+              this.$router.push("company");
+            } else this.$router.push("clients");
+          } else {
+            console.log("errorLogin:", this.errorLogin);
+            this.submitted = true;
+            if (this.errorLogin.email) {
+              document.getElementById("email").classList.add("is-invalid");
+              this.error.email = true;
+            }
+            if (this.errorLogin.password) {
+              document.getElementById("password").classList.add("is-invalid");
+              this.error.password = true;
+            }
+            if (this.errorLogin.deleted) {
+              this.showErrorUserBlocked();
+            }
+            if (this.errorLogin.workspace) {
+              this.workspaceErrMsg = this.errorLogin.error;
+              document.getElementById("workspace").classList.add("is-invalid");
+              this.error.workspace = true;
+              this.showErrorWorkspace(this.errorLogin.error);
+            }
+          }
+        }
       }
     },
     showErrorUserBlocked() {
       this.msgError = "Ошибка входа";
       this.fullErrorMsg = "Пользователь удален";
+      //this.showError = true;
+      this.msgStyle = "scale-in-vertical";
+      setTimeout(() => {
+        this.msgStyle = "scale-out-vertical";
+        this.showError = false;
+      }, 3000);
+    },
+    showErrorWorkspace(err) {
+      this.msgError = "Ошибка входа";
+      this.fullErrorMsg = err;
       //this.showError = true;
       this.msgStyle = "scale-in-vertical";
       setTimeout(() => {
@@ -260,15 +310,8 @@ export default Vue.extend({
     }
   },
   beforeCreate() {
-    const a = Vue.axios
-      .get("/api/outlook/login-url")
-      .then(response => {
-        this.outlookUrl = response.data.loginUrl;
-      })
-      .catch(e => {
-        console.log(e);
-      });
-    return a;
+    // const a = ;
+    // return a;
   }
 });
 </script>

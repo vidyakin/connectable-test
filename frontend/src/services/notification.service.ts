@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { SET_NOTIFICATION, SET_MESSAGES, ADD_MESSAGE } from '@/store/notification/mutations.type';
+import { SET_NOTIFICATION, SET_MESSAGES, ADD_MESSAGE, MARK_MESSAGE_READ } from '@/store/notification/mutations.type';
 
 export const postNotification = (context: any, notificationInfo: any) => {
     return Vue.axios
@@ -35,10 +35,14 @@ export const getMessages = (context: any) => {
         });
 };
 
-export const markMessagesAsRead = (context: any) => {
-    return Vue.axios
-        .put('/api/message/read_all')
-        .then(res => {
-            context.commit(SET_MESSAGES, res.data.resuls)
-        })
-}
+// пока непонятно надо ли будет это вообще
+// export const markMessagesAsRead = (context: any, msg_id: string) => {
+//     return Vue.axios
+//         .put('/api/message/read/' + msg_id)
+//         .then(res => {
+//             if (msg_id == '')
+//                 context.commit(MARK_MESSAGE_READ, res.data.resuls)
+//             else
+//                 context.commit(SET_MESSAGES, res.data.resuls)
+//         })
+// }

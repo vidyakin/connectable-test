@@ -41,15 +41,14 @@ export default {
     }
   },
   beforeCreate() {
-    const a = Vue.axios
-      .get("/")
+    Vue.axios
+      .get("/api/outlook/login-url")
       .then(response => {
-        this.outlookUrl = response.data.response.signInUrl;
+        this.outlookUrl = response.data.loginUrl;
       })
       .catch(e => {
         console.log(e);
       });
-    return a;
   }
 };
 </script>

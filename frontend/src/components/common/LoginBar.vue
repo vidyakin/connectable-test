@@ -1,7 +1,7 @@
 <template>
   <div class="user-bar">
     <div class="user-info" v-if="userData">
-      <div style="align-self: center;">{{getClientInfo()}}</div>
+      <div style="align-self: center;" class="client-name">{{getClientInfo()}}</div>
       <!-- Список сообщений -->
       <!-- <a-popover placement="bottom" trigger="click">
         <template slot="content">
@@ -35,8 +35,9 @@
 import store from "../../store";
 import { mapGetters } from "vuex";
 
-import { LOGOUT } from "../../store/user/actions.type";
-import { SET_SHOW_IMAGE_HEADER } from "../../store/shower/mutations.type";
+import { LOGOUT } from "@/store/user/actions.type";
+import { ENTER_CLIENT } from "@/store/client/actions.type";
+import { SET_SHOW_IMAGE_HEADER } from "@/store/shower/mutations.type";
 
 import NotificationList from "@/components/common/NotificationList";
 
@@ -136,8 +137,7 @@ export default {
         .split(".")[0];
     },
     getClientInfo() {
-      if (this.isSuperAdmin && this.currentClient)
-        return this.currentClient.name;
+      if (this.currentClient) return this.currentClient.name;
     },
     // установка счетчика сообщений из дочернего компонента
     // setNtfCounter(n) {
@@ -160,6 +160,17 @@ export default {
         title: "Новая группа", // TODO: подстроить под разные типы сообщений
         html: msg.text
       }));
+    }
+  },
+  created() {
+    // Если клиент не определен и пользователь - не суперадмин , то разлогиниваемся
+    if (
+      !this.currentClient &&
+      !this.userData.result.roles.includes("superadmin")
+    ) {
+      this.$store.dispatch(ENTER_CLIENT, this.userData.result.client_id);
+      // this.$store.dispatch(LOGOUT);
+      // this.$router.push({ name: "login" });
     }
   }
 };
@@ -235,6 +246,10 @@ export default {
     //   margin-right: 0.5rem;
     //   margin-left: 0.5rem;
     // }
+    .client-name {
+      font-size: 12pt;
+      font-weight: bold;
+    }
 
     .ant-avatar {
       /*margin-top: 0.375rem;*/

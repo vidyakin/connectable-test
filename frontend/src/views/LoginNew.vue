@@ -4,7 +4,7 @@
 
     <a-row>
       <!-- <div class="col-sm-4 offset-sm-4"> -->
-      <a-col :span="4" :offset="10">
+      <a-col :xs="{ span: 12, offset: 6 }" :lg="{ span: 6, offset: 9 }">
         <div style="font-size: 2em">Авторизоваться</div>
         <a-form
           :form="form"
@@ -50,22 +50,27 @@
       </a-col>
     </a-row>
     <div class="row">
-      <app-login-google />
+      <a-col :xs="{ span: 12, offset: 6 }" :lg="{ span: 6, offset: 9 }">
+        <app-login-google />
+        <app-login-microsoft />
 
-      <div class="login-page">
-        <a
-          class="f6 link dim br2 ph3 pv2 mb2 dib white bg-dark-blue"
-          v-bind:href="outlookUrl"
-        >Войти через учетную запись Microsoft</a>
-      </div>
-
-      <div class="col-sm-4 offset-sm-4">
-        <fieldset>
-          <div class="form-group">
-            <router-link to="/forgot-password" class="btn btn-link">Забыли пароль?</router-link>
-          </div>
-        </fieldset>
-      </div>
+        <div class="col-sm-4 offset-sm-4">
+          <fieldset>
+            <div class="form-group">
+              <router-link to="/forgot-password" class="btn btn-link">Забыли пароль?</router-link>
+            </div>
+          </fieldset>
+        </div>
+        <div class="col-sm-4 offset-sm-4">
+          <a-alert
+            :class="msgStyle"
+            :message="msgError"
+            :description="fullErrorMsg"
+            type="error"
+            show-icon
+          />
+        </div>
+      </a-col>
     </div>
   </div>
 </template>
@@ -81,6 +86,9 @@ import AppSuccessRegister from "../components/notification/SuccessRegister.vue";
 export default Vue.extend({
   data() {
     return {
+      msgStyle: "invisible",
+      msgError: "",
+      fullErrorMsg: "",
       user: {
         email: "",
         password: ""

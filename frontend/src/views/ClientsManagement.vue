@@ -4,7 +4,7 @@
       style="border: 1px solid rgb(235, 237, 240)"
       @back="() => $router.go(-1)"
       title="Управление клиентами"
-      subTitle="Доп.данные"
+      :subTitle="currentClient && currentClient.name"
     >
       <template slot="extra">
         <a-button key="1" type="primary" @click="newClientShow">Новый клиент</a-button>
@@ -23,11 +23,12 @@
       :dataSource="clients"
       size="small"
       :rowClassName="rowStyling"
+      rowKey="_id"
       class="clients_table"
     >
       <span slot="name" slot-scope="text, record">
         <a class="client_name" @click="openClient(record)">{{ text }}</a>
-        <div class="director">{{record.director}}</div>
+        <div class="workspace">{{record.workspace}}</div>
       </span>
       <span
         slot="addr"
@@ -41,6 +42,9 @@
           size="small"
           @click="blockClient(record)"
         >{{record.has_access ? 'Заблокировать' : 'Разблокировать'}}</a-button>
+      </span>
+      <span slot="enter" slot-scope="text, record">
+        <a-button size="small" shape="circle" icon="login" @click="enterClient(record)" />
       </span>
     </a-table>
     <!-- Диалог редактирования клиента -->
@@ -57,13 +61,17 @@
 <script>
 import store from "../store";
 import { mapGetters } from "vuex";
-import { GET_CLIENTS, EDIT_CLIENT } from "@/store/client/actions.type";
+import {
+  GET_CLIENTS,
+  EDIT_CLIENT,
+  ENTER_CLIENT
+} from "@/store/client/actions.type";
 
 import ClientEditDialog from "@/components/modal/ClientEditDialog";
 
 const columns = [
   {
-    title: "Название",
+    title: "Название, код",
     dataIndex: "name",
     key: "name",
     scopedSlots: { customRender: "name" }
@@ -94,6 +102,11 @@ const columns = [
     title: "Действия",
     key: "action",
     scopedSlots: { customRender: "action" }
+  },
+  {
+    title: "Вход",
+    key: "enter",
+    scopedSlots: { customRender: "enter" }
   }
 ];
 export default {
@@ -110,7 +123,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(["clients"])
+    ...mapGetters(["clients", "currentClient"])
   },
   methods: {
     tarifColor(tarif) {
@@ -189,6 +202,17 @@ export default {
           content: error
         });
       }
+    },
+    async enterClient(rec) {
+      try {
+        await this.$store.dispatch(ENTER_CLIENT, rec.workspace);
+      } catch (error) {
+        this.$error({
+          centered: true,
+          title: "Ошибка при входе в область клиента",
+          content: error
+        });
+      }
     }
   },
   beforeMount() {
@@ -210,7 +234,7 @@ export default {
     background-color: mistyrose;
     color: brown;
   }
-  .director {
+  .workspace {
     font-size: 9pt;
     color: cornflowerblue;
   }

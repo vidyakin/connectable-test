@@ -24,9 +24,9 @@
           </a-form-model-item>
         </a-col>
         <a-col span="8">
-          <a-form-model-item prop="code">
+          <a-form-model-item prop="workspace">
             <app-input
-              v-model="theform.code"
+              v-model="theform.workspace"
               placeholder="Введите краткий код"
               label="Код (workspace) клиента"
             />
@@ -142,7 +142,7 @@ function getBase64(img, callback) {
 
 function cleanForm() {
   return {
-    code: "",
+    workspace: "",
     name: "",
     country: "",
     city: "",
@@ -184,7 +184,7 @@ export default {
             trigger: "blur"
           }
         ],
-        code: [
+        workspace: [
           {
             required: true,
             message: "Необходимо указать код клиента",

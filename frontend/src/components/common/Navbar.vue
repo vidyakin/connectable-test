@@ -18,7 +18,11 @@
         <img src="@/assets/Icons/company.svg" alt />
         Компания
       </a-menu-item>
-      <a-menu-item key="/addressBook" :class="{active:isActive == 'addressBook'}">
+      <a-menu-item
+        key="/addressBook"
+        :class="{active:isActive == 'addressBook'}"
+        v-if="client_defined"
+      >
         <img src="@/assets/Icons/Adress book.svg" alt />
         Адресная книга
       </a-menu-item>
@@ -26,11 +30,11 @@
         <img src="@/assets/Icons/user.svg" alt />
         Пользователь
       </a-menu-item>
-      <a-menu-item key="/groups" :class="{active:isActive == 'groups'}">
+      <a-menu-item key="/groups" :class="{active:isActive == 'groups'}" v-if="client_defined">
         <img src="@/assets/Icons/Groups.svg" alt />
         Группы
       </a-menu-item>
-      <a-menu-item key="/calendar" :class="{active:isActive == 'calendar'}">
+      <a-menu-item key="/calendar" :class="{active:isActive == 'calendar'}" v-if="client_defined">
         <img src="@/assets/Icons/calendar.svg" alt />
         Календарь
       </a-menu-item>
@@ -38,14 +42,23 @@
         <img src="@/assets/Icons/Structure.svg" alt />
         Структура
       </a-menu-item>-->
-      <a-menu-item key="/structure_new" :class="{active:isActive == 'structure_new'}">
+      <a-menu-item
+        key="/structure_new"
+        :class="{active:isActive == 'structure_new'}"
+        v-if="client_defined"
+      >
         <img src="@/assets/Icons/Structure.svg" alt />
         Структура (нов.)
       </a-menu-item>
-      <a-menu-item key="/employees" :class="{active:isActive == 'employees'}" v-if="userIsAdmin">
+      <!-- для сотрудников заменить на userIsAdmin когда будут заданы роли пользователей -->
+      <a-menu-item
+        key="/employees"
+        :class="{active:isActive == 'employees'}"
+        v-if="userIsSuperAdmin"
+      >
         <a-icon type="idcard" style="color: #A5A4BF; font-size: 16px" />Сотрудники
       </a-menu-item>
-      <a-menu-item key="/clients" :class="{active:isActive == 'clients'}" v-if="userIsAdmin">
+      <a-menu-item key="/clients" :class="{active:isActive == 'clients'}" v-if="userIsSuperAdmin">
         <a-icon type="solution" style="color: #A5A4BF; font-size: 16px" />Клиенты
       </a-menu-item>
 
@@ -58,6 +71,10 @@
         <img src="@/assets/Icons/Structure.svg" alt />
         О нас
       </a-menu-item>
+      <a-menu-item
+        key="/special"
+        :class="{active:isActive == 'about'}"
+      >Суперадмин: {{userIsSuperAdmin}}</a-menu-item>
     </a-menu>
 
     <a-menu
@@ -95,10 +112,11 @@
       <a-menu-item key="/structure_new">
         <img src="@/assets/Icons/Structure.svg" alt />
       </a-menu-item>
-      <a-menu-item key="/employees" v-if="userIsAdmin">
+      <!-- для сотрудников заменить на userIsAdmin когда будут заданы роли пользователей -->
+      <a-menu-item key="/employees" v-if="userIsSuperAdmin">
         <img src="@/assets/Icons/calendar.svg" alt />
       </a-menu-item>
-      <a-menu-item key="/clients" v-if="userIsAdmin">
+      <a-menu-item key="/clients" v-if="userIsSuperAdmin">
         <img src="@/assets/Icons/setting.svg" alt />
       </a-menu-item>
       <a-menu-item key="/settings" class="footer">
@@ -122,9 +140,9 @@ export default {
   data() {
     return {
       current: 1,
-      datauser: store.getters.user
-        ? store.getters.user
-        : store.getters.userData,
+      // datauser: store.getters.user
+      //   ? store.getters.user
+      //   : store.getters.userData,
       isActive: this.$route.path.split("/")[1]
     };
   },
@@ -137,18 +155,37 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["user", "userData"]),
+    ...mapGetters(["user", "userData", "currentClient"]),
+    /**
+     * Определяет видимость клиенто-зависимых разделов типа сотрудников или адресной книги
+     */
+    client_defined() {
+      return (
+        !this.userIsSuperAdmin || (this.userIsSuperAdmin && this.currentClient)
+      );
+    },
     userIsAdmin() {
       return this.$can("read", {
-        accessEmail: this.datauser.result.email,
+        accessEmail: this.userData.result.email,
         __type: "Admin"
       });
     },
+    userIsSuperAdmin() {
+      console.log("userData in NavBar: ", this.userData.result);
+
+      return this.$can("manage", {
+        accessEmail: this.userData.result.email,
+        __type: "Client"
+      });
+    },
+    getClientInfo() {
+      return this.client_defined() ? this.currentClient.name : "";
+    },
     userKey: function() {
       return (
-        (this.datauser &&
-          this.datauser.result !== undefined &&
-          `/profile/${this.datauser.result._id}`) ||
+        (this.userData &&
+          this.userData.result !== undefined &&
+          `/profile/${this.userData.result._id}`) ||
         "nouser"
       );
     }

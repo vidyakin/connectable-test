@@ -33,21 +33,6 @@
         Войти
       </a-button>
     </div>
-    <!-- <div class="user-info" v-if="user">
-      
-      <a-dropdown>
-        <a-menu slot="overlay" >
-          <a-menu-item key="logout" @click="logout">
-            <a-icon type="logout" />Выйти
-          </a-menu-item>
-        </a-menu>
-        <a-button class="logout" >
-           {{ user.firstName }} <a-icon type="down" />
-        </a-button>
-      </a-dropdown>
-
-      <a-avatar :src="user.googleImage" />
-    </div>-->
   </div>
 </template>
 
@@ -120,33 +105,6 @@ export default {
     }
     button {
       width: 100%;
-    }
-  }
-
-  .logout {
-    border: none;
-    /*padding: 2px;*/
-    height: auto;
-  }
-  .user-info {
-    display: flex;
-    justify-content: flex-end;
-    margin-right: 0;
-
-    &-name {
-      line-height: 3.125rem;
-    }
-
-    i {
-      line-height: 0;
-      margin-right: 0.5rem;
-      margin-left: 0.5rem;
-    }
-
-    .ant-avatar {
-      margin-top: 0.375rem;
-      width: 2.375rem;
-      height: 2.375rem;
     }
   }
 }
