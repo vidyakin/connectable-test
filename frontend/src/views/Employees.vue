@@ -4,7 +4,7 @@
       style="border: 1px solid rgb(235, 237, 240)"
       @back="() => $router.go(-1)"
       title="Управление сотрудниками"
-      subTitle="АО «Купи & Продай»"
+      :subTitle="currentClient && currentClient.name"
     >
       <template slot="extra">
         <a-button key="1" type="primary" @click="newEmployeeOpen">Новый сотрудник</a-button>
@@ -139,7 +139,7 @@ export default {
         })
         .filter(e => (!this.showDeleted && !e.mark_del) || this.showDeleted);
     },
-    ...mapGetters(["errorRegister", "userData"]),
+    ...mapGetters(["errorRegister", "userData", "currentClient"]),
     ...mapState({
       users: state => state.auth.users
     })
@@ -177,7 +177,7 @@ export default {
       this.newEmplVisible = false;
     },
     reload() {
-      this.$store.dispatch(GET_USERS);
+      this.$store.dispatch(GET_USERS, this.currentClient.workspace);
     },
     createEmployee(empl_data) {
       this.newEmplVisible = false;
@@ -189,23 +189,26 @@ export default {
           lastName: empl_data.surname,
           email: empl_data.email,
           password: empl_data.password,
-          emailSend: true
+          emailSend: true,
+          workspace: empl_data.workspace
         })
         .then(() => {
           if (!this.errorRegister) {
             console.log(
               "Сount of users before GET_USERS: " + this.users.length
             );
-            this.$store.dispatch(GET_USERS).then(() => {
-              console.log(
-                "Count of users after GET_USERS: " + this.users.length
-              );
-              this.$success({
-                centered: true,
-                title: "Сотруник записан",
-                content: `Сотрудник ${empl_data.name} ${empl_data.surname} создан`
+            this.$store
+              .dispatch(GET_USERS, this.currentClient.workspace)
+              .then(() => {
+                console.log(
+                  "Count of users after GET_USERS: " + this.users.length
+                );
+                this.$success({
+                  centered: true,
+                  title: "Сотруник записан",
+                  content: `Сотрудник ${empl_data.name} ${empl_data.surname} создан`
+                });
               });
-            });
           } else {
             this.$error({
               centered: true,
@@ -272,7 +275,7 @@ export default {
         await this.$store.dispatch(REPLACE_GROUPS_OWNER, d.key); // заменяем создателя в группах на админа
         step = "Удаление как начальника";
         await this.$store.dispatch(CLEAR_HEAD_OF_DEPTS, d.key); // убираем из начальников отделов
-        await this.$store.dispatch(GET_USERS); // получаем список сотрудников для обновления таблицы
+        await this.$store.dispatch(GET_USERS, this.currentClient.workspace); // получаем список сотрудников для обновления таблицы
         this.$success({
           centered: true,
           title: "Сотруник " + del_type,
@@ -287,7 +290,7 @@ export default {
     }
   },
   created() {
-    this.$store.dispatch(GET_USERS);
+    this.$store.dispatch(GET_USERS, this.currentClient.workspace);
   }
 };
 </script>

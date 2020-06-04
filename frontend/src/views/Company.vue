@@ -7,7 +7,7 @@
           @pressEnter="sendMessage"
           :parent="{type: 'company', id: '0'}"
         />
-        <div class="company-name">Компания</div>
+        <div class="company-name">Компания {{userIsSuperAdmin ? '(Вы суперадмин)' : ''}}</div>
         <app-post v-for="(post, index) in sortedPosts" :post="post" :key="index" />
       </a-tab-pane>
       <a-tab-pane key="2" force-render>
@@ -46,7 +46,16 @@ export default Vue.extend({
     NotificationList
   },
   computed: {
-    ...mapGetters(["userData", "posts", "messages"]),
+    ...mapGetters(["userData", "posts", "messages", "currentClient"]),
+    userIsSuperAdmin() {
+      return (
+        this.userData &&
+        this.$can("manage", {
+          accessEmail: this.userData.result.email,
+          __type: "Client"
+        })
+      );
+    },
     sortedPosts() {
       function compare(a, b) {
         if (a.created < b.created) return 1;

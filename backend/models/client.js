@@ -8,7 +8,7 @@ const Schema = mongoose.Schema;
  * Описывает потребителя сервиса со всеми данными, настройками и т.д.
  */
 const clientSchema = new Schema({
-    code: String,   // Краткий код для удобства опознавания и вывода
+    workspace: String,   // Краткий код для удобства опознавания и вывода
     name: String,   // Полное наименование компании
     country: String, // Страна
     city: String,   // город компании

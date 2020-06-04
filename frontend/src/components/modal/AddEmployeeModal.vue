@@ -15,7 +15,7 @@
       <h3>Новый сотрудник</h3>
     </div>
     <a-form-model ref="emplForm" :model="theform" :rules="rules" layout="vertical">
-      <a-row :gutter="16">
+      <a-row :gutter="10">
         <a-col span="12">
           <a-form-model-item prop="name">
             <app-input v-model="theform.name" placeholder="Введите свое имя" label="Имя" />
@@ -31,14 +31,23 @@
           </a-form-model-item>
         </a-col>
       </a-row>
-      <a-row :gutter="16">
-        <a-col>
+      <a-row :gutter="10">
+        <a-col span="14">
           <a-form-model-item prop="email">
             <app-input v-model="theform.email" placeholder="Введите e-mail" label="E-mail" />
           </a-form-model-item>
         </a-col>
+        <a-col span="10">
+          <a-form-model-item prop="workspace">
+            <app-input
+              v-model="theform.workspace"
+              placeholder="Введите workspace"
+              label="Workspace"
+            />
+          </a-form-model-item>
+        </a-col>
       </a-row>
-      <a-row :gutter="16">
+      <a-row :gutter="10">
         <a-col span="12">
           <div class="input-label">Пароль</div>
           <a-form-model-item has-feedback prop="password">
@@ -81,6 +90,7 @@ export default {
   data() {
     return {
       theform: {
+        workspace: "",
         name: "",
         surname: "",
         password: "",
@@ -137,6 +147,13 @@ export default {
           {
             validator: this.validRepeatPassword,
             message: "Пароли не совпадают",
+            trigger: "change"
+          }
+        ],
+        workspace: [
+          {
+            max: 20,
+            message: "Максимум 20 символов",
             trigger: "change"
           }
         ]

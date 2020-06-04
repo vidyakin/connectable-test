@@ -11,4 +11,8 @@ export const SET_CURRENT_CLIENT = 'SET_CURRENT_CLIENT'
 export const UPDATE_CLIENT = 'UPDATE_CLIENT'
 
 // установка кода клиента, пользователь которого вошел в систему
+//  - надо переделать, слить с процедурой логина всех типов
 export const SET_LOGGED_CLIENT = 'SET_LOGGED_CLIENT'
+
+// смена клиента для суперадмина
+export const CHANGE_WORKSPACE = 'CHANGE_WORKSPACE'

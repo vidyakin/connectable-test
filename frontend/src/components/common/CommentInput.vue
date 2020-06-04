@@ -15,33 +15,40 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
-import AppLoginBar from './LoginBar';
-import { SEND_NEW_POST } from '../../store/post/actions.type';
-import {GET_NOTIFICATION} from '../../store/notification/actions.type';
-import Vue from 'vue';
-import store from '../../store';
-import moment from 'moment';
+import { mapGetters } from "vuex";
+import AppLoginBar from "./LoginBar";
+import { SEND_NEW_POST } from "../../store/post/actions.type";
+import { GET_NOTIFICATION } from "../../store/notification/actions.type";
+import Vue from "vue";
+import store from "../../store";
+import moment from "moment";
 export default {
-  name: 'AppCommentInput',
+  name: "AppCommentInput",
   components: {
-    AppLoginBar,
+    AppLoginBar
   },
   data() {
     return {
-      current: '',
+      current: "",
       fileList: [],
       statusEmailSend: false,
-      datauser: (store.getters.userData ? store.getters.userData : store.getters.user),
+      datauser: store.getters.userData
+        ? store.getters.userData
+        : store.getters.user
     };
   },
   computed: {
-    ...mapGetters(['showHeaderImage', 'user', 'currentUser', 'userData', 'notification']),
+    ...mapGetters([
+      "showHeaderImage",
+      "user",
+      "currentUser",
+      "userData",
+      "notification"
+    ])
   },
   methods: {
     send() {
-      if (this.current !== '') {
-
+      if (this.current !== "") {
         this.$store.dispatch(SEND_NEW_POST, {
           message: this.current,
           created: moment(),
@@ -49,10 +56,10 @@ export default {
           author: this.datauser.result,
           attachment: [],
           emailSend: this.statusEmailSend,
-          formData: this.handleUpload(),
+          formData: this.handleUpload()
         });
       }
-      this.current = '';
+      this.current = "";
     },
     handleRemove(file) {
       const index = this.fileList.indexOf(file);
@@ -69,14 +76,14 @@ export default {
       if (fileList.length > 0) {
         const formData = new FormData();
         fileList.forEach(file => {
-          formData.append('files', file);
+          formData.append("files", file);
         });
         this.fileList = [];
         return formData;
       } else {
         return null;
       }
-    },
+    }
   },
   beforeCreate() {
     // const userData = store.getters.userData;
@@ -85,21 +92,24 @@ export default {
     //   this.$store.dispatch(GET_NOTIFICATION, userData.result._id);
     // }
   },
-  mounted() {
+  beforeMount() {
     // console.log(`mounted CommentInput: userData=${JSON.stringify(this.userData)}`);
     // error if userData has no 'result' ex.: {"user":"672f0479-2248-4f04-aeb5-f8dacb2f2b29","iat":1585168721,"exp":1585255121}
-    if (this.userData.result != undefined) {
+    if (this.userData && this.userData.result != undefined) {
       this.$store.dispatch(GET_NOTIFICATION, this.userData.result._id);
     }
   },
   watch: {
     notification(notification) {
-      this.statusEmailSend = (notification && notification.userId == store.getters.userData.result._id ? notification.publications : false);
+      this.statusEmailSend =
+        notification && notification.userId == store.getters.userData.result._id
+          ? notification.publications
+          : false;
     }
   },
   props: {
-    parent: Object,
-  },
+    parent: Object
+  }
 };
 </script>
 

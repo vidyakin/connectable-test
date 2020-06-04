@@ -11,8 +11,13 @@ function getAdmins() {
     return ['w.project.portal3@gmail.com', 'vidyakin111.sergey@gmail.com']
 }
 
-export default AbilityBuilder.define( {subjectName}, (can: any) => {
+function getSuperAdmins() {
+    return ['w.project.portal3@gmail.com']
+}
+
+export default AbilityBuilder.define({ subjectName }, (can: any) => {
     //can(['crud'], 'User', { accessEmail: 'w.project.portal3@gmail.com' });
-    can(['crud'], 'Admin', { accessEmail: { $in: getAdmins() }});
+    can(['crud'], 'Admin', { accessEmail: { $in: getAdmins() } });
+    can(['manage'], 'Client', { accessEmail: { $in: getSuperAdmins() } });
 });
 // w.project.portal3@gmail.com

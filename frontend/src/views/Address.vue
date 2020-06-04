@@ -43,6 +43,7 @@
 <script>
 import { GET_USERS } from "../store/user/actions.type";
 import { mapGetters } from "vuex";
+import { Empty } from "ant-design-vue/es/empty";
 
 const columns = [
   {
@@ -66,34 +67,6 @@ const columns = [
     dataIndex: "email"
   }
 ];
-
-const testData = [
-  {
-    key: "1",
-    name: "John Brown",
-    age: 32,
-    address: "New York No. 1 Lake Park"
-  },
-  {
-    key: "2",
-    name: "Jim Green",
-    age: 42,
-    address: "London No. 1 Lake Park"
-  },
-  {
-    key: "3",
-    name: "Joe Black",
-    age: 32,
-    address: "Sidney No. 1 Lake Park"
-  },
-  {
-    key: "4",
-    name: "Jim Red",
-    age: 32,
-    address: "London No. 2 Lake Park"
-  }
-];
-
 function onChange(pagination, filters, sorter) {
   console.log("params", pagination, filters, sorter);
 }
@@ -119,13 +92,12 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["users"])
+    ...mapGetters(["users", "currentClient"])
   },
-  beforeCreate() {
-    this.imgEmpty = Empty.PRESENTED_IMAGE_SIMPLE;
-  },
+  beforeCreate() {},
   beforeMount() {
-    this.$store.dispatch(GET_USERS);
+    this.$store.dispatch(GET_USERS, this.currentClient.workspace);
+    //this.imgEmpty = Empty.PRESENTED_IMAGE_SIMPLE;
   },
   watch: {
     users(users) {

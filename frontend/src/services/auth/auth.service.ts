@@ -39,6 +39,7 @@ export const login = (context: any, user: any) => {
         localStorage.removeItem('token');
         //store.commit(SET_USER, null);
         store.commit(SET_USER_DATA, null);
+        console.log(' >> token has been expired');
         router.push('/login');
       } else {
         console.log(`login: after axios response.data is: ${JSON.stringify(response.data, null, '\t')}`)
