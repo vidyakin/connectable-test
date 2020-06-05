@@ -43,6 +43,7 @@
               v-model="theform.workspace"
               placeholder="Введите workspace"
               label="Workspace"
+              :disabled="ws_disabled"
             />
           </a-form-model-item>
         </a-col>
@@ -97,6 +98,7 @@ export default {
         passwordRepeat: "",
         email: ""
       },
+      ws_disabled: false,
       confirmLoading: false,
       validStatusPwdRepeat: "success",
       rules: {
@@ -195,6 +197,23 @@ export default {
     tr(v) {
       return v === undefined ? "" : v.trim();
     }
+  },
+  watch: {
+    visible(val) {
+      if (val) {
+        console.log(`AddEmployeeModal is now visible`);
+        if (this.$store.getters.currentClient) {
+          this.theform.workspace = this.$store.getters.currentClient.workspace;
+          this.ws_disabled = true;
+        }
+      }
+    }
+  },
+  /**
+   * Lifecycle hooks
+   */
+  mounted() {
+    //console.log(`AddEmployeeModal is mounted`);
   }
 };
 </script>
