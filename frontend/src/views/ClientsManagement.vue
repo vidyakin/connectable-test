@@ -135,7 +135,11 @@ export default {
       return colors[tarif];
     },
     rowStyling(rec, index) {
-      return !rec.has_access ? "denied" : "";
+      const styles = [];
+      if (!rec.has_access) styles.push("denied");
+      if (this.currentClient && rec.workspace == this.currentClient.workspace)
+        styles.push("curr-workspace");
+      return styles;
     },
     /**
      * Открытие окна нового клиента
@@ -206,6 +210,7 @@ export default {
     async enterClient(rec) {
       try {
         await this.$store.dispatch(ENTER_CLIENT, rec.workspace);
+        this.$message.success("Вы успешно вошли в рабочую область клиента");
       } catch (error) {
         this.$error({
           centered: true,
@@ -237,6 +242,10 @@ export default {
   .workspace {
     font-size: 9pt;
     color: cornflowerblue;
+  }
+  &.curr-workspace {
+    font-weight: bold;
+    color: green;
   }
   .client_name {
     font-weight: bold;

@@ -51,11 +51,7 @@
         Структура (нов.)
       </a-menu-item>
       <!-- для сотрудников заменить на userIsAdmin когда будут заданы роли пользователей -->
-      <a-menu-item
-        key="/employees"
-        :class="{active:isActive == 'employees'}"
-        v-if="userIsSuperAdmin"
-      >
+      <a-menu-item key="/employees" :class="{active:isActive == 'employees'}" v-if="client_defined">
         <a-icon type="idcard" style="color: #A5A4BF; font-size: 16px" />Сотрудники
       </a-menu-item>
       <a-menu-item key="/clients" :class="{active:isActive == 'clients'}" v-if="userIsSuperAdmin">
