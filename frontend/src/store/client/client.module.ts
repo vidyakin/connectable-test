@@ -5,7 +5,7 @@ import { GET_CLIENTS, CREATE_CLIENT, EDIT_CLIENT, ENTER_CLIENT } from '@/store/c
 import { ADD_CLIENT, SET_CLIENTS, SET_CURRENT_CLIENT, UPDATE_CLIENT, SET_LOGGED_CLIENT } from '@/store/client/mutations.type'
 
 // import service functions
-import { createClient, editClient, getClients, changeWorkspace } from '@/services/client.service';
+import { createClient, editClient, getClients, changeWorkspace } from './client.service';
 
 interface Client {
   _id: any,
@@ -46,8 +46,8 @@ const mutations = {
   [SET_CLIENTS](state: State, clients: Client[]) {
     state.clients = clients
   },
-  [SET_CURRENT_CLIENT](state: State, client: Client) {
-    console.log(`client ws set to ${client.name}`);
+  [SET_CURRENT_CLIENT](state: State, client: Client | null) {
+    console.log(`client ws set to ${client?.name}`);
 
     state.currentClient = client
   },

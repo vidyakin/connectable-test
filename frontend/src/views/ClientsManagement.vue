@@ -89,8 +89,8 @@ const columns = [
   },
   {
     title: "Кол-во сотрудников",
-    key: "empl",
-    dataIndex: "empl"
+    key: "users",
+    dataIndex: "users"
   },
   {
     title: "Статус",

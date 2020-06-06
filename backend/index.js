@@ -74,10 +74,16 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static('static'));
 
 app.use('/api', require('./auth/authRouter')); // ???
-//app.use('/api/user/me', validateToken, require('./auth/authRouter'));
-//app.use('/api/user', validateToken, require('./crud')(User, serializers.serializer));
-app.use('/api/user', validateToken, require('./modules/users'))
 
+/**
+ * New way to link API section to entire module of app
+ */
+app.use('/api/user', validateToken, require('./modules/users'))
+app.use('/api/clients', validateToken, require('./modules/clients'))
+
+/**
+ * Old way
+ */
 app.use('/api/group', validateToken, require('./crud')(Group, groupSerializer));
 app.use('/api/post', validateToken, require('./crud')(Post, serializers.postSerializer));
 app.use('/api/like', validateToken, require('./crud')(Like, serializers.serializer));
@@ -90,7 +96,7 @@ app.use('/api/project', validateToken, require('./crud')(Project, projectSeriali
 
 app.use('/api/message', validateToken, require('./crud')(Message, serializers.serializer));
 app.use('/api/structure', validateToken, require('./crud')(Structure, serializers.serializer));
-app.use('/api/clients', validateToken, require('./crud')(Client, serializers.serializer));
+
 //app.use('/api/dept_users', validateToken, require('./crud')(UsersInDepartment, serializers.serializer));
 
 app.use('/api/outlook', require('./auth/outlook/'));
@@ -691,17 +697,6 @@ app.get('/api/events/:email', async (req,res) => {
     }
 })
 
-// Поиск клиента по workspace
-app.get('/api/client_by_ws/:wspace', async (req, res) => {
-    try {
-        const client = await Client.findOne({workspace: req.params.wspace})
-        //console.log('client:',client);
-        res.status(200).send(client)
-    } catch (error) {
-        res.status(404).send("No client with sent workspace: "+req.params.wspace)
-    }
-    
-})
 
 
 server.listen(port, () => console.log(`[Server]: Listening on port ${port}`));

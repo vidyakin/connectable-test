@@ -4,6 +4,7 @@ import { SET_USER, SET_USER_DATA, FORGOT_INFO, RESET_INFO } from '@/store/user/m
 import { setAuthToken } from '@/services/auth/setAuthToken';
 import store from '../../store';
 import { router } from '../../router';
+import { SET_CURRENT_CLIENT } from '@/store/client/mutations.type';
 
 export const forgotPasword = (context: any, email: any) => {
   return Vue.axios.post('/auth/forgot_password', email)
@@ -58,6 +59,7 @@ export const logout = (context: any) => {
   localStorage.removeItem('token');
   //context.commit(SET_USER, null);
   context.commit(SET_USER_DATA, null);
+  context.commit(SET_CURRENT_CLIENT, null);
 };
 
 export const loginWithOutlook = (context: any, params: any) => {
