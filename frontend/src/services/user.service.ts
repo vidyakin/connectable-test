@@ -5,17 +5,15 @@ import {
   SET_CURRENT_USER,
   SET_EVENTS,
   CHANGE_EVENT,
-  SET_USER,
   SET_USERS,
   UPDATE_USER,
   IS_LOGGED_IN,
-  CURRENT_USER_DATA,
   ERROR_REGISTER,
   ERROR_LOGIN,
   SUCCESS_REGISTER,
   SET_USER_DATA
 } from '@/store/user/mutations.type';
-import { UPDATE_EVENT, DELETE_EVENT } from '@/store/user/actions.type';
+import { DELETE_EVENT } from '@/store/user/actions.type';
 import { setAuthToken } from '@/services/auth/setAuthToken';
 
 

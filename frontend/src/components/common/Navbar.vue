@@ -14,14 +14,13 @@
         <span class="logo-mob circle-2"></span>
         <span class="logo-mob circle-3"></span>
       </a-menu-item>
-      <a-menu-item key="/company" :class="{active:isActive == 'company'}">
-        <img src="@/assets/Icons/company.svg" alt />
-        Компания
+      <a-menu-item v-if="client_defined" key="/company" :class="{active:isActive == 'company'}">
+        <img src="@/assets/Icons/company.svg" alt />Компания
       </a-menu-item>
       <a-menu-item
+        v-if="client_defined"
         key="/addressBook"
         :class="{active:isActive == 'addressBook'}"
-        v-if="client_defined"
       >
         <img src="@/assets/Icons/Adress book.svg" alt />
         Адресная книга
@@ -67,10 +66,6 @@
         <img src="@/assets/Icons/Structure.svg" alt />
         О нас
       </a-menu-item>
-      <a-menu-item
-        key="/special"
-        :class="{active:isActive == 'about'}"
-      >Суперадмин: {{userIsSuperAdmin}}</a-menu-item>
     </a-menu>
 
     <a-menu
@@ -87,29 +82,29 @@
         <span class="logo-mob circle-2"></span>
         <span class="logo-mob circle-3"></span>
       </a-menu-item>
-      <a-menu-item key="/company">
+      <a-menu-item key="/company" v-if="client_defined">
         <img src="@/assets/Icons/company.svg" alt />
       </a-menu-item>
-      <a-menu-item key="/addressBook">
+      <a-menu-item key="/addressBook" v-if="client_defined">
         <img src="@/assets/Icons/Adress book.svg" alt />
       </a-menu-item>
       <a-menu-item :key="this.userKey">
         <img src="@/assets/Icons/user.svg" alt />
       </a-menu-item>
-      <a-menu-item key="/groups">
+      <a-menu-item key="/groups" v-if="client_defined">
         <img src="@/assets/Icons/Groups.svg" alt />
       </a-menu-item>
-      <a-menu-item key="/calendar">
+      <a-menu-item key="/calendar" v-if="client_defined">
         <img src="@/assets/Icons/calendar.svg" alt />
       </a-menu-item>
       <!-- <a-menu-item key="/structure">
         <img src="@/assets/Icons/Structure.svg" alt />
       </a-menu-item>-->
-      <a-menu-item key="/structure_new">
+      <a-menu-item key="/structure_new" v-if="client_defined">
         <img src="@/assets/Icons/Structure.svg" alt />
       </a-menu-item>
       <!-- для сотрудников заменить на userIsAdmin когда будут заданы роли пользователей -->
-      <a-menu-item key="/employees" v-if="userIsSuperAdmin">
+      <a-menu-item key="/employees" v-if="client_defined">
         <img src="@/assets/Icons/calendar.svg" alt />
       </a-menu-item>
       <a-menu-item key="/clients" v-if="userIsSuperAdmin">

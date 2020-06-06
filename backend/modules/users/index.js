@@ -1,5 +1,5 @@
 
-const router = require('express').Router()
+//const router = require('express').Router()
 
 const User = require('../../models/user')
 
@@ -10,7 +10,7 @@ var userDAO = require('./user-dao');
 /**
  * Common way for CRUD the model
  */
-router.get('/', require('../../crud')(User, serializers.serializer))
+const router = require('../../crud')(User, serializers.serializer)
 
 // TODO: find a purpose of this api out
 router.get('/me', (res, req) => {
