@@ -29,7 +29,7 @@ const serializer = async data => {
 const router = require('../../crud')(Client, serializer);
 
 // Поиск клиента по workspace
-router.get('/api/client_by_ws/:wspace', async (req, res) => {
+router.get('/by_ws/:wspace', async (req, res) => {
   try {
       const client = await Client.findOne({workspace: req.params.wspace})
       //console.log('client:',client);

@@ -28,7 +28,7 @@ export const editClient = (context: any, client: any) => {
 // wspace must be a name of client workspace and empty string to exit to client management mode
 export const changeWorkspace = (context: any, wspace: string) => {
   return Vue.axios
-    .get(`/api/client_by_ws/${wspace}`)
+    .get(`/api/clients/by_ws/${wspace}`)
     .then((res: any) => {
       context.commit(SET_CURRENT_CLIENT, res.data)
     })
