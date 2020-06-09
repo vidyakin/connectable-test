@@ -40,16 +40,16 @@ export default {
     ...mapGetters(["users", "userData", "user"]),
     userIsAdmin() {
       return this.$can("read", {
-        accessEmail: this.datauser().email,
+        accessEmail: this.userData.result.email,
         __type: "Admin"
       });
     }
   },
   methods: {
-    datauser() {
-      // TODO: переделать везде также. Может вообще отдельный геттер сделать с этой проверкой
-      return this.userData ? this.userData.result : this.user;
-    },
+    // datauser() {
+    //   // TODO: переделать везде также. Может вообще отдельный геттер сделать с этой проверкой
+    //   return this.userData ? this.userData.result : this.user;
+    // },
     // addDepartment() {
     //   this.$refs.structure.handleShow({ type: "new", dept: this.currentDept });
     // },

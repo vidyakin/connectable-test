@@ -255,17 +255,19 @@ export default {
           }
         ]
       }
-      //userInfo: (store.getters.userData ? store.getters.userData : store.getters.user),
     };
   },
   /**
    * ВЫЧИСЛЯЕМЫЕ СВОЙСТВА
    */
   computed: {
-    ...mapGetters(["user", "userData", "users", "notification"]),
-    userInfo() {
-      return this.userData ? this.userData : this.user;
-    },
+    ...mapGetters([
+      "user",
+      "userData",
+      "users",
+      "notification",
+      "currentClient"
+    ]),
     locale() {
       let loc = { ...locale };
       loc.dateFormat = "D MMMM YYYY г.";
@@ -368,7 +370,8 @@ export default {
         client_id: this.userData.result.client_id,
         userEmail: this.userData.result.email,
         emailSend: this.statusEmailSend,
-        attendees: this.selectedItems ? attendees : ""
+        attendees: this.selectedItems ? attendees : "",
+        client_id: this.currentClient.workspace
       };
       if (this.isEdit) {
         event._id = this.event._id;

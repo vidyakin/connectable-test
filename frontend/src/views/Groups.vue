@@ -48,8 +48,7 @@ export default {
       filterData: [],
       datauser: store.getters.userData
         ? store.getters.userData.result
-        : store.getters.user,
-      userIsAdmin: false
+        : store.getters.user
     };
   },
   methods: {
@@ -70,18 +69,21 @@ export default {
       }
       return this.filterData.sort(compare);
     },
-    // userIsAdmin() {
-    //   return this.$can('read', {'accessEmail': this.datauser.email, '__type': 'Admin'})
-    // },
+    userIsAdmin() {
+      return this.$can("read", {
+        accessEmail: this.userData.result.email,
+        __type: "Admin"
+      });
+    },
     ...mapGetters(["groups", "userData", "currentClient"])
   },
   async beforeMount() {
     try {
       this.isLoaded = true;
-      this.userIsAdmin = this.$can("read", {
-        accessEmail: this.datauser.email,
-        __type: "Admin"
-      });
+      // this.userIsAdmin = this.$can("read", {
+      //   accessEmail: this.datauser.email,
+      //   __type: "Admin"
+      // });
       if (this.userIsAdmin) {
         await this.$store.dispatch(
           GET_GROUPS_BY_CLIENT,
