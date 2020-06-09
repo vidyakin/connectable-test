@@ -12,7 +12,7 @@ import {
 export const getStructure = async (context: any, workspace: String) => {
   //context.commit(SET_STRUCTURE, {});
   const response = await Vue.axios
-    .get('api/structure/' + workspace);
+    .get('api/structure/byClient/' + workspace);
   context.commit(SET_STRUCTURE, response.data.result);
 }
 
@@ -37,8 +37,8 @@ export const editStructure = (context: any, structure: any) => {
 // получение сотрудников всех отделов, отбор по клиенту
 export const getDepartmentUsers = async (context: any, clientId: String) => {
   const response = await Vue.axios
-    .get('api/dept_users/' + clientId);
-  context.commit(SET_DEPT_USERS, response.data);
+    .get(`api/structure/byClient/${clientId}/dept_users`);
+  context.commit(SET_DEPT_USERS, response.data.result);
 }
 
 // сохранение сотрудников одного отдела (добавление)

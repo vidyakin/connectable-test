@@ -9,8 +9,8 @@
       </template>
     </a-page-header>-->
     <vo-edit
-      v-if="orgChart && !loading"
-      :data="orgChart"
+      v-if="chartData && !loading"
+      :data="chartData"
       :pan="true"
       :toggleCollapse="false"
       :toggleSiblingsResp="true"
@@ -272,55 +272,48 @@ export default {
     };
   },
   async mounted() {
-    if (!this.userData || !this.userData.result.client_id)
-      try {
-        await this.$store.dispatch(
-          GET_STRUCTURE,
-          this.userData.result.client_id
-        );
-      } catch (error) {
-        console.error(`ошибка получения данных по структуре: ${error.message}`);
-        return;
-      }
+    const client = this.currentClient.workspace;
+    if (!client) {
+      this.$error({
+        title: "Не задан клиент",
+        content: "Не установлен клиент",
+        centered: true
+      });
+      return;
+    }
+
+    try {
+      await this.$store.dispatch(GET_STRUCTURE, client);
+    } catch (error) {
+      console.error(`ошибка получения данных по структуре: ${error.message}`);
+      return;
+    }
     // Если структуры в базе нет, создаем головной элемент и сохраняем в базу
-    if (this.structure.length == 0) {
+    if (this.structure.orgTree == undefined) {
       this.chartData = {
         id: "ceo",
         name: "Главное управление"
       };
       await this.$store.dispatch(SAVE_STRUCTURE, {
-        client_id: this.userData.result.client_id,
+        client_id: client,
         orgTree: this.chartData
       });
-      await this.$store.dispatch(GET_STRUCTURE, this.userData.result.client_id); // обновление стора надо бы засунуть в SAVE_STRUCTURE
+      await this.$store.dispatch(GET_STRUCTURE, client); // обновление стора надо бы засунуть в SAVE_STRUCTURE
     }
     // 0-й элемент потому что пока что возвращается массив ( все схемы ), а будет с отбором по клиенту одна
-    this.struct_id = this.structure[0]._id;
-    this.chartData = this.structure[0].orgTree;
-    console.log(`_id of structure is ${this.struct_id}`);
+    this.struct_id = this.structure._id;
+    this.chartData = this.structure.orgTree;
     this.loading = false; //  без этого не работает загрузка данных в схему!
 
     // заполняем пользователей
-    // try {
-    //   await this.$store.dispatch(GET_DEPT_USERS, "client1");
-    //   //this.dept_users.forEach(({ dept_id, users }) => {
-    //   //   this.employeesOfDepts.dept_id = users;
-    //   // });
-    // } catch (error) {
-    //   console.error(`ошибка получения данных по сотрудникам: ${error.message}`);
-    //   return;
-    // }
+    try {
+      await this.$store.dispatch(GET_DEPT_USERS, client);
+    } catch (error) {
+      console.error(`ошибка получения данных по сотрудникам: ${error.message}`);
+      return;
+    }
   },
-  async created() {
-    // await this.$store.dispatch(GET_ORGCHART, this.$store.getters.GET_CURR_CLIENT) // заполнение оргструктуры для текущего клиента
-    // this.chartdata = await this.$store.getters.GET_CHARTDATA // получение данных о структуре
-    //});
-    // this.mountOrgChart();
-  },
-  async mounted() {
-    await this.$store.dispatch(GET_USERS);
-    await this.$store.dispatch(GET_DEPT_USERS, "client1");
-  },
+  async created() {},
   updated() {
     this.$nextTick(function() {
       // Код, который будет запущен только после
@@ -330,17 +323,23 @@ export default {
           this.orgChartObj = child;
           this.orgchart = child.orgchart;
           this.drawLevelLabels();
-          console.log(`Область диаграммы получена`);
+          //console.log(`Область диаграммы получена`);
         }
       });
     });
   },
   computed: {
-    ...mapGetters(["userData", "user", "users", "structure", "dept_users"]),
+    ...mapGetters([
+      "userData",
+      "user",
+      "users",
+      "structure",
+      "dept_users",
+      "currentClient"
+    ]),
     orgChart() {
       if (this.structure && this.structure.length) {
-        //console.log(`orgTree: ${this.structure[0].orgTree}`);
-        return this.structure[0].orgTree;
+        return this.structure.orgTree;
       } else return {};
     },
     userIsAdmin() {
