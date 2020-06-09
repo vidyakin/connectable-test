@@ -28,22 +28,12 @@ module.exports.findRequestsByGroupId = async (groupId) => {
 };
 
 module.exports.findGroupsByUserId = async (userId) => {
-  // return new Promise((resolve, rejected) => {
-  //   GroupParticipant.find({participantId: userId}, (err, data) => {
-  //     if (err) {
-  //       rejected(err)
-  //     } else {
-  //       resolve(data)
-  //     }
-  //   })
-  // })
   try {
     const user = await User.findOne({_id: userId})
     const client_id = user.client_id
-    // TODO: добавить отбор по клиенту
     // TODO: добавить проверку роли когда они будут в пользователях
     if (user.email == "w.project.portal3@gmail.com") {
-      return await Group.find()      
+      return await Group.find({client_id})      
     } else {
       let groupIds = await GroupParticipant.find()
         .where('participantId').equals(userId)
@@ -63,5 +53,4 @@ module.exports.findGroupsByUserId = async (userId) => {
   } catch (error) {
     return error
   }
-  
 };

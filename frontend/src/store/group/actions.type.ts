@@ -1,5 +1,6 @@
 export const CREATE_GROUP = 'CREATE_GROUP';
 export const GET_GROUPS = 'GET_GROUPS';
+export const GET_GROUPS_BY_CLIENT = 'GET_GROUPS_BY_CLIENT';
 
 export const GET_CURRENT_GROUP = 'GET_CURRENT_GROUP';
 export const DELETE_GROUP = 'DELETE_GROUP';

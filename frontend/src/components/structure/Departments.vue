@@ -271,13 +271,17 @@ export default {
       ]
     };
   },
-  async beforeCreate() {
-    try {
-      await this.$store.dispatch(GET_STRUCTURE); // TODO: добавить (на бэке) отбор по текущему клиенту
-    } catch (error) {
-      console.error(`ошибка получения данных по структуре: ${error.message}`);
-      return;
-    }
+  async mounted() {
+    if (!this.userData || !this.userData.result.client_id)
+      try {
+        await this.$store.dispatch(
+          GET_STRUCTURE,
+          this.userData.result.client_id
+        );
+      } catch (error) {
+        console.error(`ошибка получения данных по структуре: ${error.message}`);
+        return;
+      }
     // Если структуры в базе нет, создаем головной элемент и сохраняем в базу
     if (this.structure.length == 0) {
       this.chartData = {
@@ -285,10 +289,10 @@ export default {
         name: "Главное управление"
       };
       await this.$store.dispatch(SAVE_STRUCTURE, {
-        client_id: "client1313",
+        client_id: this.userData.result.client_id,
         orgTree: this.chartData
       });
-      await this.$store.dispatch(GET_STRUCTURE); // обновление стора надо бы засунуть в SAVE_STRUCTURE
+      await this.$store.dispatch(GET_STRUCTURE, this.userData.result.client_id); // обновление стора надо бы засунуть в SAVE_STRUCTURE
     }
     // 0-й элемент потому что пока что возвращается массив ( все схемы ), а будет с отбором по клиенту одна
     this.struct_id = this.structure[0]._id;
@@ -534,7 +538,7 @@ export default {
     async addEmployeesToDeptAction(selected_empls) {
       this.dialogDeptEmployeesVisible = false;
       const data = {
-        client_id: "client1",
+        client_id: this.userData.result.client_id,
         dept_id: this.clickedDeptId,
         users: selected_empls.map(emp => emp._id),
         headUser: ""
@@ -568,7 +572,7 @@ export default {
         onOk: async () => {
           try {
             await this.$store.dispatch(DELETE_DEPT_USER, {
-              client_id: "client1",
+              client_id: this.userData.result.client_id,
               dept_id: this.clickedDeptId,
               user_id: d.id
             });
@@ -590,7 +594,7 @@ export default {
     async setEmployeeAsDeptChief(d) {
       this.dialogDeptEmployeesVisible = false;
       const data = {
-        client_id: "client1",
+        client_id: this.userData.result.client_id,
         dept_id: this.clickedDeptId,
         user_id: d.id
       };
@@ -640,7 +644,7 @@ export default {
       try {
         await this.$store.dispatch(EDIT_STRUCTURE, {
           _id: this.struct_id,
-          client_id: "client_123123",
+          client_id: this.userData.result.client_id,
           orgTree: this.chartData // this.chartData
         });
         this.$notification["success"]({

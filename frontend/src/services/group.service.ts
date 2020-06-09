@@ -26,6 +26,13 @@ export const getGroups = (context: any, userId: any) => {
     });
 };
 
+export const getGroupsByClient = (context: any, workspace: any) => {
+  return Vue.axios
+    .get(`api/group/byClient/${workspace}`)
+    .then((response: any) => {
+      context.commit(SET_GROUPS, response.data.result);
+    });
+};
 export const getCurrentGroup = (context: any, groupId: any) => {
   return Vue.axios
     .get(`api/group/${groupId}`)

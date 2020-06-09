@@ -15,14 +15,11 @@
                   id="workspace"
                   name="workspace"
                   class="form-control"
-                  :class="{ 'is-invalid': submitted && !user.workspace }"
+                  @change="ws_blur"
+                  :class="{ 'is-invalid': submitted && error.workspace }"
                 />
                 <div
-                  v-show="submitted && !user.workspace"
-                  class="invalid-feedback"
-                >Это поле обязательно</div>
-                <div
-                  v-show="submitted && user.workspace && error.workspace"
+                  v-show="submitted && error.workspace"
                   class="invalid-feedback"
                 >{{workspaceErrMsg}}</div>
               </div>
@@ -249,10 +246,14 @@ export default Vue.extend({
         } finally {
           if (!this.errorLogin) {
             const user = this.$store.getters.userData.result;
-            if (!user.roles.includes("superadmin")) {
+            const userIsSuperAdmin = user.roles.includes("superadmin");
+            // User is not SA
+            if (!userIsSuperAdmin) {
               this.$store.dispatch(ENTER_CLIENT, this.user.workspace);
               this.$router.push("company");
-            } else this.$router.push("clients");
+            }
+            // User is SA
+            else this.$router.push("clients");
           } else {
             console.log("errorLogin:", this.errorLogin);
             this.submitted = true;
@@ -296,6 +297,9 @@ export default Vue.extend({
         this.msgStyle = "scale-out-vertical";
         this.showError = false;
       }, 3000);
+    },
+    ws_blur() {
+      this.submitted = !!this.workspace;
     }
   },
   watch: {
