@@ -9,10 +9,10 @@ import {
   REMOVE_DEPT_USER
 } from '@/store/structure/mutations.type'
 
-export const getStructure = async (context: any, clientId: String) => {
+export const getStructure = async (context: any, workspace: String) => {
   //context.commit(SET_STRUCTURE, {});
   const response = await Vue.axios
-    .get('api/structure', { params: clientId });
+    .get('api/structure/' + workspace);
   context.commit(SET_STRUCTURE, response.data.result);
 }
 

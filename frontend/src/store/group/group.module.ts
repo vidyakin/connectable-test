@@ -6,7 +6,7 @@ import {
   DELETE_GROUP, DELETE_PARTICIPANT,
   EDIT_GROUP,
   GET_CURRENT_GROUP,
-  GET_GROUPS, GET_INVITE, GET_PARTICIPANTS_REQUEST,
+  GET_GROUPS, GET_GROUPS_BY_CLIENT, GET_INVITE, GET_PARTICIPANTS_REQUEST,
   REPLACE_GROUPS_OWNER
 } from '@/store/group/actions.type';
 import {
@@ -17,7 +17,7 @@ import {
   deleteGroup, deleteParticipant,
   editGroup,
   getCurrentGroup,
-  getGroups, getInvite, getParticipantsRequest,
+  getGroups, getGroupsByClient, getInvite, getParticipantsRequest,
   replaceGroupsOwner
 } from '@/services/group.service';
 import {
@@ -61,6 +61,7 @@ const getters = {
 const actions = {
   [CREATE_GROUP]: createGroup,
   [GET_GROUPS]: getGroups,
+  [GET_GROUPS_BY_CLIENT]: getGroupsByClient,
   [GET_CURRENT_GROUP]: getCurrentGroup,
   [DELETE_GROUP]: deleteGroup,
   [EDIT_GROUP]: editGroup,

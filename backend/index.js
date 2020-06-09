@@ -77,7 +77,8 @@ app.use('/api', require('./auth/authRouter')); // ???
 app.use('/api/user', validateToken, require('./modules/users'))
 app.use('/api/clients', validateToken, require('./modules/clients'))
 app.use('/api/group', validateToken, require('./modules/groups'))
-app.use('/api/dept_users', validateToken, require('./modules/dept_users'))
+//app.use('/api/dept_users', validateToken, require('./modules/dept_users'))
+app.use('/api/structure', validateToken, require('./modules/structure'))
 
 /**
  * Old way
@@ -92,7 +93,7 @@ app.use('/api/projectParticipant', validateToken, require('./crud')(ProjectParti
 app.use('/api/project', validateToken, require('./crud')(Project, projectSerializer));
 
 app.use('/api/message', validateToken, require('./crud')(Message, serializers.serializer));
-app.use('/api/structure', validateToken, require('./crud')(Structure, serializers.serializer));
+//app.use('/api/structure', validateToken, require('./crud')(Structure, serializers.serializer));
 
 //app.use('/api/dept_users', validateToken, require('./crud')(UsersInDepartment, serializers.serializer));
 

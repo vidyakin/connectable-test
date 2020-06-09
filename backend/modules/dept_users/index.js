@@ -1,11 +1,10 @@
 
 let router = require('express').Router();
 
-const validateToken = require('../../utils').validateToken;
 const UsersInDepartment = require('../../models/usersInDepartment')
 
 // Сотрудники в отделах клиента
-router.get('/:client_id', validateToken, (req,res) => {
+router.get('/:client_id', (req,res) => {
   UsersInDepartment.find({client_id: req.params.client_id}, (err, users_in_depts) => {
       if (err) return res.status(500).send("Error during getting employees in departments");
       if (users_in_depts == null)

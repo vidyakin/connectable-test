@@ -28,7 +28,7 @@
 <script>
 import store from "../store";
 import { mapGetters } from "vuex";
-import { GET_GROUPS } from "../store/group/actions.type";
+import { GET_GROUPS, GET_GROUPS_BY_CLIENT } from "../store/group/actions.type";
 
 // import AppSearchForm from '../components/common/SearchForm';
 import AppGroup from "../components/common/Group";
@@ -73,17 +73,22 @@ export default {
     // userIsAdmin() {
     //   return this.$can('read', {'accessEmail': this.datauser.email, '__type': 'Admin'})
     // },
-    ...mapGetters(["groups", "userData"])
+    ...mapGetters(["groups", "userData", "currentClient"])
   },
   async beforeMount() {
     try {
-      await this.$store.dispatch(GET_GROUPS, this.userData.result._id);
       this.isLoaded = true;
       this.userIsAdmin = this.$can("read", {
         accessEmail: this.datauser.email,
         __type: "Admin"
       });
-      console.log(`Число групп: ${this.groups.length}`);
+      if (this.userIsAdmin) {
+        await this.$store.dispatch(
+          GET_GROUPS_BY_CLIENT,
+          this.currentClient.workspace
+        );
+      } else await this.$store.dispatch(GET_GROUPS, this.userData.result._id);
+      //console.log(`Число групп: ${this.groups.length}`);
     } catch (e) {
       console.log(`Ошибка при получении групп: ${e}`);
     }

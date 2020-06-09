@@ -113,6 +113,19 @@ router.get('/byUser/:userId', async (req,res) => {
   else res(404).send("Error while getting groups for the user")
 })
 
+router.get('/byClient/:client_id', async (req,res) => {
+  try {
+    const groups = await Group.find({client_id: req.params.client_id})
+    const data = {
+      status: 201,
+      result: await groupSerializer(groups)
+    }
+    return res.send(data)
+  } catch (error) {
+    res.status(500).send(error)
+  }
+})
+
 /**
  * Set one client to all groups with empty "client_id" field
  */
