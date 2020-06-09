@@ -40,7 +40,7 @@ const port = process.env.PORT || 4000;
 // HTTP :
 const server = require('http').createServer(app);
 
-const io = require('socket.io')(server);
+const io = require('socket.io')(server,  {'transports': ['websocket', 'polling']});
 io.set('transports', ["websocket", "polling"]);
 io.on('connection', socket=>{
     console.log("-> socket.io user connected: ", socket.id);
@@ -77,7 +77,7 @@ app.use('/api', require('./auth/authRouter')); // ???
 app.use('/api/user', validateToken, require('./modules/users'))
 app.use('/api/clients', validateToken, require('./modules/clients'))
 app.use('/api/group', validateToken, require('./modules/groups'))
-//app.use('/api/dept_users', validateToken, require('./modules/dept_users'))
+app.use('/api/dept_users', validateToken, require('./modules/dept_users'))
 app.use('/api/structure', validateToken, require('./modules/structure'))
 
 /**
@@ -509,10 +509,10 @@ app.post('/api/dislike', (req, res) => {
   
 // Поиск событий где пользователь и автор и участник
 app.get('/api/events/:email', async (req,res) => {
-    const user = await User.findOne({email: req.params.email}, '_id')
+    const user = await User.findOne({email: req.params.email}, '_id client_id')
     console.log((new Date()).toLocaleString() + ' , user:'+user);    
     try {
-        const docs = await Event.find()
+        const docs = await Event.find({client_id: user.client_id})
             .or([
                 {"userId": user._id}, 
                 {"attendees.email": {$eq: req.params.email}}
@@ -524,6 +524,28 @@ app.get('/api/events/:email', async (req,res) => {
     }
 })
 
+/**
+ * All events of all client's users (entrypoint for admin view)
+ */
+app.get('/api/event/byClient/:workspace', async (req, res) => {
+    try {
+        const events = await Event.find({client_id: req.params.workspace})
+        res.send(events)
+    } catch (err) {
+        res.status(500).send("Error while getting events of client: "+err.message)
+    }
+})
 
+/**
+ * Временная функция для установки клиента всем событиям
+ */
+app.put('/api/event/client_all/:workspace', async (req,res) => {
+    try {
+        const cnt = await Event.updateMany({client_id: null}, {client_id: req.params.workspace})
+        res.send(`Изменено событий: ${cnt.nModified}`)
+    } catch (error) {
+        res.status(500).send(error)
+    }
+})
 
 server.listen(port, () => console.log(`[Server]: Listening on port ${port}`));

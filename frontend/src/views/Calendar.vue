@@ -19,14 +19,14 @@
               class="event-wrapper"
               :style="{
                 'background-color' : val.color,
-                'border-color': val.userId === userInfo._id ? 'blue' : val.color,
-                'border-width': val.userId === userInfo._id ? 2 : 1
+                'border-color': val.userId === userData.result._id ? 'blue' : val.color,
+                'border-width': val.userId === userData.result._id ? 2 : 1
               }"
             >
               <div class="event-name">{{getTime(val)}} {{val.name}}</div>
               <div class="event-actions">
                 <a-icon
-                  :type="val.userId === userInfo._id ? 'form' : 'eye'"
+                  :type="val.userId === userData.result._id ? 'form' : 'eye'"
                   @click.stop="createOpen(val)"
                 />
                 <a-popconfirm
@@ -40,7 +40,7 @@
                   <a-icon
                     type="delete"
                     @click.stop="startDelete"
-                    v-if="val.userId === userInfo._id"
+                    v-if="val.userId === userData.result._id"
                   ></a-icon>
                 </a-popconfirm>
               </div>
@@ -120,7 +120,11 @@
 import Vue from "vue";
 import store from "../store";
 import { mapGetters } from "vuex";
-import { DELETE_EVENT, GET_EVENTS } from "../store/user/actions.type";
+import {
+  DELETE_EVENT,
+  GET_EVENTS,
+  GET_EVENTS_BY_CLIENT
+} from "../store/user/actions.type";
 
 import moment from "moment";
 import "moment/locale/ru";
@@ -143,13 +147,18 @@ export default Vue.extend({
   async created() {
     moment.locale("ru");
 
-    if (this.userInfo) {
-      await this.$store.dispatch(GET_EVENTS, this.userInfo.email);
+    if (this.userIsAdmin) {
+      await this.$store.dispatch(
+        GET_EVENTS_BY_CLIENT,
+        this.currentClient.workspace
+      );
+    } else {
+      await this.$store.dispatch(GET_EVENTS, this.userData.result.email);
     }
 
     //let april_events = this.getEventsForMonth(moment().subtract(1, "M"));
 
-    if (this.userInfo.outlookId) {
+    if (this.userData.result.outlookId) {
       console.log("beforeCreate get events");
       const a = Vue.axios
         .get("/api/outlook/event")
@@ -160,7 +169,7 @@ export default Vue.extend({
           console.log("beforeCreate error:", e);
         });
       return a;
-    } else if (this.userInfo.googleId) {
+    } else if (this.userData.result.googleId) {
       //
     }
   },
@@ -168,28 +177,23 @@ export default Vue.extend({
     AppAddEventModal
   },
   computed: {
-    ...mapGetters(["user", "events", "userData"]),
-    userInfo() {
-      return this.userData.result ? this.userData.result : this.user.result;
+    ...mapGetters(["user", "events", "userData", "currentClient"]),
+    // userInfo() {
+    //   return this.userData.result ? this.userData.result : this.user.result;
+    // },
+    userIsAdmin() {
+      return this.$can("read", {
+        accessEmail: this.userData.result.email,
+        __type: "Admin"
+      });
     },
     months() {
-      return [
-        "Январь",
-        "Февраль",
-        "Март",
-        "Апрель",
-        "Май",
-        "Июнь",
-        "Июль",
-        "Август",
-        "Сентябрь",
-        "Октябрь",
-        "Ноябрь",
-        "Декабрь"
-      ];
+      return "Январь.Февраль.Март.Апрель.Май.Июнь.Июль.Август.Сентябрь.Октябрь.Ноябрь.Декабрь".split(
+        "."
+      );
     },
     weekday() {
-      return ["ПН", "ВТ", "СР", "ЧТ", "ПТ", "СБ", "ВС"];
+      return "ПН.ВТ.СР.ЧТ.ПТ.СБ.ВС".split(".");
     }
   },
   watch: {
@@ -264,7 +268,7 @@ export default Vue.extend({
         ? []
         : this.events &&
             this.events.filter(event => {
-              if (event && event.userId === this.userInfo._id) {
+              if (event && event.userId === this.userData.result._id) {
                 return moment(event.date).isSame(moment(), "month");
               }
             });
@@ -280,7 +284,7 @@ export default Vue.extend({
       return (
         (this.events &&
           this.events.filter(event => {
-            if (event && event.userId === this.userInfo._id) {
+            if (event && event.userId === this.userData.result._id) {
               return moment(event.date).isSame(moment().add(1, "M"), "month");
             }
           })) ||

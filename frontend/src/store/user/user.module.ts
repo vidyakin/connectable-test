@@ -17,7 +17,7 @@ import {
   RESET_INFO
 } from '@/store/user/mutations.type';
 import {
-  GET_EVENTS, CREATE_EVENT, DELETE_EVENT, UPDATE_EVENT,
+  GET_EVENTS, GET_EVENTS_BY_CLIENT, CREATE_EVENT, DELETE_EVENT, UPDATE_EVENT,
   GET_INFO_ABOUT_USER, GET_USER, GET_USERS,
   LOGIN, LOGIN_WITH_GOOGLE, LOGIN_WITH_OUTLOOK, LOGOUT,
   EDIT_USER, INSERT_USER_INFO, CHECK_USER_INFO,
@@ -25,7 +25,7 @@ import {
   MARK_USER_DELETED, UNMARK_USER_DELETED
 } from '@/store/user/actions.type';
 import { getInfoAboutUser, login, loginWithGoogle, loginWithOutlook, logout, forgotPasword, resetPassword } from '@/services/auth/auth.service';
-import { createEvent, deleteEvent, updateEvent, editUser, getEvents, getUser, getUsers, insertNewUser, checkUserInfo, markUserAsDeleted, unmarkUserAsDeleted } from '@/services/user.service';
+import { createEvent, deleteEvent, updateEvent, editUser, getEvents, getUser, getUsers, insertNewUser, checkUserInfo, markUserAsDeleted, unmarkUserAsDeleted, getEventsByClient } from '@/services/user.service';
 
 interface State {
   user: any | null;
@@ -184,6 +184,7 @@ const actions = {
   [CREATE_EVENT]: createEvent,
   [UPDATE_EVENT]: updateEvent,
   [GET_EVENTS]: getEvents,
+  [GET_EVENTS_BY_CLIENT]: getEventsByClient,
   [DELETE_EVENT]: deleteEvent,
   [GET_USERS]: getUsers,
   [GET_USER]: getUser,

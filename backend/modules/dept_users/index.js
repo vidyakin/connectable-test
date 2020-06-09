@@ -3,11 +3,6 @@ let router = require('express').Router();
 
 const UsersInDepartment = require('../../models/usersInDepartment')
 
-// Сотрудники в отделах клиента
-router.get('/:client_id', (req,res) => {
-  
-})
-
 // Добавление сотрудников в отдел клиента
 router.post('/:client_id/:dept_id', (req,res) => {
   // пытаемся найти запись о сотрудниках данного отдела

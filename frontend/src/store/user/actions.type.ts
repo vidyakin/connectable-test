@@ -10,6 +10,7 @@ export const UNMARK_USER_DELETED = 'UNMARK_USER_DELETED';
 export const CREATE_EVENT = 'CREATE_EVENT';
 export const UPDATE_EVENT = 'UPDATE_EVENT';
 export const GET_EVENTS = 'GET_EVENTS';
+export const GET_EVENTS_BY_CLIENT = 'GET_EVENTS_BY_CLIENT';
 export const DELETE_EVENT = 'DELETE_EVENT';
 
 export const GET_USERS = 'GET_USERS';

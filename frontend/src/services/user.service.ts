@@ -125,6 +125,14 @@ export const getEvents = (context: any, email: any) => {
     });
 };
 
+export const getEventsByClient = (context: any, workspace: string) => {
+  return Vue.axios
+    .get('/api/event/byClient/' + workspace)
+    .then(response => {
+      context.commit(SET_EVENTS, response.data);
+    })
+}
+
 export const createEvent = (context: any, event: any) => {
   console.log(`createEvent starts on front: ${JSON.stringify(event, null, 3)}`);
   return Vue.axios
