@@ -61,7 +61,7 @@ export const createParticipant = (context: any, participant: any) => {
 
 export const getParticipantsRequest = (context: any, props: any) => {
   return Vue.axios
-    .get(`api/checkParticipant/${props.participantId}/group/${props.groupId}`)
+    .get(`api/group/${props.groupId}/checkParticipant/${props.participantId}`)
     .then((response: any) => {
       context.commit(SET_PARTICIPANTS_REQUEST, response.data);
     });
@@ -69,7 +69,7 @@ export const getParticipantsRequest = (context: any, props: any) => {
 
 export const approveParticipantsRequest = (context: any, props: any) => {
   return Vue.axios
-    .post(`api/approveParticipant/${props.participantId}/group/${props.groupId}`)
+    .post(`api/group/${props.groupId}/approveParticipant/${props.participantId}`)
     .then((response: any) => {
       context.dispatch(GET_CURRENT_GROUP, props.groupId);
     });
@@ -101,12 +101,12 @@ export const getInvite = (context: any, id: string) => {
 
 export const approveInvite = (context: any, id: string) => {
   return Vue.axios
-    .post(`api/approveInvite/${id}`);
+    .post(`api/group/approveInvite/${id}`);
 };
 
 export const cancelInvite = (context: any, id: string) => {
   return Vue.axios
-    .post(`api/cancelInvite/${id}`);
+    .post(`api/group/cancelInvite/${id}`);
 };
 
 export const replaceGroupsOwner = (context: any, userId: string) => {

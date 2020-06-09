@@ -146,7 +146,8 @@ export default {
           //type: this.type,
           creatorId: this.userinfo._id,
           userEmail: this.userinfo.email,
-          emailSend: this.statusEmailSend
+          emailSend: this.statusEmailSend,
+          client_id: this.userData.result.client_id
         };
         const newGroupId = await this.$store.dispatch(CREATE_GROUP, newGroup);
         // объект-модель для сохранения в БД
@@ -185,7 +186,8 @@ export default {
         senderId: newGroup.creatorId, // id отправителя
         listenerType: "all", // тип приемников сообщений - все, выборочно или еще как-то
         linkedObjType: "group", // связанный объект - группа, проект, и т.д.
-        linkedObjId: newGroupId
+        linkedObjId: newGroupId,
+        client_id: newGroup.client_id
       };
     },
     groupTypeOnChange(e) {

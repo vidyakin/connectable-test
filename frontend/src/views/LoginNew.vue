@@ -49,9 +49,9 @@
         </a-form>
       </a-col>
     </a-row>
-    <div class="row">
+    <a-row class="login-buttons">
       <a-col :xs="{ span: 12, offset: 6 }" :lg="{ span: 6, offset: 9 }">
-        <app-login-google />
+        <LoginButtonGoogle />
         <app-login-microsoft />
 
         <div class="col-sm-4 offset-sm-4">
@@ -71,18 +71,21 @@
           />
         </div>
       </a-col>
-    </div>
+    </a-row>
   </div>
 </template>
 
 <script>
 import Vue from "vue";
-import { CHECK_USER_INFO } from "../store/user/actions.type";
-import AppLoginGoogle from "../components/common/LoginBarGoogle.vue";
-import AppLoginMicrosoft from "../components/common/LoginBarMicrosoft.vue";
-import { SUCCESS_REGISTER } from "@/store/user/mutations.type";
 import store from "../store";
+
+import { CHECK_USER_INFO } from "../store/user/actions.type";
+import { SUCCESS_REGISTER } from "@/store/user/mutations.type";
+
+import LoginButtonGoogle from "../components/common/LoginButtonGoogle.vue";
+import AppLoginMicrosoft from "../components/common/LoginBarMicrosoft.vue";
 import AppSuccessRegister from "../components/notification/SuccessRegister.vue";
+
 export default Vue.extend({
   data() {
     return {
@@ -103,7 +106,7 @@ export default Vue.extend({
   },
   components: {
     AppSuccessRegister,
-    AppLoginGoogle,
+    LoginButtonGoogle,
     AppLoginMicrosoft
   },
   methods: {
@@ -179,29 +182,8 @@ export default Vue.extend({
   display: flex;
   justify-content: center;
 }
-</style>
-<style scoped>
-.login-page {
-  width: 100%;
-  height: 10vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-</style>
 
-
-<style lang="scss">
-.c-login {
-  padding: 50px 0;
-
-  .u-form {
-    text-align: left;
-  }
-
-  legend {
-    font-size: 2em;
-    text-align: center;
-  }
+.login-buttons {
+  padding-top: 20px;
 }
 </style>

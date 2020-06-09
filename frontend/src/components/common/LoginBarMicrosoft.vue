@@ -1,5 +1,5 @@
 <template>
-  <div class="login-page">
+  <div class="login-button">
     <a class="ms-button" :href="outlookUrl">
       <img src="@/assets/Icons/ms-symbol.png" style="margin-right: 10px" />
       Sign in with Microsoft
@@ -9,7 +9,6 @@
 
 <script>
 import Vue from "vue";
-import { SET_SHOW_IMAGE_HEADER } from "../../store/shower/mutations.type";
 import { mapGetters } from "vuex";
 
 import {
@@ -29,9 +28,6 @@ export default {
     ...mapGetters(["user"])
   },
   methods: {
-    closeImage() {
-      this.$store.commit(SET_SHOW_IMAGE_HEADER, false);
-    },
     login() {
       this.$store.dispatch(LOGIN_WITH_OUTLOOK, this.outlookUrl);
     },
@@ -54,9 +50,9 @@ export default {
 </script>
 
 <style scoped lang="scss">
-.login-page {
+.login-button {
   width: 100%;
-  height: 10vh;
+  height: 5vh;
   display: flex;
   align-items: center;
   justify-content: center;

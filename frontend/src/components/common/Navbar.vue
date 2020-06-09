@@ -162,6 +162,7 @@ export default {
       });
     },
     userIsSuperAdmin() {
+      if (!this.userData) return false;
       console.log("userData in NavBar: ", this.userData.result);
 
       return this.$can("manage", {
