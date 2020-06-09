@@ -5,13 +5,7 @@ const UsersInDepartment = require('../../models/usersInDepartment')
 
 // Сотрудники в отделах клиента
 router.get('/:client_id', (req,res) => {
-  UsersInDepartment.find({client_id: req.params.client_id}, (err, users_in_depts) => {
-      if (err) return res.status(500).send("Error during getting employees in departments");
-      if (users_in_depts == null)
-          res.status(404).send("No users in depts for client "+req.params.client_id)
-      else
-          res.status(200).send(users_in_depts) 
-  })
+  
 })
 
 // Добавление сотрудников в отдел клиента
