@@ -290,7 +290,9 @@ export default {
     }
   },
   created() {
-    this.$store.dispatch(GET_USERS, this.currentClient.workspace);
+    if (this.currentClient) {
+      this.$store.dispatch(GET_USERS, this.currentClient.workspace);
+    }
   }
 };
 </script>

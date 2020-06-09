@@ -4,7 +4,6 @@ const fileUpload = require('express-fileupload');
 const latinize = require('latinize');
 
 const serializers = require('./serializers');
-const groupSerializer = require('./serializers/groupSerializer').groupSerializer;
 const projectSerializer = require('./serializers/projectSerializer').projectSerializer;
 const inviteSerializer = require('./serializers/inviteSerializer').inviteSerializer;
 
@@ -20,7 +19,6 @@ const {
     Like,
     Comment,
     Event,
-    Group,
     GroupParticipant,
     GroupInvite,
     ProjectParticipant,
@@ -28,9 +26,7 @@ const {
     Department,
     Notification,
     Message,
-    Structure,
-    UsersInDepartment,
-    Client
+    Structure
 } = require('./models')
 
 const app = express();
@@ -80,11 +76,12 @@ app.use('/api', require('./auth/authRouter')); // ???
  */
 app.use('/api/user', validateToken, require('./modules/users'))
 app.use('/api/clients', validateToken, require('./modules/clients'))
+app.use('/api/group', validateToken, require('./modules/groups'))
+app.use('/api/dept_users', validateToken, require('./modules/dept_users'))
 
 /**
  * Old way
  */
-app.use('/api/group', validateToken, require('./crud')(Group, groupSerializer));
 app.use('/api/post', validateToken, require('./crud')(Post, serializers.postSerializer));
 app.use('/api/like', validateToken, require('./crud')(Like, serializers.serializer));
 app.use('/api/comment', validateToken, require('./crud')(Comment, serializers.commentSerializer));
@@ -105,7 +102,6 @@ app.use('/api/google/event', require('./google'));
 app.use("/role", require('./role/routes'));
 
 var mailer = require('./email/index');
-const groupParticipantDAO = require('./dao/group-participant-dao')
 
 // var userDAO = require('./modules/users/user-dao');
 // app.put('/api/user/delete/:userId', userDAO.delUserById)
@@ -159,55 +155,6 @@ app.post('/api/upload', (req, res, next) => {
 
 });
 
-app.get('/api/checkParticipant/:participantId/group/:groupId', (req, res, next) => {
-  const {participantId, groupId} = req.params;
-  GroupParticipant.findOne({participantId, groupId, approved: false}, (e, data) => {
-    if (e) {
-      res.status(500).send();
-    } else {
-      res.send(data !== null);
-    }
-
-  })
-});
-
-app.post('/api/approveParticipant/:participantId/group/:groupId', (req, res, next) => {
-  const {participantId, groupId} = req.params;
-  GroupParticipant.updateMany({participantId, groupId}, {approved: true}, (e, data) => {
-    if (e) {
-      res.status(500).send();
-    } else {
-      res.status(200).send();
-    }
-
-  })
-});
-
-app.post('/api/approveInvite/:inviteId', (req, res, next) => {
-  const {inviteId} = req.params;
-  GroupInvite.findByIdAndDelete(inviteId, (e, data) => {
-    if (e) {
-      res.status(500).send();
-    } else {
-      GroupParticipant.create({participantId: data.userId, groupId: data.groupId}, (err, data) => {
-        res.status(200).send();
-      })
-    }
-
-  })
-});
-app.post('/api/cancelInvite/:inviteId', (req, res, next) => {
-  const {inviteId} = req.params;
-  GroupInvite.findByIdAndDelete(inviteId, (e, data) => {
-    if (e) {
-      res.status(500).send();
-    } else {
-      res.status(200).send();
-    }
-
-  })
-});
-
 app.delete('/api/deleteParticipant/:participantId/group/:groupId', (req, res, next) => {
   const {participantId, groupId} = req.params;
   GroupParticipant.deleteMany({participantId, groupId}, (e, data) => {
@@ -219,6 +166,7 @@ app.delete('/api/deleteParticipant/:participantId/group/:groupId', (req, res, ne
 
   })
 });
+
 //register form
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
@@ -456,95 +404,6 @@ app.put('/api/department', (req, res) => {
 });
 //app.put('/api/department', validateToken, require('./crud')(Department, serializers.serializer));
 
-// Сотрудники в отделах клиента
-app.get('/api/dept_users/:client_id', validateToken, (req,res) => {
-    UsersInDepartment.find({client_id: req.params.client_id}, (err, users_in_depts) => {
-        if (err) return res.status(500).send("Error during getting employees in departments");
-        if (users_in_depts == null)
-            res.status(404).send("No users in depts for client "+req.params.client_id)
-        else
-            res.status(200).send(users_in_depts) 
-    })
-})
-
-// Добавление сотрудников в отдел клиента
-app.post('/api/dept_users/:client_id/:dept_id', (req,res) => {
-    // пытаемся найти запись о сотрудниках данного отдела
-    UsersInDepartment.findOne({...req.params}, (err, users_in_dept) => {
-        if (err) return res.status(500).send("Error during find employees in department");
-        // если не нашли - создаем новую запись
-        if (users_in_dept == null)
-            UsersInDepartment.create({
-                ...req.params,
-                users: req.body.users, // список сотрудников должен быть передан в теле
-                headUser: ""
-            }, (err,data) => {
-                if (err) return res.status(500).send('Error of create employees in dept: '+err)
-                res.status(200).send(data)
-            })
-            //res.status(404).send("No users in depts for client "+req.params.client_id)
-        else {
-            users_in_dept.users = [...new Set(users_in_dept.users.concat(req.body.users))] // trick for unduplicate itemsafter concat
-            UsersInDepartment.findOneAndUpdate({...req.params}, users_in_dept, {new: true}, (err, data) => {
-                if (!err) res.status(200).send(data)
-                else res.status(500).send("Error when update emloyees for dept "+req.params.dept_id+": "+err)
-            })
-        }
-    })
-})
-
-// удаление сотрудника из отдела
-app.delete('/api/dept_users', (req,res)=>{
-    // В теле должны быть указаны client_id, dept_id и user_id
-    const q = {
-        client_id: req.body.client_id, 
-        dept_id: req.body.dept_id
-    }
-    
-    UsersInDepartment.findOne(q, (err, dept_users)=>{
-        if (err) return res.status(500).send("Error during find employees in department to delete one");
-        if (dept_users == null) return res.status(404).send(`No data found by client id='${q.client_id}' and dept_id ='${q.dept_id}'`)
-
-        const i = dept_users.users.indexOf(req.body.user_id)
-        dept_users.users.splice(i,1)
-        UsersInDepartment.findByIdAndUpdate(dept_users._id, dept_users, (err, data)=>{
-            if (err) return res.status(500).send("Error during update employees in department after delete");
-            res.status(200).send(data)
-        })
-    })
-})
-
-// установка начальника отдела
-app.put('/api/dept_users', (req, res) => {
-    // В теле должны быть указаны client_id, dept_id и user_id
-    console.log(`edit dept_users API: ${JSON.stringify(req.body,null,2)}`);
-    const q = {
-        client_id: req.body.client_id, 
-        dept_id: req.body.dept_id
-    }
-    UsersInDepartment.findOne(q, (err, dept_users)=>{
-        if (err) return res.status(500).send("Error during find employees in department to set chief");
-        dept_users.headUser = req.body.user_id
-        UsersInDepartment.findByIdAndUpdate(dept_users._id, dept_users, (err, data)=>{
-            if (err) return res.status(500).send("Error during set employee as chief in the department");
-            res.status(200).send(data)
-        })
-    })
-})
-
-// удаление сотрудника из статуса начальника отделов при увольнении
-app.put(`/api/dept_users/clear_chief/:empl_id`, (req,res) => {
-    console.log('clear ', req.params.empl_id);
-    
-    UsersInDepartment.updateMany({headUser: req.params.empl_id}, {headUser: ''}, (error, docs) => {
-        if (error) res.status(500).send('Error while clearing chief:', error)
-        else {
-          console.log(`chief was cleared in ${docs.nModified} depts`);
-          res.status(200).send(docs)
-        }
-    })
-})
-
 //put notifications
 app.post('/api/notification', (req, res, next) => {
     let notifi =req.body,
@@ -646,39 +505,6 @@ app.post('/api/dislike', (req, res) => {
     });
 });
 
-app.post('/api/group/replace_owner/:userId', async (req,res) => {
-    // ищем админа, пока хардкодом, потом надо брать первого в списке админов конкретного клиента
-    const admin = await User.findOne({ email: "w.project.portal3@gmail.com" }, '_id')
-    // ищем группы где создатель это переданный userId сотрудника
-    await Group.find({creatorId: req.params.userId}, (err, groups) => {
-        groups.forEach(group => {
-            // заменяем создателя группы
-            group.creatorId = admin._id
-            // заменяем участника
-            const prt_i = group.participants.findIndex(p => p._id == req.params.userId)
-            if (prt_i != -1) {
-                group.participants.splice(prt_i, 1, admin)
-            }
-            group.save()
-            console.log(`creator of group ${group.name} was changed`);
-            
-        })
-    })
-    // удаляем участника в отдельной коллекции участников, мидлварь создаст новую запись сама
-    await GroupParticipant.deleteMany({participantId: req.params.userId})
-    res.status(200).send('Employees was replaced to admin in all groups')
-})
-
-app.get('/api/group/byUser/:userId', async (req,res) => {
-    const groups = await groupParticipantDAO.findGroupsByUserId(req.params.userId)
-    const grMin = groups.map(g => ({name: g.name, t: g.type}))
-    const data = {
-        status: 201,
-        result: await groupSerializer(groups)
-    }
-    if (groups) res.status(200).send(data)
-    else res(404).send("Error while getting groups for the user")
-})
   
 // Поиск событий где пользователь и автор и участник
 app.get('/api/events/:email', async (req,res) => {

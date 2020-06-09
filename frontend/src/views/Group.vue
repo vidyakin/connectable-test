@@ -91,7 +91,10 @@
           </div>
         </div>
         <!-- ЗАЯВКИ -->
-        <div class="group-body-items" v-if="userIsAdmin && currentGroup.requests.length">
+        <div
+          class="group-body-items"
+          v-if="currentGroup.requests.length && (currentGroup.creatorId === userinfo._id || userIsAdmin)"
+        >
           <div class="group-body-items-header">Заявки ({{currentGroup.requests.length}})</div>
           <div
             class="group-body-items-item"

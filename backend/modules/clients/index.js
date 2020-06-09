@@ -1,4 +1,3 @@
-const mongoose = require('mongoose');
 const Client = require('../../models/client')
 const User = require('../../models/user')
 //const serializers = require('../../serializers');

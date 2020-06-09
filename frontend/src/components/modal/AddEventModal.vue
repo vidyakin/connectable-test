@@ -259,6 +259,21 @@ export default {
     };
   },
   /**
+   * ВЫЧИСЛЯЕМЫЕ СВОЙСТВА
+   */
+  computed: {
+    ...mapGetters(["user", "userData", "users", "notification"]),
+    userInfo() {
+      return this.userData ? this.userData : this.user;
+    },
+    locale() {
+      let loc = { ...locale };
+      loc.dateFormat = "D MMMM YYYY г.";
+      loc.lang.monthFormat = "MMMM";
+      return loc;
+    }
+  },
+  /**
    * МЕТОДЫ КОМПОНЕНТА
    */
   methods: {
@@ -349,8 +364,9 @@ export default {
         duration,
         comment: this.theform.comment,
         color: this.theform.color.color,
-        userId: this.userInfo.result._id,
-        userEmail: this.userInfo.result.email,
+        userId: this.userData.result._id,
+        client_id: this.userData.result.client_id,
+        userEmail: this.userData.result.email,
         emailSend: this.statusEmailSend,
         attendees: this.selectedItems ? attendees : ""
       };
@@ -393,21 +409,6 @@ export default {
           (el.lastName + " " + el.firstName).toLowerCase().indexOf(text) !== -1
         );
       });
-    }
-  },
-  /**
-   * ВЫЧИСЛЯЕМЫЕ СВОЙСТВА
-   */
-  computed: {
-    ...mapGetters(["user", "userData", "users", "notification"]),
-    userInfo() {
-      return this.userData ? this.userData : this.user;
-    },
-    locale() {
-      let loc = { ...locale };
-      loc.dateFormat = "D MMMM YYYY г.";
-      loc.lang.monthFormat = "MMMM";
-      return loc;
     }
   },
   /**
