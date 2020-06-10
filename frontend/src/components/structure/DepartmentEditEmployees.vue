@@ -31,7 +31,7 @@
               <a-icon
                 type="crown"
                 theme="filled"
-                @click.stop="setAsLeader({id: item._id, name: item.firstName+' '+item.lastName})"
+                @click.stop="setAsLeader(item)"
                 style="font-size:14pt; color: darkorange"
                 v-show="mode == 'chief'"
               />
@@ -75,7 +75,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(["users"]),
+    ...mapGetters(["users", "currentClient"]),
     dataList() {
       if (!this.mode) return "";
       const empl_ids = this.employees.map(e => e._id);
@@ -92,6 +92,9 @@ export default {
         return "Выберите начальника отдела нажатием на иконку в списке";
     }
   },
+  beforeMount() {
+    this.$store.dispatch(GET_USERS, this.currentClient.workspace);
+  },
   beforeCreate() {
     // в зависимости от режима надо по разному составлять список сотрудников
     // - добавление - показывать тех кто не в этом отделе (или вообще ни в каком? для перевода в другой отдел логичнее делать из карточки сотрудника)
@@ -100,7 +103,7 @@ export default {
     // Vue.axios.get(fakeDataUrl).then(res => {
     //   this.dataList = res.data.results;
     // });
-    this.$store.dispatch(GET_USERS);
+    //this.$store.dispatch(GET_USERS, this.currentClient.workspace);
   },
   methods: {
     onChange(e) {
@@ -111,8 +114,19 @@ export default {
     startDeleteEmployee(d) {
       this.$emit("deleteEmpl", d);
     },
-    setAsLeader(d) {
+    setAsLeader(item) {
+      const d = {
+        id: item._id,
+        name: item.firstName + " " + item.lastName
+      };
       this.$emit("setEmplAsChief", d);
+    }
+  },
+  watch: {
+    visible(newVal) {
+      if (newVal) {
+        console.log(`visible: ${newVal}`);
+      }
     }
   }
 };

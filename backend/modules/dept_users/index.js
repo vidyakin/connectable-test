@@ -60,8 +60,9 @@ router.put('/', (req, res) => {
   }
   UsersInDepartment.findOne(q, (err, dept_users)=>{
       if (err) return res.status(500).send("Error during find employees in department to set chief");
+      if (dept_users == undefined) return res.status(500).send('No data about users in dept was found')
       dept_users.headUser = req.body.user_id
-      UsersInDepartment.findByIdAndUpdate(dept_users._id, dept_users, (err, data)=>{
+      UsersInDepartment.findByIdAndUpdate(dept_users._id, dept_users, {new: true}, (err, data)=>{
           if (err) return res.status(500).send("Error during set employee as chief in the department");
           res.status(200).send(data)
       })
