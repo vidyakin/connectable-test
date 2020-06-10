@@ -46,7 +46,7 @@ const safeStringify = val => {
 
 /*Bearer*/
 eventSchema.pre('save', function (next) {
-  //console.log(`events pre Save on back: this ${JSON.stringify(this,null,3)}`);
+  console.log(`events pre Save on back: this ${JSON.stringify(this,null,3)}`);
   
   user.findOne({_id: this.userId})
   .catch(err => console.log(err))
@@ -111,13 +111,16 @@ eventSchema.pre('updateOne', { query: true, document: true }, async function(nex
     // Чтобы не делать лишний запрос данные о событии есть в поле "this._update",
     // но почему-то там нет поля googleToken, приходится делать запроск базе
     let theevent = await this.findOne({_id: this._conditions._id})
-    const event_id = theevent.googleEventId
-    theevent = this._update // берем данные из поступивших данных, а не найденных в базе
+    if (theevent.googleEventId == undefined) return next() // EXIT if no google ID exists
+
     // берем токен
     const thisuser = await user.findOne({_id: theevent.userId})
+    if (thisuser.googleToken == undefined) return next() // EXIT if user has no google token
+    
     const headers = {
       'Authorization': `Bearer ${thisuser.googleToken}`,
     };
+    theevent = this._update // берем данные из поступивших данных, а не найденных в базе
     const event = {
       description: theevent.comment,
       start: {'dateTime': theevent.date},
@@ -125,7 +128,7 @@ eventSchema.pre('updateOne', { query: true, document: true }, async function(nex
       summary: theevent.name,
       attendees: theevent.attendees ? theevent.attendees : []
     };
-    await axios.put(eventsEndPoint+'/'+ event_id, event, { headers })
+    await axios.put(eventsEndPoint+'/'+ theevent.googleEventId, event, { headers })
     console.log(`Event was updated normally`);
     next()
   } catch (error) {
