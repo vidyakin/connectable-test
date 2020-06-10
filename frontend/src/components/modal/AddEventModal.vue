@@ -126,7 +126,7 @@
               width="30px"
               v-for="color in colors"
               @click="setCurrentColor(color)"
-              :key="color.color"
+              :key="color.name"
             >
               <circle cx="10" cy="10" r="10" :fill="color.color" />
               <circle
@@ -200,13 +200,13 @@ export default {
         padding: "5px"
       },
       colors: [
-        { color: "#ff0000" },
-        { color: "#ffaa00" },
-        { color: "#e6d700" },
-        { color: "#00d43f" },
-        { color: "#00dfc9" },
-        { color: "#3b86ff" },
-        { color: "#8e55d9" }
+        { color: "#ff0000", name: "red" },
+        { color: "#ffaa00", name: "orange" },
+        { color: "#e6d700", name: "yellow" },
+        { color: "#00d43f", name: "green" },
+        { color: "#00dfc9", name: "cyan" },
+        { color: "#3b86ff", name: "blue" },
+        { color: "#8e55d9", name: "purple" }
       ],
       // currentColor: {
       //   color: '#ff0000',
@@ -469,7 +469,7 @@ export default {
             timeTo: moment(),
             members: [],
             comment: "",
-            color: "#ff0000"
+            color: this.colors[0]
           };
           this.theform.timeTo = moment(this.day).add(1, "hour");
         }
