@@ -594,9 +594,17 @@ export default {
       });
     },
     async setEmployeeAsDeptChief(d) {
+      if (!this.currentClient.workspace) {
+        this.$error({
+          title: "Ошибка",
+          content: "Не задана текущая компания",
+          centered: true
+        });
+        return;
+      }
       this.dialogDeptEmployeesVisible = false;
       const data = {
-        client_id: this.userData.result.client_id,
+        client_id: this.currentClient.workspace,
         dept_id: this.clickedDeptId,
         user_id: d.id
       };
@@ -826,6 +834,9 @@ $between: 107px;
 }
 
 /* настраиваем меню */
+.v-context {
+  min-width: 16rem;
+}
 .context-menu-item {
   .title {
     font-weight: bold;
