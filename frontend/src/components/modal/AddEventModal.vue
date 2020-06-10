@@ -376,7 +376,7 @@ export default {
       if (this.isEdit) {
         event._id = this.event._id;
       }
-      console.log(`event is ${JSON.stringify(event, null, 3)}`);
+      //console.log(`event is ${JSON.stringify(event, null, 3)}`);
       //const calendar = google.calendar({version: 'v3', auth:""});
       await this.$store.dispatch(
         this.isEdit ? UPDATE_EVENT : CREATE_EVENT,

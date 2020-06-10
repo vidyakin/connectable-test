@@ -144,12 +144,12 @@ export const createEvent = (context: any, event: any) => {
 };
 
 export const updateEvent = (context: any, event: any) => {
-  console.log(`updateEvent starts on front: ${JSON.stringify(event, null, 3)}`);
+  //console.log(`service: updateEvent starts: ${JSON.stringify(event, null, 3)}`);
   return Vue.axios
     .put(`api/event/${event._id}`, event)
     .then((response: any) => {
       context.commit(CHANGE_EVENT, response.data.result);
-      console.log(`Событие изменено: ${JSON.stringify(response.data.result, null, 3)}`);
+      //console.log(`service: updateEvent end: ${JSON.stringify(response.data.result, null, 3)}`);
     });
 };
 
