@@ -1,0 +1,56 @@
+{
+  "name": "web-application",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon index.js",
+    "start": "node index.js",
+    "test_oauth": "cross-env NODE_ENV=development nodemon test/oauth.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@casl/ability": "^3.2.0",
+    "@casl/mongoose": "^2.3.2",
+    "@microsoft/microsoft-graph-client": "^2.0.0",
+    "async": "^3.1.0",
+    "axios": "^0.19.0",
+    "bcrypt": "^4.0.1",
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "express-fileupload": "^1.1.5",
+    "googleapis": "^48.0.0",
+    "jsonwebtoken": "^8.5.1",
+    "jwt-decode": "^2.2.0",
+    "latinize": "^0.4.0",
+    "moment": "^2.24.0",
+    "mongoose": "^5.6.10",
+    "node-outlook": "^1.1.8",
+    "nodemailer": "^6.3.0",
+    "nodemailer-express-handlebars": "^3.1.0",
+    "path": "^0.12.7",
+    "request": "^2.88.0",
+    "request-promise": "^4.2.5",
+    "simple-oauth2": "^3.1.0",
+    "socket.io": "^2.3.0"
+  },
+  "devDependencies": {
+    "@types/webpack-env": "^1.14.0",
+    "cross-env": "^5.2.0",
+    "morgan": "^1.9.1",
+    "nodemon": "^1.19.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/connectable-project/connectable.git"
+  },
+  "bugs": {
+    "url": "https://github.com/connectable-project/connectable/issues"
+  },
+  "homepage": "https://github.com/connectable-project/connectable#readme",
+  "keywords": []
+}
