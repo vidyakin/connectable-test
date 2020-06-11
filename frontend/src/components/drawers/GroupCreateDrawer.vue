@@ -23,7 +23,7 @@
           </div>
 
           <div class="col-sm-12">
-            <div class="label">Описание</div>
+            <div class="input-label">Описание</div>
             <a-form-item>
               <a-textarea
                 placeholder="Описание"
@@ -34,7 +34,7 @@
           </div>
 
           <div class="col-sm-12">
-            <div class="label">Тип</div>
+            <div class="input-label">Тип</div>
             <a-form-item>
               <a-select @change="groupTypeOnChange" v-decorator="getDecoratorData('type')">
                 <a-select-option value="0">Открытая</a-select-option>

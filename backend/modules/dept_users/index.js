@@ -53,7 +53,7 @@ router.delete('/', (req,res)=>{
 // установка начальника отдела
 router.put('/', (req, res) => {
   // В теле должны быть указаны client_id, dept_id и user_id
-  console.log(`edit dept_users API: ${JSON.stringify(req.body,null,2)}`);
+  //console.log(`edit dept_users API: ${JSON.stringify(req.body,null,2)}`);
   const q = {
       client_id: req.body.client_id, 
       dept_id: req.body.dept_id
@@ -61,9 +61,9 @@ router.put('/', (req, res) => {
   UsersInDepartment.findOne(q, (err, dept_users)=>{
       if (err) return res.status(500).send("Error during find employees in department to set chief");
       if (dept_users == undefined) return res.status(500).send('No data about users in dept was found')
-      dept_users.headUser = req.body.user_id
-      UsersInDepartment.findByIdAndUpdate(dept_users._id, dept_users, {new: true}, (err, data)=>{
+      UsersInDepartment.findByIdAndUpdate(dept_users._id, {headUser: req.body.user_id}, {new: true}, (err, data)=>{
           if (err) return res.status(500).send("Error during set employee as chief in the department");
+          console.log(`User in dept updated: ${data}`);
           res.status(200).send(data)
       })
   })

@@ -477,7 +477,7 @@ export default {
     }
   },
   async mounted() {
-    await this.$store.dispatch(GET_USERS);
+    await this.$store.dispatch(GET_USERS, this.currentClient.workspace);
     this.usersData = this.users;
     //console.log('userData: ',JSON.stringify(this.usersData,null,2))
   }

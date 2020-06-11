@@ -10,7 +10,7 @@
     :ok-button-props="{ props: { disabled: mode=='chief', type: mode == 'chief' ? 'link' : 'primary' } }"
   >
     <div class="dept-empl-edit-container">
-      <a-checkbox-group @change="onChange">
+      <a-checkbox-group v-model="checkedEmpls">
         <a-list :data-source="dataList" size="small">
           <a-list-item slot="renderItem" slot-scope="item">
             <a-list-item-meta
@@ -27,7 +27,7 @@
               />
             </a-list-item-meta>
             <div class="empl-actions">
-              <a-checkbox :value="item" v-show="mode == 'select'" />
+              <a-checkbox :value="item._id" v-show="mode == 'select'" />
               <a-icon
                 type="crown"
                 theme="filled"
@@ -92,8 +92,9 @@ export default {
         return "Выберите начальника отдела нажатием на иконку в списке";
     }
   },
-  beforeMount() {
-    this.$store.dispatch(GET_USERS, this.currentClient.workspace);
+  mounted() {
+    if (this.currentClient)
+      this.$store.dispatch(GET_USERS, this.currentClient.workspace);
   },
   beforeCreate() {
     // в зависимости от режима надо по разному составлять список сотрудников
@@ -125,6 +126,7 @@ export default {
   watch: {
     visible(newVal) {
       if (newVal) {
+        this.checkedEmpls = [];
         console.log(`visible: ${newVal}`);
       }
     }
