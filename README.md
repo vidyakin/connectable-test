@@ -85,3 +85,11 @@ You can see the job status in the commit tree after merge:
 
 
 ***If the status of any Job is RED - go to Actions > Open red build > click on 'build' and inspect the logs to understand the problem***
+
+## How to download backups from Google Bucket
+Google Cloud Bucket contains ZIP archive with DB backup and Git repository backup:
+- open 'connectable-prod' project
+- go to Storage > Browser
+- open 'connectable-backups' bucket
+- click on the archive name, example: '2020_06_06_00_00.zip'
+- click 'Download' button on the top
