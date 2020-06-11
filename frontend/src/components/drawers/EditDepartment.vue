@@ -87,7 +87,7 @@ export default {
     AppInput
   },
   computed: {
-    ...mapGetters(["user", "users"])
+    ...mapGetters(["user", "users", "currentClient"])
   },
   methods: {
     onClose() {
@@ -163,7 +163,7 @@ export default {
     this.$store.dispatch(GET_DEP);
   },
   mounted() {
-    this.$store.dispatch(GET_USERS);
+    this.$store.dispatch(GET_USERS, this.currentClient.workspace);
     this.$store.dispatch(GET_DEP);
   }
 };

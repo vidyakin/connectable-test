@@ -9,19 +9,18 @@
       <a-popover placement="bottom" trigger="click">
         <template slot="content">
           <a-table
-          v-if="users"
-          :columns="columns"
-          :dataSource="data"
-          @change="onChange"
-          :pagination="false"
-      >
-        <div slot="name" slot-scope="text" class="table-row-name" @click="goTo(text.id)">
-          <a-avatar :src="text.googleImage"></a-avatar>
-          {{text.firstName}} {{text.lastName}}
-        </div>
-        
-      </a-table>
-      {{userLength}} - {{endingWords(userLength)}}
+            v-if="users"
+            :columns="columns"
+            :dataSource="data"
+            @change="onChange"
+            :pagination="false"
+          >
+            <div slot="name" slot-scope="text" class="table-row-name" @click="goTo(text.id)">
+              <a-avatar :src="text.googleImage"></a-avatar>
+              {{text.firstName}} {{text.lastName}}
+            </div>
+          </a-table>
+          {{userLength}} - {{endingWords(userLength)}}
         </template>
         <div class="seo seo-1" @click="currentLenth">Департамент IT</div>
       </a-popover>
@@ -38,46 +37,46 @@
   </div>
 </template>
 <script>
-import { GET_USERS } from '@/store/user/actions.type';
-import { mapGetters } from 'vuex';
+import { GET_USERS } from "@/store/user/actions.type";
+import { mapGetters } from "vuex";
 
 const columns = [
   {
-    title: '',
-    dataIndex: 'name',
-    scopedSlots: { customRender: 'name' },
-  },
+    title: "",
+    dataIndex: "name",
+    scopedSlots: { customRender: "name" }
+  }
 ];
 
 const data = [
   {
-    key: '1',
-    name: 'John Brown',
+    key: "1",
+    name: "John Brown",
     age: 32,
-    address: 'New York No. 1 Lake Park',
+    address: "New York No. 1 Lake Park"
   },
   {
-    key: '2',
-    name: 'Jim Green',
+    key: "2",
+    name: "Jim Green",
     age: 42,
-    address: 'London No. 1 Lake Park',
+    address: "London No. 1 Lake Park"
   },
   {
-    key: '3',
-    name: 'Joe Black',
+    key: "3",
+    name: "Joe Black",
     age: 32,
-    address: 'Sidney No. 1 Lake Park',
+    address: "Sidney No. 1 Lake Park"
   },
   {
-    key: '4',
-    name: 'Jim Red',
+    key: "4",
+    name: "Jim Red",
     age: 32,
-    address: 'London No. 2 Lake Park',
-  },
+    address: "London No. 2 Lake Park"
+  }
 ];
 
 function onChange(pagination, filters, sorter) {
-  console.log('params', pagination, filters, sorter);
+  console.log("params", pagination, filters, sorter);
 }
 
 export default {
@@ -85,38 +84,41 @@ export default {
     return {
       data: [],
       columns,
-      userLength: '',
-      output: '',
+      userLength: "",
+      output: ""
     };
   },
   methods: {
     onChange,
     goTo(id) {
-      this.$router.push({ name: 'profile', params: { _id: id } });
+      this.$router.push({ name: "profile", params: { _id: id } });
     },
     currentLenth() {
       this.userLength = this.users.length;
     },
     endingWords(count) {
       if (count === 0) {
-        this.output = 'нет участников';
+        this.output = "нет участников";
       } else if (count === 1) {
-        this.output = ' участник';
-      } else if ((count > 20) && ((count % 10) === 1)) {
-        this.output = ' участник';
-      } else if (((count >= 2) && (count <= 4)) || (((count % 10) >= 2) && ((count % 10) <= 4)) && (count > 20)) {
-        this.output = ' участника';
+        this.output = " участник";
+      } else if (count > 20 && count % 10 === 1) {
+        this.output = " участник";
+      } else if (
+        (count >= 2 && count <= 4) ||
+        (count % 10 >= 2 && count % 10 <= 4 && count > 20)
+      ) {
+        this.output = " участника";
       } else {
-        this.output = ' участников';
+        this.output = " участников";
       }
       return this.output;
-    },
+    }
   },
   computed: {
-    ...mapGetters(['users']),
+    ...mapGetters(["users", "currentClient"])
   },
   beforeMount() {
-    this.$store.dispatch(GET_USERS);
+    this.$store.dispatch(GET_USERS, this.currentClient.workspace);
   },
   watch: {
     users(users) {
@@ -124,15 +126,15 @@ export default {
         const { googleImage, firstName, lastName, positions, phone, email } = e;
         const row = {};
         row.name = { googleImage, firstName, lastName, id: e._id };
-        row.positions = positions.join(', ');
+        row.positions = positions.join(", ");
         row.phone = phone;
         row.email = email;
         row.key = e._id;
         return row;
       });
       this.fullData = [...this.data];
-    },
-  },
+    }
+  }
 };
 </script>
 

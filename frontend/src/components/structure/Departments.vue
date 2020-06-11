@@ -272,8 +272,7 @@ export default {
     };
   },
   async mounted() {
-    const client = this.currentClient.workspace;
-    if (!client) {
+    if (!this.currentClient) {
       this.$error({
         title: "Не задан клиент",
         content: "Не установлен клиент",
@@ -281,6 +280,7 @@ export default {
       });
       return;
     }
+    const client = this.currentClient.workspace;
 
     try {
       await this.$store.dispatch(GET_STRUCTURE, client);
@@ -540,9 +540,9 @@ export default {
     async addEmployeesToDeptAction(selected_empls) {
       this.dialogDeptEmployeesVisible = false;
       const data = {
-        client_id: this.userData.result.client_id,
+        client_id: this.currentClient.workspace,
         dept_id: this.clickedDeptId,
-        users: selected_empls.map(emp => emp._id),
+        users: selected_empls,
         headUser: ""
       };
       try {
@@ -574,7 +574,7 @@ export default {
         onOk: async () => {
           try {
             await this.$store.dispatch(DELETE_DEPT_USER, {
-              client_id: this.userData.result.client_id,
+              client_id: this.currentClient.workspace,
               dept_id: this.clickedDeptId,
               user_id: d.id
             });

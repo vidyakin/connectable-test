@@ -103,7 +103,7 @@ export default {
     AppInput
   },
   computed: {
-    ...mapGetters(["user", "users", "departments"]),
+    ...mapGetters(["user", "users", "departments", "currentClient"]),
     filtered_departments: function() {
       if (!this.departments) {
         return [];
@@ -179,7 +179,7 @@ export default {
     this.$store.dispatch(GET_DEP);
   },
   mounted() {
-    this.$store.dispatch(GET_USERS);
+    this.$store.dispatch(GET_USERS, this.currentClient.workspace);
     this.$store.dispatch(GET_DEP);
   },
   watch: {
