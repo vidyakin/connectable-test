@@ -41,7 +41,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(["messages"])
+    ...mapGetters(["messages", "currentClient"])
   },
   methods: {
     fillNotificationFeed() {
@@ -53,7 +53,11 @@ export default {
   },
   async created() {
     //console.log(`LoginBar: userdata is ${JSON.stringify(this.datauser,null,3)}`);
-    await this.$store.dispatch(GET_MESSAGES); // TODO: доработать для получения только персональных и только НЕпрочитанных сообщений
+    await this.$store.dispatch(GET_MESSAGES, {
+      filter: {
+        client_id: this.currentClient.workspace
+      }
+    }); // TODO: доработать для получения только персональных и только НЕпрочитанных сообщений
     // динамическая подписка на событие сокета, на всякий случай
     // this.$socket.$subscribe('socketMessage', payload => {
     //   console.log(`socketMessage fired!`)
