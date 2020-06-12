@@ -27,9 +27,9 @@ export const createMessage = async (context: any, msg: any) => {
 }
 
 // TODO: пока без userId, надо сделать несколько вариантов получения сообщений
-export const getMessages = (context: any) => {
+export const getMessages = (context: any, params: any) => {
     return Vue.axios
-        .get(`api/message`)
+        .get(`api/message`, { params })
         .then((response: any) => {
             context.commit(SET_MESSAGES, response.data.result);
         });
