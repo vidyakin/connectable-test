@@ -83,7 +83,8 @@ export default Vue.extend({
         parent: {
           type: "company",
           id: "0"
-        }
+        },
+        client_id: this.currentClient && this.currentClient.workspace
       }
     });
   },

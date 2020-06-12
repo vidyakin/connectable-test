@@ -39,6 +39,7 @@ export default {
   },
   computed: {
     ...mapGetters([
+      "currentClient",
       "showHeaderImage",
       "user",
       "currentUser",
@@ -56,7 +57,8 @@ export default {
           author: this.datauser.result,
           attachment: [],
           emailSend: this.statusEmailSend,
-          formData: this.handleUpload()
+          formData: this.handleUpload(),
+          client_id: this.currentClient.workspace
         });
       }
       this.current = "";
