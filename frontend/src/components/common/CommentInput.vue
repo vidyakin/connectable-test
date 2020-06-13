@@ -1,4 +1,4 @@
-<template class="comment-input">
+<template>
   <a-input class="input" placeholder="Сообщение..." v-model="current" @pressEnter="send">
     <div slot="addonAfter" class="comment-input-action">
       <!--<a-icon type="link" @click="handleUpload"></a-icon>-->

@@ -108,7 +108,7 @@ export default Vue.extend({
   height: calc(100vh - 210px);
   overflow: auto;
   width: 100%;
-  position: fixed;
+  // position: fixed;
 
   @media (max-width: 767px) {
     padding: 20px 15px;
@@ -119,7 +119,7 @@ export default Vue.extend({
     line-height: 32px;
     color: #43425d;
     text-align: left;
-    margin-bottom: 30px;
+    margin: 0 30px;
   }
 }
 </style>

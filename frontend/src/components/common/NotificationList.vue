@@ -51,7 +51,7 @@ export default {
       }));
     }
   },
-  async created() {
+  async beforeMount() {
     //console.log(`LoginBar: userdata is ${JSON.stringify(this.datauser,null,3)}`);
     await this.$store.dispatch(GET_MESSAGES, {
       filter: {
