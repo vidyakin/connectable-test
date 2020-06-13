@@ -21,25 +21,9 @@
             ]"
         />
       </a-form-item>
-      <a-form-item label="Краткий код">
-        <a-input v-decorator="['code']" />
-      </a-form-item>
       <a-form-item label="Описание">
         <a-input type="textarea" v-decorator="['description']" />
       </a-form-item>
-      <!-- <a-form-item class='collection-create-form_last-form-item'>
-          <a-radio-group
-            v-decorator="[
-              'modifier',
-              {
-                initialValue: 'private',
-              }
-            ]"
-          >
-              <a-radio value='public'>Public</a-radio>
-              <a-radio value='private'>Private</a-radio> 
-            </a-radio-group>
-      </a-form-item>-->
     </a-form>
   </a-modal>
 </template>
