@@ -25,7 +25,7 @@ transporter.verify(function(error, success) {
 });
 
 //
-module.exports.sendInvite = async(to, url, typeGroup) => {
+exports.sendInvite = async(to, url, typeGroup) => {
   let email = await UserDao.findById(to);
   email = email.email;
 
@@ -39,7 +39,7 @@ module.exports.sendInvite = async(to, url, typeGroup) => {
 };
 
 //register new user
-module.exports.NewUser = async(to, url, dataUser) => {
+exports.NewUser = async(to, url, dataUser) => {
     transporter.sendMail({
         from: '"Connectable" <mail@connectable.pro>', // sender address
         to: dataUser.email, // list of receivers
@@ -49,7 +49,7 @@ module.exports.NewUser = async(to, url, dataUser) => {
     console.log(`>> Registration e-mail was sended to ${dataUser.email}`);
 };
 //when user added to group
-module.exports.AddUserInGroup = async(to, url, groupData) => {
+exports.AddUserInGroup = async(to, url, groupData) => {
     transporter.sendMail({
         from: '"Connectable" <mail@connectable.pro>', // sender address
         to: to, // list of receivers
@@ -58,7 +58,7 @@ module.exports.AddUserInGroup = async(to, url, groupData) => {
     });
 };
 //add event in calendar
-module.exports.CalendarEvent = async(to, url, eventdata) => {
+exports.CalendarEvent = async(to, url, eventdata) => {
     transporter.sendMail({
         from: '"Connectable" <mail@connectable.pro>', // sender address
         to: to, // list of receivers
@@ -67,7 +67,7 @@ module.exports.CalendarEvent = async(to, url, eventdata) => {
     });
 };
 //follow msg user
-module.exports.FollowEvent = async(to, url, eventdata) => {
+exports.FollowEvent = async(to, url, eventdata) => {
     transporter.sendMail({
         from: '"Connectable" <mail@connectable.pro>', // sender address
         to: to.join(','), // list of receivers
@@ -76,18 +76,18 @@ module.exports.FollowEvent = async(to, url, eventdata) => {
     });
 };
 
-module.exports.render_forgot_password_template = function(req, res) {
+exports.render_forgot_password_template = function(req, res) {
     return res.sendFile(path.resolve('./public/forgot-password.html'));
 };
 
-module.exports.render_reset_password_template = function(req, res) {
+exports.render_reset_password_template = function(req, res) {
     return res.sendFile(path.resolve('./public/reset-password.html'));
 };
 
 /**
  * Forgot password
  */
-module.exports.forgot_password_old = function(req, res) {
+exports.forgot_password_old = function(req, res) {
     async.waterfall([
         function(done) {
             User.findOne({
@@ -144,7 +144,7 @@ module.exports.forgot_password_old = function(req, res) {
     });
 };
 
-module.exports.testMail = function(req, res) {
+exports.testMail = function(req, res) {
     const data = {
         to: 'vidyakin.sergey@gmail.com',
         from: '"Connectable" <mail@connectable.pro>',
@@ -164,7 +164,7 @@ module.exports.testMail = function(req, res) {
     });
 }
 
-module.exports.forgot_password = async (req, res) => {
+exports.forgot_password = async (req, res) => {
     console.log('FORGOT START:',req.body);
 
     const user = await User.findOne({ email: req.body.email }); // надо ставить фильтр чтоб гугл-ид == undef и outlook-id тоже
@@ -205,7 +205,7 @@ module.exports.forgot_password = async (req, res) => {
 /**
  * Reset password
  */
-module.exports.reset_password = function(req, res, next) {
+exports.reset_password = function(req, res, next) {
 
     User.findOne({
         reset_password_token: req.body.token,
@@ -254,7 +254,7 @@ module.exports.reset_password = function(req, res, next) {
 /**
  * Notification about registration 
  */
-module.exports.reg_email_notify = (req, res) => {
+exports.reg_email_notify = (req, res) => {
     User.findById(req.body.userId, (error, user) => {
         if (error) return res.status(500).send('Error while finding user to send him e-mail about registration')
         const email_data = {
