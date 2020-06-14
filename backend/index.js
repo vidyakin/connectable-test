@@ -112,9 +112,8 @@ app.get('/', (req, res) => {
     res.send('Connectable backend says Hello!!!');
 });
 
-app.route('/auth/forgot_password')
-    .get(mailer.render_forgot_password_template)
-    .post(mailer.forgot_password);
+app.get('/auth/forgot_password', mailer.render_forgot_password_template)
+app.post('/auth/forgot_password', mailer.forgot_password);
 
 /**
  * test sending mail
