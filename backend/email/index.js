@@ -76,18 +76,18 @@ module.exports.FollowEvent = async(to, url, eventdata) => {
     });
 };
 
-exports.render_forgot_password_template = function(req, res) {
+module.exports.render_forgot_password_template = function(req, res) {
     return res.sendFile(path.resolve('./public/forgot-password.html'));
 };
 
-exports.render_reset_password_template = function(req, res) {
+module.exports.render_reset_password_template = function(req, res) {
     return res.sendFile(path.resolve('./public/reset-password.html'));
 };
 
 /**
  * Forgot password
  */
-exports.forgot_password_old = function(req, res) {
+module.exports.forgot_password_old = function(req, res) {
     async.waterfall([
         function(done) {
             User.findOne({
@@ -205,7 +205,7 @@ module.exports.forgot_password = async (req, res) => {
 /**
  * Reset password
  */
-exports.reset_password = function(req, res, next) {
+module.exports.reset_password = function(req, res, next) {
 
     User.findOne({
         reset_password_token: req.body.token,
@@ -254,7 +254,7 @@ exports.reset_password = function(req, res, next) {
 /**
  * Notification about registration 
  */
-exports.reg_email_notify = (req, res) => {
+module.exports.reg_email_notify = (req, res) => {
     User.findById(req.body.userId, (error, user) => {
         if (error) return res.status(500).send('Error while finding user to send him e-mail about registration')
         const email_data = {
