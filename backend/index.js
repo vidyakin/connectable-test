@@ -108,9 +108,9 @@ var mailer = require('./email/index');
 // app.put('/api/user/delete/:userId', userDAO.delUserById)
 // app.put('/api/user/undelete/:userId', userDAO.undelUserById)
 
-app.get('/', (req, res) => {
-    res.send('Connectable backend says Hello!!!');
-});
+// app.get('/', (req, res) => {
+//     res.send('Connectable backend says Hello!!!');
+// });
 
 app.get('/auth/forgot_password', mailer.render_forgot_password_template)
 app.post('/auth/forgot_password', mailer.forgot_password);
@@ -119,6 +119,8 @@ app.post('/auth/forgot_password', mailer.forgot_password);
  * test sending mail
  */
 app.post('/test', (req, res) => {
+    console.log(`>> POST '/test' has been affected`);
+    
     if (req.body.action == 'test_email') {
         mailer.testMail(req, res)
     } else {
@@ -128,6 +130,7 @@ app.post('/test', (req, res) => {
 })
 
 app.post('/api/test', validateToken, (req, res) => {
+    console.log(`>> POST '/api/test' has been affected`);
     if (req.body.action == 'test_email') {
         mailer.testMail(req, res)
     } else {
