@@ -6,7 +6,6 @@ const User = require('../models').User;
 
 router.post('/login', require('./login')); // router = /api/login  (общая точка логина для всех способов)
 
-
 router.post('/test', validateToken, (req, res) => {
   console.log(`>> POST '/api/test' has been affected`);
   if (req.body.action == 'test_email') {
@@ -15,7 +14,6 @@ router.post('/test', validateToken, (req, res) => {
       res.status(200).send('protected test path was requested, body is: '+JSON.stringify(req.body,null,3))
   }  
 })
-
 
 router.post('/upload', (req, res, next) => {
   let imageFile = req.files.files;
@@ -29,8 +27,9 @@ router.post('/upload', (req, res, next) => {
   });
 });
 
-
 //register and login page
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 
 router.post('/register', function(req,res){
   let { firstName, lastName, email, password, emailSend } = req.body;
