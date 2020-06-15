@@ -147,8 +147,6 @@ app.delete('/api/deleteParticipant/:participantId/group/:groupId', (req, res, ne
 
 //register form
 const mongoose = require('mongoose');
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
 
 mongoose.connect(process.env.DB_URL, {useNewUrlParser: true});
 var db = mongoose.connection;
