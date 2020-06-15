@@ -7,13 +7,13 @@ import { router } from '../../router';
 import { SET_CURRENT_CLIENT } from '@/store/client/mutations.type';
 
 export const forgotPasword = (context: any, email: any) => {
-  return Vue.axios.post('/auth/forgot_password', email)
+  return Vue.axios.post('/api/forgot_password', email)
     .then((response) => {
       context.commit(FORGOT_INFO, response.data);
     });
 };
 export const resetPassword = (context: any, userPasswords: any) => {
-  return Vue.axios.post(`/auth/reset_password/${userPasswords.token}`, userPasswords)
+  return Vue.axios.post(`/api/reset_password/${userPasswords.token}`, userPasswords)
     .then((response) => {
       context.commit(RESET_INFO, response.data);
     });
