@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const mailer = require('../email/index');
+const validateToken = require('../utils').validateToken;
 
 const User = require('../models').User;
 
