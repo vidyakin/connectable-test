@@ -101,38 +101,6 @@ app.use("/role", require('./role/routes'));
 
 var mailer = require('./email/index');
 
-// var userDAO = require('./modules/users/user-dao');
-// app.put('/api/user/delete/:userId', userDAO.delUserById)
-// app.put('/api/user/undelete/:userId', userDAO.undelUserById)
-
-// app.get('/', (req, res) => {
-//     res.send('Connectable backend says Hello!!!');
-// });
-
-// app.get('/api/auth/forgot_password', mailer.render_forgot_password_template)
-// app.post('/api/auth/forgot_password', mailer.forgot_password);
-
-/**
- * test sending mail
- */
-app.post('/test', (req, res) => {
-    console.log(`>> POST '/test' has been affected`);
-    
-    if (req.body.action == 'test_email') {
-        mailer.testMail(req, res)
-    } else {
-        res.status(200).send('test path was requested, body is: '+JSON.stringify(req.body,null,3))
-    }
-    
-})
-
-// == == end of test
-
-// app.route('/api/auth/reset_password/:token')
-//     .get(mailer.render_reset_password_template)
-//     .post(mailer.reset_password);
-
-
 app.delete('/api/deleteParticipant/:participantId/group/:groupId', (req, res, next) => {
   const {participantId, groupId} = req.params;
   GroupParticipant.deleteMany({participantId, groupId}, (e, data) => {
