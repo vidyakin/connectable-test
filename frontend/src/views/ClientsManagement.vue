@@ -119,11 +119,12 @@ export default {
       columns,
       editClientVisible: false,
       editMode: false,
+      currentClientStr: "",
       selectedClient: {}
     };
   },
   computed: {
-    ...mapGetters(["clients", "currentClient"])
+    ...mapGetters(["clients", "currentClient", "userData"])
   },
   methods: {
     tarifColor(tarif) {
@@ -209,7 +210,23 @@ export default {
     },
     async enterClient(rec) {
       try {
+        if (!this.userData.result._id) {
+          console.log(this.userData.result._id);
+          return;
+        }
+        // входим в воркспейс и сохраняем в сторе
         await this.$store.dispatch(ENTER_CLIENT, rec.workspace);
+        // дополнительно сохраняем в сторадж для восстановления после F5 (в компоненте LoginBar)
+        localStorage.setItem(
+          "currentClient",
+          JSON.stringify(this.currentClient)
+        );
+        // для контроля
+        // this.currentClientStr = JSON.stringify(
+        //   JSON.parse(localStorage.getItem("currentClient")),
+        //   null,
+        //   3
+        // );
         this.$message.success("Вы успешно вошли в рабочую область клиента");
       } catch (error) {
         this.$error({
@@ -222,6 +239,12 @@ export default {
   },
   beforeMount() {
     this.$store.dispatch(GET_CLIENTS);
+    // для контроля
+    // this.currentClientStr = JSON.stringify(
+    //   JSON.parse(localStorage.getItem("currentClient")),
+    //   null,
+    //   3
+    // );
   }
 };
 </script>

@@ -53,11 +53,7 @@ export default {
   },
   async beforeMount() {
     //console.log(`LoginBar: userdata is ${JSON.stringify(this.datauser,null,3)}`);
-    await this.$store.dispatch(GET_MESSAGES, {
-      filter: {
-        client_id: this.currentClient.workspace
-      }
-    }); // TODO: доработать для получения только персональных и только НЕпрочитанных сообщений
+
     // динамическая подписка на событие сокета, на всякий случай
     // this.$socket.$subscribe('socketMessage', payload => {
     //   console.log(`socketMessage fired!`)
@@ -68,6 +64,15 @@ export default {
   watch: {
     messages(val) {
       this.$emit("count", val.length);
+    },
+    async currentClient(val) {
+      if (val) {
+        await this.$store.dispatch(GET_MESSAGES, {
+          filter: {
+            client_id: val.workspace
+          }
+        }); // TODO: доработать для получения только персональных и только НЕпрочитанных сообщений
+      }
     }
   }
 };

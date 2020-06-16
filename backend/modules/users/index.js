@@ -1,17 +1,17 @@
-const User = require('../../models/user')
+const User = require('@models/user')
 
-const serializers = require('../../serializers');
+const serializers = require('@/serializers');
 
 var userDAO = require('./user-dao');
 
 /**
  * Common way for CRUD the model
  */
-const router = require('../../crud')(User, serializers.serializer)
+const router = require('@/crud')(User, serializers.serializer)
 
 // TODO: find a purpose of this api out
-router.get('/me', (res, req) => {
-  console.log(`authRouter by /user/me req.decoded=${req.decoded}`)
+router.get('/info/me', (req, res) => {
+  console.log(`authRouter by /user/info/me ${JSON.stringify(req.decoded,null,3)}`)
   if (req.decoded == undefined) {
     res.send(undefined);
   } else {

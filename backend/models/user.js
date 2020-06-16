@@ -39,7 +39,8 @@ const userSchema = new Schema({
     type: Boolean, 
     default: false 
   },
-  roles: Array  // список ролей
+  roles: Array,  // список ролей
+  currentClient: String // только для суперадмина
 });
 
 userSchema.pre('save', function (next) {

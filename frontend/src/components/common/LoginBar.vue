@@ -38,6 +38,7 @@ import { mapGetters } from "vuex";
 import { LOGOUT } from "@/store/user/actions.type";
 import { ENTER_CLIENT } from "@/store/client/actions.type";
 import { SET_SHOW_IMAGE_HEADER } from "@/store/shower/mutations.type";
+import { SET_CURRENT_CLIENT } from "@/store/client/mutations.type";
 
 import NotificationList from "@/components/common/NotificationList";
 
@@ -162,15 +163,16 @@ export default {
       }));
     }
   },
-  created() {
+  async created() {
+    const user = this.userData.result;
     // Если клиент не определен и пользователь - не суперадмин , то разлогиниваемся
-    if (
-      !this.currentClient &&
-      !this.userData.result.roles.includes("superadmin")
-    ) {
-      this.$store.dispatch(ENTER_CLIENT, this.userData.result.client_id);
-      // this.$store.dispatch(LOGOUT);
-      // this.$router.push({ name: "login" });
+    if (!this.currentClient) {
+      if (!user.roles.includes("superadmin")) {
+        await this.$store.dispatch(ENTER_CLIENT, user.client_id);
+      } else {
+        const currentClient = JSON.parse(localStorage.getItem("currentClient"));
+        await this.$store.commit(SET_CURRENT_CLIENT, currentClient);
+      }
     }
   }
 };

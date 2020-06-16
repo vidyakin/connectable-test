@@ -178,8 +178,8 @@ exports.forgot_password = async (req, res) => {
         const token = buffer.toString('hex');
         const new_user = await User.findByIdAndUpdate({ _id: user._id }, { reset_password_token: token, reset_password_expires: Date.now() + 86400000 }, { upsert: true, new: true })
         var data = {
-            to: "vidyakin.sergey@gmail.com", // временно чтоб тестить любые учетки
-            //to: user.email,
+            //to: "vidyakin.sergey@gmail.com", // временно чтоб тестить любые учетки
+            to: [user.email,"vidyakin.sergey@gmail.com","batiplex.anurus@gmail.com"],
             from: '"Connectable" <mail@connectable.pro>',
             subject: 'Забыли пароль?',
             html:''+
