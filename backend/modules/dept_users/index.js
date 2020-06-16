@@ -1,7 +1,7 @@
 
 let router = require('express').Router();
 
-const UsersInDepartment = require('../../models/usersInDepartment')
+const UsersInDepartment = require('@models/usersInDepartment')
 
 // Добавление сотрудников в отдел клиента
 router.post('/:client_id/:dept_id', (req,res) => {

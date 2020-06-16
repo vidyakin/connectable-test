@@ -1,5 +1,5 @@
-const Client = require('../../models/client')
-const User = require('../../models/user')
+const Client = require('@models/client')
+const User = require('@models/user')
 //const serializers = require('../../serializers');
 
 /**
@@ -25,7 +25,7 @@ const serializer = async data => {
 /**
  * Common way for CRUD the model
  */
-const router = require('../../crud')(Client, serializer);
+const router = require('@/crud')(Client, serializer);
 
 // Поиск клиента по workspace
 router.get('/by_ws/:wspace', async (req, res) => {

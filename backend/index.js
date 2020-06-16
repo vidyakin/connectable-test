@@ -8,6 +8,7 @@ const projectSerializer = require('./serializers/projectSerializer').projectSeri
 const inviteSerializer = require('./serializers/inviteSerializer').inviteSerializer;
 
 require('dotenv').config();
+require('module-alias/register');
 
 const fs = require('fs')
 const express = require('express');
@@ -99,8 +100,6 @@ app.use('/api/outlook/event', require('./calendar'));
 app.use('/api/google/event', require('./google'));
 app.use("/role", require('./role/routes'));
 
-var mailer = require('./email/index');
-
 app.delete('/api/deleteParticipant/:participantId/group/:groupId', (req, res, next) => {
   const {participantId, groupId} = req.params;
   GroupParticipant.deleteMany({participantId, groupId}, (e, data) => {
@@ -122,6 +121,10 @@ db.on('error', console.log.bind(console, "> Mongo connection error"));
 db.once('open', function(callback){ 
     console.log("> Mongo connection succeeded"); 
 });
+
+// ALIASES: in package.json is defined some aliases: @ = root dir, @models, @modules are the samenamed dirs
+//const User = require('@models/User')
+// docs: https://www.npmjs.com/package/module-alias
 
 //Section Structure
 app.post('/api/department', (req, res, next) => {
