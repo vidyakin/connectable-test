@@ -26,6 +26,7 @@
       <label class="selected-node-group"></label>
       <input type="text" id="selected-node" class="selected-node-group" />
     </div>
+    <!-- Контекстное меню -->
     <vue-context ref="contextMenu">
       <!-- Пункты меню для сотрудников -->
       <li class="context-menu-item" v-for="empl of employeesOfDept" :key="empl._id">
@@ -271,46 +272,10 @@ export default {
       ]
     };
   },
-  async mounted() {
-    if (!this.currentClient) {
-      this.$error({
-        title: "Не задан клиент",
-        content: "Не установлен клиент",
-        centered: true
-      });
-      return;
-    }
-    const client = this.currentClient.workspace;
-
-    try {
-      await this.$store.dispatch(GET_STRUCTURE, client);
-    } catch (error) {
-      console.error(`ошибка получения данных по структуре: ${error.message}`);
-      return;
-    }
-    // Если структуры в базе нет, создаем головной элемент и сохраняем в базу
-    if (this.structure.orgTree == undefined) {
-      this.chartData = {
-        id: "ceo",
-        name: "Главное управление"
-      };
-      await this.$store.dispatch(SAVE_STRUCTURE, {
-        client_id: client,
-        orgTree: this.chartData
-      });
-      await this.$store.dispatch(GET_STRUCTURE, client); // обновление стора надо бы засунуть в SAVE_STRUCTURE
-    }
-    // 0-й элемент потому что пока что возвращается массив ( все схемы ), а будет с отбором по клиенту одна
-    this.struct_id = this.structure._id;
-    this.chartData = this.structure.orgTree;
-    this.loading = false; //  без этого не работает загрузка данных в схему!
-
-    // заполняем пользователей
-    try {
-      await this.$store.dispatch(GET_DEPT_USERS, client);
-    } catch (error) {
-      console.error(`ошибка получения данных по сотрудникам: ${error.message}`);
-      return;
+  mounted() {
+    if (this.currentClient && this.orgchart == null) {
+      console.log(`Грузим данные в mounted`);
+      this.loadData(this.currentClient);
     }
   },
   async created() {},
@@ -352,11 +317,57 @@ export default {
       );
     }
   },
-  watch: {},
+  watch: {
+    async currentClient(client) {
+      if (!client) return;
+      console.log(`Грузим данные в watch`);
+      await this.loadData(client);
+    }
+  },
   methods: {
     datauser() {
       // TODO: переделать везде также. Может вообще отдельный геттер сделать с этой проверкой
       return this.userData ? this.userData.result : this.user;
+    },
+    /**
+     * Loading data for given client workspace
+     */
+    async loadData(client) {
+      try {
+        await this.$store.dispatch(GET_STRUCTURE, client.workspace);
+      } catch (error) {
+        console.error(`ошибка получения данных по структуре: ${error.message}`);
+        return;
+      }
+      // Если структуры в базе нет, создаем головной элемент и сохраняем в базу
+      if (this.structure.orgTree == undefined) {
+        this.chartData = {
+          id: "ceo",
+          name: "Главное управление"
+        };
+        await this.$store.dispatch(SAVE_STRUCTURE, {
+          client_id: client,
+          orgTree: this.chartData
+        });
+        await this.$store.dispatch(GET_STRUCTURE, client); // обновление стора надо бы засунуть в SAVE_STRUCTURE
+      }
+      // 0-й элемент потому что пока что возвращается массив ( все схемы ), а будет с отбором по клиенту одна
+      this.struct_id = this.structure._id;
+      this.chartData = this.structure.orgTree;
+      this.loading = false; //  без этого не работает загрузка данных в схему!
+
+      if (!this.users || !this.users.length) {
+        await this.$store.dispatch(GET_USERS, client.workspace);
+      }
+      // заполняем пользователей
+      try {
+        await this.$store.dispatch(GET_DEPT_USERS, client.workspace);
+      } catch (error) {
+        console.error(
+          `ошибка получения данных по сотрудникам: ${error.message}`
+        );
+        return;
+      }
     },
     // mountOrgChart() {
     //   this.$children.forEach(item => {
