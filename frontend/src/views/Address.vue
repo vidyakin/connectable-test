@@ -95,11 +95,16 @@ export default {
     ...mapGetters(["users", "currentClient"])
   },
   beforeCreate() {},
-  beforeMount() {
+  mounted() {
     this.$store.dispatch(GET_USERS, this.currentClient.workspace);
     //this.imgEmpty = Empty.PRESENTED_IMAGE_SIMPLE;
   },
   watch: {
+    currentClient(client) {
+      if (client) {
+        this.$store.dispatch(GET_USERS, client.workspace);
+      }
+    },
     users(users) {
       this.data = users
         .filter(u => !u.deletion_mark)
