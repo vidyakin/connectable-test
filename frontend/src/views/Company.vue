@@ -46,16 +46,13 @@ export default Vue.extend({
     NotificationList
   },
   computed: {
-    ...mapGetters(["userData", "posts", "messages", "currentClient"]),
-    userIsSuperAdmin() {
-      return (
-        this.userData &&
-        this.$can("manage", {
-          accessEmail: this.userData.result.email,
-          __type: "Client"
-        })
-      );
-    },
+    ...mapGetters([
+      "userData",
+      "posts",
+      "messages",
+      "currentClient",
+      "userIsSuperAdmin"
+    ]),
     sortedPosts() {
       function compare(a, b) {
         if (a.created < b.created) return 1;
@@ -90,7 +87,7 @@ export default Vue.extend({
   },
   watch: {
     posts(posts) {
-      this.arrPosts = posts;
+      this.arrPosts = posts.filter(e => e.author.roles.includes("admin"));
     }
   }
 });
