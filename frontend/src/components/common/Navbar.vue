@@ -66,6 +66,11 @@
         <img src="@/assets/Icons/Structure.svg" alt />
         О нас
       </a-menu-item>
+      <a-menu-item key="/about" :class="{active:isActive == 'about'}">
+        <img src="@/assets/Icons/Structure.svg" alt />
+        admin: {{+userIsAdmin}},
+        sa: {{+userIsSuperAdmin}}
+      </a-menu-item>
     </a-menu>
 
     <a-menu
@@ -146,7 +151,13 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(["user", "userData", "currentClient"]),
+    ...mapGetters([
+      "user",
+      "userData",
+      "currentClient",
+      "userIsSuperAdmin",
+      "userIsAdmin"
+    ]),
     /**
      * Определяет видимость клиенто-зависимых разделов типа сотрудников или адресной книги
      */
@@ -155,21 +166,21 @@ export default {
         !this.userIsSuperAdmin || (this.userIsSuperAdmin && this.currentClient)
       );
     },
-    userIsAdmin() {
-      return this.$can("read", {
-        accessEmail: this.userData.result.email,
-        __type: "Admin"
-      });
-    },
-    userIsSuperAdmin() {
-      if (!this.userData) return false;
-      //console.log("userData in NavBar: ", this.userData.result);
+    // userIsAdmin() {
+    //   const ability = this.$can("manage", this.userData.result);
+    //   console.log(`Admin ability: ${ability}`);
+    //   return ability;
+    // },
+    // userIsSuperAdmin() {
+    //   return false;
+    //   // if (!this.userData) return false;
+    //   // //console.log("userData in NavBar: ", this.userData.result);
 
-      return this.$can("manage", {
-        accessEmail: this.userData.result.email,
-        __type: "Client"
-      });
-    },
+    //   // return this.$can("manage", {
+    //   //   email: this.userData.result.email,
+    //   //   __type: "Client"
+    //   // });
+    // },
     getClientInfo() {
       return this.client_defined() ? this.currentClient.name : "";
     },

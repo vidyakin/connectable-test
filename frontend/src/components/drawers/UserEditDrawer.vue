@@ -126,13 +126,7 @@ export default {
     AppInput
   },
   computed: {
-    userIsAdmin() {
-      return this.$can("read", {
-        accessEmail: this.userData.result.email,
-        __type: "Admin"
-      });
-    },
-    ...mapGetters(["currentUser", "userData"])
+    ...mapGetters(["currentUser", "userData", "userIsAdmin"])
   },
   methods: {
     onClose() {

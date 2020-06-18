@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt');
 const axios = require('axios');
 const user = require('./user');
 const { google } = require('googleapis');
+const {safeStringify} = require('@/utils');
 
 const environment = process.env.NODE_ENV;
 const stage = require('../config')[environment];
@@ -25,24 +26,6 @@ const eventSchema = new Schema({
   googleEventId: String,
   attendees: Array
 });
-
-const safeStringify = val => {
-  let cache = []
-  const f = (key, value) => {
-      if (typeof value === 'object' && value !== null) {
-          if (cache.indexOf(value) !== -1) {
-              // Duplicate reference found, discard key
-              return;
-          }
-          // Store value in our collection
-          cache.push(value);
-      }
-      return value;
-  }
-  let strD = JSON.stringify(val, f, 3);
-  cache = null;
-  return strD;
-}
 
 /*Bearer*/
 eventSchema.pre('save', function (next) {

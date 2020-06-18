@@ -24,6 +24,9 @@ const gauthOption = {
   scope: 'profile email https://www.googleapis.com/auth/calendar',
   prompt: 'select_account',
 };
+
+console.log(`ability: ${ability}`);
+
 Vue.use(GAuth, gauthOption);
 Vue.use(VuexAxios, axios);
 Vue.use(Antd);

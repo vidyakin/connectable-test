@@ -300,21 +300,13 @@ export default {
       "users",
       "structure",
       "dept_users",
-      "currentClient"
+      "currentClient",
+      "userIsAdmin"
     ]),
     orgChart() {
       if (this.structure && this.structure.length) {
         return this.structure.orgTree;
       } else return {};
-    },
-    userIsAdmin() {
-      return (
-        this.userData &&
-        this.$can("read", {
-          accessEmail: this.userData.result.email,
-          __type: "Admin"
-        })
-      );
     }
   },
   watch: {
