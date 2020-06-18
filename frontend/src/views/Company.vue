@@ -86,8 +86,13 @@ export default Vue.extend({
     });
   },
   watch: {
-    posts(posts) {
-      this.arrPosts = posts.filter(e => e.author.roles.includes("admin"));
+    posts(val) {
+      if (!val || !val.length) return;
+      // 1. Посты админа
+      this.arrPosts = val.filter(
+        e => e.author.roles && e.author.roles.includes("admin")
+      );
+      // 2. посты с другими условиями
     }
   }
 });
