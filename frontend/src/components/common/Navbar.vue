@@ -66,11 +66,6 @@
         <img src="@/assets/Icons/Structure.svg" alt />
         О нас
       </a-menu-item>
-      <a-menu-item key="/about" :class="{active:isActive == 'about'}">
-        <img src="@/assets/Icons/Structure.svg" alt />
-        admin: {{+userIsAdmin}},
-        sa: {{+userIsSuperAdmin}}
-      </a-menu-item>
     </a-menu>
 
     <a-menu

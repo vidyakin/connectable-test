@@ -46,16 +46,13 @@ export default Vue.extend({
     NotificationList
   },
   computed: {
-    ...mapGetters(["userData", "posts", "messages", "currentClient"]),
-    userIsSuperAdmin() {
-      return (
-        this.userData &&
-        this.$can("manage", {
-          accessEmail: this.userData.result.email,
-          __type: "Client"
-        })
-      );
-    },
+    ...mapGetters([
+      "userData",
+      "posts",
+      "messages",
+      "currentClient",
+      "userIsSuperAdmin"
+    ]),
     sortedPosts() {
       function compare(a, b) {
         if (a.created < b.created) return 1;
@@ -89,8 +86,13 @@ export default Vue.extend({
     });
   },
   watch: {
-    posts(posts) {
-      this.arrPosts = posts;
+    posts(val) {
+      if (!val || !val.length) return;
+      // 1. Посты админа
+      this.arrPosts = val.filter(
+        e => e.author.roles && e.author.roles.includes("admin")
+      );
+      // 2. посты с другими условиями
     }
   }
 });
