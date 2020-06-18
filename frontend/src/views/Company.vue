@@ -7,7 +7,7 @@
           @pressEnter="sendMessage"
           :parent="{type: 'company', id: '0'}"
         />
-        <div class="company-name">Компания {{userIsSuperAdmin ? '(Вы суперадмин)' : ''}}</div>
+        <div class="company-name">Новости компании {{userIsSuperAdmin ? '(Вы суперадмин)' : ''}}</div>
         <app-post v-for="(post, index) in sortedPosts" :post="post" :key="index" />
       </a-tab-pane>
       <a-tab-pane key="2" force-render>

@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const mailer = require('../email/index');
-const validateToken = require('../utils').validateToken;
+//const validateToken = require('../utils').validateToken;
+const { safeStringify, validateToken} = require('@/utils');
 
 const User = require('../models').User;
 
@@ -105,8 +106,18 @@ router.post('/loginPage', async function(req,res){
           return res.status(202).send(result)
       }
   }
+//   try {
+//     const user = await User.findOne( { email })
+//     //console.log(`loginPage TEST FIND: ${safeStringify(user)}`);
+//     return res.send({body: req.body, user: safeStringify(user)})
+//   } catch (error) {
+//     console.log(`Finding error: ${error}`);
+//     return res.status(404).send(' NO USER WITH SUCH EMAIL')
+//   }
   User.findOne({email}, (err, user) => {
       let result = {};
+      
+      
       if (!err && user) {
           // TODO: реализовать нормальное определение роли
           const isSuperAdmin = user.email == 'w.project.portal3@gmail.com'
@@ -143,15 +154,15 @@ router.post('/loginPage', async function(req,res){
                   console.log('token: ', token);
                   //console.log('user: ', user);
               } else {
-                  result = { status: 202, password, error: 'Authentication error' }
+                  result = { status: 202, password, error: 'Authentication error 1' }
               }
               res.status(result.status).send(result);
           }).catch(error => {
-              result = { status: 500, error }
+              result = { status: 500, error: error.message }
               res.status(result.status).send(result);
           });
       } else {
-          result = { status: 202, email, error: 'Authentication error' }
+          result = { status: 202, email, error: `Authentication error: ${err}, user: ${user}` }
           res.status(result.status).send(result);
       }
   });

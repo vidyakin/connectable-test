@@ -29,9 +29,10 @@
       :loading="tblLoading"
       :rowClassName="rowStyling"
     >
-      <div slot="fio" slot-scope="text" class="table-row-name" @click="goTo(text.id)">
+      <div slot="fio" slot-scope="text, record" class="table-row-name" @click="goTo(text.id)">
         <a-avatar :src="text.googleImage"></a-avatar>
         <span :class="['a', text.mark_del ? 'deleted' : '']">{{text.firstName}} {{text.lastName}}</span>
+        <a-icon type="crown" class="icon-admin" v-if="record.is_admin" />
       </div>
       <span slot="role" slot-scope="role">
         <a-tag :color="roleView(role).color">{{ roleView(role).text.toUpperCase() }}</a-tag>
@@ -44,9 +45,24 @@
         <a-button size="small">
           <a-icon type="unlock" />Сбросить пароль
         </a-button>
-        <a-button size="small">
-          <a-icon type="compass" />Изменить роль
-        </a-button>
+        <!-- Меню изменения ролей -->
+        <a-dropdown :trigger="['click']" v-if="userIsAdmin">
+          <a-menu slot="overlay" @click="e=> hndChangeRoleClick(e, record)">
+            <a-menu-item key="1">
+              <a-icon type="user" />Администратор
+            </a-menu-item>
+            <a-menu-item key="2" disabled>
+              <a-icon type="user" />Модератор групп
+            </a-menu-item>
+            <a-menu-item key="3" disabled>
+              <a-icon type="user" />Управление структурой
+            </a-menu-item>
+          </a-menu>
+          <a-button style="margin-left: 8px" size="small">
+            <a-icon type="compass" />Изменить роль
+            <a-icon type="down" />
+          </a-button>
+        </a-dropdown>
       </span>
     </a-table>
     <pre style="font-size:8pt !important; height: 300px">{{JSON.stringify(userData.result._id,null,2)}}</pre>
@@ -66,6 +82,7 @@ import {
 
 import { REPLACE_GROUPS_OWNER } from "@/store/group/actions.type";
 import { CLEAR_HEAD_OF_DEPTS } from "@/store/structure/actions.type";
+import { INSERT_ROLE } from "@/store/user/actions.type";
 
 import AddEmployeeModal from "@/components/modal/AddEmployeeModal";
 
@@ -133,13 +150,20 @@ export default {
             email,
             role: e.email == "w.project.portal3@gmail.com" ? "admin" : "-",
             key: e._id,
-            mark_del: e.deletion_mark
+            mark_del: e.deletion_mark,
+            is_admin: e.roles && e.roles.includes("admin")
           };
           return row;
         })
         .filter(e => (!this.showDeleted && !e.mark_del) || this.showDeleted);
     },
-    ...mapGetters(["errorRegister", "userData", "currentClient"]),
+    ...mapGetters([
+      "errorRegister",
+      "userData",
+      "userIsSuperAdmin",
+      "userIsAdmin",
+      "currentClient"
+    ]),
     ...mapState({
       users: state => state.auth.users
     })
@@ -159,7 +183,10 @@ export default {
       this.$router.push({ name: "profile", params: { _id: id } });
     },
     rowStyling(rec, index) {
-      return rec.mark_del ? "deleted" : "";
+      const styles = [];
+      if (rec.mark_del) styles.push("deleted");
+      if (rec.is_admin) styles.push("is-admin");
+      return styles;
     },
     roleView(r) {
       switch (r) {
@@ -287,6 +314,42 @@ export default {
           content: "Шаг: " + step + " \n" + error.stack
         });
       }
+    },
+    hndChangeRoleClick(e, rec) {
+      if (e.key == 1) {
+        this.$confirm({
+          centered: true,
+          title: "Подтверждение",
+          content: `Сделать сотрудника ${rec.fio.firstName} ${rec.fio.lastName} администратором?`,
+          okType: "danger",
+          okText: "Да",
+          cancelText: "Отменить",
+          onOk: () => {
+            this.setUserToAdminAction(rec);
+          },
+          class: "test"
+        });
+      }
+    },
+    async setUserToAdminAction(rec) {
+      try {
+        await this.$store.dispatch(INSERT_ROLE, {
+          user_id: rec.key,
+          role: "admin"
+        });
+        await this.$store.dispatch(GET_USERS, this.currentClient.workspace);
+        this.$success({
+          centered: true,
+          title: "Установлен админ",
+          content: "Роль администратора установлена успешно"
+        });
+      } catch (error) {
+        this.$error({
+          centered: true,
+          title: "Ошибка установка админа",
+          content: error.message
+        });
+      }
     }
   },
   created() {
@@ -322,9 +385,19 @@ export default {
   margin: 0 5px;
 }
 
-tr.ant-table-row.deleted {
-  background-color: lightgray;
-  color: dimgray;
-  text-decoration: line-through;
+.ant-table-row {
+  &.deleted {
+    background-color: lightgray;
+    color: dimgray;
+    text-decoration: line-through;
+  }
+  &.is-admin {
+    background-color: beige;
+  }
+}
+
+.icon-admin {
+  margin-left: 10px;
+  color: goldenrod;
 }
 </style>

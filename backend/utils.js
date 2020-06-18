@@ -39,3 +39,23 @@ module.exports.jsonstr = obj => {
     cache = null;
     return strReq
 }
+
+
+module.exports.safeStringify = val => {
+    let cache = []
+    const f = (key, value) => {
+        if (typeof value === 'object' && value !== null) {
+            if (cache.indexOf(value) !== -1) {
+                // Duplicate reference found, discard key
+                return;
+            }
+            // Store value in our collection
+            cache.push(value);
+        }
+        return value;
+    }
+    let strD = JSON.stringify(val, f, 3);
+    cache = null;
+    return strD;
+  }
+  

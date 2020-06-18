@@ -70,13 +70,7 @@ export default Vue.extend({
     // );
   },
   computed: {
-    userIsAdmin() {
-      return this.$can("read", {
-        accessEmail: this.userData.result.email,
-        __type: "Admin"
-      });
-    },
-    ...mapGetters(["posts", "user", "currentUser", "userData"])
+    ...mapGetters(["posts", "user", "currentUser", "userData", "userIsAdmin"])
   },
   methods: {},
   watch: {

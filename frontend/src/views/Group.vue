@@ -203,8 +203,7 @@ export default {
       //currentGroup: null,
       userinfo: store.getters.userData.result
         ? store.getters.userData.result
-        : store.getters.user.result,
-      userIsAdmin: false
+        : store.getters.user.result
     };
   },
   computed: {
@@ -213,16 +212,11 @@ export default {
       "user",
       "currentGroup",
       "userData",
-      "participantsRequest"
+      "participantsRequest",
+      "userIsAdmin"
     ]),
     getGroupProp(f) {
       return this.currentGroup[f];
-    },
-    userIsAdmin() {
-      return this.$can("read", {
-        accessEmail: this.userData.result.email,
-        __type: "Admin"
-      });
     },
     isAuthor() {
       return (
@@ -348,10 +342,6 @@ export default {
       }
     });
     this.isLoaded = true;
-    this.userIsAdmin = this.$can("read", {
-      accessEmail: this.userinfo.email,
-      __type: "Admin"
-    });
     console.log(`before create`);
   }
 };

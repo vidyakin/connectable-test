@@ -11,7 +11,8 @@ import {
   ERROR_REGISTER,
   ERROR_LOGIN,
   SUCCESS_REGISTER,
-  SET_USER_DATA
+  SET_USER_DATA,
+  ADD_ROLE, REMOVE_ROLE
 } from '@/store/user/mutations.type';
 import { DELETE_EVENT } from '@/store/user/actions.type';
 import { setAuthToken } from '@/services/auth/setAuthToken';
@@ -143,22 +144,39 @@ export const createEvent = (context: any, event: any) => {
     });
 };
 
-export const updateEvent = (context: any, event: any) => {
+export const updateEvent = ({ commit }: any, event: any) => {
   //console.log(`service: updateEvent starts: ${JSON.stringify(event, null, 3)}`);
   return Vue.axios
     .put(`api/event/${event._id}`, event)
     .then((response: any) => {
-      context.commit(CHANGE_EVENT, response.data.result);
+      commit(CHANGE_EVENT, response.data.result);
       //console.log(`service: updateEvent end: ${JSON.stringify(response.data.result, null, 3)}`);
     });
 };
 
-export const deleteEvent = (context: any, deleteId: any) => {
+export const deleteEvent = ({ commit }: any, deleteId: any) => {
   return Vue.axios
     .delete(`api/event/${deleteId}`)
     .then((response: any) => {
-      context.commit(DELETE_EVENT, deleteId);
+      commit(DELETE_EVENT, deleteId);
     });
 };
+/**
+ * ROLES: add & delete
+ */
+export const insertRole = ({ commit }: any, data: { user_id: string, role: string }) => {
+  return Vue.axios
+    .put(`api/user/${data.user_id}/role/${data.role}`)
+    .then((response: any) => {
+      commit(ADD_ROLE, data); // no using response
+    });
+}
 
+export const deleteRole = ({ commit }: any, data: { user_id: string, role: string }) => {
+  return Vue.axios
+    .delete(`api/user/${data.user_id}/role/${data.role}`)
+    .then((response: any) => {
+      commit(REMOVE_ROLE, data); // no using response
+    });
+}
 

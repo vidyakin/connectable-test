@@ -116,13 +116,7 @@ export default {
     group: Object
   },
   computed: {
-    userIsAdmin() {
-      return this.$can("read", {
-        accessEmail: this.datauser.email,
-        __type: "Admin"
-      });
-    },
-    ...mapGetters(["userData"])
+    ...mapGetters(["userData", "userIsAdmin"])
   },
   // created() {
   //   console.log(

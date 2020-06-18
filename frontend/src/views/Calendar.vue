@@ -177,16 +177,16 @@ export default Vue.extend({
     AppAddEventModal
   },
   computed: {
-    ...mapGetters(["user", "events", "userData", "currentClient"]),
+    ...mapGetters([
+      "user",
+      "events",
+      "userData",
+      "currentClient",
+      "userIsAdmin"
+    ]),
     // userInfo() {
     //   return this.userData.result ? this.userData.result : this.user.result;
     // },
-    userIsAdmin() {
-      return this.$can("read", {
-        accessEmail: this.userData.result.email,
-        __type: "Admin"
-      });
-    },
     months() {
       return "Январь.Февраль.Март.Апрель.Май.Июнь.Июль.Август.Сентябрь.Октябрь.Ноябрь.Декабрь".split(
         "."

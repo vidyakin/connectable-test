@@ -37,4 +37,34 @@ router.get('/for_client/:workspace', (req, res) => {
 router.put('/delete/:userId', userDAO.delUserById)
 router.put('/undelete/:userId', userDAO.undelUserById)
 
+/**
+ * Roles
+ */
+router.put('/:user_id/role/:role', (req, res) => {
+  User.findById(req.params.user_id, (err,user) => {
+    if (err) return res.status(500).send(err)
+    if (!user.roles) {
+      user.roles = [req.params.role]
+      user.save()
+      res.send(user)
+    } else if (!user.roles.includes(req.params.role)){
+        user.roles.push(req.params.role)
+        user.save()
+        res.send(user)
+      }
+      else res.send(user)
+  })
+})
+
+router.delete('/:user_id/role/:role', (req, res) => {
+  User.findById(req.params.user_id, (err,user) => {
+    if (err) return res.status(500).send(err)
+    if (!user.roles) return res.status(522).send("User has no roles")
+    if (!user.roles.includes(req.params.role)) return res.status(522).send(`User has not role '${req.params.role}'`)
+    user.roles.splice(user.roles.indexOf(req.params.role),1)
+    user.save()
+    res.send(user)
+  })
+})
+
 module.exports = router

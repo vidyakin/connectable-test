@@ -69,13 +69,7 @@ export default {
       }
       return this.filterData.sort(compare);
     },
-    userIsAdmin() {
-      return this.$can("read", {
-        accessEmail: this.userData.result.email,
-        __type: "Admin"
-      });
-    },
-    ...mapGetters(["groups", "userData", "currentClient"])
+    ...mapGetters(["groups", "userData", "currentClient", "userIsAdmin"])
   },
   async beforeMount() {
     try {

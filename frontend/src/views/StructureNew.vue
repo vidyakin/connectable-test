@@ -37,16 +37,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(["users", "userData", "user"]),
-    userIsAdmin() {
-      return (
-        this.userData &&
-        this.$can("read", {
-          accessEmail: this.userData.result.email,
-          __type: "Admin"
-        })
-      );
-    }
+    ...mapGetters(["users", "userData", "user", "userIsAdmin"])
   },
   methods: {
     // datauser() {

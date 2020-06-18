@@ -18,3 +18,6 @@ export const SUCCESS_REGISTER = 'SUCCESS_REGISTER';
 export const SET_USER_DATA = 'SET_USER_DATA';
 export const FORGOT_INFO = 'FORGOT_INFO';
 export const RESET_INFO = 'RESET_INFO';
+
+export const ADD_ROLE = 'ADD_ROLE'
+export const REMOVE_ROLE = 'REMOVE_ROLE'

@@ -14,7 +14,8 @@ import {
   ERROR_LOGIN,
   SUCCESS_REGISTER,
   FORGOT_INFO,
-  RESET_INFO
+  RESET_INFO,
+  ADD_ROLE, REMOVE_ROLE
 } from '@/store/user/mutations.type';
 import {
   GET_EVENTS, GET_EVENTS_BY_CLIENT, CREATE_EVENT, DELETE_EVENT, UPDATE_EVENT,
@@ -22,15 +23,23 @@ import {
   LOGIN, LOGIN_WITH_GOOGLE, LOGIN_WITH_OUTLOOK, LOGOUT,
   EDIT_USER, INSERT_USER_INFO, CHECK_USER_INFO,
   FORGOT_PASSWORD, RESET_PASSWORD,
-  MARK_USER_DELETED, UNMARK_USER_DELETED
+  MARK_USER_DELETED, UNMARK_USER_DELETED,
+  INSERT_ROLE, DELETE_ROLE
 } from '@/store/user/actions.type';
-import { getInfoAboutUser, login, loginWithGoogle, loginWithOutlook, logout, forgotPasword, resetPassword } from '@/services/auth/auth.service';
-import { createEvent, deleteEvent, updateEvent, editUser, getEvents, getUser, getUsers, insertNewUser, checkUserInfo, markUserAsDeleted, unmarkUserAsDeleted, getEventsByClient } from '@/services/user.service';
+import { getInfoAboutUser, login, loginWithGoogle, loginWithOutlook, logout, forgotPasword, resetPassword }
+  from '@/services/auth/auth.service';
+import {
+  createEvent, deleteEvent, updateEvent, editUser, getEvents,
+  getUser, getUsers, insertNewUser, checkUserInfo, markUserAsDeleted, unmarkUserAsDeleted,
+  getEventsByClient,
+  insertRole, deleteRole
+}
+  from '@/services/user.service';
 
 interface State {
   user: any | null;
   currentUser: any | null;
-  users: any[] | null;
+  users: any[];
   events: any[] | null;
   isLoggedIn: any | null;
   currentUserData: any | null;
@@ -45,7 +54,7 @@ interface State {
 const store: State = {
   user: null,
   currentUser: null,
-  users: null,
+  users: [],
   events: [],
   isLoggedIn: null,
   currentUserData: null,
@@ -94,7 +103,16 @@ const getters = {
   userData(state: State) {
     return state.userData;
   },
-
+  userIsSuperAdmin(state: State) {
+    return state.userData && state.userData.result.roles.includes('superadmin')
+  },
+  userIsAdmin(state: State) {
+    const roles = state.userData.result.roles
+    return roles.includes('admin') || roles.includes('superadmin')
+  },
+  userHasRole(state: State, role: string) {
+    return state.userData?.roles.includes(role)
+  }
 };
 
 const mutations = {
@@ -112,15 +130,9 @@ const mutations = {
     if (!state.user || user._id === state.user._id) {
       state.user = user;
     }
-    //state.currentUser = user;
     if (state.users) {
       const userIndex = state.users!.findIndex(({ _id }) => _id === user._id);
       state.users.splice(userIndex, 1, user)
-      // state.users = [
-      //   ...state.users!.slice(0, userIndex),
-      //   user,
-      //   ...state.users!.slice(userIndex + 1),
-      // ];
     }
   },
   [SET_EVENTS](state: State, events: any[]) {
@@ -139,10 +151,6 @@ const mutations = {
     if (state.events) {
       const index = state.events!.findIndex(({ _id }) => _id === eventId);
       state.events.splice(index, 1)
-      // state.events = [
-      //   ...state.events!.slice(0, index),
-      //   ...state.events!.slice(index + 1),
-      // ];
     }
   },
   [SET_USERS](state: State, users: any[]) {
@@ -169,6 +177,23 @@ const mutations = {
   [SET_USER_DATA](state: State, userData: any) {
     state.userData = userData;
   },
+  // можно заменить на UPDATE_USER если отправлять его целиком с бэка
+  [ADD_ROLE](state: State, data: { user_id: string, role: string }) {
+    const i = state.users.findIndex(e => e._id == data.user_id)
+    const user = state.users[i]
+    if (!user.roles.includes(data.role)) {
+      user.roles.push(data.role)
+      state.users.splice(i, 1, user)
+    }
+  },
+  [REMOVE_ROLE](state: State, data: { user_id: string, role: string }) {
+    const i = state.users.findIndex(e => e._id == data.user_id)
+    const user = state.users[i]
+    if (user.roles.includes(data.role)) {
+      user.roles.splice(user.roles.indexOf(data.role), 1)
+      state.users.splice(i, 1, user)
+    }
+  }
 
 };
 
@@ -191,7 +216,9 @@ const actions = {
   [LOGOUT]: logout,
   [CHECK_USER_INFO]: checkUserInfo,
   [MARK_USER_DELETED]: markUserAsDeleted,
-  [UNMARK_USER_DELETED]: unmarkUserAsDeleted
+  [UNMARK_USER_DELETED]: unmarkUserAsDeleted,
+  [INSERT_ROLE]: insertRole,
+  [DELETE_ROLE]: deleteRole
 };
 
 export default {

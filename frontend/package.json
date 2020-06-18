@@ -8,13 +8,13 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
-    "@casl/ability": "^3.4.0",
-    "@casl/vue": "^0.5.1",
+    "@casl/ability": "^4.1.5",
+    "@casl/vue": "^1.1.1",
     "ant-design-vue": "^1.5.1",
     "axios": "^0.19.1",
     "core-js": "^2.6.11",
     "googleapis": "^48.0.0",
-    "moment": "^2.24.0",
+    "moment": "^2.26.0",
     "query-string": "^6.9.0",
     "socket.io": "^2.3.0",
     "socket.io-client": "^2.3.0",
@@ -23,17 +23,17 @@
     "vue-at": "^2.5.0-beta.2",
     "vue-axios": "^2.1.5",
     "vue-class-component": "^7.2.3",
-    "vue-context": "^5.1.0",
+    "vue-context": "^5.2.0",
     "vue-dialog-loading": "^0.4.3",
     "vue-google-oauth2": "^1.4.0",
     "vue-mq": "^1.0.1",
     "vue-orgchart": "^1.1.7",
     "vue-phone-number-input": "^1.1.9",
-    "vue-router": "^3.1.4",
+    "vue-router": "^3.3.4",
     "vue-social-sharing": "^2.4.7",
-    "vue-socket.io": "^3.0.7",
-    "vue-socket.io-extended": "^4.0.1",
-    "vuex": "^3.1.2"
+    "vue-socket.io": "^3.0.9",
+    "vue-socket.io-extended": "^4.0.3",
+    "vuex": "^3.4.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.8.3",
@@ -45,7 +45,7 @@
     "babel-loader": "^8.1.0",
     "babel-plugin-import": "^1.13.0",
     "node-sass": "^4.14.1",
-    "sass-loader": "^7.3.1",
+    "sass-loader": "^8.0.2",
     "typescript": "^3.7.4",
     "vue-template-compiler": "^2.6.11"
   },
