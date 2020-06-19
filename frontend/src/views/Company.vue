@@ -6,6 +6,7 @@
           v-model="content"
           @pressEnter="sendMessage"
           :parent="{type: 'company', id: '0'}"
+          v-if="userIsAdmin"
         />
         <div class="company-name">Новости компании {{userIsSuperAdmin ? '(Вы суперадмин)' : ''}}</div>
         <app-post v-for="(post, index) in sortedPosts" :post="post" :key="index" />
@@ -51,6 +52,7 @@ export default Vue.extend({
       "posts",
       "messages",
       "currentClient",
+      "userIsAdmin",
       "userIsSuperAdmin"
     ]),
     sortedPosts() {
@@ -59,7 +61,7 @@ export default Vue.extend({
         if (a.created > b.created) return -1;
         return 0;
       }
-      return this.arrPosts.sort(compare);
+      return this.posts.sort(compare);
     }
   },
   methods: {
@@ -86,14 +88,14 @@ export default Vue.extend({
     });
   },
   watch: {
-    posts(val) {
-      if (!val || !val.length) return;
-      // 1. Посты админа
-      this.arrPosts = val.filter(
-        e => e.author.roles && e.author.roles.includes("admin")
-      );
-      // 2. посты с другими условиями
-    }
+    // posts(val) {
+    //   if (!val || !val.length) return;
+    //   // 1. Посты админа
+    //   this.arrPosts = val.filter(
+    //     e => e.author.roles && e.author.roles.includes("admin")
+    //   );
+    //   // 2. посты с другими условиями
+    // }
   }
 });
 </script>
