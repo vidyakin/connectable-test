@@ -44,13 +44,17 @@
       <a-menu-item
         key="/structure_new"
         :class="{active:isActive == 'structure_new'}"
-        v-if="client_defined"
+        v-if="userIsAdmin"
       >
         <img src="@/assets/Icons/Structure.svg" alt />
         Структура (нов.)
       </a-menu-item>
       <!-- для сотрудников заменить на userIsAdmin когда будут заданы роли пользователей -->
-      <a-menu-item key="/employees" :class="{active:isActive == 'employees'}" v-if="client_defined">
+      <a-menu-item
+        key="/employees"
+        :class="{active:isActive == 'employees'}"
+        v-if="client_defined && userIsAdmin"
+      >
         <a-icon type="idcard" style="color: #A5A4BF; font-size: 16px" />Сотрудники
       </a-menu-item>
       <a-menu-item key="/clients" :class="{active:isActive == 'clients'}" v-if="userIsSuperAdmin">
@@ -100,11 +104,11 @@
       <!-- <a-menu-item key="/structure">
         <img src="@/assets/Icons/Structure.svg" alt />
       </a-menu-item>-->
-      <a-menu-item key="/structure_new" v-if="client_defined">
+      <a-menu-item key="/structure_new" v-if="userIsAdmin">
         <img src="@/assets/Icons/Structure.svg" alt />
       </a-menu-item>
       <!-- для сотрудников заменить на userIsAdmin когда будут заданы роли пользователей -->
-      <a-menu-item key="/employees" v-if="client_defined">
+      <a-menu-item key="/employees" v-if="userIsAdmin">
         <img src="@/assets/Icons/calendar.svg" alt />
       </a-menu-item>
       <a-menu-item key="/clients" v-if="userIsSuperAdmin">

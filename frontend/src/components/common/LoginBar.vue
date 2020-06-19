@@ -85,13 +85,13 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(["userData", "user", "users", "currentClient"]),
-    isSuperAdmin() {
-      return this.$can("manage", {
-        accessEmail: this.userData.result.email,
-        __type: "Client"
-      });
-    }
+    ...mapGetters(["userData", "user", "users", "currentClient"])
+    // isSuperAdmin() {
+    //   return this.$can("manage", {
+    //     accessEmail: this.userData.result.email,
+    //     __type: "Client"
+    //   });
+    // }
   },
   sockets: {
     connect() {
