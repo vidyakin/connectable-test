@@ -98,7 +98,7 @@
         trigger="click"
         :container="'post-' + post._id"
         overlayClassName="action-popup-content"
-        v-if="post && post.author._id === datauser._id || $can('read', {'accessEmail': datauser.email, '__type': 'Admin'})"
+        v-if="post && post.author._id === datauser._id || userIsAdmin"
       >
         <template slot="content">
           <a-tooltip title="Удалить">
@@ -189,7 +189,13 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(["showHeaderImage", "user", "currentUser", "userData"])
+    ...mapGetters([
+      "showHeaderImage",
+      "user",
+      "currentUser",
+      "userData",
+      "userIsAdmin"
+    ])
   },
   methods: {
     handleScroll() {
