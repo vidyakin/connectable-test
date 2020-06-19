@@ -34,8 +34,8 @@
         <span :class="['a', text.mark_del ? 'deleted' : '']">{{text.firstName}} {{text.lastName}}</span>
         <a-icon type="crown" class="icon-admin" v-if="record.is_admin" />
       </div>
-      <span slot="role" slot-scope="role">
-        <a-tag :color="roleView(role).color">{{ roleView(role).text.toUpperCase() }}</a-tag>
+      <span slot="is_admin" slot-scope="is_admin">
+        <a-tag :color="roleView(is_admin).color">{{ roleView(is_admin).text.toUpperCase() }}</a-tag>
       </span>
       <span slot="actions" slot-scope="text, record" class="action-buttons">
         <a-button size="small" @click="deleteEmployee(record)">
@@ -49,7 +49,7 @@
         <a-dropdown :trigger="['click']" v-if="userIsAdmin">
           <a-menu slot="overlay" @click="e=> hndChangeRoleClick(e, record)">
             <a-menu-item key="1">
-              <a-icon type="user" />Администратор
+              <a-icon :type="record.is_admin ? 'minus' : 'plus'" />Администратор
             </a-menu-item>
             <a-menu-item key="2" disabled>
               <a-icon type="user" />Модератор групп
@@ -82,7 +82,7 @@ import {
 
 import { REPLACE_GROUPS_OWNER } from "@/store/group/actions.type";
 import { CLEAR_HEAD_OF_DEPTS } from "@/store/structure/actions.type";
-import { INSERT_ROLE } from "@/store/user/actions.type";
+import { INSERT_ROLE, DELETE_ROLE } from "@/store/user/actions.type";
 
 import AddEmployeeModal from "@/components/modal/AddEmployeeModal";
 
@@ -110,9 +110,9 @@ const cols = [
   },
   {
     title: "Роль",
-    dataIndex: "role",
-    key: "role",
-    scopedSlots: { customRender: "role" }
+    dataIndex: "is_admin",
+    key: "is_admin",
+    scopedSlots: { customRender: "is_admin" }
   },
   {
     title: "Действия",
@@ -188,14 +188,19 @@ export default {
       if (rec.is_admin) styles.push("is-admin");
       return styles;
     },
-    roleView(r) {
-      switch (r) {
-        case "admin":
-          return { text: "Администратор", color: "volcano" };
-          break;
-        default:
-          return { text: "Сотрудник", color: "blue" };
+    roleView(is_admin) {
+      if (is_admin) {
+        return { text: "Администратор", color: "volcano" };
+      } else {
+        return { text: "Сотрудник", color: "blue" };
       }
+      // switch (r) {
+      //   case "admin":
+      //     return { text: "Администратор", color: "volcano" };
+      //     break;
+      //   default:
+      //     return { text: "Сотрудник", color: "blue" };
+      // }
     },
     newEmployeeOpen() {
       this.newEmplVisible = true;
@@ -317,36 +322,50 @@ export default {
     },
     hndChangeRoleClick(e, rec) {
       if (e.key == 1) {
+        if (rec.key == this.userData.result._id) {
+          this.$error({
+            centered: true,
+            title: "Ошибка изменения роли",
+            content: "Нельзя изменять собственную роль"
+          });
+          return;
+        }
+        const fio = rec.fio.firstName + " " + rec.fio.lastName;
+        const content = rec.is_admin
+          ? `Снять с ${fio} права администратора`
+          : `Сделать сотрудника ${fio} администратором?`;
         this.$confirm({
           centered: true,
           title: "Подтверждение",
-          content: `Сделать сотрудника ${rec.fio.firstName} ${rec.fio.lastName} администратором?`,
+          content,
           okType: "danger",
           okText: "Да",
           cancelText: "Отменить",
           onOk: () => {
-            this.setUserToAdminAction(rec);
+            this.manageUserAdminRoleAction(rec);
           },
           class: "test"
         });
       }
     },
-    async setUserToAdminAction(rec) {
+    async manageUserAdminRoleAction(rec) {
       try {
-        await this.$store.dispatch(INSERT_ROLE, {
+        await this.$store.dispatch(rec.is_admin ? DELETE_ROLE : INSERT_ROLE, {
           user_id: rec.key,
           role: "admin"
         });
         await this.$store.dispatch(GET_USERS, this.currentClient.workspace);
         this.$success({
           centered: true,
-          title: "Установлен админ",
-          content: "Роль администратора установлена успешно"
+          title: "Изменение роли",
+          content: `Роль администратора ${
+            rec.is_admin ? "установлена" : "снята"
+          } успешно`
         });
       } catch (error) {
         this.$error({
           centered: true,
-          title: "Ошибка установка админа",
+          title: "Ошибка изменения роли",
           content: error.message
         });
       }
