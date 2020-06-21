@@ -9,6 +9,7 @@ import {
   REMOVE_COMMENT,
   REMOVE_ANSWER,
   SET_POSTS,
+  SET_POSTS_OF_FOLLOWS,
   SET_POST
 } from '@/store/post/mutations.type';
 
@@ -79,6 +80,12 @@ export const getPosts = async (context: any, parent: any) => {
     .get('api/post', { params: parent });
   context.commit(SET_POSTS, response.data.result);
 };
+
+export const getPostsOfFollows = async (context: any, user_id: string) => {
+  const posts = await Vue.axios
+    .get('/api/post/follows/' + user_id)
+  context.commit(SET_POSTS_OF_FOLLOWS, posts.data)
+}
 
 export const getPost = async (context: any, postId: any) => {
   const response = await Vue.axios

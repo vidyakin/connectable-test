@@ -1,6 +1,7 @@
 export const SEND_NEW_POST = 'SEND_NEW_POST';
 
 export const GET_POSTS = 'GET_POSTS';
+export const GET_POSTS_OF_FLWS = 'GET_POSTS_OF_FLWS';
 export const GET_POST = 'GET_POST';
 export const DELETE_POST = 'DELETE_POST';
 export const DELETE_COMMENT = 'DELETE_COMMENT';

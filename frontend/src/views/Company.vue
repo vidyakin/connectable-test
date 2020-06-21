@@ -1,6 +1,7 @@
 <template>
   <div id="profile" class="company">
     <a-tabs default-active-key="1" @change="tabPageChange">
+      <!-- Новости от администрации компании -->
       <a-tab-pane key="1" tab="Компания">
         <app-comment-input
           v-model="content"
@@ -11,6 +12,7 @@
         <div class="company-name">Новости компании {{userIsSuperAdmin ? '(Вы суперадмин)' : ''}}</div>
         <app-post v-for="(post, index) in sortedPosts" :post="post" :key="index" />
       </a-tab-pane>
+      <!-- Оповещения системы -->
       <a-tab-pane key="2" force-render>
         <span slot="tab">
           <a-badge
@@ -19,6 +21,16 @@
           >Мои новости&nbsp;&nbsp;&nbsp;&nbsp;</a-badge>
         </span>
         <NotificationList @count="setNtfCounter" />
+      </a-tab-pane>
+      <!-- Подписки на блоги пользователей -->
+      <a-tab-pane key="3" force-render>
+        <span slot="tab">
+          <a-badge
+            :count="subsrcCount"
+            title="Есть непрочитанные сообщения"
+          >Подписки&nbsp;&nbsp;&nbsp;&nbsp;</a-badge>
+        </span>
+        <SubscriptionList @count="setSubscrCounter" :user="userData.result._id" />
       </a-tab-pane>
     </a-tabs>
   </div>
@@ -30,6 +42,7 @@ import { mapGetters } from "vuex";
 import { GET_POSTS } from "@/store/post/actions.type";
 import AppCommentInput from "@/components/common/CommentInput";
 import NotificationList from "@/components/common/NotificationList";
+import SubscriptionList from "@/components/common/SubscriptionList";
 import AppPost from "@/components/common/Post";
 
 export default Vue.extend({
@@ -38,13 +51,15 @@ export default Vue.extend({
     return {
       content: "",
       arrPosts: [],
-      notifCount: 0
+      notifCount: 0,
+      subsrcCount: 0
     };
   },
   components: {
     AppCommentInput,
     AppPost,
-    NotificationList
+    NotificationList,
+    SubscriptionList
   },
   computed: {
     ...mapGetters([
@@ -74,6 +89,9 @@ export default Vue.extend({
     // установка счетчика сообщений из дочернего компонента
     setNtfCounter(n) {
       this.notifCount = n;
+    },
+    setSubscrCounter(n) {
+      this.subsrcCount = n;
     }
   },
   beforeMount() {

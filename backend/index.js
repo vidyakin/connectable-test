@@ -112,6 +112,11 @@ app.delete('/api/deleteParticipant/:participantId/group/:groupId', (req, res, ne
   })
 });
 
+app.get('/api/post/follows/:user_id', async (req,res) => {
+    const posts = await Post.find({ "author.followers": req.params.user_id })
+    res.send(posts);
+})
+
 //register form
 const mongoose = require('mongoose');
 

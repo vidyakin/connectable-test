@@ -2,7 +2,7 @@ import { SET_SHOW_IMAGE_HEADER } from '@/store/shower/mutations.type';
 import {
   DELETE_POST,
   EDIT_POST,
-  GET_POSTS,
+  GET_POSTS, GET_POSTS_OF_FLWS,
   GET_POST,
   REPOST,
   SEND_COMMENT,
@@ -16,6 +16,7 @@ import {
 import { } from '@/store/post/actions.type';
 import {
   deletePost, editPost, getPosts, getPost, repost,
+  getPostsOfFollows,
   sendComment, sendLike, sendNewPost, dislike, editComment, deleteComment
 } from '@/services/post.service';
 
@@ -26,12 +27,13 @@ import {
   ADD_LIKE_FOR_POST,
   ADD_POST, CHANGE_POST, CHANGE_COMMENT, CHANGE_ANSWER,
   REMOVE_POST, SET_EDIT_POST_VISIBLE, SET_POST_FOR_EDITING, SET_EDIT_COMMENT_VISIBLE, SET_COMMENT_FOR_EDITING,
-  SET_POSTS, SET_POST, REMOVE_COMMENT, REMOVE_ANSWER,
+  SET_POSTS, SET_POSTS_OF_FOLLOWS, SET_POST, REMOVE_COMMENT, REMOVE_ANSWER,
 } from '@/store/post/mutations.type';
 import { DELETE_EVENT } from '@/store/user/actions.type';
 
 interface State {
   posts: any[];
+  posts_of_follows: any[],
   currentPost: any,
   comments: any[];
   postForEditing: any;
@@ -42,6 +44,7 @@ interface State {
 
 const store: State = {
   posts: [],
+  posts_of_follows: [],
   currentPost: null,
   comments: [],
   postForEditing: null,
@@ -72,11 +75,15 @@ const getters = {
   editCommVisible(state: State) {
     return state.editCommVisible;
   },
+  posts_of_follows(state: State) {
+    return state.posts_of_follows
+  }
 };
 
 const actions = {
   [SEND_NEW_POST]: sendNewPost,
   [GET_POSTS]: getPosts,
+  [GET_POSTS_OF_FLWS]: getPostsOfFollows,
   [GET_POST]: getPost,
   [SEND_LIKE]: sendLike,
   [DELETE_LIKE]: dislike,
@@ -91,6 +98,10 @@ const actions = {
 const mutations = {
   [SET_POSTS](state: State, posts: any[]) {
     state.posts = posts;
+  },
+
+  [SET_POSTS_OF_FOLLOWS](state: State, posts: any[]) {
+    state.posts_of_follows = posts;
   },
 
   [SET_POST](state: State, post: any[]) {
