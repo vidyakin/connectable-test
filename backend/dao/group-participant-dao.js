@@ -40,9 +40,10 @@ module.exports.findGroupsByUserId = async (userId) => {
         .select('groupId')
       console.log(`groupIds: ${JSON.stringify(groupIds,null,3)}`);
       
-      if (!groupIds.length) return [] // Nothing found
+      if (groupIds.length) {
+        groupIds = groupIds.map(_ => mongoose.Types.ObjectId(_.groupId))
+      }
       
-      groupIds = groupIds.map(_ => mongoose.Types.ObjectId(_.groupId))
       const groups = await Group.find({client_id})
         .or([
           { type: { $in: [0,1] }}, // открытые и закрытые видно, но в закрытых не должно быть видно посты и участников (?)

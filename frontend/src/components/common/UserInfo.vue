@@ -25,10 +25,7 @@
       <div class="user-info-content-email">{{currentUser && currentUser.email}}</div>
     </div>
 
-    <div
-      class="user-info-edit"
-      v-if="datauser._id == this.$route.params._id || $can('read', {'accessEmail': datauser.email, '__type': 'Admin'})"
-    >
+    <div class="user-info-edit" v-if="datauser._id == this.$route.params._id || userIsAdmin">
       <a-button icon="edit" @click="editDrawerVisible = true"></a-button>
     </div>
   </div>
@@ -64,7 +61,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(["currentUser", "userData"])
+    ...mapGetters(["currentUser", "userData", "userIsAdmin"])
   },
   methods: {
     closeEditDrawer() {

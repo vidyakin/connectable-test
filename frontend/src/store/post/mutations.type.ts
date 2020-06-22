@@ -1,4 +1,6 @@
 export const SET_POSTS = 'SET_POSTS';
+export const SET_POSTS_OF_FOLLOWS = 'SET_POSTS_OF_FOLLOWS';
+export const SET_POSTS_OF_GROUPS = 'SET_POSTS_OF_GROUPS';
 export const SET_POST = 'SET_POST';
 export const ADD_POST = 'ADD_POST';
 

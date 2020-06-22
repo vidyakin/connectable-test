@@ -255,9 +255,7 @@ export default {
     },
     deleteEmployee(empl_data) {
       // Предварительные проверки на самого себя и админа
-      if (
-        this.$can("read", { accessEmail: empl_data.email, __type: "Admin" })
-      ) {
+      if (this.userIsAdmin) {
         this.$error({
           centered: true,
           title: "Ошибка при удалении",

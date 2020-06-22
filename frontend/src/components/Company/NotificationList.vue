@@ -35,9 +35,7 @@ import { GET_MESSAGES } from "@/store/notification/actions.type";
 export default {
   data() {
     return {
-      notifs: [],
-      // Количество сообщений - для надписи на бейджике. Возможно не нужно отдельную переменную
-      msgCount: 0
+      notifs: []
     };
   },
   computed: {
@@ -45,6 +43,7 @@ export default {
   },
   methods: {
     fillNotificationFeed() {
+      this.$emit("count", this.messages.length);
       this.notifs = this.messages.map(msg => ({
         title: "Новая группа", // TODO: подстроить под разные типы сообщений
         html: msg.text
@@ -53,17 +52,15 @@ export default {
   },
   async beforeMount() {
     //console.log(`LoginBar: userdata is ${JSON.stringify(this.datauser,null,3)}`);
-
     // динамическая подписка на событие сокета, на всякий случай
     // this.$socket.$subscribe('socketMessage', payload => {
     //   console.log(`socketMessage fired!`)
     // });
     this.fillNotificationFeed();
-    this.$emit("count", this.messages.length);
   },
   watch: {
     messages(val) {
-      this.$emit("count", val.length);
+      this.fillNotificationFeed();
     },
     async currentClient(val) {
       if (val) {

@@ -74,10 +74,6 @@ export default {
   async beforeMount() {
     try {
       this.isLoaded = true;
-      // this.userIsAdmin = this.$can("read", {
-      //   accessEmail: this.datauser.email,
-      //   __type: "Admin"
-      // });
       if (this.userIsAdmin) {
         await this.$store.dispatch(
           GET_GROUPS_BY_CLIENT,
