@@ -1,6 +1,6 @@
 <template>
   <div>
-    <app-post v-for="(post, index) in posts_of_follows.sort(compare)" :post="post" :key="index" />
+    <app-post v-for="(post, index) in sortedPosts" :post="post" :key="index" />
   </div>
 </template>
 
@@ -11,11 +11,11 @@ import { GET_POSTS_OF_FLWS } from "@/store/post/actions.type";
 
 import AppPost from "@/components/common/Post";
 
-function compare(a, b) {
+const compare = (a, b) => {
   if (a.created < b.created) return 1;
   if (a.created > b.created) return -1;
   return 0;
-}
+};
 
 export default {
   props: ["user"],
@@ -24,7 +24,7 @@ export default {
   },
   data() {
     return {
-      //sortedPosts: []
+      sortedPosts: []
     };
   },
   computed: {
@@ -33,7 +33,7 @@ export default {
   methods: {
     fillSubscriptionPosts() {
       this.$emit("count", this.posts_of_follows.length);
-      //this.sortedPosts = this.posts_of_follows.sort(compare);
+      this.sortedPosts = this.posts_of_follows.sort(compare);
     }
   },
   watch: {

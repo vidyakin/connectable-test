@@ -8,9 +8,10 @@ import {
   REMOVE_POST,
   REMOVE_COMMENT,
   REMOVE_ANSWER,
+  SET_POST,
   SET_POSTS,
   SET_POSTS_OF_FOLLOWS,
-  SET_POST
+  SET_POSTS_OF_GROUPS
 } from '@/store/post/mutations.type';
 
 export const sendNewPost = (context: any, post: any) => {
@@ -85,6 +86,12 @@ export const getPostsOfFollows = async (context: any, user_id: string) => {
   const posts = await Vue.axios
     .get('/api/post/follows/' + user_id)
   context.commit(SET_POSTS_OF_FOLLOWS, posts.data)
+}
+
+export const getPostsOfuserGroups = async (context: any, user_id: string) => {
+  const posts = await Vue.axios
+    .get('/api/post/group/user/' + user_id)
+  context.commit(SET_POSTS_OF_GROUPS, posts.data)
 }
 
 export const getPost = async (context: any, postId: any) => {

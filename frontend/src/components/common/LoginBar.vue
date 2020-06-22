@@ -40,12 +40,12 @@ import { ENTER_CLIENT } from "@/store/client/actions.type";
 import { SET_SHOW_IMAGE_HEADER } from "@/store/shower/mutations.type";
 import { SET_CURRENT_CLIENT } from "@/store/client/mutations.type";
 
-import NotificationList from "@/components/common/NotificationList";
+//import NotificationList from "@/components/Company/NotificationList";
 
 export default {
   name: "AppLoginBar",
   components: {
-    NotificationList
+    //NotificationList
   },
   data() {
     return {
