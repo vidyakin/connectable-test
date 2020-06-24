@@ -148,18 +148,19 @@ export default Vue.extend({
     }
   },
   beforeMount() {
-    this.$store.dispatch(GET_USERS, this.currentClient.workspace);
+    const user = this.userData.result;
+    this.$store.dispatch(GET_USERS, user.client_id);
     this.$store.dispatch(GET_POSTS, {
       filter: {
         parent: {
           type: "company",
           id: "0"
         },
-        client_id: this.currentClient && this.currentClient.workspace
+        client_id: user.client_id
       }
     });
-    this.$store.dispatch(GET_POSTS_OF_GROUPS, this.userData.result._id);
-    this.$store.dispatch(GET_EVENTS, this.userData.result.email);
+    this.$store.dispatch(GET_POSTS_OF_GROUPS, user._id);
+    this.$store.dispatch(GET_EVENTS, user.email);
   },
   watch: {
     // posts(val) {
