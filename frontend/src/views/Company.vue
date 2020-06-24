@@ -47,11 +47,18 @@
       <a-tab-pane key="5" force-render>
         <span slot="tab">
           <a-badge
-            :count="eventsCount"
+            :count="eventsWithMe.length"
             title="Есть непросмотренные события"
           >События&nbsp;&nbsp;&nbsp;&nbsp;</a-badge>
         </span>
-        События
+        <div v-for="event in eventsWithMe" :key="event._id" class="event-block">
+          <div class="title">{{event.name}}</div>
+          <div>Описание: {{event.description}}</div>
+          <div>Дата начала: {{(new Date(event.date)).toLocaleString()}}</div>
+          <div>Окончание: {{(new Date(event.end)).toLocaleString()}}</div>
+          <div>Создал: {{eventAuthorName(event)}}</div>
+          <router-link to="/calendar">Перейти в календарь</router-link>
+        </div>
         <!-- <SubscriptionList @count="setSubscrCounter" :user="userData.result._id" /> -->
       </a-tab-pane>
     </a-tabs>
@@ -62,6 +69,7 @@
 import Vue from "vue";
 import { mapGetters } from "vuex";
 import { GET_POSTS, GET_POSTS_OF_GROUPS } from "@/store/post/actions.type";
+import { GET_EVENTS, GET_USERS } from "@/store/user/actions.type";
 import AppCommentInput from "@/components/common/CommentInput";
 import NotificationList from "@/components/Company/NotificationList";
 import SubscriptionList from "@/components/Company/SubscriptionList";
@@ -94,9 +102,11 @@ export default Vue.extend({
   computed: {
     ...mapGetters([
       "userData",
+      "users",
       "posts",
       "posts_of_groups",
       "messages",
+      "events",
       "currentClient",
       "userIsAdmin",
       "userIsSuperAdmin"
@@ -106,6 +116,14 @@ export default Vue.extend({
     },
     sortedGroupsPosts() {
       return this.posts_of_groups.sort(compare);
+    },
+    eventsWithMe() {
+      const user = this.userData.result;
+      return this.events.filter(
+        ev =>
+          ev.userId != user._id &&
+          ev.attendees.filter(att => att.email == user.email).length > 0
+      );
     }
   },
   methods: {
@@ -121,9 +139,16 @@ export default Vue.extend({
     },
     setSubscrCounter(n) {
       this.subsrcCount = n;
+    },
+    eventAuthorName(event) {
+      const user = this.users.find(u => u._id == event.userId);
+      return user == undefined
+        ? "Пользователь не найден"
+        : user.firstName + " " + user.lastName;
     }
   },
   beforeMount() {
+    this.$store.dispatch(GET_USERS, this.currentClient.workspace);
     this.$store.dispatch(GET_POSTS, {
       filter: {
         parent: {
@@ -134,6 +159,7 @@ export default Vue.extend({
       }
     });
     this.$store.dispatch(GET_POSTS_OF_GROUPS, this.userData.result._id);
+    this.$store.dispatch(GET_EVENTS, this.userData.result.email);
   },
   watch: {
     // posts(val) {
@@ -172,6 +198,17 @@ export default Vue.extend({
     color: #43425d;
     text-align: left;
     margin: 0 30px;
+  }
+}
+
+.event-block {
+  border: 1px solid darkgrey;
+  border-radius: 6px;
+  padding: 10px;
+  width: 400px;
+  .title {
+    font-size: 14pt;
+    font-weight: bold;
   }
 }
 </style>
