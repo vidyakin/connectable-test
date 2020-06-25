@@ -15,7 +15,7 @@
         <span class="logo-mob circle-3"></span>
       </a-menu-item>
       <a-menu-item v-if="client_defined" key="/company" :class="{active:isActive == 'company'}">
-        <img src="@/assets/Icons/company.svg" alt />Компания
+        <img src="@/assets/Icons/company.svg" alt />Стена
       </a-menu-item>
       <a-menu-item
         v-if="client_defined"

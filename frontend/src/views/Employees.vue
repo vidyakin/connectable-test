@@ -8,6 +8,7 @@
     >
       <template slot="extra">
         <a-button key="1" type="primary" @click="newEmployeeOpen">Новый сотрудник</a-button>
+        <a-button key="3" type="success" @click="newEmployeeTest">Тест сообщения</a-button>
         <a-button key="2" @click="reload">Обновить</a-button>
         <!-- <a-button key="2">Operation</a-button>    -->
       </template>
@@ -79,7 +80,7 @@ import {
   MARK_USER_DELETED,
   UNMARK_USER_DELETED
 } from "@/store/user/actions.type";
-
+import { CREATE_MESSAGE } from "@/store/notification/actions.type";
 import { REPLACE_GROUPS_OWNER } from "@/store/group/actions.type";
 import { CLEAR_HEAD_OF_DEPTS } from "@/store/structure/actions.type";
 import { INSERT_ROLE, DELETE_ROLE } from "@/store/user/actions.type";
@@ -211,47 +212,90 @@ export default {
     reload() {
       this.$store.dispatch(GET_USERS, this.currentClient.workspace);
     },
+    newMsgForEmpl(full_name, client_id, id) {
+      return {
+        msgType: "NEW_EMPL", // тип сообщения, для разделения бизнес-логики - "NEW_GROUP","YOU_ADDED_IN_GROUP", ""
+        dateCreated: Date.now(), // Дата создания сообщения
+        text: full_name, // текст сообщения
+        senderId: "system", // id отправителя
+        listenerType: "all", // тип приемников сообщений - все, выборочно или еще как-то
+        linkedObjType: "employee", // связанный объект - группа, проект, и т.д.
+        linkedObjId: id,
+        client_id
+      };
+    },
     createEmployee(empl_data) {
       this.newEmplVisible = false;
       this.tblLoading = true;
       console.log("Before INSERT: " + this.users.length);
+      const newEmpl = {
+        firstName: empl_data.name,
+        lastName: empl_data.surname,
+        email: empl_data.email,
+        password: empl_data.password,
+        emailSend: true,
+        workspace: empl_data.workspace
+      };
       this.$store
-        .dispatch(INSERT_USER_INFO, {
-          firstName: empl_data.name,
-          lastName: empl_data.surname,
-          email: empl_data.email,
-          password: empl_data.password,
-          emailSend: true,
-          workspace: empl_data.workspace
-        })
-        .then(() => {
-          if (!this.errorRegister) {
-            console.log(
-              "Сount of users before GET_USERS: " + this.users.length
-            );
-            this.$store
-              .dispatch(GET_USERS, this.currentClient.workspace)
-              .then(() => {
-                console.log(
-                  "Count of users after GET_USERS: " + this.users.length
-                );
-                this.$success({
-                  centered: true,
-                  title: "Сотруник записан",
-                  content: `Сотрудник ${empl_data.name} ${empl_data.surname} создан`
-                });
-              });
-          } else {
+        .dispatch(INSERT_USER_INFO, newEmpl)
+        .then(newEmpl => {
+          if (this.errorRegister) {
             this.$error({
               centered: true,
               title: "Ошибка при сохранении сотрудника",
               content: this.errorRegister
             });
+            return;
           }
+          //console.log("Сount of users before GET_USERS: " + this.users.length);
+          // объект-модель для сохранения в БД
+          const newMsg = this.newMsgForEmpl(
+            `${empl_data.name} ${empl_data.surname}`,
+            empl_data.workspace,
+            newEmpl.id
+          );
+          // Создаем сообщение в БД и сторе
+          this.$store.dispatch(CREATE_MESSAGE, newMsg).then(newMsgId => {
+            this.$socket.client.emit("to all", {
+              type: "NEW_EMPL",
+              val: newMsg
+            });
+          });
+          this.$store
+            .dispatch(GET_USERS, this.currentClient.workspace)
+            .then(() => {
+              console.log(
+                "Count of users after GET_USERS: " + this.users.length
+              );
+              this.$success({
+                centered: true,
+                title: "Сотруник записан",
+                content: `Сотрудник ${empl_data.name} ${empl_data.surname} создан`
+              });
+            });
         })
         .finally(() => {
           this.tblLoading = false;
         });
+    },
+    newEmployeeTest() {
+      const newEmpl = {
+        firstName: "Иван",
+        lastName: "Иванов",
+        email: "ivan@gmail.com",
+        client_id: this.userData.result.client_id
+      };
+      const newMsg = this.newMsgForEmpl(
+        newEmpl.firstName + " " + newEmpl.lastName,
+        newEmpl.client_id,
+        "23412341235"
+      );
+      this.$store.dispatch(CREATE_MESSAGE, newMsg).then(newMsgId => {
+        this.$socket.client.emit("to all", {
+          type: "NEW_EMPL",
+          val: newMsg
+        });
+      });
     },
     deleteEmployee(empl_data) {
       // Предварительные проверки на самого себя и админа

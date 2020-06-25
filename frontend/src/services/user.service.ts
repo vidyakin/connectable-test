@@ -85,7 +85,7 @@ export const insertNewUser = (context: any, dataUser: any) => {
       if (response.data.status === 200) {
         context.commit(ERROR_REGISTER, '');
         context.commit(SUCCESS_REGISTER, 'Регистрация прошла успешно');
-
+        return response.data
       } else if (response.data.status === 202) {
         context.commit(ERROR_REGISTER, response.data.error);
       }

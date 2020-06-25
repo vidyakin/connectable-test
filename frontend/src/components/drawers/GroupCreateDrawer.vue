@@ -182,7 +182,8 @@ export default {
       return {
         msgType: "NEW_GROUP", // тип сообщения, для разделения бизнес-логики - "NEW_GROUP","YOU_ADDED_IN_GROUP", ""
         dateCreated: Date.now(), // Дата создания сообщения
-        text: `<b>${this.userinfo.firstName} ${this.userinfo.lastName}</b> создал новую группу <i>${newGroup.name}</i>`, // текст сообщения
+        //text: `<b>${this.userinfo.firstName} ${this.userinfo.lastName}</b> создал новую группу <i><a href="#">${newGroup.name}</a></i>`, // текст сообщения
+        text: `${this.userinfo.firstName} ${this.userinfo.lastName}`,
         senderId: newGroup.creatorId, // id отправителя
         listenerType: "all", // тип приемников сообщений - все, выборочно или еще как-то
         linkedObjType: "group", // связанный объект - группа, проект, и т.д.
