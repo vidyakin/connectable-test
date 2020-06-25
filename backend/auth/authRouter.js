@@ -47,49 +47,57 @@ router.post('/register', function(req,res){
   User.findOne({email}, (err, user) => {
       if (!err && user) {
           bcrypt.compare(password, user.password).then(match => {
-              if (match) {
-                  status = 202;
-                  result.status = status;
-                  result.error = `Authentication error. This email is already registered`;
-              } else {
-                  status = 202;
-                  result.status = status;
-                  result.error = `Authentication error. This email is already registered`;
-              }
+            if (match) {
+              status = 202;
+              result.status = status;
+              result.error = `Authentication error. This email is already registered`;
+            } else {
+              status = 202;
+              result.status = status;
+              result.error = `Authentication error. This email is already registered`;
+            }
 
-              res.status(status).send(result);
+            res.status(status).send(result);
           });
       } else {
-          bcrypt.hash(password, 10, function (err, hash) {
-              if (err) {
-                  next(err);
-              }
-              else {
-                  data.password = hash;
-                  db.collection('users').insertOne(data,function(err, collection){
-                      if (err) return res.status(500).send("There was a problem registering the user.");
-                  });
-                  if (emailSend) {
-                      console.log(`>> '/api/register' sending email to ${email}`);
-                      mailer.NewUser(email, `https://connectable.pro/login/`, {email:email, password:password});
-                  }
+        status = 200;
+        bcrypt.hash(password, 10, async (err, hash) => {
+          if (err) {
+            next(err);
+          }
+          else {
+            data.password = hash;
+            
+            try {
+              
+              new_data = await User.create(data)
+              result.id = new_data._id
+              // prepare token
+              const payload = { user: email };
+              const secret = process.env.JWT_SECRET;
+              const token = jwt.sign(payload, secret, {
+                  expiresIn: 86400 // expires in 24 hours
+              });
+              result.token = token;
+             
+            } catch (error) {
+              
+              result.status = 500
+              result.error = "There was a problem registering the user: " + error;
 
-              }
-          });
+            } finally {
+              
+              result.status = status;
+              res.status(status).send(result);
+            }
+            
+            if (emailSend) {
+                console.log(`>> '/api/register' sending email to ${email}`);
+                mailer.NewUser(email, `https://connectable.pro/login/`, {email:email, password:password});
+            }
 
-          status = 200;
-          const payload = {user: email};
-          const secret = process.env.JWT_SECRET;
-          const token = jwt.sign(payload, secret, {
-              expiresIn: 86400 // expires in 24 hours
-          });
-
-          result.token = token;
-          result.status = status;
-          //result.result = user;
-
-          res.status(status).send(result);
-
+          }
+        });
       }
   });
 

@@ -104,21 +104,29 @@ export default {
      *  val - данные, структура зависит от типа сообщения
      */
     async socketMessage(payload) {
+      const messages = {
+        NEW_GROUP: "Создана новая группа",
+        NEW_EMPL: "Добавлен новый сотрудник"
+      };
       console.log(`socket message received`);
       if (payload.type === "NEW_GROUP") {
-        //this.notifs.push(payload.val);
-        //this.msgCount += 1;
         await this.$store.dispatch(GET_MESSAGES);
-        //this.fillNotificationFeed();
+        // вывод оповещения о новом оповещении
+        this.$notification["info"]({
+          message: messages[payload.type],
+          description: `Новое оповещение в ленте`,
+          placement: "topLeft"
+        });
       }
-      // вывод оповещения о новом оповещении
-      this.$notification["info"]({
-        message: {
-          NEW_GROUP: "Создана новая группа"
-        }[payload.type],
-        description: `Новое оповещение в ленте`,
-        placement: "topLeft"
-      });
+      if (payload.type === "NEW_EMPL") {
+        await this.$store.dispatch(GET_MESSAGES);
+        // вывод оповещения о новом оповещении
+        this.$notification["info"]({
+          message: messages[payload.type],
+          description: `Новый сотрудник: <router-link to='/user/${payload.val.id}'>${payload.val.fio}</router-link>`,
+          placement: "topLeft"
+        });
+      }
     }
   },
   methods: {

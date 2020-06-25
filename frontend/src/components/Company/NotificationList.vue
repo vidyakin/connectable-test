@@ -22,15 +22,33 @@
           src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
         />
         <!-- <div slot="description" class="notif-description"><b>{{item.userFrom}}</b> {{item.text}} <i>{{item.subj}}</i></div> -->
-        <div slot="description" class="notif-description" v-html="item.html"></div>
+        <div slot="description" class="notif-description">
+          <MsgEmplBody v-if="item.type == 'NEW_EMPL'" :id="item.id" :name="item.text" />
+          <MsgGroupBody
+            v-else-if="item.type == 'NEW_GROUP'"
+            :id="item.id"
+            :creator="item.creator"
+            :name="item.text"
+          />
+          <div v-else>Тип сообщения не опознан</div>
+        </div>
       </a-list-item-meta>
     </a-list-item>
   </a-list>
-</template>
+</template> 
 
 <script>
+import Vue from "vue";
 import { mapGetters } from "vuex";
 import { GET_MESSAGES } from "@/store/notification/actions.type";
+
+import MessageEmployeeBody from "./NotificationBodies/MessageEmployeeBody";
+import MessageGroupBody from "./NotificationBodies/MessageGroupBody";
+
+const msgTitles = {
+  NEW_GROUP: "Новая группа",
+  NEW_EMPL: "Новый сотрудник"
+};
 
 export default {
   data() {
@@ -38,15 +56,26 @@ export default {
       notifs: []
     };
   },
+  components: {
+    MsgEmplBody: MessageEmployeeBody,
+    MsgGroupBody: MessageGroupBody
+  },
   computed: {
-    ...mapGetters(["messages", "currentClient"])
+    ...mapGetters(["users", "messages", "currentClient"])
   },
   methods: {
     fillNotificationFeed() {
       this.$emit("count", this.messages.length);
+      const getCreatorName = msg => {
+        const user = this.users.find(u => u._id == msg.senderId);
+        return user ? user.firstName + " " + user.lastName : "not found";
+      };
       this.notifs = this.messages.map(msg => ({
-        title: "Новая группа", // TODO: подстроить под разные типы сообщений
-        html: msg.text
+        type: msg.msgType,
+        creator: getCreatorName(msg),
+        title: msgTitles[msg.msgType], // TODO: подстроить под разные типы сообщений
+        text: msg.text,
+        id: msg.linkedObjId
       }));
     }
   },
@@ -83,7 +112,7 @@ export default {
 
 .notif {
   &-item {
-    width: 350px;
+    width: 600px;
     padding: 5px 0 !important;
   }
   &-title {

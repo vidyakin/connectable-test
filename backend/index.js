@@ -119,10 +119,10 @@ app.get('/api/post/follows/:user_id', async (req,res) => {
 })
 
 app.get('/api/post/group/user/:user_id', async (req,res) => {
-  console.log(`>> Posts in groups`);
+  //console.log(`>> Posts in groups`);
   // 1st - find a workspace of user  
   const user = await User.findById(req.params.user_id)
-  console.log(`>> Client ID ${user._id} , ${user.client_id}`);
+  //console.log(`>> Client ID ${user._id} , ${user.client_id}`);
   // 2nd - find groups where user is participant
   let groupIds = await GroupParticipant.find()
     .where('participantId').equals(user._id)
@@ -130,7 +130,7 @@ app.get('/api/post/group/user/:user_id', async (req,res) => {
   if (groupIds.length) {
     groupIds = groupIds.map(_ => mongoose.Types.ObjectId(_.groupId))
   }
-  console.log(`>> groupIds ${groupIds}`);
+  //console.log(`>> groupIds ${groupIds}`);
   // 3rd - find all groups that user can see messages - open groups and groups as participant, not own groups
   const user_groups = await Group.find({
       client_id: user.client_id, 
@@ -144,7 +144,7 @@ app.get('/api/post/group/user/:user_id', async (req,res) => {
         "parent.type": "group", 
         "parent.id": user_groups.map(u => u._id.toString()) 
       })
-    console.log(`posts: ${JSON.stringify(posts,null,2)}`);
+    //console.log(`posts: ${JSON.stringify(posts,null,2)}`);
     res.send(posts)
   } catch (error) {
     res.status(500).send(error)
