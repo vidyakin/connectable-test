@@ -299,7 +299,7 @@ export default {
     },
     deleteEmployee(empl_data) {
       // Предварительные проверки на самого себя и админа
-      if (this.userIsAdmin) {
+      if (empl_data.is_admin) {
         this.$error({
           centered: true,
           title: "Ошибка при удалении",
