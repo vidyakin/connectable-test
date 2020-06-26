@@ -15,11 +15,11 @@
       :key="index"
     />
 
-    <pre v-if="userIsAdmin">Служебная инфа: 
+    <pre v-if="userIsSuperAdmin">Служебная инфа: 
     $route.params._id = {{$route.params._id}}
 userData: {{JSON.stringify(userData,null,2)}}
 currentUser: {{JSON.stringify(currentUser,null,2)}}
-{{userIsAdmin ? "Есть права администратора" : ""}}
+{{userIsSuperAdmin ? "Есть права супер-админа" : ""}}
     </pre>
   </div>
 </template>
@@ -70,7 +70,14 @@ export default Vue.extend({
     // );
   },
   computed: {
-    ...mapGetters(["posts", "user", "currentUser", "userData", "userIsAdmin"])
+    ...mapGetters([
+      "posts",
+      "user",
+      "currentUser",
+      "userData",
+      "userIsAdmin",
+      "userIsSuperAdmin"
+    ])
   },
   methods: {},
   watch: {
