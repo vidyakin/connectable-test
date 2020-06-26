@@ -156,7 +156,7 @@ export default Vue.extend({
           type: "company",
           id: "0"
         },
-        client_id: user.client_id
+        client_id: userIsSuperAdmin ? currentClient.workspace : user.client_id
       }
     });
     this.$store.dispatch(GET_POSTS_OF_GROUPS, user._id);

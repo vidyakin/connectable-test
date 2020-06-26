@@ -37,6 +37,8 @@ import { mapGetters } from "vuex";
 
 import { LOGOUT } from "@/store/user/actions.type";
 import { ENTER_CLIENT } from "@/store/client/actions.type";
+import { GET_MESSAGES } from "@/store/notification/actions.type";
+
 import { SET_SHOW_IMAGE_HEADER } from "@/store/shower/mutations.type";
 import { SET_CURRENT_CLIENT } from "@/store/client/mutations.type";
 

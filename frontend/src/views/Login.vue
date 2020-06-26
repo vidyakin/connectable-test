@@ -305,7 +305,7 @@ export default Vue.extend({
   watch: {
     errorLogin(val) {
       if (!val) return;
-      this.showErrorUserBlocked();
+      //this.showErrorUserBlocked();
       // this.$error({
       //   centered: true,
       //   title: "Ошибка входа",

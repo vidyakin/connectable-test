@@ -61,43 +61,34 @@ router.post('/register', function(req,res){
           });
       } else {
         status = 200;
-        bcrypt.hash(password, 10, async (err, hash) => {
-          if (err) {
-            next(err);
-          }
-          else {
-            data.password = hash;
-            
-            try {
+        
+        try {
               
-              new_data = await User.create(data)
-              result.id = new_data._id
-              // prepare token
-              const payload = { user: email };
-              const secret = process.env.JWT_SECRET;
-              const token = jwt.sign(payload, secret, {
-                  expiresIn: 86400 // expires in 24 hours
-              });
-              result.token = token;
-             
-            } catch (error) {
-              
-              result.status = 500
-              result.error = "There was a problem registering the user: " + error;
+          new_data = await User.create(data)  // hashing realized in User schema 
+          result.id = new_data._id
+          // prepare token
+          const payload = { user: email };
+          const secret = process.env.JWT_SECRET;
+          const token = jwt.sign(payload, secret, {
+              expiresIn: 86400 // expires in 24 hours
+          });
+          result.token = token;
+         
+        } catch (error) {
+          
+          result.status = 500
+          result.error = "There was a problem registering the user: " + error;
 
-            } finally {
-              
-              result.status = status;
-              res.status(status).send(result);
-            }
-            
-            if (emailSend) {
-                console.log(`>> '/api/register' sending email to ${email}`);
-                mailer.NewUser(email, `https://connectable.pro/login/`, {email:email, password:password});
-            }
-
-          }
-        });
+        } finally {
+          
+          result.status = status;
+          res.status(status).send(result);
+        }
+        
+        if (emailSend) {
+            console.log(`>> '/api/register' sending email to ${email}`);
+            mailer.NewUser(email, `https://connectable.pro/login/`, {email:email, password:password});
+        }
       }
   });
 
@@ -162,7 +153,10 @@ router.post('/loginPage', async function(req,res){
                   console.log('token: ', token);
                   //console.log('user: ', user);
               } else {
-                  result = { status: 202, password, error: 'Authentication error 1' }
+                bcrypt.hash(password, 10, (err,pwd) => {
+                  console.log(`> Пароли не совпадают: введенный: ${password} => ${pwd}, у пользователя: ${user.password}`);
+                })
+                result = { status: 202, password, error: 'Authentication error 1' }
               }
               res.status(result.status).send(result);
           }).catch(error => {
