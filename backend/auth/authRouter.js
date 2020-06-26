@@ -18,9 +18,13 @@ router.post('/test', validateToken, (req, res) => {
 
 router.post('/upload', (req, res, next) => {
   let imageFile = req.files.files;
+  console.log(`req.files.files: ${req.files.files}, process.cwd(): ${process.cwd()}`);
+  
   const fileName = `/public/${Date.now()}${imageFile.name}`;
-  imageFile.mv(`${__dirname}/static${fileName}`, function (err) {
+  imageFile.mv(`${process.cwd()}/static${fileName}`, function (err) {
     if (err) {
+      console.log(`${Date.now()}: Error on upload ${err}`);
+      
       return res.status(500).send(err);
     }
 
