@@ -44,7 +44,7 @@ router.post('/register', function(req,res){
   let result = {};
   let status = 200;
   
-  User.findOne({email}, (err, user) => {
+  User.findOne({email}, async (err, user) => {
       if (!err && user) {
           bcrypt.compare(password, user.password).then(match => {
             if (match) {
@@ -143,7 +143,7 @@ router.post('/loginPage', async function(req,res){
           .then(match => {
               if (match) {
                   user.password = '';
-                  if (isSuperAdmin) user.roles.push('superadmin'); // по идее тут уже в базе будет роль
+                  if (isSuperAdmin && !user.roles.includes('superadmin')) user.roles.push('superadmin'); // по идее тут уже в базе будет роль
                   const payload = {result: user};
                   const secret = process.env.JWT_SECRET;
                   const token = jwt.sign(payload, secret, {

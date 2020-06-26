@@ -8,14 +8,14 @@
     >
       <template slot="extra">
         <a-button key="1" type="primary" @click="newEmployeeOpen">Новый сотрудник</a-button>
-        <a-button key="3" type="success" @click="newEmployeeTest">Тест сообщения</a-button>
+        <!-- <a-button key="3" type="success" @click="newEmployeeTest">Тест сообщения</a-button> -->
         <a-button key="2" @click="reload">Обновить</a-button>
         <!-- <a-button key="2">Operation</a-button>    -->
       </template>
       <a-descriptions size="small" :column="4">
         <a-descriptions-item label="Всего сотрудников">{{employees && employees.length}}</a-descriptions-item>
-        <a-descriptions-item label="Ген.директор">Иванов Борис</a-descriptions-item>
-        <a-descriptions-item label="Зам. директора">Смирнова Светлана</a-descriptions-item>
+        <!-- <a-descriptions-item label="Ген.директор">Иванов Борис</a-descriptions-item>
+        <a-descriptions-item label="Зам. директора">Смирнова Светлана</a-descriptions-item>-->
         <a-descriptions-item label="Показывать удаленных">
           <a-switch size="small" default-checked @change="chkd => {this.showDeleted = chkd}" />
         </a-descriptions-item>
