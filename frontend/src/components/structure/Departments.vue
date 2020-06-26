@@ -338,10 +338,18 @@ export default {
           name: "Главное управление"
         };
         await this.$store.dispatch(SAVE_STRUCTURE, {
-          client_id: client,
+          client_id: client.workspace,
           orgTree: this.chartData
         });
-        await this.$store.dispatch(GET_STRUCTURE, client); // обновление стора надо бы засунуть в SAVE_STRUCTURE
+        await this.$store.dispatch(GET_STRUCTURE, client.workspace); // обновление стора надо бы засунуть в SAVE_STRUCTURE
+      }
+      if (!this.structure._id) {
+        this.$error({
+          title: "Ошибка",
+          content: "Не удалось загрузить данные о структуре",
+          centered: true
+        });
+        return;
       }
       // 0-й элемент потому что пока что возвращается массив ( все схемы ), а будет с отбором по клиенту одна
       this.struct_id = this.structure._id;
