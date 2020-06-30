@@ -105,7 +105,7 @@ export default {
     openNotification() {
       this.$notification["success"]({
         message: `Приглашение отправлено`,
-        description: "Результат приглашения положительный",
+        description: "Пользователь получит сообщение в ленте",
         placement: "topRight"
       });
     }

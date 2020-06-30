@@ -20,5 +20,7 @@ export const CANCEL_INVITE = 'CANCEL_INVITE';
 // сместить владельца групп
 export const REPLACE_GROUPS_OWNER = 'REPLACE_GROUPS_OWNER'
 
+// запросы на вступление в мои группы
+export const GET_REQUESTS_TO_MY_GROUPS = 'GET_REQUESTS_TO_MY_GROUPS'
 
 

@@ -5,12 +5,21 @@
       <a-tab-pane key="1" tab="Компания">
         <app-comment-input
           v-model="content"
-          @pressEnter="sendMessage"
+          @pressEnter="sendCompanyMessage"
           :parent="{type: 'company', id: '0'}"
           v-if="userIsAdmin"
         />
         <div class="company-name">Новости компании {{userIsSuperAdmin ? '(Вы суперадмин)' : ''}}</div>
         <app-post v-for="(post, index) in sortedPosts" :post="post" :key="index" />
+      </a-tab-pane>
+      <!-- Общая лента -->
+      <a-tab-pane key="6" tab="Общая лента" force-render>
+        <app-comment-input
+          v-model="feed_message"
+          @pressEnter="sendFeedMessage"
+          :parent="{type: 'feed', id: '0'}"
+        />
+        <app-post v-for="(post, index) in sortedFeed" :post="post" :key="index" />
       </a-tab-pane>
       <!-- Оповещения системы -->
       <a-tab-pane key="2" force-render>
@@ -18,7 +27,7 @@
           <a-badge
             :count="notifCount"
             title="Есть непрочитанные сообщения"
-          >Мои новости&nbsp;&nbsp;&nbsp;&nbsp;</a-badge>
+          >Оповещения&nbsp;&nbsp;&nbsp;&nbsp;</a-badge>
         </span>
         <NotificationList @count="setNtfCounter" />
       </a-tab-pane>
@@ -49,7 +58,7 @@
           <a-badge
             :count="eventsWithMe.length"
             title="Есть непросмотренные события"
-          >События&nbsp;&nbsp;&nbsp;&nbsp;</a-badge>
+          >События календаря&nbsp;&nbsp;&nbsp;&nbsp;</a-badge>
         </span>
         <div v-for="event in eventsWithMe" :key="event._id" class="event-block">
           <div class="title">{{event.name}}</div>
@@ -86,6 +95,7 @@ export default Vue.extend({
   data() {
     return {
       content: "",
+      feed_message: "",
       arrPosts: [],
       notifCount: 0,
       subsrcCount: 0,
@@ -103,19 +113,29 @@ export default Vue.extend({
     ...mapGetters([
       "userData",
       "users",
-      "posts",
+      "posts_company",
       "posts_of_groups",
+      "posts_of_feed",
+      "posts_of_system",
       "messages",
       "events",
       "currentClient",
       "userIsAdmin",
       "userIsSuperAdmin"
     ]),
+    wsp() {
+      return this.userIsSuperAdmin
+        ? this.currentClient.workspace
+        : this.userData.result.client_id;
+    },
     sortedPosts() {
-      return this.posts.sort(compare);
+      return this.posts_company.sort(compare);
     },
     sortedGroupsPosts() {
       return this.posts_of_groups.sort(compare);
+    },
+    sortedFeed() {
+      return this.posts_of_feed.concat(this.posts_of_system).sort(compare);
     },
     eventsWithMe() {
       const user = this.userData.result;
@@ -127,8 +147,11 @@ export default Vue.extend({
     }
   },
   methods: {
-    sendMessage() {
-      console.log(this.newPostMessage);
+    sendCompanyMessage() {
+      //console.log(this.newPostMessage);
+    },
+    sendFeedMessage() {
+      console.log(this.feed_message);
     },
     tabPageChange(key) {
       console.log("Panel key is", key);
@@ -149,16 +172,14 @@ export default Vue.extend({
   },
   beforeMount() {
     const user = this.userData.result;
-    this.$store.dispatch(GET_USERS, user.client_id);
+    this.$store.dispatch(GET_USERS, this.wsp);
     this.$store.dispatch(GET_POSTS, {
       filter: {
-        parent: {
-          type: "company",
-          id: "0"
-        },
-        client_id: this.userIsSuperAdmin
-          ? this.currentClient.workspace
-          : user.client_id
+        // parent: {
+        //   type: "company",
+        //   id: "0"
+        // },
+        client_id: this.wsp
       }
     });
     this.$store.dispatch(GET_POSTS_OF_GROUPS, user._id);

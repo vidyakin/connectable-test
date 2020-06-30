@@ -45,10 +45,7 @@ export default {
       isLoaded: false,
       groupsData: [],
       searchText: "",
-      filterData: [],
-      datauser: store.getters.userData
-        ? store.getters.userData.result
-        : store.getters.user
+      filterData: []
     };
   },
   methods: {

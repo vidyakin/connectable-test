@@ -27,6 +27,10 @@ module.exports.findRequestsByGroupId = async (groupId) => {
   })
 };
 
+/**
+ * Groups that user can see
+ * @param {string} userId 
+ */
 module.exports.findGroupsByUserId = async (userId) => {
   try {
     const user = await User.findOne({_id: userId})

@@ -10,7 +10,7 @@
         <div>
           <div
             class="post-wrapper-header-author"
-          >{{ post.author.firstName + ' ' + post.author.lastName }}</div>
+          >{{ post.author == "system" ? "Системное оповещение" : post.author.firstName + ' ' + post.author.lastName }}</div>
           <div class="post-wrapper-header-time">
             {{ post && getMomentTime(post.created) }}
             <span
@@ -20,7 +20,11 @@
         </div>
       </div>
       <div class="post-wrapper-content">
-        <div>{{ post && post.message }}</div>
+        <div v-if="post && post.parent.type == 'system.GROUPS.NEW_USER'">
+          <router-link :to="'/profile/'+post.parent.user.id">{{post.parent.user.name}}</router-link>&nbsp;добавлен в группу
+          <router-link :to="'/group/'+post.parent.group.id">{{post.parent.group.name}}</router-link>
+        </div>
+        <div v-else>{{ post && post.message }}</div>
         <img
           :src="post && post.attachment && post.attachment[0].src"
           alt

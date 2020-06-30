@@ -11,14 +11,15 @@ import {
   DELETE_LIKE,
   DELETE_COMMENT,
   EDIT_COMMENT,
-  GET_POSTS_OF_GROUPS,
+  GET_POSTS_OF_GROUPS
 } from '@/store/post/actions.type';
 
 import { } from '@/store/post/actions.type';
 import {
   deletePost, editPost, getPosts, getPost, repost,
   getPostsOfFollows, getPostsOfuserGroups,
-  sendComment, sendLike, sendNewPost, dislike, editComment, deleteComment
+  sendComment, sendLike, sendNewPost,
+  dislike, editComment, deleteComment
 } from '@/services/post.service';
 
 import {
@@ -28,7 +29,8 @@ import {
   ADD_LIKE_FOR_POST,
   ADD_POST, CHANGE_POST, CHANGE_COMMENT, CHANGE_ANSWER,
   REMOVE_POST, SET_EDIT_POST_VISIBLE, SET_POST_FOR_EDITING, SET_EDIT_COMMENT_VISIBLE, SET_COMMENT_FOR_EDITING,
-  SET_POSTS, SET_POSTS_OF_FOLLOWS, SET_POSTS_OF_GROUPS, SET_POST, REMOVE_COMMENT, REMOVE_ANSWER,
+  SET_POSTS, SET_POSTS_OF_FOLLOWS, SET_POSTS_OF_GROUPS, SET_POST,
+  REMOVE_COMMENT, REMOVE_ANSWER,
 } from '@/store/post/mutations.type';
 import { DELETE_EVENT } from '@/store/user/actions.type';
 
@@ -78,11 +80,20 @@ const getters = {
   editCommVisible(state: State) {
     return state.editCommVisible;
   },
+  posts_company(state: State) {
+    return state.posts.filter(p => p.parent.type == 'company')
+  },
   posts_of_follows(state: State) {
     return state.posts_of_follows
   },
   posts_of_groups(state: State) {
     return state.posts_of_groups
+  },
+  posts_of_feed(state: State) {
+    return state.posts.filter(p => p.parent.type == 'feed')
+  },
+  posts_of_system(state: State) {
+    return state.posts.filter(p => p.author == 'system')
   }
 };
 
