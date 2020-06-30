@@ -104,10 +104,10 @@ const getters = {
     return state.userData;
   },
   userIsSuperAdmin(state: State) {
-    return state.userData && state.userData.result.roles.includes('superadmin')
+    return state.userData?.result.roles.includes('superadmin')
   },
   userIsAdmin(state: State) {
-    const roles = state.userData.result.roles
+    const roles = state.userData?.result.roles
     return roles.includes('admin') || roles.includes('superadmin')
   },
   userHasRole(state: State, role: string) {

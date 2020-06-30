@@ -6,6 +6,7 @@ import {
   SET_GROUPS, SET_INVITE,
   SET_PARTICIPANTS_REQUEST,
   UPDATE_GROUP,
+  SET_REQUESTS,
 } from '@/store/group/mutations.type';
 import { GET_CURRENT_GROUP } from '@/store/group/actions.type';
 
@@ -120,3 +121,11 @@ export const replaceGroupsOwner = (context: any, userId: string) => {
   return Vue.axios
     .post(`api/group/replace_owner/${userId}`);
 };
+
+export const getRequests = (context: any, userId: string) => {
+  return Vue.axios
+    .get(`api/group/requests/${userId}`)
+    .then((response: any) => {
+      context.commit(SET_REQUESTS, response.data);
+    });
+}

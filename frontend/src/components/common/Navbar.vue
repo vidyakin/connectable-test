@@ -186,7 +186,7 @@ export default {
     userKey: function() {
       return (
         (this.userData &&
-          this.userData.result !== undefined &&
+          this.userData.result &&
           `/profile/${this.userData.result._id}`) ||
         "nouser"
       );

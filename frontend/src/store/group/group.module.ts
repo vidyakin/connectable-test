@@ -7,7 +7,8 @@ import {
   EDIT_GROUP,
   GET_CURRENT_GROUP,
   GET_GROUPS, GET_GROUPS_BY_CLIENT, GET_INVITE, GET_PARTICIPANTS_REQUEST,
-  REPLACE_GROUPS_OWNER
+  REPLACE_GROUPS_OWNER,
+  GET_REQUESTS_TO_MY_GROUPS
 } from '@/store/group/actions.type';
 import {
   approveInvite,
@@ -18,7 +19,8 @@ import {
   editGroup,
   getCurrentGroup,
   getGroups, getGroupsByClient, getInvite, getParticipantsRequest,
-  replaceGroupsOwner
+  replaceGroupsOwner,
+  getRequests
 } from '@/services/group.service';
 import {
   ADD_GROUP,
@@ -27,6 +29,7 @@ import {
   SET_GROUPS, SET_INVITE,
   SET_PARTICIPANTS_REQUEST,
   UPDATE_GROUP,
+  SET_REQUESTS
 } from '@/store/group/mutations.type';
 
 interface State {
@@ -34,6 +37,7 @@ interface State {
   currentGroup: any;
   participantsRequest: boolean | null;
   invite: any | null;
+  requests: any[]
 }
 
 const store: State = {
@@ -41,6 +45,7 @@ const store: State = {
   currentGroup: null,
   participantsRequest: null,
   invite: null,
+  requests: []
 };
 
 const getters = {
@@ -56,6 +61,9 @@ const getters = {
   invite(state: State) {
     return state.invite;
   },
+  requests(state: State) {
+    return state.requests
+  }
 };
 
 const actions = {
@@ -68,13 +76,13 @@ const actions = {
   [CREATE_PARTICIPANT]: createParticipant,
   [GET_PARTICIPANTS_REQUEST]: getParticipantsRequest,
   [APPROVE_PARTICIPANTS_REQUEST]: approveParticipantsRequest,
-  [APPROVE_PARTICIPANTS_REQUEST]: approveParticipantsRequest,
   [DELETE_PARTICIPANT]: deleteParticipant,
   [CREATE_INVITE]: createInvite,
   [GET_INVITE]: getInvite,
   [APPROVE_INVITE]: approveInvite,
   [CANCEL_INVITE]: cancelInvite,
-  [REPLACE_GROUPS_OWNER]: replaceGroupsOwner
+  [REPLACE_GROUPS_OWNER]: replaceGroupsOwner,
+  [GET_REQUESTS_TO_MY_GROUPS]: getRequests
 };
 
 const mutations = {
@@ -106,6 +114,9 @@ const mutations = {
   [SET_INVITE](state: State, invite: any) {
     state.invite = invite;
   },
+  [SET_REQUESTS](state: State, requests: any[]) {
+    state.requests = requests
+  }
 };
 
 export default {

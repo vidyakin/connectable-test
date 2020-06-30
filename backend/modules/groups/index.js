@@ -1,8 +1,12 @@
+const User = require('../../models/user')
 const Group = require('../../models/group')
 const GroupParticipant = require('../../models/groupParticipant')
+const GroupInvite = require('../../models/groupInvite')
 const groupSerializer = require('../../serializers/groupSerializer').groupSerializer;
 
-const groupParticipantDAO = require('../../dao/group-participant-dao')
+const groupParticipantDAO = require('../../dao/group-participant-dao');
+const { Post } = require('../../models');
+const { reset_password } = require('../../email');
 
 /**
  * Common way for CRUD the model
@@ -36,16 +40,38 @@ router.get('/:groupId/checkParticipant/:participantId', (req, res, next) => {
   })
 });
 
-router.post('/:groupId/approveParticipant/:participantId', (req, res, next) => {
+router.post('/:groupId/approveParticipant/:participantId', async (req, res) => {
   const {participantId, groupId} = req.params;
-  GroupParticipant.updateMany({participantId, groupId}, {approved: true}, (e, data) => {
-    if (e) {
-      res.status(500).send();
-    } else {
-      res.status(200).send();
-    }
+  
+  try {
+    const group = await Group.findById(groupId)
+    const new_participant = await User.findById(participantId)
+    const result = await GroupParticipant.updateOne({participantId, groupId}, {approved: true})
+    if (!result.nModified) return res.status(422).send({status: "No one GroupParticipant was updated"})
+    // TODO: refactor after change schema "Group"
+    // group.participants.push(new_participant)
+    // group.save()
+    // res.send({status: "User is now the participant of the group"})
 
-  })
+    const info_post = {
+      message: `${new_participant.firstName} ${new_participant.lastName} добавлен в группу ${group.name}`,
+      parent: { 
+        type: "system.GROUPS.NEW_USER", 
+        group: { id: groupId, name: group.name },
+        user: { id: participantId, name: new_participant.firstName + ' ' + new_participant.lastName }
+      },
+      author: "system",
+      client_id: group.client_id
+    }
+    await Post.create(info_post)
+    console.log(`info post was created`);
+    
+    res.send({status: "OK"})
+
+  } catch (error) {
+    console.log('Error in approveParticipant: ',error);
+    res.status(500).send({error})
+  }
 });
 
 router.post('/approveInvite/:inviteId', (req, res, next) => {
@@ -139,7 +165,6 @@ router.put('/chng_all/client', async (req,res) => {
   } catch (error) {
     res.status(500).send(error)
   }
-  
 })
 
 /**
@@ -158,5 +183,13 @@ router.put('/:group_id/client', async (req,res) => {
   
 })
 
+/**
+ * Get requests for user
+ */
+router.get('/requests/:user_id', async (req, res) => {
+  const groups = await Group.find({creatorId: req.params.user_id})
+  const reqs = await GroupParticipant.find({approved: false, groupId: {$in: groups.map(g => g._id.toString())}})
+  res.send(reqs)
+})
 
 module.exports = router

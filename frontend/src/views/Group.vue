@@ -309,6 +309,8 @@ export default {
       this.$store.dispatch(APPROVE_PARTICIPANTS_REQUEST, {
         groupId: this.currentGroup._id,
         participantId
+      }).then(() => {
+        
       });
     },
     deleteParticipant(participantId) {
