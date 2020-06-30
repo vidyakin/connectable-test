@@ -46,7 +46,7 @@ router.post('/:groupId/approveParticipant/:participantId', async (req, res) => {
   try {
     const group = await Group.findById(groupId)
     const new_participant = await User.findById(participantId)
-    const result = await GroupParticipant.updateOne({participantId, groupId}, {approved: true})
+    const result = await GroupParticipant.updateOne({participantId, groupId, approved: false}, {approved: true})
     if (!result.nModified) return res.status(422).send({status: "No one GroupParticipant was updated"})
     // TODO: refactor after change schema "Group"
     // group.participants.push(new_participant)
@@ -180,16 +180,32 @@ router.put('/:group_id/client', async (req,res) => {
   } catch (error) {
     res.status(500).send(error)
   }
-  
 })
 
 /**
  * Get requests for user
  */
 router.get('/requests/:user_id', async (req, res) => {
+  // TODO: после рефакторинга через ссылки на объекты переделать на populate 
   const groups = await Group.find({creatorId: req.params.user_id})
   const reqs = await GroupParticipant.find({approved: false, groupId: {$in: groups.map(g => g._id.toString())}})
-  res.send(reqs)
+  try {
+    const data = await Promise.all(reqs.map(async r => {
+      const group = await Group.findById(r.groupId).select('name');
+      const user = await User.findById(r.participantId).select('firstName lastName googleImage positions')
+      return {
+        groupId: r.groupId,
+        userId: r.participantId,
+        groupName: group.name,
+        userName: user.firstName + ' ' + user.lastName,
+        googleImage: user.googleImage || "",
+        positions: user.positions.join(',')
+      }
+    }))
+    res.send(data)
+  } catch (error) {
+    res.status(522).send(error)
+  }  
 })
 
 module.exports = router

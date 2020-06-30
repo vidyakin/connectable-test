@@ -70,6 +70,50 @@
         </div>
         <!-- <SubscriptionList @count="setSubscrCounter" :user="userData.result._id" /> -->
       </a-tab-pane>
+      <!-- Заявки на вступление в группы -->
+      <a-tab-pane key="7" force-render>
+        <span slot="tab">
+          <a-badge
+            :count="eventsWithMe.length"
+            title="Есть непросмотренные заявки"
+          >Заявки в группы&nbsp;&nbsp;&nbsp;&nbsp;</a-badge>
+        </span>
+        <div v-for="req in group_requests" :key="req.userId+req.groupId" class="post-wrapper">
+          <div class="post-wrapper-body">
+            <div class="post-wrapper-header">
+              <div class="post-wrapper-header-photo">
+                <a-avatar
+                  :src="(req.googleImage ? req.googleImage : require('../assets/no_image.png'))"
+                />
+              </div>
+              <div>
+                <div class="post-wrapper-header-author">Заявка на вступление в группу</div>
+                <div class="post-wrapper-header-time">Время создания заявки</div>
+              </div>
+            </div>
+            <div class="post-wrapper-content">
+              <div style="padding: 10px">
+                <router-link :to="'/profile/'+req.userId">{{req.userName}}</router-link>&nbsp;подал заявку на вступление в группу
+                <router-link :to="'/group/'+req.group">{{req.groupName}}</router-link>
+              </div>
+              <div class="req-buttons" style="padding: 0 10px">
+                <a-button
+                  type="primary"
+                  icon="check"
+                  @click="approve(req.groupId, req.userId)"
+                  style="margin-right: 10px;"
+                >Одобрить</a-button>
+                <a-button
+                  type="danger"
+                  icon="close"
+                  @click="deleteParticipant(req.groupId, req.userId)"
+                >Отклонить</a-button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- <SubscriptionList @count="setSubscrCounter" :user="userData.result._id" /> -->
+      </a-tab-pane>
     </a-tabs>
   </div>
 </template>
@@ -79,6 +123,11 @@ import Vue from "vue";
 import { mapGetters } from "vuex";
 import { GET_POSTS, GET_POSTS_OF_GROUPS } from "@/store/post/actions.type";
 import { GET_EVENTS, GET_USERS } from "@/store/user/actions.type";
+import {
+  GET_REQUESTS_TO_MY_GROUPS,
+  APPROVE_PARTICIPANTS_REQUEST,
+  DELETE_PARTICIPANT
+} from "@/store/group/actions.type";
 import AppCommentInput from "@/components/common/CommentInput";
 import NotificationList from "@/components/Company/NotificationList";
 import SubscriptionList from "@/components/Company/SubscriptionList";
@@ -119,6 +168,7 @@ export default Vue.extend({
       "posts_of_system",
       "messages",
       "events",
+      "group_requests",
       "currentClient",
       "userIsAdmin",
       "userIsSuperAdmin"
@@ -168,22 +218,78 @@ export default Vue.extend({
       return user == undefined
         ? "Пользователь не найден"
         : user.firstName + " " + user.lastName;
+    },
+    // для заявок
+    approve(groupId, participantId) {
+      this.$store
+        .dispatch(APPROVE_PARTICIPANTS_REQUEST, {
+          groupId,
+          participantId
+        })
+        .then(() =>
+          this.$notification["success"]({
+            placement: "topRight",
+            message: "Запрос одобрен",
+            description: "Вступление в группу одобрено"
+          })
+        )
+        .then(() => this.checkParticipants());
+    },
+    deleteParticipant(groupId, participantId) {
+      this.$store
+        .dispatch(DELETE_PARTICIPANT, {
+          groupId,
+          participantId
+        })
+        .then(() =>
+          this.$notification["info"]({
+            placement: "topRight",
+            message: "Запрос отклонен",
+            description: "Вступление в группу отклонено"
+          })
+        )
+        .then(() => this.checkParticipants());
+    },
+    checkParticipants() {
+      if (this.userData) {
+        this.$store.dispatch(
+          GET_REQUESTS_TO_MY_GROUPS,
+          this.userData.result._id
+        );
+      }
     }
   },
   beforeMount() {
     const user = this.userData.result;
-    this.$store.dispatch(GET_USERS, this.wsp);
-    this.$store.dispatch(GET_POSTS, {
-      filter: {
-        // parent: {
-        //   type: "company",
-        //   id: "0"
-        // },
-        client_id: this.wsp
-      }
+    Promise.all([
+      this.$store.dispatch(GET_USERS, this.wsp).then(d => {
+        console.log("DISP: Users");
+      }),
+      this.$store
+        .dispatch(GET_POSTS, {
+          filter: {
+            // parent: {
+            //   type: "company",
+            //   id: "0"
+            // },
+            client_id: this.wsp
+          }
+        })
+        .then(d => {
+          console.log("DISP: Posts");
+        }),
+      this.$store.dispatch(GET_POSTS_OF_GROUPS, user._id).then(d => {
+        console.log("DISP: Post of groups");
+      }),
+      this.$store.dispatch(GET_EVENTS, user.email).then(d => {
+        console.log("DISP: Events");
+      }),
+      this.$store.dispatch(GET_REQUESTS_TO_MY_GROUPS, user._id).then(d => {
+        console.log("DISP: Reqs");
+      })
+    ]).finally(_ => {
+      console.log("All dispatch ended");
     });
-    this.$store.dispatch(GET_POSTS_OF_GROUPS, user._id);
-    this.$store.dispatch(GET_EVENTS, user.email);
   },
   watch: {
     // posts(val) {

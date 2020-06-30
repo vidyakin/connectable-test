@@ -61,7 +61,7 @@ const getters = {
   invite(state: State) {
     return state.invite;
   },
-  requests(state: State) {
+  group_requests(state: State) {
     return state.requests
   }
 };
