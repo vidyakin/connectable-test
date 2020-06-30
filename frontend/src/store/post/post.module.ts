@@ -87,7 +87,7 @@ const getters = {
     return state.posts_of_follows
   },
   posts_of_groups(state: State) {
-    return state.posts_of_groups
+    return state.posts.filter(p => p.parent.type == 'group') //posts_of_groups
   },
   posts_of_feed(state: State) {
     return state.posts.filter(p => p.parent.type == 'feed')
@@ -122,7 +122,7 @@ const mutations = {
     state.posts_of_follows = posts;
   },
   [SET_POSTS_OF_GROUPS](state: State, posts: any[]) {
-    state.posts_of_groups = posts;
+    state.posts = [...state.posts, posts];
   },
 
   [SET_POST](state: State, post: any[]) {

@@ -278,9 +278,9 @@ export default Vue.extend({
         .then(d => {
           console.log("DISP: Posts");
         }),
-      this.$store.dispatch(GET_POSTS_OF_GROUPS, user._id).then(d => {
-        console.log("DISP: Post of groups");
-      }),
+      // this.$store.dispatch(GET_POSTS_OF_GROUPS, user._id).then(d => {
+      //   console.log("DISP: Post of groups");
+      // }),
       this.$store.dispatch(GET_EVENTS, user.email).then(d => {
         console.log("DISP: Events");
       }),
