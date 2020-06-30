@@ -96,7 +96,9 @@ export default {
   },
   beforeCreate() {},
   mounted() {
-    this.$store.dispatch(GET_USERS, this.currentClient.workspace);
+    if (this.currentClient) {
+      this.$store.dispatch(GET_USERS, this.currentClient.workspace);
+    }
     //this.imgEmpty = Empty.PRESENTED_IMAGE_SIMPLE;
   },
   watch: {
