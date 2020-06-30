@@ -134,7 +134,8 @@ app.get('/api/post/group/user/:user_id', async (req,res) => {
   // 3rd - find all groups that user can see messages - open groups and groups as participant, not own groups
   const user_groups = await Group.find({
       client_id: user.client_id, 
-      creatorId: {"$ne": user._id}, 
+      // собственные группы исключать?
+      //creatorId: {"$ne": user._id}, 
       _id: { $in: groupIds}
     })
   // 3rd - post in that groups
