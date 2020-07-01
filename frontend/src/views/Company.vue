@@ -94,7 +94,7 @@
             <div class="post-wrapper-content">
               <div style="padding: 10px">
                 <router-link :to="'/profile/'+req.userId">{{req.userName}}</router-link>&nbsp;подал заявку на вступление в группу
-                <router-link :to="'/group/'+req.group">{{req.groupName}}</router-link>
+                <router-link :to="'/group/'+req.groupId">{{req.groupName}}</router-link>
               </div>
               <div class="req-buttons" style="padding: 0 10px">
                 <a-button
