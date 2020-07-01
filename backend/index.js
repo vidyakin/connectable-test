@@ -152,6 +152,19 @@ app.get('/api/post/group/user/:user_id', async (req,res) => {
   }
 })
 
+app.get('/api/post/comments/new_user/:user_id', async (req,res) => {
+    try {
+        const posts = await Post.find({"parent.type": "system.GROUPS.NEW_USER", "parent.user.id": req.params.user_id}).select('_id')
+        const comments = await Comment
+            .find({"parent.id": {$in: posts.map(p => p._id.toString())}})
+            .select('parent.id author.id author.firstName author.lastName message created')
+            .lean()
+        res.send(comments.map(c => ({...c, type: "GROUPS.NEW_USER"})))
+    } catch (error) {
+        res.status(522).send(error)
+    }    
+})
+
 //register form
 const mongoose = require('mongoose');
 

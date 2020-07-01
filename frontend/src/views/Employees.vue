@@ -66,7 +66,6 @@
         </a-dropdown>
       </span>
     </a-table>
-    <pre style="font-size:8pt !important; height: 300px">{{JSON.stringify(userData.result._id,null,2)}}</pre>
     <!-- Модальное окно создания сотрудника -->
     <add-employee-modal :visible="newEmplVisible" :close="newEmplClose" @create="createEmployee" />
   </div>
@@ -177,6 +176,11 @@ export default {
           newempl ? newempl.length : "null"
         }!`
       );
+    },
+    currentClient(client) {
+      if (client) {
+        this.$store.dispatch(GET_USERS, client.workspace);
+      }
     }
   },
   methods: {
@@ -247,7 +251,6 @@ export default {
             });
             return;
           }
-          //console.log("Сount of users before GET_USERS: " + this.users.length);
           // объект-модель для сохранения в БД
           const newMsg = this.newMsgForEmpl(
             `${empl_data.name} ${empl_data.surname}`,
@@ -413,7 +416,7 @@ export default {
       }
     }
   },
-  created() {
+  mounted() {
     if (this.currentClient) {
       this.$store.dispatch(GET_USERS, this.currentClient.workspace);
     }

@@ -16,7 +16,8 @@ export const CHANGE_POST = 'CHANGE_POST';
 export const CHANGE_COMMENT = 'CHANGE_COMMENT';
 export const CHANGE_ANSWER = 'CHANGE_ANSWER';
 
-
+// комментарии, которые надо показывать отдельно, в отдельных лентах (или ленте)
+export const SET_COMMENTS_FEED = 'SET_COMMENTS_FEED'
 
 export const SET_POST_FOR_EDITING = 'SET_POST_FOR_EDITING';
 export const SET_COMMENT_FOR_EDITING = 'SET_COMMENT_FOR_EDITING';

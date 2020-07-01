@@ -11,7 +11,8 @@ import {
   DELETE_LIKE,
   DELETE_COMMENT,
   EDIT_COMMENT,
-  GET_POSTS_OF_GROUPS
+  GET_POSTS_OF_GROUPS,
+  GET_COMMENTS_ABOUT_MY_ONBOARD
 } from '@/store/post/actions.type';
 
 import { } from '@/store/post/actions.type';
@@ -19,7 +20,7 @@ import {
   deletePost, editPost, getPosts, getPost, repost,
   getPostsOfFollows, getPostsOfuserGroups,
   sendComment, sendLike, sendNewPost,
-  dislike, editComment, deleteComment
+  dislike, editComment, deleteComment, getCommentsAboutMyOnboarding
 } from '@/services/post.service';
 
 import {
@@ -31,6 +32,7 @@ import {
   REMOVE_POST, SET_EDIT_POST_VISIBLE, SET_POST_FOR_EDITING, SET_EDIT_COMMENT_VISIBLE, SET_COMMENT_FOR_EDITING,
   SET_POSTS, SET_POSTS_OF_FOLLOWS, SET_POSTS_OF_GROUPS, SET_POST,
   REMOVE_COMMENT, REMOVE_ANSWER,
+  SET_COMMENTS_FEED
 } from '@/store/post/mutations.type';
 import { DELETE_EVENT } from '@/store/user/actions.type';
 
@@ -40,6 +42,7 @@ interface State {
   posts_of_groups: any[],
   currentPost: any,
   comments: any[];
+  comments_feed: any[],
   postForEditing: any;
   commentForEditing: any;
   editPostVisible: boolean;
@@ -52,6 +55,7 @@ const store: State = {
   posts_of_groups: [],
   currentPost: null,
   comments: [],
+  comments_feed: [],
   postForEditing: null,
   commentForEditing: null,
   editPostVisible: false,
@@ -67,6 +71,9 @@ const getters = {
   },
   comments(state: State) {
     return state.comments;
+  },
+  comments_feed(state: State) {
+    return state.comments_feed;
   },
   postForEditing(state: State) {
     return state.postForEditing;
@@ -110,7 +117,8 @@ const actions = {
   [DELETE_COMMENT]: deleteComment,
   [REPOST]: repost,
   [EDIT_POST]: editPost,
-  [EDIT_COMMENT]: editComment
+  [EDIT_COMMENT]: editComment,
+  [GET_COMMENTS_ABOUT_MY_ONBOARD]: getCommentsAboutMyOnboarding
 };
 
 const mutations = {
@@ -236,6 +244,9 @@ const mutations = {
   [SET_EDIT_COMMENT_VISIBLE](state: State, visible: any) {
     state.editCommVisible = visible;
   },
+  [SET_COMMENTS_FEED](state: State, data: any) {
+    state.comments_feed = data
+  }
 };
 
 export default {

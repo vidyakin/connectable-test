@@ -13,3 +13,6 @@ export const SEND_COMMENT = 'SEND_COMMENT';
 export const REPOST = 'REPOST';
 export const EDIT_POST = 'EDIT_POST';
 export const EDIT_COMMENT = 'EDIT_COMMENT';
+
+// Комментарии к посту что я новый сотрудник
+export const GET_COMMENTS_ABOUT_MY_ONBOARD = 'GET_COMMENTS_ABOUT_MY_ONBOARD'

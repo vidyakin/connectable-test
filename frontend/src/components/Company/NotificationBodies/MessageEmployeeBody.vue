@@ -1,6 +1,6 @@
 <template>
   <div>
-    <router-link :to="'/user/'+id">{{name}}</router-link>, добро пожаловать в команду!
+    <router-link :to="'/profile/'+id">{{name}}</router-link>, добро пожаловать в команду!
   </div>
 </template>
 
