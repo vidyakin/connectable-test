@@ -74,7 +74,7 @@
       <a-tab-pane key="7" force-render>
         <span slot="tab">
           <a-badge
-            :count="eventsWithMe.length"
+            :count="group_requests.length"
             title="Есть непросмотренные заявки"
           >Заявки в группы&nbsp;&nbsp;&nbsp;&nbsp;</a-badge>
         </span>
@@ -114,6 +114,23 @@
         </div>
         <!-- <SubscriptionList @count="setSubscrCounter" :user="userData.result._id" /> -->
       </a-tab-pane>
+      <a-tab-pane key="8" force-render>
+        <span slot="tab">
+          <a-badge
+            :count="comments_feed.length"
+            title="Есть непросмотренные комментарии"
+          >Комментарии&nbsp;&nbsp;&nbsp;&nbsp;</a-badge>
+        </span>
+        <div v-for="comment in comments_feed" :key="comment._id" class="comment">
+          <div
+            class="comment-type"
+          >{{comment.type == "GROUPS.NEW_USER" ? "Я - новый сотрудник" : ""}}</div>
+          <div class="comment-head">
+            <span class="comment-head-name">{{comment.author.firstName}} {{comment.author.lastName}}</span>&nbsp;добавил комментарий:
+          </div>
+          <div class="comment-body">{{comment.message}}</div>
+        </div>
+      </a-tab-pane>
     </a-tabs>
   </div>
 </template>
@@ -121,7 +138,11 @@
 <script>
 import Vue from "vue";
 import { mapGetters } from "vuex";
-import { GET_POSTS, GET_POSTS_OF_GROUPS } from "@/store/post/actions.type";
+import {
+  GET_POSTS,
+  GET_POSTS_OF_GROUPS,
+  GET_COMMENTS_ABOUT_MY_ONBOARD
+} from "@/store/post/actions.type";
 import { GET_EVENTS, GET_USERS } from "@/store/user/actions.type";
 import {
   GET_REQUESTS_TO_MY_GROUPS,
@@ -166,6 +187,7 @@ export default Vue.extend({
       "posts_of_groups",
       "posts_of_feed",
       "posts_of_system",
+      "comments_feed",
       "messages",
       "events",
       "group_requests",
@@ -262,31 +284,22 @@ export default Vue.extend({
   beforeMount() {
     const user = this.userData.result;
     Promise.all([
-      this.$store.dispatch(GET_USERS, this.wsp).then(d => {
-        console.log("DISP: Users");
+      this.$store.dispatch(GET_USERS, this.wsp),
+      this.$store.dispatch(GET_POSTS, {
+        filter: {
+          // parent: {
+          //   type: "company",
+          //   id: "0"
+          // },
+          client_id: this.wsp
+        }
       }),
-      this.$store
-        .dispatch(GET_POSTS, {
-          filter: {
-            // parent: {
-            //   type: "company",
-            //   id: "0"
-            // },
-            client_id: this.wsp
-          }
-        })
-        .then(d => {
-          console.log("DISP: Posts");
-        }),
       // this.$store.dispatch(GET_POSTS_OF_GROUPS, user._id).then(d => {
       //   console.log("DISP: Post of groups");
       // }),
-      this.$store.dispatch(GET_EVENTS, user.email).then(d => {
-        console.log("DISP: Events");
-      }),
-      this.$store.dispatch(GET_REQUESTS_TO_MY_GROUPS, user._id).then(d => {
-        console.log("DISP: Reqs");
-      })
+      this.$store.dispatch(GET_EVENTS, user.email),
+      this.$store.dispatch(GET_REQUESTS_TO_MY_GROUPS, user._id),
+      this.$store.dispatch(GET_COMMENTS_ABOUT_MY_ONBOARD, user._id)
     ]).finally(_ => {
       console.log("All dispatch ended");
     });
@@ -339,6 +352,30 @@ export default Vue.extend({
   .title {
     font-size: 14pt;
     font-weight: bold;
+  }
+}
+
+.comment {
+  box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.04);
+  background-color: white;
+  &-type {
+    font-size: 9pt;
+    background-color: lavender;
+    font-weight: bold;
+    padding-left: 10px;
+  }
+  &-head {
+    margin: 5px 10px;
+
+    &-name {
+      font-weight: bold;
+    }
+  }
+  &-body {
+    font-size: 10pt;
+    font-style: italic;
+    margin: 5px 10px;
+    padding-bottom: 10px;
   }
 }
 </style>

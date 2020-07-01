@@ -108,7 +108,7 @@ const getters = {
   },
   userIsAdmin(state: State) {
     const roles = state.userData?.result.roles
-    return roles.includes('admin') || roles.includes('superadmin')
+    return roles?.includes('admin') || roles?.includes('superadmin')
   },
   userHasRole(state: State, role: string) {
     return state.userData?.roles.includes(role)

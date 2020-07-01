@@ -11,7 +11,8 @@ import {
   SET_POST,
   SET_POSTS,
   SET_POSTS_OF_FOLLOWS,
-  SET_POSTS_OF_GROUPS
+  SET_POSTS_OF_GROUPS,
+  SET_COMMENTS_FEED
 } from '@/store/post/mutations.type';
 
 export const sendNewPost = (context: any, post: any) => {
@@ -136,8 +137,6 @@ export const deletePost = (context: any, postId: number) => {
     });
 };
 export const deleteComment = (context: any, commentId: any) => {
-  console.log(commentId);
-
   return Vue.axios
     .delete('api/comment/' + commentId._id)
     .then((response: any) => {
@@ -150,3 +149,10 @@ export const deleteComment = (context: any, commentId: any) => {
     });
 };
 
+export const getCommentsAboutMyOnboarding = (context: any, user_id: string) => {
+  return Vue.axios
+    .get('/api/post/comments/new_user/' + user_id)
+    .then((response: any) => {
+      context.commit(SET_COMMENTS_FEED, response.data)
+    })
+}
