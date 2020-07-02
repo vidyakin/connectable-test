@@ -75,13 +75,21 @@ router.get('/comments_feed/:user_id', async (req,res) => {
     // 2. Комментарии в блоге пользователя
     const obj = { type: "user", id: req.params.user_id}
     posts = await Post.find({parent: {$eq: obj} }).select("_id")
-    console.log(`posts: ${posts}`);
     
     const comments_blog =  await Comment
       .find({"parent.id": { $in: posts.map(p => p._id.toString()) }})
       .select('parent.id author.id author.firstName author.lastName message created')
       .lean()
     comments = comments.concat(comments_blog.map(c => ({...c, type: "USER.BLOG"})))
+    
+    // 3. Комментарии к постам юзера на стене
+    posts = await Post.find({"parent.type": "feed", "author._id": req.params.user_id }).select("_id")
+    const comments_feed =  await Comment
+      .find({"parent.id": { $in: posts.map(p => p._id.toString()) }})
+      .select('parent.id author.id author.firstName author.lastName message created')
+      .lean()
+    comments = comments.concat(comments_feed.map(c => ({...c, type: "USER.FEED"})))
+
     res.send(comments)
   } catch (error) {
     res.status(522).send(error)

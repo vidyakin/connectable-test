@@ -127,6 +127,10 @@
             class="comment-type new-user"
           >Я - новый сотрудник</div>
           <div v-else-if="comment.type == 'USER.BLOG'" class="comment-type user-blog">Запись в блоге</div>
+          <div
+            v-else-if="comment.type == 'USER.FEED'"
+            class="comment-type user-feed"
+          >Запись на стене</div>
           <div v-else>Тип записи с комментарием не определен</div>
           <div class="comment-head">
             <span class="comment-head-name">{{comment.author.firstName}} {{comment.author.lastName}}</span>&nbsp;добавил комментарий:
@@ -370,6 +374,9 @@ export default Vue.extend({
     }
     &.user-blog {
       background-color: lightpink;
+    }
+    &.user-feed {
+      background-color: lightskyblue;
     }
   }
   &-head {
