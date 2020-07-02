@@ -90,6 +90,14 @@ router.get('/comments_feed/:user_id', async (req,res) => {
       .lean()
     comments = comments.concat(comments_feed.map(c => ({...c, type: "USER.FEED"})))
 
+    // 4. Комментарии к постам юзера в группах
+    posts = await Post.find({"parent.type": "group", "author._id": req.params.user_id }).select("_id")
+    const comments_groups =  await Comment
+      .find({"parent.id": { $in: posts.map(p => p._id.toString()) }})
+      .select('parent.id author.id author.firstName author.lastName message created')
+      .lean()
+    comments = comments.concat(comments_groups.map(c => ({...c, type: "USER.GROUP"})))
+
     res.send(comments)
   } catch (error) {
     res.status(522).send(error)

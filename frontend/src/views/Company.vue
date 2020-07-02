@@ -131,6 +131,10 @@
             v-else-if="comment.type == 'USER.FEED'"
             class="comment-type user-feed"
           >Запись на стене</div>
+          <div
+            v-else-if="comment.type == 'USER.GROUP'"
+            class="comment-type user-group"
+          >Запись в группе</div>
           <div v-else>Тип записи с комментарием не определен</div>
           <div class="comment-head">
             <span class="comment-head-name">{{comment.author.firstName}} {{comment.author.lastName}}</span>&nbsp;добавил комментарий:
@@ -377,6 +381,9 @@ export default Vue.extend({
     }
     &.user-feed {
       background-color: lightskyblue;
+    }
+    &.user-group {
+      background-color: olivedrab;
     }
   }
   &-head {
