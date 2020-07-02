@@ -12,7 +12,7 @@ import {
   DELETE_COMMENT,
   EDIT_COMMENT,
   GET_POSTS_OF_GROUPS,
-  GET_COMMENTS_ABOUT_MY_ONBOARD
+  GET_COMMENTS
 } from '@/store/post/actions.type';
 
 import { } from '@/store/post/actions.type';
@@ -20,7 +20,7 @@ import {
   deletePost, editPost, getPosts, getPost, repost,
   getPostsOfFollows, getPostsOfuserGroups,
   sendComment, sendLike, sendNewPost,
-  dislike, editComment, deleteComment, getCommentsAboutMyOnboarding
+  dislike, editComment, deleteComment, getComments
 } from '@/services/post.service';
 
 import {
@@ -118,7 +118,7 @@ const actions = {
   [REPOST]: repost,
   [EDIT_POST]: editPost,
   [EDIT_COMMENT]: editComment,
-  [GET_COMMENTS_ABOUT_MY_ONBOARD]: getCommentsAboutMyOnboarding
+  [GET_COMMENTS]: getComments
 };
 
 const mutations = {
