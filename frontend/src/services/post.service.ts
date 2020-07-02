@@ -149,9 +149,9 @@ export const deleteComment = (context: any, commentId: any) => {
     });
 };
 
-export const getCommentsAboutMyOnboarding = (context: any, user_id: string) => {
+export const getComments = (context: any, user_id: string) => {
   return Vue.axios
-    .get('/api/post/comments/new_user/' + user_id)
+    .get('/api/post/comments_feed/' + user_id)
     .then((response: any) => {
       context.commit(SET_COMMENTS_FEED, response.data)
     })

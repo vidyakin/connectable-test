@@ -81,11 +81,11 @@ app.use('/api/clients', validateToken, require('./modules/clients'))
 app.use('/api/group', validateToken, require('./modules/groups'))
 app.use('/api/dept_users', validateToken, require('./modules/dept_users'))
 app.use('/api/structure', validateToken, require('./modules/structure'))
-
+app.use('/api/post', validateToken, require('./modules/posts'));
 /**
  * Old way
  */
-app.use('/api/post', validateToken, require('./crud')(Post, serializers.postSerializer));
+//app.use('/api/post', validateToken, require('./crud')(Post, serializers.postSerializer));
 app.use('/api/like', validateToken, require('./crud')(Like, serializers.serializer));
 app.use('/api/comment', validateToken, require('./crud')(Comment, serializers.commentSerializer));
 app.use('/api/event', validateToken, require('./crud')(Event, serializers.serializer));
@@ -112,58 +112,6 @@ app.delete('/api/deleteParticipant/:participantId/group/:groupId', (req, res, ne
 
   })
 });
-
-app.get('/api/post/follows/:user_id', async (req,res) => {
-    const posts = await Post.find({ "author.followers": req.params.user_id })
-    res.send(posts);
-})
-
-app.get('/api/post/group/user/:user_id', async (req,res) => {
-  //console.log(`>> Posts in groups`);
-  // 1st - find a workspace of user  
-  const user = await User.findById(req.params.user_id)
-  //console.log(`>> Client ID ${user._id} , ${user.client_id}`);
-  // 2nd - find groups where user is participant
-  let groupIds = await GroupParticipant.find()
-    .where('participantId').equals(user._id)
-    .select('groupId')
-  if (groupIds.length) {
-    groupIds = groupIds.map(_ => mongoose.Types.ObjectId(_.groupId))
-  }
-  //console.log(`>> groupIds ${groupIds}`);
-  // 3rd - find all groups that user can see messages - open groups and groups as participant, not own groups
-  const user_groups = await Group.find({
-      client_id: user.client_id, 
-      // собственные группы исключать?
-      //creatorId: {"$ne": user._id}, 
-      _id: { $in: groupIds}
-    })
-  // 3rd - post in that groups
-  try {
-    //console.log(`>> groupsIds ${groupsIds}`);
-    const posts = await Post.find({
-        "parent.type": "group", 
-        "parent.id": user_groups.map(u => u._id.toString()) 
-      })
-    //console.log(`posts: ${JSON.stringify(posts,null,2)}`);
-    res.send(posts)
-  } catch (error) {
-    res.status(500).send(error)
-  }
-})
-
-app.get('/api/post/comments/new_user/:user_id', async (req,res) => {
-    try {
-        const posts = await Post.find({"parent.type": "system.GROUPS.NEW_USER", "parent.user.id": req.params.user_id}).select('_id')
-        const comments = await Comment
-            .find({"parent.id": {$in: posts.map(p => p._id.toString())}})
-            .select('parent.id author.id author.firstName author.lastName message created')
-            .lean()
-        res.send(comments.map(c => ({...c, type: "GROUPS.NEW_USER"})))
-    } catch (error) {
-        res.status(522).send(error)
-    }    
-})
 
 //register form
 const mongoose = require('mongoose');

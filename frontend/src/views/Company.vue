@@ -123,8 +123,19 @@
         </span>
         <div v-for="comment in comments_feed" :key="comment._id" class="comment">
           <div
-            class="comment-type"
-          >{{comment.type == "GROUPS.NEW_USER" ? "Я - новый сотрудник" : ""}}</div>
+            v-if="comment.type == 'GROUPS.NEW_USER'"
+            class="comment-type new-user"
+          >Я - новый сотрудник</div>
+          <div v-else-if="comment.type == 'USER.BLOG'" class="comment-type user-blog">Запись в блоге</div>
+          <div
+            v-else-if="comment.type == 'USER.FEED'"
+            class="comment-type user-feed"
+          >Запись на стене</div>
+          <div
+            v-else-if="comment.type == 'USER.GROUP'"
+            class="comment-type user-group"
+          >Запись в группе</div>
+          <div v-else>Тип записи с комментарием не определен</div>
           <div class="comment-head">
             <span class="comment-head-name">{{comment.author.firstName}} {{comment.author.lastName}}</span>&nbsp;добавил комментарий:
           </div>
@@ -141,7 +152,7 @@ import { mapGetters } from "vuex";
 import {
   GET_POSTS,
   GET_POSTS_OF_GROUPS,
-  GET_COMMENTS_ABOUT_MY_ONBOARD
+  GET_COMMENTS
 } from "@/store/post/actions.type";
 import { GET_EVENTS, GET_USERS } from "@/store/user/actions.type";
 import {
@@ -299,7 +310,7 @@ export default Vue.extend({
       // }),
       this.$store.dispatch(GET_EVENTS, user.email),
       this.$store.dispatch(GET_REQUESTS_TO_MY_GROUPS, user._id),
-      this.$store.dispatch(GET_COMMENTS_ABOUT_MY_ONBOARD, user._id)
+      this.$store.dispatch(GET_COMMENTS, user._id)
     ]).finally(_ => {
       console.log("All dispatch ended");
     });
@@ -360,9 +371,20 @@ export default Vue.extend({
   background-color: white;
   &-type {
     font-size: 9pt;
-    background-color: lavender;
     font-weight: bold;
     padding-left: 10px;
+    &.new-user {
+      background-color: lavender;
+    }
+    &.user-blog {
+      background-color: lightpink;
+    }
+    &.user-feed {
+      background-color: lightskyblue;
+    }
+    &.user-group {
+      background-color: olivedrab;
+    }
   }
   &-head {
     margin: 5px 10px;
