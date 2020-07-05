@@ -1,6 +1,7 @@
 <template>
   <div class="post-wrapper">
     <div class="post-wrapper-body">
+      <!-- ЗАГОЛОВОК -->
       <div class="post-wrapper-header">
         <div class="post-wrapper-header-photo">
           <a-avatar
@@ -19,12 +20,13 @@
           </div>
         </div>
       </div>
+      <!-- СОДЕРЖИМОЕ -->
       <div class="post-wrapper-content">
         <div v-if="post && post.parent.type == 'system.GROUPS.NEW_USER'">
           <router-link :to="'/profile/'+post.parent.user.id">{{post.parent.user.name}}</router-link>&nbsp;добавлен в группу
           <router-link :to="'/group/'+post.parent.group.id">{{post.parent.group.name}}</router-link>
         </div>
-        <div v-else>{{ post && post.message }}</div>
+        <DynamicLink v-else :text="post.message" :mentions="post.mentions" force-render />
         <img
           :src="post && post.attachment && post.attachment[0].src"
           alt
@@ -54,6 +56,7 @@
           </div>
         </div>
       </div>
+      <!-- ПАНЕЛЬ КНОПОК -->
       <div class="post-wrapper-footer">
         <span v-if="datauser && post.likes.findIndex(e => e.author._id === datauser._id) > -1">
           <a-button icon="dislike" @click="dislike(post._id)">Не нравится</a-button>
@@ -61,6 +64,7 @@
         <a-button icon="like" @click="likes(post._id)" v-else>Нравится</a-button>
         <a-button icon="message" @click="commented">Комментировать</a-button>
       </div>
+      <!-- Комментарии -->
       <div class="post-wrapper-comments">
         <span
           v-if="post.comments.length > 2 && !allComment"
@@ -83,6 +87,7 @@
           <app-comment v-for="comment in post.comments" :comment="comment" :key="comment._id"></app-comment>
         </span>
       </div>
+      <!-- Поле ввода нового комментария -->
       <div class="post-comment-input" v-if="commenting">
         <a-avatar
           :src="(this.datauser.googleImage ? this.datauser.googleImage : require('../../assets/no_image.png'))"
@@ -95,6 +100,7 @@
         ></a-input>
       </div>
     </div>
+    <!-- всплывающее меню с действиями -->
     <div>
       <a-popover
         title="Действия с постом"
@@ -151,9 +157,12 @@
 </template>
 
 <script>
+import Vue from "vue";
 import { mapGetters } from "vuex";
 import AppLoginBar from "./LoginBar";
 import AppComment from "./Comment";
+import DynamicLink from "./DynamicLink";
+
 import {
   DELETE_POST,
   REPOST,
@@ -171,13 +180,12 @@ import store from "../../store";
 import { GET_POSTS } from "../../store/post/actions.type";
 import { PUBLIC_URL } from "../../../config/dev.env";
 
-// тест перехода на пост: http://connectable.pro/post/5e979343cf7539002af8ba75
-
 export default {
   name: "AppPost",
   components: {
     AppLoginBar,
-    AppComment
+    AppComment,
+    DynamicLink
   },
   data() {
     return {
@@ -270,6 +278,7 @@ export default {
           message: "Пост удален",
           placement: "topRight"
         });
+        this.visible = false;
       });
     },
     editPost() {
