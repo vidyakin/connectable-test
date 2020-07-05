@@ -1,17 +1,36 @@
 <template>
-  <a-input class="input" placeholder="Сообщение..." v-model="current" @pressEnter="send">
-    <div slot="addonAfter" class="comment-input-action">
-      <!--<a-icon type="link" @click="handleUpload"></a-icon>-->
-      <a-upload
-        :multiple="false"
-        :fileList="fileList"
-        :beforeUpload="beforeUpload"
-        :handleRemove="handleRemove"
-      >
-        <a-icon type="file"></a-icon>
-      </a-upload>
-    </div>
-  </a-input>
+  <div style="display: flex; flex-flow: column">
+    <!-- <a-input class="input" placeholder="Сообщение..." v-model="current" @pressEnter="send"> -->
+    <a-mentions
+      v-model="current"
+      @select="onSelect"
+      @change="onChange"
+      @keypress.enter.prevent="send"
+    >
+      <div slot="addonAfter" class="comment-input-action">
+        <!--<a-icon type="link" @click="handleUpload"></a-icon>-->
+      </div>
+      <a-mentions-option
+        :value="user.firstName+' '+user.lastName"
+        :data-id="user._id"
+        v-for="user in users"
+        :key="user._id"
+      >{{user.firstName}} {{user.lastName}}</a-mentions-option>
+    </a-mentions>
+    <!-- </a-input> -->
+    <a-upload
+      class="upload-box"
+      :multiple="false"
+      :fileList="fileList"
+      :before-upload="beforeUpload"
+      :remove="handleRemove"
+    >
+      <a-button type="link">
+        <a-icon type="file" />Приложить файл
+      </a-button>
+    </a-upload>
+    <div class="mentions" v-html="mentionsFormat"></div>
+  </div>
 </template>
 
 <script>
@@ -19,9 +38,13 @@ import { mapGetters } from "vuex";
 import AppLoginBar from "./LoginBar";
 import { SEND_NEW_POST } from "../../store/post/actions.type";
 import { GET_NOTIFICATION } from "../../store/notification/actions.type";
-import Vue from "vue";
+
 import store from "../../store";
 import moment from "moment";
+
+import { Mentions } from "ant-design-vue";
+const { getMentions } = Mentions;
+
 export default {
   name: "AppCommentInput",
   components: {
@@ -32,6 +55,7 @@ export default {
       current: "",
       fileList: [],
       statusEmailSend: false,
+      mentionsData: [],
       datauser: store.getters.userData
         ? store.getters.userData
         : store.getters.user
@@ -42,26 +66,60 @@ export default {
       "currentClient",
       "showHeaderImage",
       "user",
+      "users",
       "currentUser",
       "userData",
       "notification"
-    ])
+    ]),
+    mentionsFormat() {
+      const f =
+        (this.mentionsData.length ? "Упомянутые сотрудники: " : "") +
+        this.mentionsData
+          .map(
+            m => `<a class='user-link' href='/profile/${m.id}'>${m.name}</a>`
+          )
+          .join(", ");
+      return f;
+    }
   },
   methods: {
+    onSelect(option) {
+      const selected_user = this.users.find(
+        u => u.firstName + " " + u.lastName == option.value
+      );
+      this.mentionsData.push({
+        id: selected_user._id,
+        name: selected_user.firstName + " " + selected_user.lastName
+      });
+    },
+    onChange(val) {
+      const mentions = getMentions(val);
+      // if (this.mentionsData.length !== mentions.length) {
+      //   console.log(`mentions changed: ${mentions}`);
+      // }
+    },
+    removeTags(text) {
+      return text.replace(/(<([^>]+)>)/gi, ""); // TODO: implement cleaning of HTML tags to prevent any injects
+    },
     send() {
       if (this.current !== "") {
-        this.$store.dispatch(SEND_NEW_POST, {
-          message: this.current,
-          created: moment(),
-          parent: this.parent,
-          author: this.datauser.result,
-          attachment: [],
-          emailSend: this.statusEmailSend,
-          formData: this.handleUpload(),
-          client_id: this.currentClient.workspace
-        });
+        this.$store
+          .dispatch(SEND_NEW_POST, {
+            message: this.removeTags(this.current),
+            parent: this.parent,
+            author: this.datauser.result, // obsolete in future
+            author_ref: this.datauser.result._id,
+            attachment: [],
+            emailSend: this.statusEmailSend,
+            formData: this.handleUpload(),
+            client_id: this.currentClient.workspace,
+            mentions: this.mentionsData.map(m => m.id)
+          })
+          .then(() => {
+            this.current = "";
+            this.mentionsData = [];
+          });
       }
-      this.current = "";
     },
     handleRemove(file) {
       const index = this.fileList.indexOf(file);
@@ -143,6 +201,20 @@ export default {
   .anticon {
     margin-right: 0.5rem !important;
     cursor: pointer;
+  }
+}
+.upload-box {
+  display: flex;
+  flex-flow: row;
+  align-items: flex-start;
+}
+// Поле с названием выбранного файла
+.ant-upload-list {
+  &-item {
+    margin-top: 5px !important;
+    &-info {
+      padding: 0 30px 0 4px;
+    }
   }
 }
 </style>

@@ -104,4 +104,12 @@ router.get('/comments_feed/:user_id', async (req,res) => {
   }    
 })
 
+/**
+ * Sample select & populate data :
+ */
+// res.send(await Post.findById(req.params.id)
+//     .populate("mentions", "firstName lastName") // get only 2 fields of nested object 
+//     .populate("author_ref") // full populate other field
+//     .select('created message mentions author_ref')) // all fields of whole object that will be in result
+
 module.exports = router

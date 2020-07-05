@@ -1,8 +1,8 @@
 <template>
   <div id="profile" class="company">
-    <a-tabs default-active-key="1" @change="tabPageChange">
+    <a-tabs default-active-key="1" @change="tabPageChange" size="small" :tabBarGutter="tabGutter">
       <!-- Новости от администрации компании -->
-      <a-tab-pane key="1" tab="Компания">
+      <a-tab-pane key="1" tab="Новости компании">
         <app-comment-input
           v-model="content"
           @pressEnter="sendCompanyMessage"
@@ -13,7 +13,7 @@
         <app-post v-for="(post, index) in sortedPosts" :post="post" :key="index" />
       </a-tab-pane>
       <!-- Общая лента -->
-      <a-tab-pane key="6" tab="Общая лента" force-render>
+      <a-tab-pane key="6" tab="Мои новости" force-render>
         <app-comment-input
           v-model="feed_message"
           @pressEnter="sendFeedMessage"
@@ -37,7 +37,7 @@
           <a-badge
             :count="subsrcCount"
             title="Есть непрочитанные сообщения"
-          >Подписки&nbsp;&nbsp;&nbsp;&nbsp;</a-badge>
+          >Блоги&nbsp;&nbsp;&nbsp;&nbsp;</a-badge>
         </span>
         <SubscriptionList @count="setSubscrCounter" :user="userData.result._id" />
       </a-tab-pane>
@@ -175,6 +175,7 @@ export default Vue.extend({
   name: "AppCompany",
   data() {
     return {
+      tabGutter: 1,
       content: "",
       feed_message: "",
       arrPosts: [],
@@ -333,6 +334,9 @@ export default Vue.extend({
   .company {
     height: calc(100vh - 50px);
   }
+}
+.ant-tabs-tab {
+  margin: 0 10px 0 0 !important;
 }
 .company {
   padding: 0 30px;
