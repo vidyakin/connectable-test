@@ -301,6 +301,7 @@ export default {
       if (this.commentContent) {
         this.$store.dispatch(SEND_COMMENT, comment).then(() => {
           this.commentContent = "";
+          this.mentionsData = [];
         });
       }
     },

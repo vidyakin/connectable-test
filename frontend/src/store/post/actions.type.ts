@@ -16,3 +16,4 @@ export const EDIT_COMMENT = 'EDIT_COMMENT';
 
 // Комментарии к посту что я новый сотрудник
 export const GET_COMMENTS = 'GET_COMMENTS'
+export const GET_MENTIONS = 'GET_MENTIONS'

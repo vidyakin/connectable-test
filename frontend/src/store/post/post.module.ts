@@ -12,7 +12,8 @@ import {
   DELETE_COMMENT,
   EDIT_COMMENT,
   GET_POSTS_OF_GROUPS,
-  GET_COMMENTS
+  GET_COMMENTS,
+  GET_MENTIONS
 } from '@/store/post/actions.type';
 
 import { } from '@/store/post/actions.type';
@@ -20,7 +21,7 @@ import {
   deletePost, editPost, getPosts, getPost, repost,
   getPostsOfFollows, getPostsOfuserGroups,
   sendComment, sendLike, sendNewPost,
-  dislike, editComment, deleteComment, getComments
+  dislike, editComment, deleteComment, getComments, getMentions
 } from '@/services/post.service';
 
 import {
@@ -32,7 +33,7 @@ import {
   REMOVE_POST, SET_EDIT_POST_VISIBLE, SET_POST_FOR_EDITING, SET_EDIT_COMMENT_VISIBLE, SET_COMMENT_FOR_EDITING,
   SET_POSTS, SET_POSTS_OF_FOLLOWS, SET_POSTS_OF_GROUPS, SET_POST,
   REMOVE_COMMENT, REMOVE_ANSWER,
-  SET_COMMENTS_FEED
+  SET_COMMENTS_FEED, SET_MENTIONS_FEED
 } from '@/store/post/mutations.type';
 import { DELETE_EVENT } from '@/store/user/actions.type';
 
@@ -43,6 +44,7 @@ interface State {
   currentPost: any,
   comments: any[];
   comments_feed: any[],
+  mentions_feed: any[],
   postForEditing: any;
   commentForEditing: any;
   editPostVisible: boolean;
@@ -56,6 +58,7 @@ const store: State = {
   currentPost: null,
   comments: [],
   comments_feed: [],
+  mentions_feed: [],
   postForEditing: null,
   commentForEditing: null,
   editPostVisible: false,
@@ -101,6 +104,9 @@ const getters = {
   },
   posts_of_system(state: State) {
     return state.posts.filter(p => p.author == 'system')
+  },
+  mentions_feed(state: State) {
+    return state.mentions_feed
   }
 };
 
@@ -118,7 +124,8 @@ const actions = {
   [REPOST]: repost,
   [EDIT_POST]: editPost,
   [EDIT_COMMENT]: editComment,
-  [GET_COMMENTS]: getComments
+  [GET_COMMENTS]: getComments,
+  [GET_MENTIONS]: getMentions
 };
 
 const mutations = {
@@ -246,6 +253,9 @@ const mutations = {
   },
   [SET_COMMENTS_FEED](state: State, data: any) {
     state.comments_feed = data
+  },
+  [SET_MENTIONS_FEED](state: State, data: any) {
+    state.mentions_feed = data
   }
 };
 

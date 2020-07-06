@@ -12,7 +12,8 @@ import {
   SET_POSTS,
   SET_POSTS_OF_FOLLOWS,
   SET_POSTS_OF_GROUPS,
-  SET_COMMENTS_FEED
+  SET_COMMENTS_FEED,
+  SET_MENTIONS_FEED
 } from '@/store/post/mutations.type';
 
 export const sendNewPost = (context: any, post: any) => {
@@ -154,5 +155,13 @@ export const getComments = (context: any, user_id: string) => {
     .get('/api/post/comments_feed/' + user_id)
     .then((response: any) => {
       context.commit(SET_COMMENTS_FEED, response.data)
+    })
+}
+
+export const getMentions = (context: any, user_id: string) => {
+  return Vue.axios
+    .get('/api/post/mentions_feed/' + user_id)
+    .then((response: any) => {
+      context.commit(SET_MENTIONS_FEED, response.data)
     })
 }

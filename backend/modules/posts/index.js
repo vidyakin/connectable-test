@@ -13,6 +13,12 @@ const comment = require('../../models/comment')
  */
 const router = require('@/crud')(Post, serializers.postSerializer)
 
+function compareByDate(a, b) {
+  if (a.created < b.created) return 1;
+  if (a.created > b.created) return -1;
+  return 0;
+}
+
 /**
  * Подписчики пользователя
  */
@@ -102,6 +108,54 @@ router.get('/comments_feed/:user_id', async (req,res) => {
   } catch (error) {
     res.status(522).send(error)
   }    
+})
+
+router.get('/mentions_feed/:user_id', async (req,res) => {
+  try {
+    // 1. найдем упоминания в постах
+    let post_m = await Post
+      .find({ mentions: {$in: req.params.user_id} })
+      .populate("author_ref", "firstName lastName")
+      .select('message parent author_ref created')
+      .lean()
+    post_m = post_m.map(d => ({
+      ...d,
+      type: "post."+d.parent.type,
+      link: d.parent.id
+    }))
+    // 2. найдем упоминания в комментариях
+    let comment_m = await Comment
+      .find({ mentions: {$in: req.params.user_id} })
+      //.populate("author_ref", "firstName lastName")
+      .select('message parent author.firstName author.lastName created')
+      .lean()
+    comment_m = await Promise.all(comment_m.map(async d => {
+      if (d.parent.type == 'comment') return {
+        ...d,
+        type: "comment"
+      }
+      else {
+        const post = await Post.findById(d.parent.id).select('parent')
+        return {
+          ...d,
+          type: "comment."+post.parent.type,
+          link: post.parent.id
+        }
+      }
+    }))
+    // comment_m = comment_m.map(async c => {
+    //   if (c.parent.type == 'comment') return c
+    //   const post = await Post.findById(c.parent.id).select('parent')
+    //   return {
+    //     ...c,
+    //     type: c.type += '.'+post.parent.type
+    //   }
+    // })
+    res.json([].concat(post_m).concat(comment_m).sort(compareByDate))
+  } catch (error) {
+    console.log(error);
+    res.status(522).send(error)
+  }
 })
 
 /**

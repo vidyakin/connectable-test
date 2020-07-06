@@ -198,9 +198,10 @@ export default {
         mentions: this.mentionsData.map(m => m.id)
       };
       if (this.commentContent) {
-        this.$store
-          .dispatch(SEND_COMMENT, comment)
-          .then(() => (this.commentContent = ""));
+        this.$store.dispatch(SEND_COMMENT, comment).then(() => {
+          this.commentContent = "";
+          this.mentionsData = [];
+        });
       }
     },
     like(id, type) {
