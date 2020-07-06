@@ -92,12 +92,27 @@
         <a-avatar
           :src="(this.datauser.googleImage ? this.datauser.googleImage : require('../../assets/no_image.png'))"
         ></a-avatar>
-        <a-input
+        <a-mentions
+          v-model="commentContent"
+          @keypress.enter.prevent="sendComment(post._id)"
+          @select="onSelect"
+        >
+          <div slot="addonAfter" class="comment-input-action">
+            <!--<a-icon type="link" @click="handleUpload"></a-icon>-->
+          </div>
+          <a-mentions-option
+            :value="user.firstName+' '+user.lastName"
+            :data-id="user._id"
+            v-for="user in users"
+            :key="user._id"
+          >{{user.firstName}} {{user.lastName}}</a-mentions-option>
+        </a-mentions>
+        <!-- <a-input
           class="comment-input"
           placeholder="Комментарий..."
           v-model="commentContent"
           @pressEnter="sendComment(post._id)"
-        ></a-input>
+        ></a-input>-->
       </div>
     </div>
     <!-- всплывающее меню с действиями -->
@@ -190,6 +205,7 @@ export default {
   data() {
     return {
       current: "",
+      mentionsData: [],
       commenting: false,
       visible: false,
       commentContent: "",
@@ -203,6 +219,7 @@ export default {
   computed: {
     ...mapGetters([
       "showHeaderImage",
+      "users",
       "user",
       "currentUser",
       "userData",
@@ -221,6 +238,20 @@ export default {
     getMomentTime(time) {
       return moment(time).fromNow(true);
     },
+    onSelect(option) {
+      const selected_user = this.users.find(
+        u => u.firstName + " " + u.lastName == option.value
+      );
+      this.mentionsData.push({
+        id: selected_user._id,
+        name: selected_user.firstName + " " + selected_user.lastName
+      });
+      console.log(
+        "Выбран ",
+        selected_user.firstName + " " + selected_user.lastName
+      );
+    },
+
     likes(postId) {
       const likes = {
         parent: { type: "post", id: postId },
@@ -264,7 +295,8 @@ export default {
         parent: { type: "post", id: postId },
         author: this.datauser,
         created: moment(),
-        message: this.commentContent
+        message: this.commentContent,
+        mentions: this.mentionsData.map(m => m.id)
       };
       if (this.commentContent) {
         this.$store.dispatch(SEND_COMMENT, comment).then(() => {

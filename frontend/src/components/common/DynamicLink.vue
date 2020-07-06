@@ -22,7 +22,6 @@ export default {
      */
     transformed() {
       const template = this.convertMentionsToLinks(this.text, this.mentions);
-      console.log("DYN.LINK:", template);
 
       return {
         template
@@ -30,7 +29,7 @@ export default {
     }
   },
   created() {
-    console.log("created: ", this.text);
+    //console.log("created: ", this.text);
   }
 };
 </script>

@@ -1,7 +1,9 @@
 <template>
   <div class="comment-wrapper">
     <div class="comment-wrapper-avatar">
-      <a-avatar :src="(comment && comment.author.googleImage ? comment.author.googleImage : require('../../assets/no_image.png'))"></a-avatar>
+      <a-avatar
+        :src="(comment && comment.author.googleImage ? comment.author.googleImage : require('../../assets/no_image.png'))"
+      ></a-avatar>
     </div>
 
     <div class="comment-wrapper-content">
@@ -9,7 +11,8 @@
         <div
           class="comment-wrapper-content-text-author"
         >{{ comment.author.firstName }} {{ comment.author.lastName }}</div>
-        <div class="comment-wrapper-content-text-message">{{ comment.message }}</div>
+        <DynamicLink :text="comment.message" :mentions="comment.mentions" />
+        <!-- <div class="comment-wrapper-content-text-message">{{ comment.message }}</div> -->
       </div>
       <div class="comment-wrapper-content-time">
         <span
@@ -26,51 +29,57 @@
       >Показать {{comment.answers.length}} ответ</span>
       <span v-if="showAnswer" class="show-answers" @click="() => showAnswer=false">Скрыть</span>
 
-      <div v-if="showAnswer" class="comment-wrapper" v-for="answer in comment.answers">
-        <div class="comment-wrapper-avatar">
-          <a-avatar :src="(answer && answer.author.googleImage ? answer.author.googleImage : require('../../assets/no_image.png'))"></a-avatar>
-        </div>
-        <div class="comment-wrapper-content">
-          <div class="comment-wrapper-content-text">
-            <div
-              class="comment-wrapper-content-text-author"
-            >{{ answer.author.firstName }} {{ answer.author.lastName }}</div>
-            <div class="comment-wrapper-content-text-message">{{ answer.message }}</div>
+      <!-- ОТВЕТЫ -->
+      <div v-if="showAnswer">
+        <div class="comment-wrapper" v-for="answer in comment.answers" :key="answer._id">
+          <div class="comment-wrapper-avatar">
+            <a-avatar
+              :src="(answer && answer.author.googleImage ? answer.author.googleImage : require('../../assets/no_image.png'))"
+            ></a-avatar>
           </div>
-          <div class="comment-wrapper-content-time">
-            <span
-              @click="like(answer._id, 'answer')"
-              v-if="answer.likes.findIndex(e => e.author._id === datauser._id) ===  -1"
-            >Нравится</span>
-            {{getMomentTime(answer.created) }}
+          <div class="comment-wrapper-content">
+            <div class="comment-wrapper-content-text">
+              <div
+                class="comment-wrapper-content-text-author"
+              >{{ answer.author.firstName }} {{ answer.author.lastName }}</div>
+              <div class="comment-wrapper-content-text-message">{{ answer.message }}</div>
+            </div>
+            <div class="comment-wrapper-content-time">
+              <span
+                @click="like(answer._id, 'answer')"
+                v-if="answer.likes.findIndex(e => e.author._id === datauser._id) ===  -1"
+              >Нравится</span>
+              {{getMomentTime(answer.created) }}
+            </div>
           </div>
-        </div>
-        <div class="comment-wrapper-likes">
-          <div class="comment-wrapper-likes-like" v-if="answer.likes.length > 0">
-            <a-icon type="like"></a-icon>
-            {{answer.likes.length}}
+          <div class="comment-wrapper-likes">
+            <div class="comment-wrapper-likes-like" v-if="answer.likes.length > 0">
+              <a-icon type="like"></a-icon>
+              {{answer.likes.length}}
+            </div>
           </div>
+          <a-popover
+            title="Действия с комментарием"
+            trigger="click"
+            overlayClassName="action-popup-content"
+            v-if="answer && answer.author._id === datauser._id"
+          >
+            <template slot="content">
+              <a-tooltip title="Удалить">
+                <a-icon type="delete" @click="deleteAnswer(answer)"></a-icon>
+              </a-tooltip>
+              <a-tooltip title="Редактировать">
+                <a-icon type="edit" @click="editAnswer(answer)"></a-icon>
+              </a-tooltip>
+            </template>
+            <a-button icon="ellipsis" class="open-action-button"></a-button>
+          </a-popover>
         </div>
-        <a-popover
-                title="Действия с комментарием"
-                trigger="click"
-                overlayClassName="action-popup-content"
-                v-if="answer && answer.author._id === datauser._id"
-        >
-          <template slot="content">
-            <a-tooltip title="Удалить">
-              <a-icon type="delete" @click="deleteAnswer(answer)"></a-icon>
-            </a-tooltip>
-            <a-tooltip title="Редактировать">
-              <a-icon type="edit" @click="editAnswer(answer)"></a-icon>
-            </a-tooltip>
-          </template>
-          <a-button icon="ellipsis" class="open-action-button"></a-button>
-        </a-popover>
       </div>
-
       <div class="post-comment-input" v-if="showAnswer || answering">
-        <a-avatar :src="(this.datauser.googleImage ? this.datauser.googleImage : require('../../assets/no_image.png'))"></a-avatar>
+        <a-avatar
+          :src="(this.datauser.googleImage ? this.datauser.googleImage : require('../../assets/no_image.png'))"
+        ></a-avatar>
         <a-input
           class="comment-input"
           placeholder="Ответить..."
@@ -79,12 +88,15 @@
         ></a-input>
       </div>
     </div>
+    <!-- КОНЕЦ СОДЕРЖИМОГО -->
+    <!-- ЛАЙКИ -->
     <div class="comment-wrapper-likes">
       <div class="comment-wrapper-likes-like" v-if="comment.likes.length > 0">
         <a-icon type="like"></a-icon>
         {{comment.likes.length}}
       </div>
     </div>
+    <!-- ДЕЙСТВИЯ -->
     <a-popover
       title="Действия с комментарием"
       trigger="click"
@@ -105,80 +117,117 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
-import AppLoginBar from './LoginBar';
+import { mapGetters } from "vuex";
+
+import AppLoginBar from "./LoginBar";
+import DynamicLink from "./DynamicLink";
+
 import {
   GET_POSTS,
   DELETE_COMMENT,
   SEND_COMMENT,
   SEND_LIKE,
-  SEND_NEW_POST,
-} from '../../store/post/actions.type';
+  SEND_NEW_POST
+} from "../../store/post/actions.type";
 import {
   SET_EDIT_POST_VISIBLE,
   SET_COMMENT_FOR_EDITING,
-  SET_EDIT_COMMENT_VISIBLE,
-} from '../../store/post/mutations.type';
-import moment from 'moment';
-import store from '../../store';
+  SET_EDIT_COMMENT_VISIBLE
+} from "../../store/post/mutations.type";
+import moment from "moment";
+import store from "../../store";
+
 export default {
-  name: 'AppCommentInput',
+  name: "AppCommentInput",
   components: {
     AppLoginBar,
+    DynamicLink
   },
   data() {
     return {
-      current: '',
-      commentContent: '',
+      current: "",
+      commentContent: "",
+      mentionsData: [],
       answering: false,
       showAnswer: false,
       visible: false,
       show: false,
-      datauser: (store.getters.userData.result ? store.getters.userData.result : store.getters.currentUser),
+      datauser: store.getters.userData.result
+        ? store.getters.userData.result
+        : store.getters.currentUser
     };
   },
   computed: {
-    ...mapGetters(['showHeaderImage', 'user', 'userData', 'currentUser']),
+    ...mapGetters([
+      "showHeaderImage",
+      "user",
+      "users",
+      "userData",
+      "currentUser"
+    ]),
+    mentionsFormat() {
+      const f =
+        (this.mentionsData.length ? "Упомянутые сотрудники: " : "") +
+        this.mentionsData
+          .map(
+            m => `<a class='user-link' href='/profile/${m.id}'>${m.name}</a>`
+          )
+          .join(", ");
+      return f;
+    }
   },
   methods: {
     getMomentTime(time) {
       return moment(time).fromNow(true);
     },
+    onSelect(option) {
+      const selected_user = this.users.find(
+        u => u.firstName + " " + u.lastName == option.value
+      );
+      this.mentionsData.push({
+        id: selected_user._id,
+        name: selected_user.firstName + " " + selected_user.lastName
+      });
+    },
     sendComment(id, type) {
       const comment = {
-        parent: { type: 'comment', id },
+        parent: { type: "comment", id },
         author: this.datauser,
         created: moment(),
         message: this.commentContent,
+        mentions: this.mentionsData.map(m => m.id)
       };
       if (this.commentContent) {
         this.$store
-                .dispatch(SEND_COMMENT, comment)
-                .then(() => (this.commentContent = ''));
+          .dispatch(SEND_COMMENT, comment)
+          .then(() => (this.commentContent = ""));
       }
     },
     like(id, type) {
       const like = {
         parent: { type, id },
-        author: this.datauser,
+        author: this.datauser
       };
       this.$store.dispatch(SEND_LIKE, like);
     },
     deleteComment(comment) {
-
       this.$store.dispatch(DELETE_COMMENT, comment).then(() => {
-                this.$notification.success({
-                  message: 'Комментарий удален',
-                  placement: 'topRight'
-                });
+        this.$notification.success({
+          message: "Комментарий удален",
+          placement: "topRight"
+        });
       });
     },
     deleteAnswer(answer) {
-      const comment = {_id: answer._id, parent: answer.parent.id, type: 'answer'};
+      const comment = {
+        _id: answer._id,
+        parent: answer.parent.id,
+        type: "answer"
+      };
       this.$store.dispatch(DELETE_COMMENT, comment).then(() => {
         this.$notification.success({
-          message: 'Комментарий удален',
-          placement: 'topRight'
+          message: "Комментарий удален",
+          placement: "topRight"
         });
       });
     },
@@ -192,28 +241,27 @@ export default {
         _id: answer._id,
         author: this.datauser,
         message: answer.message,
-        status: 'answer'
+        status: "answer"
       };
       this.$store.commit(SET_COMMENT_FOR_EDITING, comment);
       this.$store.commit(SET_EDIT_COMMENT_VISIBLE, true);
       this.visible = false;
       this.show = false;
-    },
-
+    }
   },
   props: {
     parent: Object,
     comment: Object,
-    post: Object,
-  },
+    post: Object
+  }
 };
 </script>
 
 <style lang="scss">
-  // центрируется из-за этого в других компонентах
-  // .ant-popover-inner-content {
-  //   text-align: center;
-  // }
+// центрируется из-за этого в других компонентах
+// .ant-popover-inner-content {
+//   text-align: center;
+// }
 .comment-wrapper {
   display: flex;
   margin-top: 0.75rem;
@@ -293,14 +341,13 @@ export default {
     cursor: pointer;
   }
 }
-  @media (max-width: 1023px) {
-    .comment-wrapper-content-text {
-      flex-wrap: wrap;
-    }
-    .comment-wrapper-content-text-message {
-      width: 100%;
-      padding: 0 8px;
-    }
+@media (max-width: 1023px) {
+  .comment-wrapper-content-text {
+    flex-wrap: wrap;
   }
-
+  .comment-wrapper-content-text-message {
+    width: 100%;
+    padding: 0 8px;
+  }
+}
 </style>
