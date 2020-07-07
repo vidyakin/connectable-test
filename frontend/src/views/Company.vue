@@ -142,6 +142,41 @@
           <div class="comment-body">{{comment.message}}</div>
         </div>
       </a-tab-pane>
+      <a-tab-pane key="9" force-render>
+        <span slot="tab">
+          <a-badge
+            :count="mentions_feed.length"
+            title="Есть непросмотренные упоминания"
+          >Упоминания&nbsp;&nbsp;&nbsp;&nbsp;</a-badge>
+        </span>
+        <div class="comment" v-for="mention in mentions_feed" :key="mention._id">
+          <div
+            v-if="['post.feed','comment.feed','post.company','comment.company'].includes(mention.type)"
+            class="comment-type mention-feed"
+          >Упоминание в новостях</div>
+          <div
+            v-else-if="['post.group','comment.group'].includes(mention.type)"
+            class="comment-type mention-group"
+          >
+            Упоминание в
+            <router-link :to="'/group/'+mention.link">группе</router-link>
+          </div>
+          <div
+            v-else-if="['post.user','comment.user'].includes(mention.type)"
+            class="comment-type mention-blog"
+          >
+            Упоминание в
+            <router-link :to="'/profile/'+mention.link">блоге</router-link>
+          </div>
+          <div class="comment-type" v-else>Упоминание</div>
+          <div class="comment-head">
+            <b>{{ mention.created | asDate }}</b>
+            <br />
+            {{ getFIO(mention) }} в {{ mention.created | asTime }} упомянул вас в сообщении:
+          </div>
+          <div class="comment-body">{{mention.message}}</div>
+        </div>
+      </a-tab-pane>
     </a-tabs>
   </div>
 </template>
@@ -152,7 +187,8 @@ import { mapGetters } from "vuex";
 import {
   GET_POSTS,
   GET_POSTS_OF_GROUPS,
-  GET_COMMENTS
+  GET_COMMENTS,
+  GET_MENTIONS
 } from "@/store/post/actions.type";
 import { GET_EVENTS, GET_USERS } from "@/store/user/actions.type";
 import {
@@ -200,6 +236,7 @@ export default Vue.extend({
       "posts_of_feed",
       "posts_of_system",
       "comments_feed",
+      "mentions_feed",
       "messages",
       "events",
       "group_requests",
@@ -230,6 +267,14 @@ export default Vue.extend({
       );
     }
   },
+  filters: {
+    asDate(d) {
+      return new Date(d).toLocaleDateString();
+    },
+    asTime(d) {
+      return new Date(d).toLocaleTimeString();
+    }
+  },
   methods: {
     sendCompanyMessage() {
       //console.log(this.newPostMessage);
@@ -252,6 +297,10 @@ export default Vue.extend({
       return user == undefined
         ? "Пользователь не найден"
         : user.firstName + " " + user.lastName;
+    },
+    getFIO(m) {
+      const author = m.author ? m.author : m.author_ref;
+      return author.firstName + " " + author.lastName;
     },
     // для заявок
     approve(groupId, participantId) {
@@ -311,7 +360,8 @@ export default Vue.extend({
       // }),
       this.$store.dispatch(GET_EVENTS, user.email),
       this.$store.dispatch(GET_REQUESTS_TO_MY_GROUPS, user._id),
-      this.$store.dispatch(GET_COMMENTS, user._id)
+      this.$store.dispatch(GET_COMMENTS, user._id),
+      this.$store.dispatch(GET_MENTIONS, user._id)
     ]).finally(_ => {
       console.log("All dispatch ended");
     });
@@ -380,14 +430,17 @@ export default Vue.extend({
     &.new-user {
       background-color: lavender;
     }
-    &.user-blog {
+    &.user-blog,
+    &.mention-blog {
       background-color: lightpink;
     }
-    &.user-feed {
+    &.user-feed,
+    &.mention-feed {
       background-color: lightskyblue;
     }
-    &.user-group {
-      background-color: olivedrab;
+    &.user-group,
+    &.mention-group {
+      background-color: lightgreen;
     }
   }
   &-head {
@@ -402,6 +455,17 @@ export default Vue.extend({
     font-style: italic;
     margin: 5px 10px;
     padding-bottom: 10px;
+  }
+}
+
+.mention {
+  border: 1px solid grey;
+  margin-bottom: 5px;
+  padding: 10px;
+
+  &-head {
+  }
+  &-message {
   }
 }
 </style>

@@ -13,6 +13,18 @@ const commentSchema = new Schema({
     },
     likes: Array,
     answers: Array,
+    mentions: [{ type: Schema.Types.ObjectId, ref: 'User' }]
+});
+
+
+commentSchema.pre('find', function () {
+    this.populate('mentions', 'firstName lastName');
+});
+
+commentSchema.post('save', function (doc, next) {
+    doc.populate('mentions', 'firstName lastName').execPopulate().then( () => {
+        next();
+    })
 });
 
 module.exports = mongoose.model('Comment', commentSchema);
