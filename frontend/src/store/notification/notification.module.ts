@@ -54,7 +54,7 @@ const mutations = {
   //   state.messages.splice(i, 1, msg)
   // },
   [ADD_MESSAGE](state: State, msg: any) {
-    state.messages.push(msg);
+    state.messages = [msg, ...state.messages];
   },
   // Только изменение state для обновления UI
   [SOCKET_NEW_MESSAGE](state: State, msg: any) {

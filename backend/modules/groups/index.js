@@ -13,6 +13,12 @@ const { reset_password } = require('../../email');
  */
 const router = require('../../crud')(Group, groupSerializer)
 
+function compareByDate(a, b) {
+  if (a.created < b.created) return 1;
+  if (a.created > b.created) return -1;
+  return 0;
+}
+
 /**
  * Find groups of given client
  */
@@ -199,10 +205,11 @@ router.get('/requests/:user_id', async (req, res) => {
         groupName: group.name,
         userName: user.firstName + ' ' + user.lastName,
         googleImage: user.googleImage || "",
-        positions: user.positions.join(',')
+        positions: user.positions.join(','),
+        created: r.created
       }
     }))
-    res.send(data)
+    res.send(data.sort(compareByDate))
   } catch (error) {
     res.status(522).send(error)
   }  

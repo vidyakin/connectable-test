@@ -171,6 +171,7 @@
           <div class="comment-type" v-else>Упоминание</div>
           <div class="comment-head">
             <b>{{ mention.created | asDate }}</b>
+            <br />
             {{ getFIO(mention) }} в {{ mention.created | asTime }} упомянул вас в сообщении:
           </div>
           <div class="comment-body">{{mention.message}}</div>

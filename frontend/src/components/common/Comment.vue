@@ -42,7 +42,8 @@
               <div
                 class="comment-wrapper-content-text-author"
               >{{ answer.author.firstName }} {{ answer.author.lastName }}</div>
-              <div class="comment-wrapper-content-text-message">{{ answer.message }}</div>
+              <!-- <div class="comment-wrapper-content-text-message">{{ answer.message }}</div> -->
+              <DynamicLink :text="answer.message" :mentions="answer.mentions" />
             </div>
             <div class="comment-wrapper-content-time">
               <span
@@ -80,12 +81,27 @@
         <a-avatar
           :src="(this.datauser.googleImage ? this.datauser.googleImage : require('../../assets/no_image.png'))"
         ></a-avatar>
-        <a-input
+        <a-mentions
+          v-model="commentContent"
+          @keypress.enter.prevent="sendComment(comment._id)"
+          @select="onSelect"
+        >
+          <div slot="addonAfter" class="comment-input-action">
+            <!--<a-icon type="link" @click="handleUpload"></a-icon>-->
+          </div>
+          <a-mentions-option
+            :value="user.firstName+' '+user.lastName"
+            :data-id="user._id"
+            v-for="user in users"
+            :key="user._id"
+          >{{user.firstName}} {{user.lastName}}</a-mentions-option>
+        </a-mentions>
+        <!-- <a-input
           class="comment-input"
           placeholder="Ответить..."
           v-model="commentContent"
           @pressEnter="sendComment(comment._id)"
-        ></a-input>
+        ></a-input>-->
       </div>
     </div>
     <!-- КОНЕЦ СОДЕРЖИМОГО -->

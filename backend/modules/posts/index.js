@@ -104,7 +104,7 @@ router.get('/comments_feed/:user_id', async (req,res) => {
       .lean()
     comments = comments.concat(comments_groups.map(c => ({...c, type: "USER.GROUP"})))
 
-    res.send(comments)
+    res.send(comments.sort(compareByDate))
   } catch (error) {
     res.status(522).send(error)
   }    

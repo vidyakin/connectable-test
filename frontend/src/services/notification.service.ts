@@ -1,6 +1,12 @@
 import Vue from 'vue';
 import { SET_NOTIFICATION, SET_MESSAGES, ADD_MESSAGE, MARK_MESSAGE_READ } from '@/store/notification/mutations.type';
 
+function compareByDate(a: any, b: any) {
+    if (a.dateCreated < b.dateCreated) return 1;
+    if (a.dateCreated > b.dateCreated) return -1;
+    return 0;
+}
+
 export const postNotification = (context: any, notificationInfo: any) => {
     return Vue.axios
         .post(`api/notification`, notificationInfo).then((response: any) => {
@@ -31,7 +37,7 @@ export const getMessages = (context: any, params: any) => {
     return Vue.axios
         .get(`api/message`, { params })
         .then((response: any) => {
-            context.commit(SET_MESSAGES, response.data.result);
+            context.commit(SET_MESSAGES, response.data.result.sort(compareByDate));
         });
 };
 
