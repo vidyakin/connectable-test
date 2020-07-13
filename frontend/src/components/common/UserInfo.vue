@@ -9,9 +9,9 @@
       <a-button
         v-model="statusFollow"
         v-if="this.$route.params._id != datauser._id"
-        :class="{'is-active' : followIds.includes(datauser._id)}"
-        @click="handleFollowClick(currentUser._id, datauser._id, datauser.email, followIds.includes(datauser._id))"
-      >{{ followIds.includes(datauser._id) ? 'Уже подписаны' : 'Подписаться' }}</a-button>
+        :class="{'is-active' : currentUser.followers.includes(datauser._id)}"
+        @click="handleFollowClick(currentUser._id, datauser._id, datauser.email, currentUser.followers.includes(datauser._id))"
+      >{{ currentUser.followers.includes(datauser._id) ? 'Уже подписаны' : 'Подписаться' }}</a-button>
     </div>
 
     <div class="user-info-content">
@@ -52,16 +52,14 @@ export default {
     return {
       current: "",
       editDrawerVisible: false,
-      statusFollow: false,
-      followIds: [],
-      userinfo: [],
-      datauser: store.getters.userData
-        ? store.getters.userData.result
-        : store.getters.user
+      statusFollow: false
     };
   },
   computed: {
-    ...mapGetters(["currentUser", "userData", "userIsAdmin"])
+    ...mapGetters(["currentUser", "userData", "userIsAdmin"]),
+    datauser() {
+      return this.userData.result;
+    }
   },
   methods: {
     closeEditDrawer() {
@@ -94,10 +92,7 @@ export default {
     }
   },
   watch: {
-    currentUser(currentUser) {
-      this.followIds = currentUser.followers;
-      this.userinfo = currentUser._id;
-    }
+    currentUser(currentUser) {}
   }
 };
 </script>
