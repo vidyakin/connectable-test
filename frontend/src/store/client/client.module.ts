@@ -1,11 +1,11 @@
 // import actions
-import { GET_CLIENTS, CREATE_CLIENT, EDIT_CLIENT, ENTER_CLIENT } from '@/store/client/actions.type'
+import { GET_CLIENTS, CREATE_CLIENT, EDIT_CLIENT, ENTER_CLIENT, GET_STATISTIC, DROP_COLLECTION } from '@/store/client/actions.type'
 
 // import mutations
-import { ADD_CLIENT, SET_CLIENTS, SET_CURRENT_CLIENT, UPDATE_CLIENT, SET_LOGGED_CLIENT } from '@/store/client/mutations.type'
+import { ADD_CLIENT, SET_CLIENTS, SET_CURRENT_CLIENT, UPDATE_CLIENT, SET_LOGGED_CLIENT, SET_STATISTIC } from '@/store/client/mutations.type'
 
 // import service functions
-import { createClient, editClient, getClients, changeWorkspace } from './client.service';
+import { createClient, editClient, getClients, changeWorkspace, getStatistic, deleteCollection } from './client.service';
 
 interface Client {
   _id: any,
@@ -24,13 +24,15 @@ interface Client {
 interface State {
   clients: Client[],
   currentClient: Client | null,
-  clientLogged: String
+  clientLogged: String,
+  client_statistic: Object | null
 }
 
 const store: State = {
   clients: [],
   currentClient: null,
-  clientLogged: ""
+  clientLogged: "",
+  client_statistic: null
 }
 
 const getters = {
@@ -39,6 +41,9 @@ const getters = {
   },
   currentClient(state: State) {
     return state.currentClient
+  },
+  client_statistic(state: State) {
+    return state.client_statistic
   }
 }
 
@@ -63,13 +68,18 @@ const mutations = {
   [SET_LOGGED_CLIENT](state: State, client_id: String) {
     state.clientLogged = client_id
   },
+  [SET_STATISTIC](state: State, data: Object) {
+    state.client_statistic = data
+  }
 }
 
 const actions = {
   [GET_CLIENTS]: getClients,
   [CREATE_CLIENT]: createClient,
   [EDIT_CLIENT]: editClient,
-  [ENTER_CLIENT]: changeWorkspace
+  [ENTER_CLIENT]: changeWorkspace,
+  [GET_STATISTIC]: getStatistic,
+  [DROP_COLLECTION]: deleteCollection
 }
 
 export default {

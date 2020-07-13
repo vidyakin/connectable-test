@@ -66,6 +66,15 @@
         <img src="@/assets/Icons/setting.svg" alt />
         Настройки
       </a-menu-item>
+      <a-menu-item
+        key="/admin"
+        class="footer"
+        :class="{active:isActive == 'settings'}"
+        v-if="userIsSuperAdmin && client_defined"
+      >
+        <img src="@/assets/Icons/setting.svg" alt />
+        Админ.панель
+      </a-menu-item>
       <a-menu-item key="/about" :class="{active:isActive == 'about'}">
         <img src="@/assets/Icons/Structure.svg" alt />
         О нас
@@ -116,6 +125,9 @@
       </a-menu-item>
       <a-menu-item key="/settings" class="footer">
         <img src="@/assets/Icons/setting.svg" alt />
+      </a-menu-item>
+      <a-menu-item key="/admin" class="footer">
+        <img src="@/assets/Icons/setting.svg" alt v-if="userIsSuperAdmin && client_defined" />
       </a-menu-item>
       <a-menu-item key="/about">
         <img src="@/assets/Icons/Structure.svg" alt />
