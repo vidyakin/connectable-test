@@ -89,6 +89,11 @@ export const router = new Router({
           component: view('Settings'),
         },
         {
+          path: '/admin/',
+          name: 'admin',
+          component: view('AdminPanel'),
+        },
+        {
           path: '/list_users/',
           name: 'list_users',
           component: view('ListUsers'),
