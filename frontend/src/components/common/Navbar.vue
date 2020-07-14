@@ -69,7 +69,7 @@
       <a-menu-item
         key="/admin"
         class="footer"
-        :class="{active:isActive == 'settings'}"
+        :class="{active:isActive == 'admin'}"
         v-if="userIsSuperAdmin && client_defined"
       >
         <img src="@/assets/Icons/setting.svg" alt />
