@@ -174,7 +174,8 @@ export default {
      */
     client_defined() {
       return (
-        !this.userIsSuperAdmin || (this.userIsSuperAdmin && this.currentClient)
+        !this.userIsSuperAdmin ||
+        (this.userIsSuperAdmin && !!this.currentClient)
       );
     },
     // userIsAdmin() {
