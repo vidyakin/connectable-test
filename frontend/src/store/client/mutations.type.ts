@@ -16,3 +16,7 @@ export const SET_LOGGED_CLIENT = 'SET_LOGGED_CLIENT'
 
 // смена клиента для суперадмина
 export const CHANGE_WORKSPACE = 'CHANGE_WORKSPACE'
+
+// статистика по данным в БД
+export const SET_STATISTIC = 'SET_STATISTIC'
+export const UPDATE_STATISTIC = 'UPDATE_STATISTIC'

@@ -29,9 +29,11 @@ postSchema.pre('find', function () {
 });
 
 postSchema.post('save', function (doc, next) {
-  doc.populate('mentions', 'firstName lastName').execPopulate().then( () => {
-    next();
-  })
+  doc.populate('mentions', 'firstName lastName')
+    .execPopulate()
+    .then(() => {
+      next();
+    })
 });
 
 module.exports = mongoose.model('Post', postSchema);
