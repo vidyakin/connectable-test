@@ -41,15 +41,14 @@
         >
           <source :src="post && post.attachment && post.attachment[0].src" type="video/mp4" />
         </video>
+        <!-- ЛАЙКИ -->
         <div class="post-wrapper-content-likes">
           <div
             class="post-wrapper-content-likes-authors"
             v-if="post.likes && post.likes.length > 0"
           >
             <a-icon type="like"></a-icon>
-            {{ post.likes[0] && post.likes[0].author.firstName + ' ' + post.likes[0].author.lastName}}{{ post.likes[1]
-            &&
-            ', ' + post.likes[1].author.firstName + ' ' + post.likes[1].author.lastName}}
+            {{ firstTwoLikers }}
             <span
               v-if="post.likes.length > 2"
             >и еще {{post.likes && post.likes.length - 2 }}</span>
@@ -58,10 +57,10 @@
       </div>
       <!-- ПАНЕЛЬ КНОПОК -->
       <div class="post-wrapper-footer">
-        <span v-if="datauser && post.likes.findIndex(e => e.author._id === datauser._id) > -1">
+        <span v-if="user_id && post.likes.findIndex(e => e.author._id === user_id) > -1">
           <a-button icon="dislike" @click="dislike(post._id)">Не нравится</a-button>
         </span>
-        <a-button icon="like" @click="likes(post._id)" v-else>Нравится</a-button>
+        <a-button icon="like" @click="like(post._id)" v-else>Нравится</a-button>
         <a-button icon="message" @click="commented">Комментировать</a-button>
       </div>
       <!-- Комментарии -->
@@ -89,9 +88,7 @@
       </div>
       <!-- Поле ввода нового комментария -->
       <div class="post-comment-input" v-if="commenting">
-        <a-avatar
-          :src="(this.datauser.googleImage ? this.datauser.googleImage : require('../../assets/no_image.png'))"
-        ></a-avatar>
+        <a-avatar :src="userAvatar"></a-avatar>
         <a-mentions
           v-model="commentContent"
           @keypress.enter.prevent="sendComment(post._id)"
@@ -103,7 +100,7 @@
           <a-mentions-option
             :value="user.firstName+' '+user.lastName"
             :data-id="user._id"
-            v-for="user in users"
+            v-for="user in users.filter(u => !u.deletion_mark)"
             :key="user._id"
           >{{user.firstName}} {{user.lastName}}</a-mentions-option>
         </a-mentions>
@@ -123,7 +120,7 @@
         trigger="click"
         :container="'post-' + post._id"
         overlayClassName="action-popup-content"
-        v-if="post && post.author._id === datauser._id || userIsAdmin"
+        v-if="post && post.author._id === user_id || userIsAdmin"
       >
         <template slot="content">
           <a-tooltip title="Удалить">
@@ -210,10 +207,10 @@ export default {
       visible: false,
       commentContent: "",
       allComment: false,
-      pubUrl: PUBLIC_URL,
-      datauser: store.getters.userData.result
-        ? store.getters.userData.result
-        : store.getters.currentUser
+      pubUrl: PUBLIC_URL
+      // datauser: store.getters.userData.result
+      //   ? store.getters.userData.result
+      //   : store.getters.currentUser
     };
   },
   computed: {
@@ -224,7 +221,26 @@ export default {
       "currentUser",
       "userData",
       "userIsAdmin"
-    ])
+    ]),
+    user_id() {
+      return this.userData.result && this.userData.result._id;
+    },
+    userAvatar() {
+      return this.userData.result.googleImage
+        ? this.userData.result.googleImage
+        : require("../../assets/no_image.png");
+    },
+    firstTwoLikers() {
+      if (!this.post.likes) return "";
+      if (this.post.likes.length == 1) {
+        const user = this.post.likes[0].author;
+        return user.firstName + " " + user.lastName;
+      } else {
+        const user0 = this.post.likes[0].author;
+        const user1 = this.post.likes[1].author;
+        return `${user0.firstName} ${user0.lastName}, ${user1.firstName} ${user1.lastName}`;
+      }
+    }
   },
   methods: {
     handleScroll() {
@@ -251,49 +267,55 @@ export default {
         selected_user.firstName + " " + selected_user.lastName
       );
     },
-
-    likes(postId) {
-      const likes = {
-        parent: { type: "post", id: postId },
-        author: this.datauser
+    like(post_id) {
+      // const likes = {
+      //   parent: { type: "post", id: postId },
+      //   author: this.datauser
+      // };
+      const like = {
+        post_id, // тут всегда код поста, даже если лайк комменту или ответу, чтобы знать где искать
+        user_id: this.user_id,
+        parent: { type: "post", id: post_id } // дублируется код поста т.к. лайкаем пост но в общем случае тут разные типы
       };
-      this.$store.dispatch(SEND_LIKE, likes);
+      this.$store.dispatch(SEND_LIKE, like);
     },
-    dislike(postId) {
-      const likes = {
-        parent: { type: "post", id: postId },
-        author: this.datauser
+    dislike(post_id) {
+      const like = {
+        post_id,
+        user_id: this.user_id,
+        parent: { type: "post", id: post_id }
       };
-      this.$store.dispatch(DELETE_LIKE, likes).finally(() => {
-        let parentVal = "";
-        let idUrl = "0";
-        switch (this.$route.path.split("/")[1]) {
-          case "group":
-            parentVal = "group";
-            idUrl = this.$route.params._id;
-            break;
-          case "profile":
-            parentVal = "user";
-            idUrl = this.$route.params._id;
-            break;
-          case "company":
-            parentVal = "company";
-            break;
-        }
-        this.$store.dispatch(GET_POSTS, {
-          filter: {
-            parent: {
-              type: parentVal,
-              id: idUrl
-            }
-          }
-        });
-      });
+      this.$store.dispatch(DELETE_LIKE, like);
+      // .finally(() => {
+      //   let parentVal = "";
+      //   let idUrl = "0";
+      //   switch (this.$route.path.split("/")[1]) {
+      //     case "group":
+      //       parentVal = "group";
+      //       idUrl = this.$route.params._id;
+      //       break;
+      //     case "profile":
+      //       parentVal = "user";
+      //       idUrl = this.$route.params._id;
+      //       break;
+      //     case "company":
+      //       parentVal = "company";
+      //       break;
+      //   }
+      //   this.$store.dispatch(GET_POSTS, {
+      //     filter: {
+      //       parent: {
+      //         type: parentVal,
+      //         id: idUrl
+      //       }
+      //     }
+      //   });
+      // });
     },
     sendComment(postId) {
       const comment = {
         parent: { type: "post", id: postId },
-        author: this.datauser,
+        author: this.user_id,
         created: moment(),
         message: this.commentContent,
         mentions: this.mentionsData.map(m => m.id)
@@ -332,7 +354,7 @@ export default {
         ...rePost,
         likes: [],
         comments: [],
-        parent: { type: "user", id: this.datauser._id }
+        parent: { type: "user", id: this.user_id }
       });
     },
     soc_open(netwO, url) {

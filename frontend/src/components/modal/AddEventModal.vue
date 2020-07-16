@@ -405,7 +405,8 @@ export default {
       text = text.toLowerCase();
       this.usersData = this.users.filter(el => {
         return (
-          el.firstName.toLowerCase().indexOf(text) !== -1 ||
+          (!el.deletion_mark &&
+            el.firstName.toLowerCase().indexOf(text) !== -1) ||
           el.lastName.toLowerCase().indexOf(text) !== -1 ||
           (el.firstName + " " + el.lastName).toLowerCase().indexOf(text) !==
             -1 ||
@@ -478,7 +479,7 @@ export default {
   },
   async mounted() {
     await this.$store.dispatch(GET_USERS, this.currentClient.workspace);
-    this.usersData = this.users;
+    this.usersData = this.users.filter(u => !u.deletion_mark);
     //console.log('userData: ',JSON.stringify(this.usersData,null,2))
   }
 };

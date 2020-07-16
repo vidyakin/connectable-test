@@ -14,27 +14,27 @@ import {
   GET_POSTS_OF_GROUPS,
   GET_COMMENTS,
   GET_MENTIONS
-} from '@/store/post/actions.type';
+} from './actions.type';
 
-import { } from '@/store/post/actions.type';
+import { } from './actions.type';
 import {
   deletePost, editPost, getPosts, getPost, repost,
   getPostsOfFollows, getPostsOfuserGroups,
   sendComment, sendLike, sendNewPost,
-  dislike, editComment, deleteComment, getComments, getMentions
-} from '@/services/post.service';
+  sendDislike, editComment, deleteComment, getComments, getMentions
+} from './post.service';
 
 import {
   ADD_ANSWER_FOR_COMMENT,
   ADD_COMMENT_FOR_POST,
-  ADD_LIKE_FOR_COMMENT,
-  ADD_LIKE_FOR_POST,
+  ADD_LIKE_FOR_COMMENT, REMOVE_LIKE_FOR_COMMENT,
+  ADD_LIKE_FOR_POST, REMOVE_LIKE_FOR_POST,
   ADD_POST, CHANGE_POST, CHANGE_COMMENT, CHANGE_ANSWER,
   REMOVE_POST, SET_EDIT_POST_VISIBLE, SET_POST_FOR_EDITING, SET_EDIT_COMMENT_VISIBLE, SET_COMMENT_FOR_EDITING,
   SET_POSTS, SET_POSTS_OF_FOLLOWS, SET_POSTS_OF_GROUPS, SET_POST,
   REMOVE_COMMENT, REMOVE_ANSWER,
   SET_COMMENTS_FEED, SET_MENTIONS_FEED
-} from '@/store/post/mutations.type';
+} from './mutations.type';
 import { DELETE_EVENT } from '@/store/user/actions.type';
 
 interface State {
@@ -117,7 +117,7 @@ const actions = {
   [GET_POSTS_OF_GROUPS]: getPostsOfuserGroups,
   [GET_POST]: getPost,
   [SEND_LIKE]: sendLike,
-  [DELETE_LIKE]: dislike,
+  [DELETE_LIKE]: sendDislike,
   [SEND_COMMENT]: sendComment,
   [DELETE_POST]: deletePost,
   [DELETE_COMMENT]: deleteComment,
@@ -127,6 +127,11 @@ const actions = {
   [GET_COMMENTS]: getComments,
   [GET_MENTIONS]: getMentions
 };
+
+const replaceVal = (arr: any, val: any, newVal: any) => {
+  const n = arr.findIndex((a: any) => a == val);
+  return n == -1 ? arr : [...arr.slice(0, n), newVal, ...arr.slice(n + 1)]
+}
 
 const mutations = {
   [SET_POSTS](state: State, posts: any[]) {
@@ -150,7 +155,16 @@ const mutations = {
 
   [ADD_LIKE_FOR_POST](state: State, like: any) {
     const postIndex = state.posts.findIndex((post) => post._id === like.parent.id);
-    state.posts[postIndex].likes.push(like)
+    const post = { ...state.posts[postIndex] }
+    post.likes.push(like)
+    state.posts = [...state.posts.slice(0, postIndex), post, ...state.posts.slice(postIndex + 1)]
+  },
+
+  [REMOVE_LIKE_FOR_POST](state: State, like: any) {
+    const postIndex = state.posts.findIndex((post) => post._id === like.parent.id);
+    const post = { ...state.posts[postIndex] }
+    post.likes = post.likes.filter(l => l.author._id != like.author._id)
+    state.posts = [...state.posts.slice(0, postIndex), post, ...state.posts.slice(postIndex + 1)]
   },
 
   [ADD_LIKE_FOR_COMMENT](state: State, like: any) {
@@ -160,6 +174,10 @@ const mutations = {
       return commentIndex !== -1;
     });
     state.posts[postIndex].comments[commentIndex].likes.push(like)
+  },
+
+  [REMOVE_LIKE_FOR_COMMENT](state: State, like: any) {
+
   },
 
   [ADD_COMMENT_FOR_POST](state: State, comment: any) {

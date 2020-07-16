@@ -11,22 +11,23 @@ const postSchema = new Schema({
   author_ref: { type: Schema.Types.ObjectId, ref: 'User' },
   author: Object,
   attachment: Array,
-  created: {
-    type: Date,
-    default: Date.now(),
-  },
-  likes: Array,
-  comments: Array,
-  edited: {
-    type: Boolean,
-    default: false,
-  },
+  created: { type: Date, default: Date.now },
+  likes: [{
+    created: { type: Date, default: Date.now },
+    author: { type: Schema.Types.ObjectId, ref: 'User' }
+  }],
+  comments: [{ type: Schema.Types.ObjectId, ref: 'Comment' }],
+  edited: { type: Boolean, default: false },
   mentions: [{ type: Schema.Types.ObjectId, ref: 'User' }]
 });
 
-postSchema.pre('find', function () {
-  this.populate('mentions', 'firstName lastName');
-});
+const populatePost = function () {
+  this.populate('mentions', 'firstName lastName')
+    .populate('likes.author', 'firstName lastName')
+}
+
+postSchema.pre('findOne', populatePost)
+  .pre('find', populatePost);
 
 postSchema.post('save', function (doc, next) {
   doc.populate('mentions', 'firstName lastName')
