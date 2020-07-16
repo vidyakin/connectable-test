@@ -88,7 +88,7 @@
               </div>
               <div>
                 <div class="post-wrapper-header-author">Заявка на вступление в группу</div>
-                <div class="post-wrapper-header-time">Время создания заявки</div>
+                <div class="post-wrapper-header-time">{{req.created | asDateTime}}</div>
               </div>
             </div>
             <div class="post-wrapper-content">
@@ -273,6 +273,9 @@ export default Vue.extend({
     },
     asTime(d) {
       return new Date(d).toLocaleTimeString();
+    },
+    asDateTime(d) {
+      return new Date(d).toLocaleString();
     }
   },
   methods: {
