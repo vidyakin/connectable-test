@@ -3,7 +3,7 @@ import {
   ADD_ANSWER_FOR_COMMENT,
   ADD_COMMENT_FOR_POST,
   ADD_LIKE_FOR_COMMENT,
-  ADD_LIKE_FOR_POST,
+  ADD_LIKE_FOR_POST, REMOVE_LIKE_FOR_POST,
   ADD_POST, CHANGE_POST, CHANGE_COMMENT, CHANGE_ANSWER,
   REMOVE_POST,
   REMOVE_COMMENT,
@@ -102,21 +102,57 @@ export const getPost = async (context: any, postId: any) => {
   context.commit(SET_POST, response.data.result);
 };
 
-export const sendLike = async (context: any, like: any) => {
-  const response = await Vue.axios
-    .post('api/like', like);
-  const newLike = response.data.result;
-  if (newLike.parent.type === 'post') {
-    context.commit(ADD_LIKE_FOR_POST, newLike);
+type Like = {
+  post_id: string,
+  user_id: string,
+  parent: {
+    type: 'post' | 'user' | 'group' | 'comment',
+    id: string
   }
-  if (newLike.parent.type === 'comment') {
-    context.commit(ADD_LIKE_FOR_COMMENT, newLike);
+}
+
+type LikeResponse = {
+  _id: string,
+  author: {
+    _id: string,
+    firstName: string,
+    lastName: string
+  },
+  created: Date
+}
+
+/**
+ * 
+ * @param context 
+ * @param like : Like  // TODO: доработать на стороне клиента отправку 
+ */
+export const sendLike = async (context: any, like: Like) => {
+  const response = await Vue.axios
+    .post('api/post/like', like);
+  if (response.data.status == 201) {
+    const newLike: LikeResponse = response.data.result;
+    if (like.parent.type === 'post') {
+      context.commit(ADD_LIKE_FOR_POST, newLike);
+    }
+    if (like.parent.type === 'comment') {
+      context.commit(ADD_LIKE_FOR_COMMENT, newLike);
+    }
   }
 };
-export const dislike = async (context: any, disLike: any) => {
+
+export const sendDislike = async (context: any, dislike: Like) => {
   const response = await Vue.axios
     // .delete(`api/dislike/${arrRes}`)
-    .post('api/dislike', disLike);
+    .post('api/post/dislike', dislike);
+  if (response.data.status == 201) {
+    const newDislike: LikeResponse = response.data.result;
+    if (dislike.parent.type === 'post') {
+      context.commit(REMOVE_LIKE_FOR_POST, newDislike);
+    }
+    // if (dislike.parent.type === 'comment') {
+    //   context.commit(REMOVE_LIKE_FOR_COMMENT, newDislike);
+    // }
+  }
   return response.data;
 };
 
