@@ -92,7 +92,7 @@
           <a-mentions-option
             :value="user.firstName+' '+user.lastName"
             :data-id="user._id"
-            v-for="user in users"
+            v-for="user in users.filter(u => !u.deletion_mark)"
             :key="user._id"
           >{{user.firstName}} {{user.lastName}}</a-mentions-option>
         </a-mentions>
