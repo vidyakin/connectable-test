@@ -9,9 +9,9 @@
       <a-button
         v-model="statusFollow"
         v-if="this.$route.params._id != datauser._id"
-        :class="{'is-active' : currentUser.followers.includes(datauser._id)}"
-        @click="handleFollowClick(currentUser._id, datauser._id, datauser.email, currentUser.followers.includes(datauser._id))"
-      >{{ currentUser.followers.includes(datauser._id) ? 'Уже подписаны' : 'Подписаться' }}</a-button>
+        :class="{'is-active' : iamSubscribed }"
+        @click="handleFollowClick(currentUser._id, datauser._id, datauser.email, iamSubscribed)"
+      >{{ iamSubscribed ? 'Уже подписаны' : 'Подписаться' }}</a-button>
     </div>
 
     <div class="user-info-content">
@@ -59,6 +59,9 @@ export default {
     ...mapGetters(["currentUser", "userData", "userIsAdmin"]),
     datauser() {
       return this.userData.result;
+    },
+    iamSubscribed() {
+      return this.currentUser.followers.includes(this.datauser._id)
     }
   },
   methods: {
