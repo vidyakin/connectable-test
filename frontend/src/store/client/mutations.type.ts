@@ -20,3 +20,5 @@ export const CHANGE_WORKSPACE = 'CHANGE_WORKSPACE'
 // статистика по данным в БД
 export const SET_STATISTIC = 'SET_STATISTIC'
 export const UPDATE_STATISTIC = 'UPDATE_STATISTIC'
+
+export const SET_DIALOG_MESSAGE = 'SET_DIALOG_MESSAGE'
