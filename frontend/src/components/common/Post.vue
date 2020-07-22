@@ -91,7 +91,9 @@
         <a-avatar :src="userAvatar"></a-avatar>
         <a-mentions
           v-model="commentContent"
+          :prefix="['@',dblQuote]"
           @keypress.enter.prevent="sendComment(post._id)"
+          @search="onSearch"
           @select="onSelect"
         >
           <div slot="addonAfter" class="comment-input-action">
@@ -207,6 +209,7 @@ export default {
       visible: false,
       commentContent: "",
       allComment: false,
+      currPrefix: "",
       pubUrl: PUBLIC_URL
       // datauser: store.getters.userData.result
       //   ? store.getters.userData.result
@@ -222,6 +225,9 @@ export default {
       "userData",
       "userIsAdmin"
     ]),
+    dblQuote() {
+      return '"';
+    },
     user_id() {
       return this.userData.result && this.userData.result._id;
     },
@@ -254,18 +260,24 @@ export default {
     getMomentTime(time) {
       return moment(time).fromNow(true);
     },
+    onSearch(val, prefix) {
+      this.currPrefix = prefix;
+    },
     onSelect(option) {
       const selected_user = this.users.find(
         u => u.firstName + " " + u.lastName == option.value
       );
+      const name = selected_user.firstName + " " + selected_user.lastName;
       this.mentionsData.push({
         id: selected_user._id,
-        name: selected_user.firstName + " " + selected_user.lastName
+        name
       });
-      console.log(
-        "Выбран ",
-        selected_user.firstName + " " + selected_user.lastName
-      );
+      if (this.currPrefix == '"') {
+        this.commentContent = this.commentContent.replace(
+          '"' + name,
+          "@" + name
+        );
+      }
     },
     like(post_id) {
       // const likes = {
