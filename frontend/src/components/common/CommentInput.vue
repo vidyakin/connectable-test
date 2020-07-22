@@ -3,7 +3,9 @@
     <!-- <a-input class="input" placeholder="Сообщение..." v-model="current" @pressEnter="send"> -->
     <a-mentions
       v-model="current"
+      :prefix="['@',dblQuote]"
       @select="onSelect"
+      @search="onSearch"
       @change="onChange"
       @keypress.enter.prevent="send"
     >
@@ -56,6 +58,7 @@ export default {
       fileList: [],
       statusEmailSend: false,
       mentionsData: [],
+      currPrefix: "",
       datauser: store.getters.userData
         ? store.getters.userData
         : store.getters.user
@@ -71,6 +74,9 @@ export default {
       "userData",
       "notification"
     ]),
+    dblQuote() {
+      return '"';
+    },
     mentionsFormat() {
       const f =
         (this.mentionsData.length ? "Упомянутые сотрудники: " : "") +
@@ -83,14 +89,21 @@ export default {
     }
   },
   methods: {
+    onSearch(val, prefix) {
+      this.currPrefix = prefix;
+    },
     onSelect(option) {
       const selected_user = this.users.find(
         u => u.firstName + " " + u.lastName == option.value
       );
+      const name = selected_user.firstName + " " + selected_user.lastName;
       this.mentionsData.push({
         id: selected_user._id,
-        name: selected_user.firstName + " " + selected_user.lastName
+        name
       });
+      if (this.currPrefix == '"') {
+        this.current = this.current.replace('"' + name, "@" + name);
+      }
     },
     onChange(val) {
       const mentions = getMentions(val);
