@@ -7,7 +7,12 @@
     <a-table :columns="columns" :data-source="client_statistic" v-if="loaded">
       <span class="collection-name" slot="collection" slot-scope="c_name">{{c_name}}</span>
       <span slot="actions" slot-scope="row">
-        <a-button type="danger" size="small" @click="deleteCollectionDialog(row.collection)">Удалить данные</a-button>
+        <a-button
+          type="danger"
+          size="small"
+          :disabled="!accessible[row.collection]"
+          @click="deleteCollectionDialog(row.collection)"
+        >Удалить данные</a-button>
         <a-divider type="vertical" />
         <a-button size="small" disabled>Удалить по фильтру</a-button>
       </span>
@@ -44,11 +49,18 @@ export default {
     return {
       columns: cols,
       //db_data: demo_data,
+      accessible: {
+        users: false,
+        posts: false,
+        events: true,
+        groups: false,
+        messages: true
+      },
       loaded: false
     };
   },
   computed: {
-    ...mapGetters(["client_statistic", "currentClient"])
+    ...mapGetters(["client_statistic", "currentClient", "dialog_message"])
   },
   created() {
     this.$store
@@ -58,34 +70,38 @@ export default {
       });
   },
   methods: {
-    deleteCollectionDialog(col_name) {
+    deleteCollectionDialog(coll_name) {
       this.$confirm({
-        title: 'Удаление коллекции '+col_name,
-        content: 'Данные будут удалены безвозвратно, удалить?',
-        okText: 'Удалить',
-        okType: 'danger',
-        cancelText: 'Нет',
-        onOk() {
-          this.dropCollection(col_name)
+        title: "Удаление коллекции " + coll_name,
+        content: "Данные будут удалены безвозвратно, удалить?",
+        centered: true,
+        okText: "Удалить",
+        okType: "danger",
+        cancelText: "Нет",
+        onOk: () => {
+          this.dropCollection(coll_name);
         }
-      })
+      });
     },
-    dropCollection(col_name) {
-      this.$store.dispatch(DROP_COLLECTION, this.currentClient.workspace, col_name)
-        .then(res => {
-          this.$success({
-            title: "Данные в коллекции удалены",
-            content: "Коллекция очищена",
-            centered: true
-          })
-        })
-        .catch(err => {
-          this.$error({
-            title: "Ошибка при удалении данных",
-            content: err,
-            centered: true
-          })
-        })
+    async dropCollection(coll_name) {
+      try {
+        const res = await this.$store.dispatch(DROP_COLLECTION, {
+          client: this.currentClient.workspace,
+          coll_name
+        });
+        console.log("delete result:", res);
+        this.$success({
+          title: "Данные в коллекции удалены: ",
+          content: this.dialog_message,
+          centered: true
+        });
+      } catch (error) {
+        this.$error({
+          title: "Ошибка при удалении данных",
+          content: error,
+          centered: true
+        });
+      }
     }
   }
 };
@@ -97,5 +113,9 @@ export default {
 }
 .collection-name {
   font-weight: bold;
+}
+.ant-table-thead > tr > th,
+.ant-table-tbody > tr > td {
+  padding: 8px;
 }
 </style>

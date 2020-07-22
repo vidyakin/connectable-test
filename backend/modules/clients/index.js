@@ -40,7 +40,6 @@ router.get('/by_ws/:wspace', async (req, res) => {
   } catch (error) {
     res.status(404).send("No client with sent workspace: " + req.params.wspace)
   }
-
 })
 
 /**
@@ -68,7 +67,23 @@ router.get('/stat/:client_id', async (req, res) => {
 })
 
 router.delete('/:client_id/:coll_name', async (req, res) => {
-
+  const { client_id, coll_name } = req.params
+  const models = {
+    users: User,
+    messages: Message,
+    groups: Group,
+    events: Event,
+    posts: Post
+  }
+  try {
+    const result = await models[coll_name].deleteMany({client_id}) 
+    console.log('RESULT OF DELETE:',JSON.stringify(result,null,3));
+    console.log(`>>> Delete collection «${coll_name}» for client «${client_id}»: ${result.deleteedCount} recs was deleted`);
+    res.send({status: 202, result: `Удалено ${result.deleteedCount} записей`})
+  } catch (error) {
+    console.log('>> DELECT COLL error : ',error);
+    res.status(500).send('Error when cleaning collection '+coll_name+': '+error)
+  }
 })
 
 module.exports = router

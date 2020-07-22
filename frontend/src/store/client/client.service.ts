@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { SET_CLIENTS, ADD_CLIENT, UPDATE_CLIENT, SET_CURRENT_CLIENT, SET_STATISTIC, UPDATE_STATISTIC } from '@/store/client/mutations.type'
+import { SET_CLIENTS, ADD_CLIENT, UPDATE_CLIENT, SET_CURRENT_CLIENT, SET_STATISTIC, SET_DIALOG_MESSAGE } from '@/store/client/mutations.type'
 
 export const getClients = (context: any) => {
   return Vue.axios
@@ -42,11 +42,15 @@ export const getStatistic = (context: any, wspace: string) => {
     })
 }
 
-export const deleteCollection = (context: any, wspace: string, coll_name: string) => {
+export const deleteCollection = (context: any, data: { client: string, coll_name: string }) => {
   return Vue.axios
-    .delete(`/api/clients/${wspace}/${coll_name}`)
-    .then(res => {
-      context.commit(UPDATE_STATISTIC, res.data)
+    .delete(`/api/clients/${data.client}/${data.coll_name}`)
+    .then(resDelete => {
+      context.commit(SET_DIALOG_MESSAGE, resDelete.data.result)
+      Vue.axios.get(`/api/clients/stat/${data.client}`)
+        .then(resGet => {
+          context.commit(SET_STATISTIC, resGet.data)
+        })
     })
     .catch(err => {
       throw Error('Ошибка при удалении данных клиента: ' + err)

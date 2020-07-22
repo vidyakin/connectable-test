@@ -1,4 +1,5 @@
 const User = require('@models/user')
+const UsersInDepartment = require('@models/usersInDepartment')
 
 const serializers = require('@/serializers');
 
@@ -32,10 +33,37 @@ router.get('/for_client/:workspace', (req, res) => {
 })
 
 /**
- * Delete/Undelete user actions
+ * Delete/Undelete user actions - PUT because DELETE request is reserved by 
  */
-router.put('/delete/:userId', userDAO.delUserById)
-router.put('/undelete/:userId', userDAO.undelUserById)
+router.put('/delete/:userId', async (req, res) => {
+  const user_id = req.params.userId
+  try {
+    await User.findByIdAndUpdate(user_id, {$set: {deletion_mark: true}}, {new: true})
+    // delete from departments
+    const depts = await UsersInDepartment.find({users: user_id})
+    const upd_depts = await Promise.all(
+      depts.map( async doc => {
+        doc.users = doc.users.filter(user => user!=user_id)
+        await doc.save()
+        return doc._id
+      }))
+    res.status(200).send({
+      status: 200,
+      user_id,
+      deletedFrom: upd_depts
+    })
+  } catch (error) {
+    console.error("> delete user, error: ", error);
+    return res.status(500).send("There was a problem deleting the user: "+error);
+  }
+})
+
+router.put('/undelete/:userId', (req, res) => {
+  User.findByIdAndUpdate(req.params.userId, {$set: {deletion_mark: false}}, {new: true}, (error,doc) => {
+    if (error) return res.status(500).send("There was a problem undeleting the user");
+    res.status(200).send(doc)
+  })
+})
 
 /**
  * Roles

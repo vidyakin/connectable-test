@@ -2,7 +2,7 @@
 import { GET_CLIENTS, CREATE_CLIENT, EDIT_CLIENT, ENTER_CLIENT, GET_STATISTIC, DROP_COLLECTION } from '@/store/client/actions.type'
 
 // import mutations
-import { ADD_CLIENT, SET_CLIENTS, SET_CURRENT_CLIENT, UPDATE_CLIENT, SET_LOGGED_CLIENT, SET_STATISTIC } from '@/store/client/mutations.type'
+import { ADD_CLIENT, SET_CLIENTS, SET_CURRENT_CLIENT, UPDATE_CLIENT, SET_LOGGED_CLIENT, SET_STATISTIC, SET_DIALOG_MESSAGE } from '@/store/client/mutations.type'
 
 // import service functions
 import { createClient, editClient, getClients, changeWorkspace, getStatistic, deleteCollection } from './client.service';
@@ -25,14 +25,16 @@ interface State {
   clients: Client[],
   currentClient: Client | null,
   clientLogged: String,
-  client_statistic: Object | null
+  client_statistic: Object | null,
+  dialog_message: String
 }
 
 const store: State = {
   clients: [],
   currentClient: null,
   clientLogged: "",
-  client_statistic: null
+  client_statistic: null,
+  dialog_message: ""
 }
 
 const getters = {
@@ -44,10 +46,16 @@ const getters = {
   },
   client_statistic(state: State) {
     return state.client_statistic
+  },
+  dialog_message(state: State) {
+    return state.dialog_message
   }
 }
 
 const mutations = {
+  [SET_DIALOG_MESSAGE](state: State, text: string) {
+    state.dialog_message = text
+  },
   [SET_CLIENTS](state: State, clients: Client[]) {
     state.clients = clients
   },
