@@ -4,15 +4,24 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const gISchema = new Schema({
-  clientId: String,       // код клиента
-  userId: String,
-  groupId: String,
+  client_id: {
+    type: String,       // код клиента
+    required: true
+  },
   created: {
     type: Date,
-    default: Date.now(),
+    default: Date.now,
   },
-  group: Object,
+  user: { type: Schema.Types.ObjectId, ref: 'User' },
+  //userId: String,
+  //groupId: String,
+  group: { type: Schema.Types.ObjectId, ref: 'Group' },
 });
 
+gISchema.pre('findOne', function (next) {
+  this.populate('user', 'firstName lastName')
+    .populate('group', 'name description type')
+  next()
+})
 
 module.exports = mongoose.model('GroupInvite', gISchema);

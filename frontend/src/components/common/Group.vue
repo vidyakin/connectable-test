@@ -7,7 +7,7 @@
         <div class="group-header-content-name" @click="redirectToGroup">{{group.name}}</div>
         <div
           class="group-header-content-count"
-        >{{group.participants.length}} {{group && endingWords(group.participants.length)}}</div>
+        >{{group.participants_ref.length}} {{group && endingWords(group.participants_ref.length)}}</div>
       </div>
       <div
         class="group-header-action"
@@ -16,6 +16,7 @@
         <a-popover
           title="Действия с группой"
           trigger="click"
+          v-model="groupActionPopoverVisible"
           overlayClassName="group-header-action-popup-content"
         >
           <template slot="content">
@@ -34,10 +35,10 @@
         </a-popover>
       </div>
     </div>
-    <div class="group-content" v-if="group.participants" @click="redirectToGroup">
+    <div class="group-content" v-if="group.participants_ref" @click="redirectToGroup">
       <div
         :class="['group-content-participant', participant._id == group.creatorId ? 'creator' : '']"
-        v-for="participant in group.participants.filter(e => !!e)"
+        v-for="participant in group.participants_ref.filter(e => !!e).map(p => p.user_ref)"
         :key="participant._id"
       >
         <!--<a-avatar :src="participant.googleImage"></a-avatar>-->
@@ -97,6 +98,7 @@ export default {
   name: "AppGroup",
   data() {
     return {
+      groupActionPopoverVisible: false,
       datauser: store.getters.userData
         ? store.getters.userData.result
         : store.getters.user,
@@ -104,7 +106,7 @@ export default {
     };
   },
   beforeMount() {
-    const null_prt = this.group.participants.findIndex(e => e == null);
+    const null_prt = this.group.participants_ref.findIndex(e => e == null);
     console.log(
       `before mount, ${null_prt != -1 ? "есть пустые участники группы" : ""}`
     );
@@ -131,6 +133,7 @@ export default {
   methods: {
     deleteGroup() {
       this.$store.dispatch(DELETE_GROUP, this.group._id).then(() => {
+        this.groupActionPopoverVisible = false;
         this.$notification["success"]({
           message: "Група удалена",
           placement: "topRight"

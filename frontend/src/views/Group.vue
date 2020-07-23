@@ -21,7 +21,7 @@
             >{{['Открытая','Закрытая','Приватная'][currentGroup.type] }} группа</div>
             <div
               class="group-body-info-header-content-participants"
-            >{{currentGroup.participants.length}} {{endingWords(currentGroup.participants.length)}}</div>
+            >{{currentGroup.participants_ref.length}} {{endingWords(currentGroup.participants_ref.length)}}</div>
           </div>
           <!-- Заголовок группы с действиями -->
           <div class="group-body-info-header-action">
@@ -30,7 +30,7 @@
               trigger="click"
               v-model="visible"
               overlayClassName="group-header-action-popup-content"
-              v-if="currentGroup.creatorId === userinfo._id || userIsAdmin"
+              v-if="currentGroup.creatorId === userData.result._id || userIsAdmin"
             >
               <template slot="content">
                 <!-- Удаление группы -->
@@ -73,12 +73,8 @@
       <div>
         <!-- УЧАСТНИКИ -->
         <div class="group-body-items">
-          <div class="group-body-items-header">Участники ({{currentGroup.participants.length}})</div>
-          <div
-            class="group-body-items-item"
-            v-for="(participant, index) in currentGroup.participants"
-            :key="index"
-          >
+          <div class="group-body-items-header">Участники ({{currentGroup.participants_ref.length}})</div>
+          <div class="group-body-items-item" v-for="(participant, index) in members" :key="index">
             <a-avatar
               :src="(participant.googleImage ? participant.googleImage : require('../assets/no_image.png'))"
             ></a-avatar>
@@ -93,7 +89,7 @@
         <!-- ЗАЯВКИ -->
         <div
           class="group-body-items"
-          v-if="currentGroup.requests.length && (currentGroup.creatorId === userinfo._id || userIsAdmin)"
+          v-if="currentGroup.requests.length && (currentGroup.creatorId === userData.result._id || userIsAdmin)"
         >
           <div class="group-body-items-header">Заявки ({{currentGroup.requests.length}})</div>
           <div
@@ -124,9 +120,7 @@
     <!-- SPINNER while loading -->
     <a-spin size="large" v-else />
     <!-- Блок из поля ввода комментария и постов -->
-    <template
-      v-if="isLoaded && (currentGroup.type === 0 || currentGroup.participants.findIndex(i => i._id === userinfo._id) !== -1)"
-    >
+    <template v-if="isLoaded && (currentGroup.type === 0 || userIsMember)">
       <app-comment-input :parent="{type: 'group', id: currentGroup._id}" />
       <app-post v-for="(post, index) in posts" :post="post" :key="index" />
     </template>
@@ -135,13 +129,13 @@
       <a-button
         type="primary"
         @click="createParticipant"
-        v-if="currentGroup.type === 0 && isAuthor"
+        v-if="currentGroup.type === 0 && !userIsMember"
       >Вступить</a-button>
       <a-button
         type="primary"
         @click="createParticipantsRequest"
         v-if="currentGroup.type === 1
-              && isAuthor
+              && !userIsMember
               && !participantsRequest"
       >Подать заявку</a-button>
       <a-button
@@ -199,11 +193,11 @@ export default {
       changeOwnerVisible: false,
       visible: false,
       hovered: false,
-      output: "",
+      output: ""
       //currentGroup: null,
-      userinfo: store.getters.userData.result
-        ? store.getters.userData.result
-        : store.getters.user.result
+      // userinfo: store.getters.userData.result
+      //   ? store.getters.userData.result
+      //   : store.getters.user.result
     };
   },
   computed: {
@@ -218,12 +212,17 @@ export default {
     getGroupProp(f) {
       return this.currentGroup[f];
     },
+    members() {
+      return this.currentGroup.participants_ref.map(p => p.user_ref);
+    },
     isAuthor() {
+      return this.currentGroup.creator === this.userData.result._id;
+    },
+    userIsMember() {
       return (
-        this.currentGroup.participants &&
-        this.currentGroup.participants.findIndex(
-          i => i._id === this.userinfo._id
-        ) === -1
+        this.members.findIndex(
+          user => user._id === this.userData.result._id
+        ) !== -1
       );
     }
   },
@@ -284,14 +283,14 @@ export default {
     // Работа с участниками группы
     createParticipant() {
       this.$store.dispatch(CREATE_PARTICIPANT, {
-        participantId: this.userinfo._id,
+        participantId: this.userData.result._id,
         groupId: this.currentGroup._id
       });
     },
     deleteOwnParticipant() {
       this.$store
         .dispatch(DELETE_PARTICIPANT, {
-          participantId: this.userinfo._id,
+          participantId: this.userData.result._id,
           groupId: this.currentGroup._id
         })
         .then(() => this.checkParticipants());
@@ -299,19 +298,19 @@ export default {
     createParticipantsRequest() {
       this.$store
         .dispatch(CREATE_PARTICIPANT, {
-          participantId: this.userinfo._id,
+          participantId: this.userData.result._id,
           groupId: this.currentGroup._id,
           approved: false
         })
         .then(() => this.checkParticipants());
     },
     approve(participantId) {
-      this.$store.dispatch(APPROVE_PARTICIPANTS_REQUEST, {
-        groupId: this.currentGroup._id,
-        participantId
-      }).then(() => {
-        
-      });
+      this.$store
+        .dispatch(APPROVE_PARTICIPANTS_REQUEST, {
+          groupId: this.currentGroup._id,
+          participantId
+        })
+        .then(() => {});
     },
     deleteParticipant(participantId) {
       this.$store
@@ -324,7 +323,7 @@ export default {
     checkParticipants() {
       this.$store.dispatch(GET_PARTICIPANTS_REQUEST, {
         groupId: this.currentGroup._id,
-        participantId: this.userinfo._id
+        participantId: this.userData.result._id
       });
     }
   },

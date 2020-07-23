@@ -50,7 +50,13 @@ export default {
   },
   components: {},
   computed: {
-    ...mapGetters(["user", "currentGroup", "users", "currentClient"]),
+    ...mapGetters([
+      "userData",
+      "user",
+      "currentGroup",
+      "users",
+      "currentClient"
+    ]),
     filteredData() {
       return !this.data
         ? []
@@ -89,8 +95,9 @@ export default {
       Promise.all(
         this.selectedItems.map(userId => {
           const inviteData = {
-            userId: userId.key,
-            groupId: this.currentGroup._id,
+            client_id: this.userData.result.client_id,
+            user: userId.key,
+            group: this.currentGroup._id,
             groupType: this.currentGroup.type
           };
           console.log(`Создаем инвайт: ${JSON.stringify(inviteData, null, 2)}`);
