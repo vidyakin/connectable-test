@@ -7,7 +7,7 @@ import {
   EDIT_GROUP,
   GET_CURRENT_GROUP,
   GET_GROUPS, GET_GROUPS_BY_CLIENT, GET_INVITE, GET_PARTICIPANTS_REQUEST,
-  REPLACE_GROUPS_OWNER,
+  REPLACE_GROUPS_OWNER, CHANGE_GROUP_OWNER,
   GET_REQUESTS_TO_MY_GROUPS
 } from './actions.type';
 import {
@@ -19,7 +19,7 @@ import {
   editGroup,
   getCurrentGroup,
   getGroups, getGroupsByClient, getInvite, getParticipantsRequest,
-  replaceGroupsOwner,
+  replaceGroupsOwner, changeGroupOwner,
   getRequests
 } from './group.service';
 import {
@@ -82,6 +82,7 @@ const actions = {
   [APPROVE_INVITE]: approveInvite,
   [CANCEL_INVITE]: cancelInvite,
   [REPLACE_GROUPS_OWNER]: replaceGroupsOwner,
+  [CHANGE_GROUP_OWNER]: changeGroupOwner,
   [GET_REQUESTS_TO_MY_GROUPS]: getRequests
 };
 

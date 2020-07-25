@@ -32,7 +32,7 @@ router.get('/for_client/:workspace', async (req, res) => {
 })
 
 /**
- * Get unapproved participants of group
+ * Get unapproved participants of group [DEPRECATED]
  */
 router.get('/:groupId/checkParticipant/:participantId', (req, res, next) => {
   const { participantId, groupId } = req.params;
@@ -47,39 +47,86 @@ router.get('/:groupId/checkParticipant/:participantId', (req, res, next) => {
   })
 });
 
-router.post('/:groupId/approveParticipant/:participantId', async (req, res) => {
-  const { participantId, groupId } = req.params;
+/**
+ * Became a participant of open group or create request to closed one
+ */
+router.post('/:group_id/participant/:user_id', async (req,res) => {
+  try {
+    const { group_id, user_id } = req.params
+    const result = await Group.createParticipantOrRequest(group_id, user_id)
+    res.status(200).send({
+      status: 200,
+      result
+    })
+  } catch (error) {
+    console.log('>> becoming a participant error: ', error);
+    res.status(500).send(error);
+  }
+})
+
+/**
+ * Delete a participant of any group
+ */
+router.delete('/:group_id/participant/:user_id', async (req,res) => {
+  try {
+    const { group_id, user_id } = req.params
+    const result = await Group.removeParticipant(group_id, user_id)
+    res.status(200).send({
+      status: 200,
+      result
+    })
+  } catch (error) {
+    console.log('>> removing a participant error: ', error);
+    res.status(500).send(error);
+  }
+})
+
+/**
+ * Delete a request to join
+ */
+router.delete('/:group_id/request/:user_id', async (req,res) => {
+  try {
+    const { group_id, user_id } = req.params
+    const result = await Group.removeRequest(group_id, user_id)
+    res.status(200).send({
+      status: 200,
+      result
+    })
+  } catch (error) {
+    console.log('>> removing a request error: ', error);
+    res.status(500).send(error);
+  }
+})
+
+/**
+ * Approve request to join
+ */
+router.post('/:group_id/participant/:user_id/approve', async (req, res) => {
+  const { user_id, group_id } = req.params;
 
   try {
-    const group = await Group.findById(groupId)
-    const new_participant = await User.findById(participantId)
-    const result = await GroupParticipant.updateOne({ participantId, groupId, approved: false }, { approved: true })
-    if (!result.nModified) return res.status(422).send({ status: "No one GroupParticipant was updated" })
-    // TODO: refactor after change schema "Group"
-    // group.participants.push(new_participant)
-    // group.save()
-    // res.send({status: "User is now the participant of the group"})
-
-    const info_post = {
-      message: `${new_participant.firstName} ${new_participant.lastName} добавлен в группу ${group.name}`,
-      parent: {
-        type: "system.GROUPS.NEW_USER",
-        group: { id: groupId, name: group.name },
-        user: { id: participantId, name: new_participant.firstName + ' ' + new_participant.lastName }
-      },
-      author: "system",
-      client_id: group.client_id
-    }
-    await Post.create(info_post)
-    console.log(`info post was created`);
-
-    res.send({ status: "OK" })
-
+    const result = await Group.approveRequest(group_id, user_id)
+    res.send({ status: 200, result })
   } catch (error) {
-    console.log('Error in approveParticipant: ', error);
-    res.status(500).send({ error })
+    console.log('Error in approve participant: ', error);
+    res.status(500).send({ status: 500, result: error })
   }
 });
+
+/**
+ * Change owner of one group
+ */
+router.put('/:group_id/owner/:user_id', async (req,res) => {
+  const { user_id, group_id } = req.params;
+  try {
+    const result = await Group.changeOwner(group_id, user_id)
+    res.send({ status: 200, result })
+  } catch (error) {
+    console.log('Error in changing owner of the group: ', error);
+    res.status(500).send({ error })
+  }
+})
+
 
 router.post('/approveInvite/:inviteId', async (req, res, next) => {
   const invite = await GroupInvite.findOne({ _id: req.params.inviteId }, 'group user')

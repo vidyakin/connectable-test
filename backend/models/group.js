@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
-const groupParticipant = require('./groupParticipant');
 const User = require('./user');
-const client = require('./client');
+const Post = require('./post');
 
 // schema maps to a collection
 const Schema = mongoose.Schema;
@@ -28,7 +27,7 @@ const groupSchema = new Schema({
       type: Date, default: Date.now,
     }
   }],
-  requests: [{
+  requests_ref: [{
     user_ref: {
       type: Schema.Types.ObjectId, ref: 'User'
     },
@@ -41,9 +40,9 @@ const groupSchema = new Schema({
   }]
 });
 
-const populateMembers = function (next) {
-  this.populate('participants_ref.user_ref', 'firstName lastName positions googleImage');
-  next()
+const populateMembers = function () {
+  this.populate('participants_ref.user_ref', 'firstName lastName positions googleImage')
+  this.populate('requests_ref.user_ref', 'firstName lastName positions googleImage')
 }
 
 groupSchema
@@ -95,6 +94,114 @@ groupSchema.statics.findGroupsByUserId = async function (user_id) {
     console.log(`groups: ${JSON.stringify(groups.map(g => ({ type: g.type, name: g.name })), null, 3)}`);
     return groups
   }
+}
+
+/**
+ * Включение сотрудника в состав участников или в список подавших заявку на вступление (для закрытой группы)
+ * @param {String} group_id 
+ * @param {String} user_id 
+ */
+groupSchema.statics.createParticipantOrRequest = async function(group_id, user_id) {
+  const group = await this.findById(group_id)
+  // forbid to join into private group thr. POST query
+  if (group.type == 2) {
+    return res.status(500).send({
+      status: 500,
+      result: "You cannot join to private group"
+    });
+  }
+  // choose collection based on group type
+  const collection = ['participants_ref','requests_ref'][group.type];
+  // push user ID to choosen collection and save
+  if (!group[collection].find(el => el.user_ref._id.toString() == user_id)) {
+    group[collection].push({ user_ref: user_id })
+    await group.save()
+    return `user has been ${group.type == 0 ? 'added' : 'sent request'} to the group`
+  } else 
+    return `this user ${group.type == 0 ? 'is participant yet' : 'has sent request earlier'}`
+}
+
+/**
+ * Удаление сотрудника из состава участников или из списка подавших заявку на вступление
+ * @param {String} group_id 
+ * @param {String} user_id 
+ */
+groupSchema.statics.removeParticipant = async function(group_id, user_id) {
+  const group = await this.findById(group_id)
+  if (group.participants_ref.find(el => el.user_ref._id.toString() == user_id)) {
+    group.participants_ref = group.participants_ref.filter(p => p.user_ref._id.toString() != user_id)
+    await group.save()
+    return `User has been removed from the group`
+  } else 
+    return `This user is not participant of this group`
+}
+
+/**
+ * Одобрение заявки на вступление
+ * @param {String} group_id 
+ * @param {String} user_id 
+ */
+groupSchema.statics.approveRequest = async function(group_id, user_id) {
+  const group = await this.findById(group_id)
+  const new_participant = await User.findById(user_id)
+  // check that request exists
+  if (!group.requests_ref.find(r => r.user_ref._id.toString() == user_id)) {
+    return { status: 404, result: 'No requests for this user in this group' }
+  }
+  // del request and add user as participant
+  group.requests_ref = group.requests_ref.filter(p => p.user_ref._id.toString() != user_id)
+  group.participants_ref.push({ user_ref: user_id })
+  
+  //const result = await GroupParticipant.updateOne({ userId, groupId, approved: false }, { approved: true })
+  //if (!result.nModified) return res.status(422).send({ status: "No one GroupParticipant was updated" })
+  await group.save()
+
+  const fullName = new_participant.firstName + ' ' + new_participant.lastName
+  const info_post = {
+    message: `${fullName} добавлен в группу ${group.name}`,
+    parent: {
+      type: "system.GROUPS.NEW_USER",
+      group: { id: group_id, name: group.name },
+      user: { id: user_id, name: fullName }
+    },
+    author: "system",
+    client_id: group.client_id
+  }
+  await Post.create(info_post);
+  console.log(`info post was created`);
+  return {
+    status:201,
+    result: `Request was approved, user ${fullName} now is the participant of the group` 
+  }
+}
+
+/**
+ * Удаление заявки на вступление из списка заявок группы
+ * @param {String} group_id 
+ * @param {String} user_id 
+ */
+groupSchema.statics.removeRequest = async function(group_id, user_id) {
+  const group = await this.findById(group_id)
+  if (group.requests_ref.find(el => el.user_ref._id.toString() == user_id)) {
+    group.requests_ref = group.requests_ref.filter(p => p.user_ref._id.toString() != user_id)
+    await group.save()
+    return `Request has been removed from the group`
+  } else 
+    return `No request for this user there is in this group`
+}
+
+groupSchema.statics.changeOwner = async function(group_id, user_id) {
+  const group = await this.findById(group_id)
+  // удаляем старого владельца из участников - пока не удаляем, просто меняем
+  //group.participants_ref = group.participants_ref.filter(p => p.user_ref != group.creator)
+  // добавляем нового как участника, если его еще нет среди них
+  if (!group.participants_ref.find(p => p.user_ref._id.toString() == user_id)) {
+    group.participants_ref.push({user_ref: user_id})
+  }
+  // добавляем нового как владельца группы
+  group.creator = user_id
+  await group.save()
+  return `New user was set as author of the group`
 }
 
 module.exports = mongoose.model('Group', groupSchema);
