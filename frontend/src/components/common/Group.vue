@@ -2,21 +2,23 @@
   <!-- Приватная группа, когда пользователь это ее создатель -->
   <!-- <div class="group" v-if="group.type === 2 && group.creatorId === datauser._id || userIsAdmin"> -->
   <div class="group" v-if="groupVisible">
-    <div class="group-header" :class="group.type === 2 ? 'private' : ''">
-      <div class="group-header-content">
-        <div class="group-header-content-name" @click="redirectToGroup">{{group.name}}</div>
+    <div class="header" :class="group.type === 2 ? 'private' : ''">
+      <div class="title">
+        <div class="title-name" @click="redirectToGroup">{{group.name}}</div>
         <div
-          class="group-header-content-count"
-        >{{group.participants.length}} {{group && endingWords(group.participants.length)}}</div>
+          class="title-count"
+        >{{group.participants_ref.length}} {{group && endingWords(group.participants_ref.length)}}</div>
+        <div
+          class="title-type"
+        >{{['Открытая группа','Закрытая группа','Приватная группа'][group.type]}}</div>
       </div>
-      <div
-        class="group-header-action"
-        v-if="group && group.creatorId === datauser._id || userIsAdmin"
-      >
+      <!-- Меню действий для админа/владельца -->
+      <div class="action" v-if="group && group.creatorId === datauser._id || userIsAdmin">
         <a-popover
           title="Действия с группой"
           trigger="click"
-          overlayClassName="group-header-action-popup-content"
+          v-model="groupActionPopoverVisible"
+          overlayClassName="popup-content"
         >
           <template slot="content">
             <a-popconfirm
@@ -34,20 +36,19 @@
         </a-popover>
       </div>
     </div>
-    <div class="group-content" v-if="group.participants" @click="redirectToGroup">
+    <!-- GROUP CONTENT -->
+    <div class="content" v-if="group.participants_ref" @click="redirectToGroup">
       <div
-        :class="['group-content-participant', participant._id == group.creatorId ? 'creator' : '']"
-        v-for="participant in group.participants.filter(e => !!e)"
+        :class="['participant', participant._id == group.creator ? 'creator' : '']"
+        v-for="participant in group.participants_ref.map(p => p.user_ref)"
         :key="participant._id"
       >
         <!--<a-avatar :src="participant.googleImage"></a-avatar>-->
-        <div class="group-content-participant-info">
-          <div
-            class="group-content-participant-info-name"
-          >{{participant.firstName + " " + participant.lastName}}</div>
-          <div class="group-content-participant-info-positions">{{participant.positions.join(', ')}}</div>
+        <div class="info">
+          <div class="name">{{ fullName(participant) | undefReplace }}</div>
+          <div class="positions">{{participant.positions && participant.positions.join(', ')}}</div>
         </div>
-        <a-icon class="img-creator" type="crown" v-if="participant._id == group.creatorId" />
+        <a-icon class="img-creator" type="crown" v-if="participant._id == group.creator" />
       </div>
     </div>
   </div>
@@ -97,14 +98,15 @@ export default {
   name: "AppGroup",
   data() {
     return {
+      groupActionPopoverVisible: false,
       datauser: store.getters.userData
         ? store.getters.userData.result
         : store.getters.user,
-      output: ""
+      output: "",
     };
   },
   beforeMount() {
-    const null_prt = this.group.participants.findIndex(e => e == null);
+    const null_prt = this.group.participants_ref.findIndex((e) => e == null);
     console.log(
       `before mount, ${null_prt != -1 ? "есть пустые участники группы" : ""}`
     );
@@ -113,10 +115,10 @@ export default {
     //console.log(`mounted`);
   },
   props: {
-    group: Object
+    group: Object,
   },
   computed: {
-    ...mapGetters(["userData", "userIsAdmin"])
+    ...mapGetters(["userData", "userIsAdmin"]),
   },
   // created() {
   //   console.log(
@@ -127,13 +129,18 @@ export default {
   //     )}, group: ${this.group}`
   //   );
   // },
-
+  filters: {
+    undefReplace(val) {
+      return val == undefined ? "<DELETED>" : val;
+    },
+  },
   methods: {
     deleteGroup() {
       this.$store.dispatch(DELETE_GROUP, this.group._id).then(() => {
+        this.groupActionPopoverVisible = false;
         this.$notification["success"]({
           message: "Група удалена",
-          placement: "topRight"
+          placement: "topRight",
         });
       });
     },
@@ -163,24 +170,17 @@ export default {
         (this.group.type === 2 && this.group.creatorId === this.datauser._id) ||
         this.userIsAdmin
       );
-    }
-  }
+    },
+    fullName(participant) {
+      return participant.firstName == undefined
+        ? "<DELETED>"
+        : participant.firstName + " " + participant.lastName;
+    },
+  },
 };
 </script>
 
 <style lang="scss">
-.group-header-action-popup-content {
-  text-align: center;
-
-  // .ant-popover-inner-content {
-  // display: flex;
-  // justify-content: center;
-  // .ant-btn {
-  //   border: 0;
-  //   background-color: transparent;
-  // }
-  // }
-}
 .group {
   min-width: 16rem;
   max-width: 16rem;
@@ -191,7 +191,7 @@ export default {
   margin-right: 2rem;
   margin-bottom: 2rem;
 
-  &-header {
+  & .header {
     background-color: #f5f6fa;
     height: 4rem;
     padding: 0.75rem 0.5rem 0.75rem 1rem;
@@ -199,14 +199,17 @@ export default {
     justify-content: space-between;
     margin-bottom: 15px;
 
-    &.private {
+    & .private {
       background-color: lavender;
     }
 
-    &-content {
+    & .title {
       max-width: 90%;
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
 
-      &-name {
+      .title-name {
         height: 20px;
         font-size: 16px;
         font-weight: bold;
@@ -217,7 +220,7 @@ export default {
         text-align: left;
         color: #949494;
         white-space: nowrap;
-        overflow: hidden;
+        // overflow: hidden;
         text-overflow: ellipsis;
 
         &:hover {
@@ -225,7 +228,7 @@ export default {
         }
       }
 
-      &-count {
+      .title-count {
         height: 13px;
         font-size: 10px;
         font-weight: normal;
@@ -236,30 +239,53 @@ export default {
         text-align: left;
         color: #808495;
       }
+      .title-type {
+        font-size: 9pt;
+        align-self: flex-end;
+        color: grey;
+      }
     }
 
-    &-action {
+    .action {
       .ant-btn {
         padding: 0;
+      }
+
+      .popup-content {
+        text-align: center;
+
+        // .ant-popover-inner-content {
+        // display: flex;
+        // justify-content: center;
+        // .ant-btn {
+        //   border: 0;
+        //   background-color: transparent;
+        // }
+        // }
       }
     }
   }
 
-  &-content {
+  & > .content {
     // height: 16rem;
     background-color: white;
     overflow: auto;
+    width: 100%;
     cursor: pointer;
 
-    &-participant {
+    .participant {
       display: flex;
       position: relative;
       padding: 5px 1rem;
 
-      &-info {
+      // &:hover {
+      //   background-color: cornsilk;
+      // }
+
+      .info {
         margin-left: 0.5rem;
 
-        &-name {
+        .name {
           height: 17px;
           font-size: 13px;
           font-weight: bold;
@@ -271,7 +297,7 @@ export default {
           color: #4d565c;
         }
 
-        &-positions {
+        .positions {
           height: 14px;
           font-size: 11px;
           font-weight: normal;

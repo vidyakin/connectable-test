@@ -12,7 +12,7 @@
     @ok="() => { $emit('create', checkedEmpls) }"
   >
     <div class="group-owner-change-container">
-      <a-list :data-source="dataList" size="small">
+      <a-list :data-source="dataList" size="small" v-if="dataList.length">
         <a-list-item slot="renderItem" slot-scope="item">
           <a-list-item-meta
             :description="item.positions.length ? item.positions[0] : 'нет должности'"
@@ -33,6 +33,9 @@
             <a-spin />
         </div>-->
       </a-list>
+      <a-empty v-else>
+        <div slot="description">Нет сотрудников для замены</div>
+      </a-empty>
     </div>
   </a-modal>
 </template>
@@ -45,62 +48,57 @@ import { GET_USERS } from "@/store/user/actions.type";
 import {
   DELETE_PARTICIPANT,
   CREATE_PARTICIPANT,
-  EDIT_GROUP
+  CHANGE_GROUP_OWNER,
 } from "../../store/group/actions.type";
 import { CHANGE_POST } from "../../store/post/mutations.type";
 
 export default {
   props: {
     visible: Boolean,
-    group: Object
+    group: Object,
   },
   data() {
     return {
-      a: []
+      a: [],
     };
   },
   computed: {
     ...mapGetters(["users"]),
     dataList() {
       if (!this.users) return [];
-      return this.users.filter(u => !u.deletion_mark);
-    }
+      return this.users.filter(
+        (u) => !u.deletion_mark && u._id != this.group.creator
+      );
+    },
   },
   methods: {
     async selectOwner(_id) {
-      const creator = this.group.creatorId;
-      const newGroup = {
-        ...this.group,
-        creatorId: _id
-      };
       try {
-        // заменяем владельца-создателя
-        await this.$store.dispatch(EDIT_GROUP, newGroup);
-        // удаляем старого из участников
-        await this.$store.dispatch(DELETE_PARTICIPANT, {
+        await this.$store.dispatch(CHANGE_GROUP_OWNER, {
           groupId: this.group._id,
-          participantId: creator
+          newOwner: _id,
         });
-        // добавляем нового как участника
-        // TODO: добавляется неправильно в саму группу в массив participants
-        await this.$store.dispatch(CREATE_PARTICIPANT, {
-          participantId: _id,
-          groupId: this.group._id
-        });
+        const creator = this.currentGroup.participants_ref.find(
+          (p) => (p.user_ref = this.currentGroup.creator)
+        );
         this.$success({
           title: "Владелец группы изменен",
-          content: "Новый владелец группы: " + _id
+          content:
+            "Новый владелец группы: " +
+            creator.firstName +
+            " " +
+            creator.lastName,
         });
       } catch (error) {
         this.$error({
           title: "Ошибка при установке владельца группы",
-          content: error.message
+          content: error.message,
         });
       } finally {
         this.$emit("close");
       }
-    }
-  }
+    },
+  },
 };
 </script>
 

@@ -75,9 +75,9 @@ export default {
       current: "",
       createButtonSpinning: false,
       statusEmailSend: false,
-      userinfo: store.getters.userData.result
-        ? store.getters.userData.result
-        : store.getters.user.result,
+      // userinfo: store.getters.userData.result
+      //   ? store.getters.userData.result
+      //   : store.getters.user.result,
       rules: {
         name: [
           {
@@ -116,7 +116,13 @@ export default {
     AppInput
   },
   computed: {
-    ...mapGetters(["user", "userData", "notification"])
+    ...mapGetters([
+      "user",
+      "userData",
+      "notification",
+      "currentClient",
+      "userIsSuperAdmin"
+    ])
   },
   methods: {
     onClose() {
@@ -139,15 +145,28 @@ export default {
           return;
         }
 
-        this.createButtonSpinning = true;
         // записываем группу в БД и стор
+        const { _id: id, email } = this.userData.result;
+        const client_id = this.userIsSuperAdmin
+          ? this.currentClient.workspace
+          : this.userData.result.client_id;
+        if (!client_id) {
+          this.$error({
+            title: "Ошибка проверки клиента",
+            content: "Не удалось установить текущего клиента",
+            centered: true
+          });
+          return;
+        }
+        this.createButtonSpinning = true;
         const newGroup = {
           ...formFields,
           //type: this.type,
-          creatorId: this.userinfo._id,
-          userEmail: this.userinfo.email,
+          creatorId: id,
+          creator: id, // ref field
+          userEmail: email,
           emailSend: this.statusEmailSend,
-          client_id: this.userData.result.client_id
+          client_id
         };
         const newGroupId = await this.$store.dispatch(CREATE_GROUP, newGroup);
         // объект-модель для сохранения в БД
@@ -183,7 +202,7 @@ export default {
         msgType: "NEW_GROUP", // тип сообщения, для разделения бизнес-логики - "NEW_GROUP","YOU_ADDED_IN_GROUP", ""
         dateCreated: Date.now(), // Дата создания сообщения
         //text: `<b>${this.userinfo.firstName} ${this.userinfo.lastName}</b> создал новую группу <i><a href="#">${newGroup.name}</a></i>`, // текст сообщения
-        text: `${this.userinfo.firstName} ${this.userinfo.lastName}`,
+        text: `${this.userData.result.firstName} ${this.userData.result.lastName}`,
         senderId: newGroup.creatorId, // id отправителя
         listenerType: "all", // тип приемников сообщений - все, выборочно или еще как-то
         linkedObjType: "group", // связанный объект - группа, проект, и т.д.

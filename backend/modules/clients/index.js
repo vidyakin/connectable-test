@@ -34,11 +34,10 @@ const router = require('@/crud')(Client, serializer);
 // Поиск клиента по workspace
 router.get('/by_ws/:wspace', async (req, res) => {
   try {
-    const client = await Client.findOne({ workspace: req.params.wspace })
-    //console.log('client:',client);
+    const client = await Client.findByWorkspace(req.params.wspace)
     res.status(200).send(client)
   } catch (error) {
-    res.status(404).send("No client with sent workspace: " + req.params.wspace)
+    res.status(404).send("Error while finding client by workspace: " + req.params.wspace+": "+error)
   }
 })
 

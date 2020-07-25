@@ -59,11 +59,11 @@ export const editGroup = (context: any, group: any) => {
 };
 
 
-export const createParticipant = (context: any, participant: any) => {
+export const createParticipant = (context: any, data: any) => {
   return Vue.axios
-    .post(`api/groupParticipant/`, participant)
+    .post(`api/group/${data.groupId}/participant/${data.userId}`, data)
     .then((response: any) => {
-      context.dispatch(GET_CURRENT_GROUP, participant.groupId);
+      context.dispatch(GET_CURRENT_GROUP, data.groupId);
     });
 };
 
@@ -75,19 +75,19 @@ export const getParticipantsRequest = (context: any, props: any) => {
     });
 };
 
-export const approveParticipantsRequest = (context: any, props: any) => {
+export const approveParticipantsRequest = (context: any, data: any) => {
   return Vue.axios
-    .post(`api/group/${props.groupId}/approveParticipant/${props.participantId}`)
+    .post(`api/group/${data.groupId}/participant/${data.userId}/approve`)
     .then((response: any) => {
-      context.dispatch(GET_CURRENT_GROUP, props.groupId);
+      context.dispatch(GET_CURRENT_GROUP, data.groupId);
     });
 };
 
-export const deleteParticipant = (context: any, props: any) => {
+export const deleteParticipant = (context: any, data: any) => {
   return Vue.axios
-    .delete(`api/deleteParticipant/${props.participantId}/group/${props.groupId}`)
+    .delete(`api/group/${data.groupId}/participant/${data.userId}`)
     .then((response: any) => {
-      context.dispatch(GET_CURRENT_GROUP, props.groupId);
+      context.dispatch(GET_CURRENT_GROUP, data.groupId);
     });
 };
 
@@ -120,6 +120,14 @@ export const cancelInvite = (context: any, id: string) => {
 export const replaceGroupsOwner = (context: any, userId: string) => {
   return Vue.axios
     .post(`api/group/replace_owner/${userId}`);
+};
+
+export const changeGroupOwner = (context: any, data: any) => {
+  return Vue.axios
+    .put(`api/group/${data.groupId}/owner/${data.newOwner}`)
+    .then((response: any) => {
+      context.dispatch(GET_CURRENT_GROUP, data.groupId);
+    });
 };
 
 export const getRequests = (context: any, userId: string) => {

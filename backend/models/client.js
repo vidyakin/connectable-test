@@ -21,4 +21,8 @@ const clientSchema = new Schema({
     comment: String // дополнительная информация, примечания
 });
 
+clientSchema.statics.findByWorkspace = function(workspace) {
+    return this.findOne({ workspace })
+}
+
 module.exports = mongoose.model('Client', clientSchema);
