@@ -213,7 +213,6 @@ export default {
       // },
       usersData: [],
       selectedItems: [],
-      date: moment(),
       statusEmailSend: false,
       timeError: "",
       timeErrorHelp: "",
@@ -301,7 +300,16 @@ export default {
         const hour = t.hour();
         if (hour > 19 || hour < 8) {
           // TODO: сделать настройку в компании "Рабочие часы" и определять по ней
-          callback(new Error("Выберите рабочие часы"));
+          return callback(new Error("Выберите рабочие часы"));
+        }
+        if (
+          this.theform.dateEvent
+            .startOf("day")
+            .isSame(this.getNow().startOf("day"))
+        ) {
+          if (t.startOf("minute").isBefore(this.getNow())) {
+            return callback(new Error("Выбранное время сегодня уже прошло"));
+          }
         } else {
           callback();
         }
@@ -317,7 +325,9 @@ export default {
         callback();
       }
     },
-
+    getNow() {
+      return moment();
+    },
     /**
      * Создание события по кнопке "Создать"
      */
@@ -347,50 +357,50 @@ export default {
       const duration = end.diff(start, "minutes") + " minutes";
       console.log(`event starts at: ${start.format()}`);
 
-      const valid = await this.$refs.eventForm.validate(); // (async valid => {
-      if (!valid) {
-        console.log(`Form not valid`);
-        return;
-      }
-      const keys = this.selectedItems.map(e => e.key);
-      // Выбираем емейлы указанных в списке лиц
-      const attendees = usersData
-        .filter(ud => keys.includes(ud._id))
-        .map(e => ({ email: e.email }));
-      //this.createButtonSpinning = true;
-      // Объект для передачи в Монго
-      const event = {
-        name: this.theform.name,
-        date: start,
-        end,
-        duration,
-        comment: this.theform.comment,
-        color: this.theform.color.color,
-        userId: this.userData.result._id,
-        client_id: this.userData.result.client_id,
-        userEmail: this.userData.result.email,
-        emailSend: this.statusEmailSend,
-        attendees: this.selectedItems ? attendees : "",
-        client_id: this.currentClient.workspace
-      };
-      if (this.isEdit) {
-        event._id = this.event._id;
-      }
-      //console.log(`event is ${JSON.stringify(event, null, 3)}`);
-      //const calendar = google.calendar({version: 'v3', auth:""});
-      await this.$store.dispatch(
-        this.isEdit ? UPDATE_EVENT : CREATE_EVENT,
-        event
-      );
-      //.finally(() => {
-      // this.form.setFieldsValue({
-      //   name: '',
-      //   dateEvent: blancDate,
-      //   timeEvent: blancDate,
-      //   comment: ''
-      // });
-      this.close();
-      //});
+      this.$refs.eventForm.validate(async valid => {
+        if (!valid) {
+          console.log(`Form not valid`);
+          return;
+        }
+        const keys = this.selectedItems.map(e => e.key);
+        // Выбираем емейлы указанных в списке лиц
+        const attendees = usersData
+          .filter(ud => keys.includes(ud._id))
+          .map(e => ({ email: e.email }));
+        //this.createButtonSpinning = true;
+        // Объект для передачи в Монго
+        const event = {
+          name: this.theform.name,
+          date: start,
+          end,
+          duration,
+          comment: this.theform.comment,
+          color: this.theform.color.color,
+          userId: this.userData.result._id,
+          client_id: this.userData.result.client_id,
+          userEmail: this.userData.result.email,
+          emailSend: this.statusEmailSend,
+          attendees: this.selectedItems ? attendees : "",
+          client_id: this.currentClient.workspace
+        };
+        if (this.isEdit) {
+          event._id = this.event._id;
+        }
+        //console.log(`event is ${JSON.stringify(event, null, 3)}`);
+        //const calendar = google.calendar({version: 'v3', auth:""});
+        await this.$store.dispatch(
+          this.isEdit ? UPDATE_EVENT : CREATE_EVENT,
+          event
+        );
+        //.finally(() => {
+        // this.form.setFieldsValue({
+        //   name: '',
+        //   dateEvent: blancDate,
+        //   timeEvent: blancDate,
+        //   comment: ''
+        // });
+        this.close();
+      });
       //});
     },
     onMembersTextChange(value) {
