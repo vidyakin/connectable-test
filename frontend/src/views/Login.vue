@@ -205,24 +205,24 @@ export default Vue.extend({
       user: {
         workspace: "",
         email: "",
-        password: ""
+        password: "",
       },
       submitted: false,
       error: {
         workspace: false,
         email: false,
-        password: false
+        password: false,
       },
-      outlookUrl: ""
+      outlookUrl: "",
     };
   },
   components: {
     AppSuccessRegister,
     AppLoginGoogle,
-    AppLoginMicrosoft
+    AppLoginMicrosoft,
   },
   computed: {
-    ...mapGetters(["errorLogin"])
+    ...mapGetters(["errorLogin"]),
   },
   methods: {
     async handleSubmit(e) {
@@ -235,13 +235,13 @@ export default Vue.extend({
           await this.$store.dispatch(CHECK_USER_INFO, {
             email: this.user.email,
             password: this.user.password,
-            workspace: this.user.workspace
+            workspace: this.user.workspace,
           });
         } catch (error) {
           this.$error({
             title: "ошибка входа",
             content: error,
-            centered: true
+            centered: true,
           });
         } finally {
           if (!this.errorLogin) {
@@ -300,7 +300,7 @@ export default Vue.extend({
     },
     ws_blur() {
       this.submitted = !!this.workspace;
-    }
+    },
   },
   watch: {
     errorLogin(val) {
@@ -311,18 +311,18 @@ export default Vue.extend({
       //   title: "Ошибка входа",
       //   content: "Ваша учетная запись заблокирована"
       // });
-    }
+    },
   },
   beforeCreate() {
     // const a = ;
     // return a;
-  }
+  },
 });
 </script>
 
 <style lang="scss">
 .c-login {
-  padding: 50px 0;
+  padding: 25vh 0;
 
   .u-form {
     text-align: left;
@@ -338,31 +338,7 @@ export default Vue.extend({
     box-shadow: none !important;
   }
 }
-</style>
-<style scoped>
-.login-page {
-  width: 100%;
-  height: 10vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-</style>
 
-
-<style lang="scss">
-.c-login {
-  padding: 50px 0;
-
-  .u-form {
-    text-align: left;
-  }
-
-  legend {
-    font-size: 2em;
-    text-align: center;
-  }
-}
 /**
  * ----------------------------------------
  * animation scale-out-vertical
@@ -394,5 +370,15 @@ export default Vue.extend({
 }
 .scale-out-vertical {
   animation: scale-out-vertical 0.3s cubic-bezier(0.165, 0.84, 0.44, 1) both;
+}
+</style>
+
+<style scoped>
+.login-page {
+  width: 100%;
+  height: 10vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 </style>
