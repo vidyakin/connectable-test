@@ -23,7 +23,7 @@
         <a-select-option v-for="d in data" :key="d._id">{{d.firstName + ' ' + d.lastName}}</a-select-option>
       </a-select>
       <a-spin :spinning="buttonSpinning">
-        <a-button type="primary" @click="sendInvite">Пригласить</a-button>
+        <a-button type="primary" @click="sendInvite" :disabled="!selectedItems.length">Пригласить</a-button>
       </a-spin>
     </div>
   </a-drawer>
@@ -34,7 +34,7 @@ import { mapGetters } from "vuex";
 import { GET_USERS } from "../../store/user/actions.type";
 import {
   APPROVE_PARTICIPANTS_REQUEST,
-  CREATE_INVITE
+  CREATE_INVITE,
 } from "../../store/group/actions.type";
 
 export default {
@@ -45,25 +45,29 @@ export default {
       buttonSpinning: false,
       type: 1,
       data: [],
-      selectedItems: []
+      selectedItems: [],
     };
   },
-  components: {},
+  props: {
+    group: Object,
+    close: Function,
+    visible: Boolean,
+  },
   computed: {
     ...mapGetters([
       "userData",
       "user",
       "currentGroup",
       "users",
-      "currentClient"
+      "currentClient",
     ]),
     filteredData() {
       return !this.data
         ? []
         : this.data.filter(
-            user => !this.selectedItems.map(s => s.key).includes(user._id)
+            (user) => !this.selectedItems.map((s) => s.key).includes(user._id)
           );
-    }
+    },
   },
   methods: {
     onClose() {
@@ -72,7 +76,7 @@ export default {
     search(text) {
       const searchText = text.toLowerCase().trim();
       // функция, превращающая юзера в строку из сочетаний имени и фамилии
-      const allStr = e =>
+      const allStr = (e) =>
         []
           .concat(
             e.firstName,
@@ -85,7 +89,9 @@ export default {
       this.data =
         searchText === ""
           ? this.users
-          : this.users.filter(user => allStr(user).indexOf(searchText) !== -1);
+          : this.users.filter(
+              (user) => allStr(user).indexOf(searchText) !== -1
+            );
     },
     handleChange(value) {
       this.selectedItems = value;
@@ -93,17 +99,17 @@ export default {
     sendInvite() {
       this.buttonSpinning = true;
       Promise.all(
-        this.selectedItems.map(userId => {
+        this.selectedItems.map((userId) => {
           const inviteData = {
             client_id: this.userData.result.client_id,
             user: userId.key,
             group: this.currentGroup._id,
-            groupType: this.currentGroup.type
+            groupType: this.currentGroup.type,
           };
           console.log(`Создаем инвайт: ${JSON.stringify(inviteData, null, 2)}`);
           this.$store.dispatch(CREATE_INVITE, inviteData);
         })
-      ).finally(result => {
+      ).finally((result) => {
         this.buttonSpinning = false;
         this.openNotification();
         this.onClose();
@@ -113,18 +119,19 @@ export default {
       this.$notification["success"]({
         message: `Приглашение отправлено`,
         description: "Пользователь получит сообщение в ленте",
-        placement: "topRight"
+        placement: "topRight",
       });
-    }
-  },
-  props: {
-    close: Function,
-    visible: Boolean
+    },
   },
   async mounted() {
     await this.$store.dispatch(GET_USERS, this.currentClient.workspace);
-    this.data = this.users;
-  }
+    const group_perticipants_ids = this.group.participants_ref.map((p) =>
+      p.user_ref._id.toString()
+    );
+    this.data = this.users.filter(
+      (u) => !group_perticipants_ids.includes(u._id)
+    );
+  },
 };
 </script>
 
