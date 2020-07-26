@@ -66,6 +66,24 @@
         </a-dropdown>
       </span>
     </a-table>
+    <a-modal
+      v-if="selectedEmployee"
+      v-model="confirmEmplDeleteVisible"
+      :centered="true"
+      title="Подтвердите удаление сотрудника"
+      ok-type="danger"
+      ok-text="ОК"
+      cancel-text="Отменить"
+      @ok="() => deleteEmployeeAction()"
+    >
+      Сотрудник «{{selectedEmployee.fio.fullName}}» будет удален. Произойдет:
+      <br />
+      <ul>
+        <li>Удаление из списка сотрудников отделов</li>
+        <li>Исключение из состава участников групп</li>
+        <li>Вход на портал будет заблокирован</li>
+      </ul>Подтверждаете удаление?
+    </a-modal>
     <!-- Модальное окно создания сотрудника -->
     <add-employee-modal :visible="newEmplVisible" :close="newEmplClose" @create="createEmployee" />
   </div>
@@ -77,7 +95,7 @@ import {
   GET_USERS,
   INSERT_USER_INFO,
   MARK_USER_DELETED,
-  UNMARK_USER_DELETED
+  UNMARK_USER_DELETED,
 } from "@/store/user/actions.type";
 import { CREATE_MESSAGE } from "@/store/notification/actions.type";
 import { REPLACE_GROUPS_OWNER } from "@/store/group/actions.type";
@@ -91,34 +109,34 @@ const cols = [
     title: "ФИО",
     dataIndex: "fio",
     key: "fio",
-    scopedSlots: { customRender: "fio" }
+    scopedSlots: { customRender: "fio" },
   },
   {
     title: "e-mail",
     dataIndex: "email",
-    key: "email"
+    key: "email",
   },
   {
     title: "Должности",
     dataIndex: "positions",
-    key: "positions"
+    key: "positions",
   },
   {
     title: "Телефон",
     dataIndex: "phone",
-    key: "phone"
+    key: "phone",
   },
   {
     title: "Роль",
     dataIndex: "is_admin",
     key: "is_admin",
-    scopedSlots: { customRender: "is_admin" }
+    scopedSlots: { customRender: "is_admin" },
   },
   {
     title: "Действия",
     key: "actions",
-    scopedSlots: { customRender: "actions" }
-  }
+    scopedSlots: { customRender: "actions" },
+  },
 ];
 export default {
   components: { AddEmployeeModal },
@@ -127,21 +145,23 @@ export default {
       tblLoading: false,
       cols: cols,
       newEmplVisible: false,
-      showDeleted: true
+      showDeleted: true,
+      confirmEmplDeleteVisible: false,
+      selectedEmployee: null,
     };
   },
   computed: {
     employees() {
       if (!this.users) return [];
       return this.users
-        .map(e => {
+        .map((e) => {
           const {
             googleImage,
             firstName,
             lastName,
             positions,
             phone,
-            email
+            email,
           } = e;
           const row = {
             fio: { googleImage, firstName, lastName, id: e._id },
@@ -151,22 +171,22 @@ export default {
             role: e.email == "w.project.portal3@gmail.com" ? "admin" : "-",
             key: e._id,
             mark_del: e.deletion_mark,
-            is_admin: e.roles && e.roles.includes("admin")
+            is_admin: e.roles && e.roles.includes("admin"),
           };
           return row;
         })
-        .filter(e => (!this.showDeleted && !e.mark_del) || this.showDeleted);
+        .filter((e) => (!this.showDeleted && !e.mark_del) || this.showDeleted);
     },
     ...mapGetters([
       "errorRegister",
       "userData",
       "userIsSuperAdmin",
       "userIsAdmin",
-      "currentClient"
+      "currentClient",
     ]),
     ...mapState({
-      users: state => state.auth.users
-    })
+      users: (state) => state.auth.users,
+    }),
   },
   watch: {
     employees(newempl, oldempl) {
@@ -181,7 +201,7 @@ export default {
       if (client) {
         this.$store.dispatch(GET_USERS, client.workspace);
       }
-    }
+    },
   },
   methods: {
     goTo(id) {
@@ -225,7 +245,7 @@ export default {
         listenerType: "all", // тип приемников сообщений - все, выборочно или еще как-то
         linkedObjType: "employee", // связанный объект - группа, проект, и т.д.
         linkedObjId: id,
-        client_id
+        client_id,
       };
     },
     createEmployee(empl_data) {
@@ -238,16 +258,16 @@ export default {
         email: empl_data.email,
         password: empl_data.password,
         emailSend: true,
-        workspace: empl_data.workspace
+        workspace: empl_data.workspace,
       };
       this.$store
         .dispatch(INSERT_USER_INFO, newEmpl)
-        .then(newEmpl => {
+        .then((newEmpl) => {
           if (this.errorRegister) {
             this.$error({
               centered: true,
               title: "Ошибка при сохранении сотрудника",
-              content: this.errorRegister
+              content: this.errorRegister,
             });
             return;
           }
@@ -258,10 +278,10 @@ export default {
             newEmpl.id
           );
           // Создаем сообщение в БД и сторе
-          this.$store.dispatch(CREATE_MESSAGE, newMsg).then(newMsgId => {
+          this.$store.dispatch(CREATE_MESSAGE, newMsg).then((newMsgId) => {
             this.$socket.client.emit("to all", {
               type: "NEW_EMPL",
-              val: newMsg
+              val: newMsg,
             });
           });
           this.$store
@@ -273,7 +293,7 @@ export default {
               this.$success({
                 centered: true,
                 title: "Сотруник записан",
-                content: `Сотрудник ${empl_data.name} ${empl_data.surname} создан`
+                content: `Сотрудник ${empl_data.name} ${empl_data.surname} создан`,
               });
             });
         })
@@ -286,17 +306,17 @@ export default {
         firstName: "Иван",
         lastName: "Иванов",
         email: "ivan@gmail.com",
-        client_id: this.userData.result.client_id
+        client_id: this.userData.result.client_id,
       };
       const newMsg = this.newMsgForEmpl(
         newEmpl.firstName + " " + newEmpl.lastName,
         newEmpl.client_id,
         "23412341235"
       );
-      this.$store.dispatch(CREATE_MESSAGE, newMsg).then(newMsgId => {
+      this.$store.dispatch(CREATE_MESSAGE, newMsg).then((newMsgId) => {
         this.$socket.client.emit("to all", {
           type: "NEW_EMPL",
-          val: newMsg
+          val: newMsg,
         });
       });
     },
@@ -306,7 +326,7 @@ export default {
         this.$error({
           centered: true,
           title: "Ошибка при удалении",
-          content: "Невозможно удалить администратора"
+          content: "Невозможно удалить администратора",
         });
         return;
       }
@@ -314,54 +334,65 @@ export default {
         this.$error({
           centered: true,
           title: "Ошибка при удалении",
-          content: "Невозможно удалить самого себя"
+          content: "Невозможно удалить самого себя",
         });
         return;
       }
 
       const fio = empl_data.fio.firstName + " " + empl_data.fio.lastName;
-      const title = !empl_data.mark_del
-        ? "Подтвердите удаление сотрудника"
-        : "Восстановить удаленного сотрудника";
-      const content =
-        `Сотрудник «${fio}» будет ` +
-        (!empl_data.mark_del ? "удален" : "восстановлен");
-      // TODO: добавить проверку на текущего пользователя, чтобы нельзя было удалить себя, и на администратора
-      this.$confirm({
-        centered: true,
-        title,
-        content,
-        okType: "danger",
-        okText: "ОК",
-        cancelText: "Отменить",
-        onOk: () => {
-          this.deleteEmployeeAction(empl_data, !empl_data.mark_del);
-        },
-        class: "test"
-      });
+      this.selectedEmployee = empl_data;
+      this.selectedEmployee.fio.fullName = fio;
+
+      // для восстановления пользователя. Для удаления отдельный компонент в шаблоне
+      if (empl_data.mark_del) {
+        // TODO: добавить проверку на текущего пользователя, чтобы нельзя было удалить себя, и на администратора
+        this.$confirm({
+          centered: true,
+          title: "Восстановить удаленного сотрудника",
+          content: `Сотрудник «${this.selectedEmployee.fio.fullName}» будет восстановлен на портале`,
+          okType: "danger",
+          okText: "ОК",
+          cancelText: "Отменить",
+          onOk: () => {
+            this.deleteEmployeeAction();
+          },
+          class: "test",
+        });
+      } else {
+        this.confirmEmplDeleteVisible = true;
+      }
     },
-    async deleteEmployeeAction(d, deleting_mark) {
-      const disp_name = deleting_mark ? MARK_USER_DELETED : UNMARK_USER_DELETED,
-        del_type = deleting_mark ? "удален" : "восстановлен",
-        fio = d.fio.firstName + " " + d.fio.lastName;
-      console.log(`Deleting empl ${fio} with id ${d.key}`);
+    async deleteEmployeeAction() {
+      this.confirmEmplDeleteVisible = false;
+      const dispatch_name = !this.selectedEmployee.mark_del
+          ? MARK_USER_DELETED
+          : UNMARK_USER_DELETED,
+        del_type = !this.selectedEmployee.mark_del ? "удален" : "восстановлен",
+        key = this.selectedEmployee.key,
+        fio = this.selectedEmployee.fio.fullName;
+      console.log(`Deleting empl ${fio} with id ${key}`);
       let step = del_type + "ие";
       try {
-        await this.$store.dispatch(disp_name, d.key); // помечаем как удаленного или восстанавливаем
+        await this.$store.dispatch(dispatch_name, key); // помечаем как удаленного или восстанавливаем
         step = "Замена в группах";
-        await this.$store.dispatch(REPLACE_GROUPS_OWNER, d.key); // заменяем создателя в группах на админа
+        await this.$store.dispatch(REPLACE_GROUPS_OWNER, key); // заменяем создателя в группах на админа
         step = "Удаление как начальника";
-        await this.$store.dispatch(CLEAR_HEAD_OF_DEPTS, d.key); // убираем из начальников отделов
+        await this.$store.dispatch(CLEAR_HEAD_OF_DEPTS, key); // убираем из начальников отделов
         await this.$store.dispatch(GET_USERS, this.currentClient.workspace); // получаем список сотрудников для обновления таблицы
+
+        // after all actions hide dialogs and show infos
+        if (!this.selectedEmployee.mark_del) {
+          this.confirmEmplDeleteVisible = false;
+        }
         this.$success({
           centered: true,
           title: "Сотруник " + del_type,
-          content: `Сотрудник ${fio} был ${del_type}`
+          content: `Сотрудник ${fio} был ${del_type}`,
         });
       } catch (error) {
         this.$error({
           title: "Ошибка при удалении сотрудника",
-          content: "Шаг: " + step + " \n" + error.stack
+          content: "Шаг: " + step + " \n" + error.stack,
         });
       }
     },
@@ -371,7 +402,7 @@ export default {
           this.$error({
             centered: true,
             title: "Ошибка изменения роли",
-            content: "Нельзя изменять собственную роль"
+            content: "Нельзя изменять собственную роль",
           });
           return;
         }
@@ -389,7 +420,7 @@ export default {
           onOk: () => {
             this.manageUserAdminRoleAction(rec);
           },
-          class: "test"
+          class: "test",
         });
       }
     },
@@ -397,7 +428,7 @@ export default {
       try {
         await this.$store.dispatch(rec.is_admin ? DELETE_ROLE : INSERT_ROLE, {
           user_id: rec.key,
-          role: "admin"
+          role: "admin",
         });
         await this.$store.dispatch(GET_USERS, this.currentClient.workspace);
         this.$success({
@@ -405,22 +436,22 @@ export default {
           title: "Изменение роли",
           content: `Роль администратора ${
             rec.is_admin ? "установлена" : "снята"
-          } успешно`
+          } успешно`,
         });
       } catch (error) {
         this.$error({
           centered: true,
           title: "Ошибка изменения роли",
-          content: error.message
+          content: error.message,
         });
       }
-    }
+    },
   },
   mounted() {
     if (this.currentClient) {
       this.$store.dispatch(GET_USERS, this.currentClient.workspace);
     }
-  }
+  },
 };
 </script>
 

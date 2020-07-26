@@ -38,20 +38,16 @@ router.get('/for_client/:workspace', (req, res) => {
 router.put('/delete/:userId', async (req, res) => {
   const user_id = req.params.userId
   try {
-    await User.findByIdAndUpdate(user_id, {$set: {deletion_mark: true}}, {new: true})
+    const user = await User.findByIdAndUpdate(user_id, {$set: {deletion_mark: true}}, {new: true})
     // delete from departments
     const depts = await UsersInDepartment.find({users: user_id})
-    const upd_depts = await Promise.all(
+    await Promise.all(
       depts.map( async doc => {
         doc.users = doc.users.filter(user => user!=user_id)
         await doc.save()
         return doc._id
       }))
-    res.status(200).send({
-      status: 200,
-      user_id,
-      deletedFrom: upd_depts
-    })
+    res.status(200).send(user)
   } catch (error) {
     console.error("> delete user, error: ", error);
     return res.status(500).send("There was a problem deleting the user: "+error);
