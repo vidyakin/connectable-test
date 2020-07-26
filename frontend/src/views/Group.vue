@@ -8,7 +8,7 @@
         :close="closeRequests"
       />-->
       <!-- приглашать можно в закрытых и приватных -->
-      <app-invite-drawer :visible="invitesVisible" :close="closeInvites" />
+      <app-invite-drawer :visible="invitesVisible" :close="closeInvites" :group="currentGroup" />
     </template>
 
     <div class="group-body" v-if="isLoaded">
@@ -79,8 +79,8 @@
               :src="(participant.googleImage ? participant.googleImage : require('../assets/no_image.png'))"
             ></a-avatar>
             <div class="info">
-              <div class="name">{{participant.firstName + " " + participant.lastName}}</div>
-              <div class="positions">{{participant.positions.join(', ')}}</div>
+              <div class="name">{{fio(participant)}}</div>
+              <div class="positions">{{participant.positions && participant.positions.join(', ')}}</div>
             </div>
             <div class="icon">
               <a-icon type="crown" v-if="participant._id == currentGroup.creator" />
@@ -119,7 +119,7 @@
             ></a-avatar>
             <div class="info">
               <div class="name">{{req.firstName + " " + req.lastName}}</div>
-              <div class="positions">{{req.positions.join(', ')}}</div>
+              <div class="positions">{{req.positions && req.positions.join(', ')}}</div>
               <div class="req-buttons">
                 <a-button type="primary" icon="check" size="small" @click="approveRequest(req._id)"></a-button>
                 <a-button type="danger" icon="close" size="small" @click="deleteRequest(req._id)"></a-button>
@@ -215,14 +215,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters([
-      "posts",
-      "user",
-      "currentGroup",
-      "userData",
-      "participantsRequest",
-      "userIsAdmin",
-    ]),
+    ...mapGetters(["posts", "user", "currentGroup", "userData", "userIsAdmin"]),
     user_id() {
       return this.userData.result._id;
     },
@@ -343,6 +336,11 @@ export default {
         userId,
       });
       //.then(() => this.checkParticipants());
+    },
+    fio(participant) {
+      return participant.firstName == undefined
+        ? "<DELETED>"
+        : participant.firstName + " " + participant.lastName;
     },
     // checkParticipants() {
     //   this.$store.dispatch(GET_PARTICIPANTS_REQUEST, {
