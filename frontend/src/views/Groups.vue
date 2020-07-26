@@ -32,12 +32,12 @@ import { GET_GROUPS, GET_GROUPS_BY_CLIENT } from "../store/group/actions.type";
 
 // import AppSearchForm from '../components/common/SearchForm';
 import AppGroup from "../components/common/Group";
-import AppGroupCreateDrawer from "../components/drawers/GroupCreateDrawer";
+import AppGroupCreateDrawer from "../components/groups/GroupCreateDrawer";
 
 export default {
   components: {
     AppGroupCreateDrawer,
-    AppGroup
+    AppGroup,
   },
   data() {
     return {
@@ -45,7 +45,7 @@ export default {
       isLoaded: false,
       groupsData: [],
       searchText: "",
-      filterData: []
+      filterData: [],
     };
   },
   methods: {
@@ -54,7 +54,7 @@ export default {
     },
     openCreate() {
       this.createVisible = true;
-    }
+    },
   },
 
   computed: {
@@ -66,7 +66,7 @@ export default {
       }
       return this.filterData.sort(compare);
     },
-    ...mapGetters(["groups", "userData", "currentClient", "userIsAdmin"])
+    ...mapGetters(["groups", "userData", "currentClient", "userIsAdmin"]),
   },
   async beforeMount() {
     try {
@@ -90,10 +90,10 @@ export default {
     },
     searchText(text) {
       this.filterData = this.fullData.filter(
-        el => el.name.toLowerCase().indexOf(text.toLowerCase().trim()) !== -1
+        (el) => el.name.toLowerCase().indexOf(text.toLowerCase().trim()) !== -1
       );
-    }
-  }
+    },
+  },
 };
 </script>
 

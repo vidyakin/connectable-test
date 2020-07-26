@@ -183,10 +183,10 @@ import {
 
 import AppCommentInput from "../components/common/CommentInput";
 import AppPost from "../components/common/Post";
-import AppGroupEditDrawer from "../components/drawers/GroupEditDrawer";
-import AppRequestsDrawer from "../components/drawers/RequestsDrawer";
-import AppInviteDrawer from "../components/drawers/InviteDrawer";
-import GroupOwnerChangeDialog from "../components/modal/ChangeGroupOwner";
+import AppGroupEditDrawer from "../components/groups/GroupEditDrawer";
+import AppRequestsDrawer from "../components/groups/RequestsDrawer";
+import AppInviteDrawer from "../components/groups/InviteDrawer";
+import GroupOwnerChangeDialog from "../components/groups/ChangeGroupOwner";
 
 export default {
   components: {

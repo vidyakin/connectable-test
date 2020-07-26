@@ -1,7 +1,7 @@
 <template>
   <div class="group-view">
     <div class="groups-header">
-      <div class="groups-header-name">Структура </div>
+      <div class="groups-header-name">Структура</div>
     </div>
     <div class="group-body">
       <div class="group-body-info">
@@ -63,18 +63,17 @@
             >{{participant.positions.join(', ')}}</div>
           </div>
           <a-popconfirm
-                  title="Подтверите удаление"
-                  okText="Подтверждаю"
-                  cancelText="Отмена"
-                  @confirm="deleteParticipantById(participant._id)"
-                  v-if="user && participant._id != user._id"
+            title="Подтверите удаление"
+            okText="Подтверждаю"
+            cancelText="Отмена"
+            @confirm="deleteParticipantById(participant._id)"
+            v-if="user && participant._id != user._id"
           >
             <a-tooltip title="Удалить">
               <a-button class="delete-department" icon="delete"></a-button>
             </a-tooltip>
           </a-popconfirm>
         </div>
-
       </div>
     </div>
     <template
@@ -82,26 +81,26 @@
        currentProject.participants.findIndex(({_id}) => _id === user._id) !== -1"
     >
       <app-comment-input :parent="{type: 'project', id: currentProject && currentProject._id}" />
-      <app-post v-for="(post, index) in posts" :post="post" :key="index"/>
+      <app-post v-for="(post, index) in posts" :post="post" :key="index" />
     </template>
   </div>
 </template>
 <script>
-import { mapGetters } from 'vuex';
-import { GET_POSTS } from '../store/post/actions.type';
-import AppCommentInput from '../components/common/CommentInput';
-import AppPost from '../components/common/Post';
+import { mapGetters } from "vuex";
+import { GET_POSTS } from "../store/post/actions.type";
+import AppCommentInput from "../components/common/CommentInput";
+import AppPost from "../components/common/Post";
 import {
   CREATE_PARTICIPANT,
   DELETE_GROUP,
   DELETE_PARTICIPANT,
   GET_CURRENT_GROUP,
   GET_PARTICIPANTS_REQUEST,
-} from '../store/group/actions.type';
-import AppGroupEditDrawer from '../components/drawers/GroupEditDrawer';
-import AppRequestsDrawer from '../components/drawers/RequestsDrawer';
-import AppInviteDrawer from '../components/drawers/InviteDrawer';
-import { GET_CURRENT_PROJECT } from '../store/project/actions.type';
+} from "../store/group/actions.type";
+import AppGroupEditDrawer from "../components/groups/GroupEditDrawer";
+import AppRequestsDrawer from "../components/groups/RequestsDrawer";
+import AppInviteDrawer from "../components/groups/InviteDrawer";
+import { GET_CURRENT_PROJECT } from "../store/project/actions.type";
 
 export default {
   components: {
@@ -115,7 +114,7 @@ export default {
     return {
       editVisible: false,
       requestVisible: false,
-      output: '',
+      output: "",
     };
   },
   methods: {
@@ -130,7 +129,7 @@ export default {
     },
     deleteGroup() {
       this.$store.dispatch(DELETE_GROUP, this.currentGroup._id).then(() => {
-        this.$router.push({ name: 'groups' });
+        this.$router.push({ name: "groups" });
       });
     },
     closeEdit() {
@@ -178,15 +177,18 @@ export default {
     },
     endingWords(count) {
       if (count === 0) {
-        this.output = 'нет участников';
+        this.output = "нет участников";
       } else if (count === 1) {
-        this.output = ' участник';
-      } else if ((count > 20) && ((count % 10) == 1)) {
-        this.output = ' участник';
-      } else if (((count >= 2) && (count <= 4)) || (((count % 10) >= 2) && ((count % 10) <= 4)) && (count > 20)) {
-        this.output = ' участника';
+        this.output = " участник";
+      } else if (count > 20 && count % 10 == 1) {
+        this.output = " участник";
+      } else if (
+        (count >= 2 && count <= 4) ||
+        (count % 10 >= 2 && count % 10 <= 4 && count > 20)
+      ) {
+        this.output = " участника";
       } else {
-        this.output = ' участников';
+        this.output = " участников";
       }
       return this.output;
     },
@@ -195,7 +197,7 @@ export default {
     this.$store.dispatch(GET_CURRENT_PROJECT, this.$route.params._id);
   },
   computed: {
-    ...mapGetters(['posts', 'currentProject', 'user']),
+    ...mapGetters(["posts", "currentProject", "user"]),
   },
 };
 </script>
