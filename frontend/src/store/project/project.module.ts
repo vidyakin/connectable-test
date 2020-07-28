@@ -1,24 +1,4 @@
 import {
-  APPROVE_INVITE,
-  APPROVE_PARTICIPANTS_REQUEST, CANCEL_INVITE,
-  CREATE_GROUP, CREATE_INVITE,
-  CREATE_PARTICIPANT,
-  DELETE_GROUP, DELETE_PARTICIPANT,
-  EDIT_GROUP,
-  GET_CURRENT_GROUP,
-  GET_GROUPS, GET_INVITE, GET_PARTICIPANTS_REQUEST,
-} from '@/store/group/actions.type';
-import {
-  approveInvite,
-  approveParticipantsRequest, cancelInvite,
-  createGroup, createInvite,
-  createParticipant,
-  deleteGroup, deleteParticipant,
-  editGroup,
-  getCurrentGroup,
-  getGroups, getInvite, getParticipantsRequest,
-} from '@/services/group.service';
-import {
   ADD_GROUP,
   REMOVE_GROUP,
   SET_CURRENT_GROUP,
