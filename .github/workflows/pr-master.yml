@@ -11,7 +11,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: BUILD FRONTEND
-      run: docker-compose build --force-rm --no-cache connfrontend
+      run: docker-compose -f docker-compose-prod.yaml build --force-rm --no-cache connfrontend
     - name: BUILD BACKEND
       if: ${{ success() }}
-      run: docker-compose build --force-rm --no-cache connbackend
+      run: docker-compose -f docker-compose-prod.yaml build --force-rm --no-cache connbackend
