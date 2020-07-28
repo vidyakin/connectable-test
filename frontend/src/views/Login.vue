@@ -6,7 +6,7 @@
         <div class="col-sm-4 offset-sm-4">
           <form class="u-form" @submit.prevent="handleSubmit">
             <fieldset>
-              <legend>Авторизоваться</legend>
+              <legend>АвторизоватьсЯ</legend>
               <div class="form-group">
                 <label for="workspace">Workspace</label>
                 <input
