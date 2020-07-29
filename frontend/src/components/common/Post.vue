@@ -177,18 +177,43 @@ import AppLoginBar from "./LoginBar";
 import AppComment from "./Comment";
 import DynamicLink from "./DynamicLink";
 
+function plural(word, num) {
+  const forms = word.split("_");
+  return num % 10 === 1 && num % 100 !== 11
+    ? forms[0]
+    : num % 10 >= 2 && num % 10 <= 4 && (num % 100 < 10 || num % 100 >= 20)
+    ? forms[1]
+    : forms[2];
+}
+
+function relativeTimeWithPlural(number, withoutSuffix, key) {
+  const format = {
+    ss: withoutSuffix ? "секунда_секунды_секунд" : "секунду_секунды_секунд",
+    mm: withoutSuffix ? "минута_минуты_минут" : "минуту_минуты_минут",
+    hh: "час_часа_часов",
+    dd: "день_дня_дней",
+    MM: "месяц_месяца_месяцев",
+    yy: "год_года_лет",
+  };
+  if (key === "m") {
+    return withoutSuffix ? "минута" : "минуту";
+  } else {
+    return number + " " + plural(format[key], +number);
+  }
+}
+
 import {
   DELETE_POST,
   REPOST,
   SEND_COMMENT,
   SEND_LIKE,
   SEND_NEW_POST,
-  DELETE_LIKE
+  DELETE_LIKE,
 } from "../../store/post/actions.type";
 import moment from "moment";
 import {
   SET_EDIT_POST_VISIBLE,
-  SET_POST_FOR_EDITING
+  SET_POST_FOR_EDITING,
 } from "../../store/post/mutations.type";
 import store from "../../store";
 import { GET_POSTS } from "../../store/post/actions.type";
@@ -199,7 +224,7 @@ export default {
   components: {
     AppLoginBar,
     AppComment,
-    DynamicLink
+    DynamicLink,
   },
   data() {
     return {
@@ -210,7 +235,7 @@ export default {
       commentContent: "",
       allComment: false,
       currPrefix: "",
-      pubUrl: PUBLIC_URL
+      pubUrl: PUBLIC_URL,
       // datauser: store.getters.userData.result
       //   ? store.getters.userData.result
       //   : store.getters.currentUser
@@ -223,7 +248,7 @@ export default {
       "user",
       "currentUser",
       "userData",
-      "userIsAdmin"
+      "userIsAdmin",
     ]),
     dblQuote() {
       return '"';
@@ -246,7 +271,7 @@ export default {
         const user1 = this.post.likes[1].author;
         return `${user0.firstName} ${user0.lastName}, ${user1.firstName} ${user1.lastName}`;
       }
-    }
+    },
   },
   methods: {
     handleScroll() {
@@ -265,12 +290,12 @@ export default {
     },
     onSelect(option) {
       const selected_user = this.users.find(
-        u => u.firstName + " " + u.lastName == option.value
+        (u) => u.firstName + " " + u.lastName == option.value
       );
       const name = selected_user.firstName + " " + selected_user.lastName;
       this.mentionsData.push({
         id: selected_user._id,
-        name
+        name,
       });
       if (this.currPrefix == '"') {
         this.commentContent = this.commentContent.replace(
@@ -287,7 +312,7 @@ export default {
       const like = {
         post_id, // тут всегда код поста, даже если лайк комменту или ответу, чтобы знать где искать
         user_id: this.user_id,
-        parent: { type: "post", id: post_id } // дублируется код поста т.к. лайкаем пост но в общем случае тут разные типы
+        parent: { type: "post", id: post_id }, // дублируется код поста т.к. лайкаем пост но в общем случае тут разные типы
       };
       this.$store.dispatch(SEND_LIKE, like);
     },
@@ -295,7 +320,7 @@ export default {
       const like = {
         post_id,
         user_id: this.user_id,
-        parent: { type: "post", id: post_id }
+        parent: { type: "post", id: post_id },
       };
       this.$store.dispatch(DELETE_LIKE, like);
       // .finally(() => {
@@ -330,7 +355,7 @@ export default {
         author: this.user_id,
         created: moment(),
         message: this.commentContent,
-        mentions: this.mentionsData.map(m => m.id)
+        mentions: this.mentionsData.map((m) => m.id),
       };
       if (this.commentContent) {
         this.$store.dispatch(SEND_COMMENT, comment).then(() => {
@@ -343,7 +368,7 @@ export default {
       this.$store.dispatch(DELETE_POST, this.post._id).then(() => {
         this.$notification["success"]({
           message: "Пост удален",
-          placement: "topRight"
+          placement: "topRight",
         });
         this.visible = false;
       });
@@ -366,7 +391,7 @@ export default {
         ...rePost,
         likes: [],
         comments: [],
-        parent: { type: "user", id: this.user_id }
+        parent: { type: "user", id: this.user_id },
       });
     },
     soc_open(netwO, url) {
@@ -377,17 +402,35 @@ export default {
     },
     soc_close(netwO, url) {
       console.log(`close: ${netwO}, ${url}`);
-    }
+    },
   },
   beforeMount() {
+    moment.locale("ru", {
+      relativeTime: {
+        future: "через %s",
+        past: "%s назад",
+        s: "несколько секунд",
+        ss: relativeTimeWithPlural,
+        m: relativeTimeWithPlural,
+        mm: relativeTimeWithPlural,
+        h: "%d час",
+        hh: relativeTimeWithPlural,
+        d: "%d день",
+        dd: relativeTimeWithPlural,
+        M: "1 месяц",
+        MM: relativeTimeWithPlural,
+        y: "1 год",
+        yy: relativeTimeWithPlural,
+      },
+    });
     const mainBlock = document.getElementById("profile");
     if (mainBlock) {
       mainBlock.addEventListener("scroll", this.handleScroll);
     }
   },
   props: {
-    post: Object
-  }
+    post: Object,
+  },
 };
 </script>
 
