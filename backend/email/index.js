@@ -18,7 +18,7 @@ var hbs = require('nodemailer-express-handlebars'),
 
 transporter.verify(function(error, success) {
   if (error) {
-    console.log(error);
+    console.log('>> Ошибка верификации почтового аккаунта: ',error);
   } else {
     console.log('Mailer was verified to send any messages');
   }

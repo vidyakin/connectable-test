@@ -17,7 +17,7 @@ import {
   editGroup,
   getCurrentGroup,
   getGroups, getInvite, getParticipantsRequest,
-} from '@/services/group.service';
+} from '@/store/group/group.service';
 import {
   ADD_GROUP,
   REMOVE_GROUP,
@@ -33,7 +33,7 @@ import {
   GET_CURRENT_PROJECT,
   GET_PROJECTS,
 } from '@/store/project/actions.type';
-import {ADD_PROJECT, REMOVE_PROJECT, SET_CURRENT_PROJECT, SET_PROJECTS} from '@/store/project/mutations.type';
+import { ADD_PROJECT, REMOVE_PROJECT, SET_CURRENT_PROJECT, SET_PROJECTS } from '@/store/project/mutations.type';
 import {
   createProject,
   createProjectParticipant,
@@ -60,7 +60,7 @@ const getters = {
         if (a._id === e.creatorId) {
           return -1;
         }
-        if (b._id ===  e.creatorId) {
+        if (b._id === e.creatorId) {
           return 1;
         }
         return 0;
@@ -94,7 +94,7 @@ const mutations = {
   },
   [REMOVE_PROJECT](state: State, projectId: any) {
     if (state.projects) {
-      const index = state.projects.findIndex(({_id}) => _id === projectId);
+      const index = state.projects.findIndex(({ _id }) => _id === projectId);
       state.projects = [
         ...state.projects.slice(0, index),
         ...state.projects.slice(index + 1),
@@ -104,7 +104,7 @@ const mutations = {
   [UPDATE_GROUP](state: State, project: any) {
     state.currentProject = project;
     if (state.projects) {
-      const index = state.projects.findIndex(({_id}) => _id === project._id);
+      const index = state.projects.findIndex(({ _id }) => _id === project._id);
       state.projects = [
         ...state.projects.slice(0, index),
         project,
