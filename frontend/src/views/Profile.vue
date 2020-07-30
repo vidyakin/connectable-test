@@ -9,11 +9,7 @@
       v-if="userData.result._id == $route.params._id"
     />
     <!-- убрано: v-if="(post && post.author._id == $route.params._id)" -->
-    <app-post
-      v-for="(post, index) in posts.filter(p => p.author._id == $route.params._id)"
-      :post="post"
-      :key="index"
-    />
+    <app-post v-for="(post, index) in preparedPosts" :post="post" :key="index" />
 
     <pre v-if="userIsSuperAdmin">Служебная инфа: 
     $route.params._id = {{$route.params._id}}
@@ -36,12 +32,17 @@ import AppCommentInput from "../components/common/CommentInput";
 import AppPost from "../components/common/Post";
 import AppUserInfo from "../components/common/UserInfo";
 
+function compare(a, b) {
+  if (a.created < b.created) return 1;
+  if (a.created > b.created) return -1;
+  return 0;
+}
 export default Vue.extend({
   name: "AppCompany",
   data() {
     return {
       content: "",
-      isLoaded: false
+      isLoaded: false,
       // datauser: store.getters.userData
       //   ? store.getters.userData.result
       //   : store.getters.user
@@ -50,7 +51,7 @@ export default Vue.extend({
   components: {
     AppCommentInput,
     AppPost,
-    AppUserInfo
+    AppUserInfo,
   },
   async beforeMount() {
     await this.$store.dispatch(GET_USER, this.$route.params._id);
@@ -58,9 +59,9 @@ export default Vue.extend({
       filter: {
         parent: {
           type: "user",
-          id: this.$route.params._id
-        }
-      }
+          id: this.$route.params._id,
+        },
+      },
     });
     this.isLoaded = true;
   },
@@ -76,8 +77,12 @@ export default Vue.extend({
       "currentUser",
       "userData",
       "userIsAdmin",
-      "userIsSuperAdmin"
-    ])
+      "userIsSuperAdmin",
+    ]),
+    preparedPosts() {
+      const user_id = this.$route.params._id;
+      return this.posts.filter((p) => p.author_ref == user_id).sort(compare);
+    },
   },
   methods: {},
   watch: {
@@ -87,13 +92,13 @@ export default Vue.extend({
           filter: {
             parent: {
               type: "user",
-              id: this.$route.params._id
-            }
-          }
+              id: this.$route.params._id,
+            },
+          },
         });
       });
-    }
-  }
+    },
+  },
 });
 </script>
 
