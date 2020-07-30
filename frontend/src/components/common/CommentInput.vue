@@ -50,7 +50,7 @@ const { getMentions } = Mentions;
 export default {
   name: "AppCommentInput",
   components: {
-    AppLoginBar
+    AppLoginBar,
   },
   data() {
     return {
@@ -61,7 +61,7 @@ export default {
       currPrefix: "",
       datauser: store.getters.userData
         ? store.getters.userData
-        : store.getters.user
+        : store.getters.user,
     };
   },
   computed: {
@@ -72,7 +72,7 @@ export default {
       "users",
       "currentUser",
       "userData",
-      "notification"
+      "notification",
     ]),
     dblQuote() {
       return '"';
@@ -82,11 +82,11 @@ export default {
         (this.mentionsData.length ? "Упомянутые сотрудники: " : "") +
         this.mentionsData
           .map(
-            m => `<a class='user-link' href='/profile/${m.id}'>${m.name}</a>`
+            (m) => `<a class='user-link' href='/profile/${m.id}'>${m.name}</a>`
           )
           .join(", ");
       return f;
-    }
+    },
   },
   methods: {
     onSearch(val, prefix) {
@@ -94,12 +94,12 @@ export default {
     },
     onSelect(option) {
       const selected_user = this.users.find(
-        u => u.firstName + " " + u.lastName == option.value
+        (u) => u.firstName + " " + u.lastName == option.value
       );
       const name = selected_user.firstName + " " + selected_user.lastName;
       this.mentionsData.push({
         id: selected_user._id,
-        name
+        name,
       });
       if (this.currPrefix == '"') {
         this.current = this.current.replace('"' + name, "@" + name);
@@ -114,24 +114,29 @@ export default {
     removeTags(text) {
       return text.replace(/(<([^>]+)>)/gi, ""); // TODO: implement cleaning of HTML tags to prevent any injects
     },
-    send() {
+    async send() {
+      const ws = this.currentClient.workspace;
       if (this.current !== "") {
-        this.$store
-          .dispatch(SEND_NEW_POST, {
-            message: this.removeTags(this.current),
-            parent: this.parent,
-            author: this.datauser.result, // obsolete in future
-            author_ref: this.datauser.result._id,
-            attachment: [],
-            emailSend: this.statusEmailSend,
-            formData: this.handleUpload(),
-            client_id: this.currentClient.workspace,
-            mentions: this.mentionsData.map(m => m.id)
-          })
-          .then(() => {
-            this.current = "";
-            this.mentionsData = [];
-          });
+        await this.$store.dispatch(SEND_NEW_POST, {
+          message: this.removeTags(this.current),
+          parent: this.parent,
+          author: this.datauser.result, // obsolete in future
+          author_ref: this.datauser.result._id,
+          attachment: [],
+          emailSend: this.statusEmailSend,
+          formData: this.handleUpload(),
+          client_id: ws,
+          mentions: this.mentionsData.map((m) => m.id),
+        });
+        //.then(() => {
+        this.current = "";
+        this.mentionsData = [];
+        this.$socket.client.emit("FOR_ALL", {
+          workspace: ws,
+          area: "POSTS",
+        });
+        console.log(`Socket msg sent: ${this.$socket.client.nsp}`);
+        //});
       }
     },
     handleRemove(file) {
@@ -148,7 +153,7 @@ export default {
       const { fileList } = this;
       if (fileList.length > 0) {
         const formData = new FormData();
-        fileList.forEach(file => {
+        fileList.forEach((file) => {
           formData.append("files", file);
         });
         this.fileList = [];
@@ -156,7 +161,7 @@ export default {
       } else {
         return null;
       }
-    }
+    },
   },
   beforeCreate() {
     // const userData = store.getters.userData;
@@ -178,11 +183,11 @@ export default {
         notification && notification.userId == store.getters.userData.result._id
           ? notification.publications
           : false;
-    }
+    },
   },
   props: {
-    parent: Object
-  }
+    parent: Object,
+  },
 };
 </script>
 

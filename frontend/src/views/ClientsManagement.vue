@@ -64,7 +64,7 @@ import { mapGetters } from "vuex";
 import {
   GET_CLIENTS,
   EDIT_CLIENT,
-  ENTER_CLIENT
+  ENTER_CLIENT,
 } from "@/store/client/actions.type";
 
 import ClientEditDialog from "@/components/modal/ClientEditDialog";
@@ -74,45 +74,45 @@ const columns = [
     title: "Название, код",
     dataIndex: "name",
     key: "name",
-    scopedSlots: { customRender: "name" }
+    scopedSlots: { customRender: "name" },
   },
   {
     title: "Телефон",
     dataIndex: "phone",
-    key: "phone"
+    key: "phone",
   },
   {
     title: "Адрес компании",
     dataIndex: "address",
     key: "address",
-    scopedSlots: { customRender: "addr" }
+    scopedSlots: { customRender: "addr" },
   },
   {
     title: "Кол-во сотрудников",
     key: "users",
-    dataIndex: "users"
+    dataIndex: "users",
   },
   {
     title: "Статус",
     key: "access_status",
     dataIndex: "has_access",
-    scopedSlots: { customRender: "access_status" }
+    scopedSlots: { customRender: "access_status" },
   },
   {
     title: "Действия",
     key: "action",
-    scopedSlots: { customRender: "action" }
+    scopedSlots: { customRender: "action" },
   },
   {
     title: "Вход",
     key: "enter",
-    scopedSlots: { customRender: "enter" }
-  }
+    scopedSlots: { customRender: "enter" },
+  },
 ];
 export default {
   name: "AppClients",
   components: {
-    ClientEditDialog
+    ClientEditDialog,
   },
   data() {
     return {
@@ -120,18 +120,18 @@ export default {
       editClientVisible: false,
       editMode: false,
       currentClientStr: "",
-      selectedClient: {}
+      selectedClient: {},
     };
   },
   computed: {
-    ...mapGetters(["clients", "currentClient", "userData"])
+    ...mapGetters(["clients", "currentClient", "userData"]),
   },
   methods: {
     tarifColor(tarif) {
       const colors = {
         free: "#ff0000",
         base: "#00ff00",
-        prof: "#0000ff"
+        prof: "#0000ff",
       };
       return colors[tarif];
     },
@@ -187,7 +187,7 @@ export default {
         cancelText: "Отменить",
         onOk: () => {
           this.blockClientAction(record);
-        }
+        },
       });
     },
     async blockClientAction(rec) {
@@ -198,13 +198,13 @@ export default {
           centered: true,
           title: "Статус изменен",
           content:
-            "Клиент " + (!rec.has_access ? "заблокирован" : "разблокирован")
+            "Клиент " + (!rec.has_access ? "заблокирован" : "разблокирован"),
         });
       } catch (error) {
         this.$error({
           centered: true,
           title: "Ошибка при изменении статуса клиента",
-          content: error
+          content: error,
         });
       }
     },
@@ -221,6 +221,7 @@ export default {
           "currentClient",
           JSON.stringify(this.currentClient)
         );
+        this.$socket.client.nsp = "/" + rec.workspace;
         // для контроля
         // this.currentClientStr = JSON.stringify(
         //   JSON.parse(localStorage.getItem("currentClient")),
@@ -232,10 +233,10 @@ export default {
         this.$error({
           centered: true,
           title: "Ошибка при входе в область клиента",
-          content: error
+          content: error,
         });
       }
-    }
+    },
   },
   beforeMount() {
     this.$store.dispatch(GET_CLIENTS);
@@ -245,7 +246,7 @@ export default {
     //   null,
     //   3
     // );
-  }
+  },
 };
 </script>
 

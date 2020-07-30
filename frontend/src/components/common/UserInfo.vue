@@ -46,23 +46,23 @@ export default {
   name: "AppUserInfo",
   components: {
     AppLoginBar,
-    AppUserEditDrawer
+    AppUserEditDrawer,
   },
   data() {
     return {
       current: "",
       editDrawerVisible: false,
-      statusFollow: false
+      statusFollow: false,
     };
   },
   computed: {
     ...mapGetters(["currentUser", "userData", "userIsAdmin"]),
     datauser() {
-      return this.userData.result;
+      return this.userData && this.userData.result;
     },
     iamSubscribed() {
-      return this.currentUser.followers.includes(this.datauser._id)
-    }
+      return this.currentUser.followers.includes(this.datauser._id);
+    },
   },
   methods: {
     closeEditDrawer() {
@@ -87,16 +87,16 @@ export default {
         .dispatch(eventName, {
           userID: user_id,
           curentUserID: current_user_id,
-          userEmail: current_user_email
+          userEmail: current_user_email,
         })
         .finally(() => {
           this.$store.dispatch(GET_USER, this.$route.params._id);
         });
-    }
+    },
   },
   watch: {
-    currentUser(currentUser) {}
-  }
+    currentUser(currentUser) {},
+  },
 };
 </script>
 

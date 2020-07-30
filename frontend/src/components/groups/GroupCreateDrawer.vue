@@ -61,7 +61,7 @@ import { mapGetters } from "vuex";
 import { CREATE_GROUP } from "@/store/group/actions.type";
 import {
   GET_NOTIFICATION,
-  CREATE_MESSAGE
+  CREATE_MESSAGE,
 } from "@/store/notification/actions.type";
 import { SOCKET_NEW_MESSAGE } from "@/store/notification/mutations.type";
 
@@ -83,37 +83,37 @@ export default {
           {
             required: true,
             message: "Название не может быть пустым!",
-            transform: this.tr
+            transform: this.tr,
           },
           {
             max: 50,
             message: "Максимальная длина заголовка - 50 символов",
-            transform: this.tr
-          }
+            transform: this.tr,
+          },
         ],
         description: [
           {
             required: true,
             message: "Описание не может быть пустым!",
-            transform: this.tr
+            transform: this.tr,
           },
           {
             max: 250,
             message: "Максимальная длина описания - 250 символов",
-            transform: this.tr
-          }
+            transform: this.tr,
+          },
         ],
         type: [
           {
             required: true,
-            message: "Тип группы не может быть пустым!"
-          }
-        ]
-      }
+            message: "Тип группы не может быть пустым!",
+          },
+        ],
+      },
     };
   },
   components: {
-    AppInput
+    AppInput,
   },
   computed: {
     ...mapGetters([
@@ -121,8 +121,8 @@ export default {
       "userData",
       "notification",
       "currentClient",
-      "userIsSuperAdmin"
-    ])
+      "userIsSuperAdmin",
+    ]),
   },
   methods: {
     onClose() {
@@ -154,7 +154,7 @@ export default {
           this.$error({
             title: "Ошибка проверки клиента",
             content: "Не удалось установить текущего клиента",
-            centered: true
+            centered: true,
           });
           return;
         }
@@ -166,7 +166,7 @@ export default {
           creator: id, // ref field
           userEmail: email,
           emailSend: this.statusEmailSend,
-          client_id
+          client_id,
         };
         const newGroupId = await this.$store.dispatch(CREATE_GROUP, newGroup);
         // объект-модель для сохранения в БД
@@ -178,8 +178,8 @@ export default {
 
         // Посылаем сообщение для всех о появлении нового сообщения
         // с сервера придет бродкастом сообщение "socketMessage" с переданными данными
-        this.$socket.client.emit("to all", {
-          type: "NEW_GROUP"
+        this.$socket.client.emit("FOR_ALL", {
+          type: "NEW_GROUP",
           // 1 вариант - создавать объект тут, второй - в момент приема этого сообщения в обработчике события "to all"
           // val: {
           //   title: "Новая группа",
@@ -207,16 +207,16 @@ export default {
         listenerType: "all", // тип приемников сообщений - все, выборочно или еще как-то
         linkedObjType: "group", // связанный объект - группа, проект, и т.д.
         linkedObjId: newGroupId,
-        client_id: newGroup.client_id
+        client_id: newGroup.client_id,
       };
     },
     groupTypeOnChange(e) {
       //this.type = e;
-    }
+    },
   },
   props: {
     close: Function,
-    visible: Boolean
+    visible: Boolean,
   },
   beforeCreate() {
     this.form = this.$form.createForm(this);
@@ -230,8 +230,8 @@ export default {
         notification.userId === store.getters.userData.result._id
           ? notification.publications
           : false;
-    }
-  }
+    },
+  },
 };
 </script>
 

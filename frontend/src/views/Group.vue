@@ -349,6 +349,11 @@ export default {
     //   });
     // },
   },
+  sockets: {
+    socketMessage(payload) {
+      console.log(`GROUP has received message`);
+    },
+  },
   async beforeMount() {},
   async beforeCreate() {
     await this.$store.dispatch(GET_CURRENT_GROUP, this.$route.params._id);

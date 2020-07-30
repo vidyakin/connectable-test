@@ -69,7 +69,6 @@ router.post('/dislike', async (req, res) => {
     if (deletedLike) {
       post.likes = post.likes.filter(l => l.author._id.toString() !== user_id)
       await post.save()
-      //await post.populate(`likes.${post.likes.length - 1}.author`, 'firstName lastName').execPopulate()
       res.send({
         status: 201,
         result: {

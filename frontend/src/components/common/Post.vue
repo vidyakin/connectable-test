@@ -254,7 +254,7 @@ export default {
       return '"';
     },
     user_id() {
-      return this.userData.result && this.userData.result._id;
+      return this.userData && this.userData.result._id;
     },
     userAvatar() {
       return this.userData.result.googleImage

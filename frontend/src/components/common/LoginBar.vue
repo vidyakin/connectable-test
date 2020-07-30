@@ -1,7 +1,10 @@
 <template>
   <div class="user-bar">
     <div class="user-info" v-if="userData">
-      <div style="align-self: center;" class="client-name">{{getClientInfo()}}</div>
+      <div style="align-self: center;" class="client-name">
+        {{getClientInfo()}}
+        <!-- Socket: {{!$socket.client.connected ? 'not' : ''}} connected ({{getSocket_nsp}}) -->
+      </div>
       <!-- Список сообщений -->
       <!-- <a-popover placement="bottom" trigger="click">
         <template slot="content">
@@ -51,7 +54,7 @@ export default {
   },
   data() {
     return {
-      current: 1
+      current: 1,
       /*************************************** 
        * Структура объекта "datauser":
        * "result": {
@@ -87,7 +90,10 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(["userData", "user", "users", "currentClient"])
+    ...mapGetters(["userData", "user", "users", "currentClient"]),
+    getSocket_nsp() {
+      return this.$socket.client.nsp;
+    },
     // isSuperAdmin() {
     //   return this.$can("manage", {
     //     accessEmail: this.userData.result.email,
@@ -99,6 +105,9 @@ export default {
     connect() {
       console.log("socket connected");
     },
+    disconnect() {
+      console.log("socket disconnected");
+    },
     /**
      * Событие на прием сообщения с кодом "socketMessage"
      * @param payload: object - {type, val}
@@ -108,28 +117,47 @@ export default {
     async socketMessage(payload) {
       const messages = {
         NEW_GROUP: "Создана новая группа",
-        NEW_EMPL: "Добавлен новый сотрудник"
+        NEW_EMPL: "Добавлен новый сотрудник",
+        UPDATE_FEED: "Нужно обновить ленту",
+        FOR_ALL: "ВСЕМ ВСЕМ ВСЕМ",
       };
       console.log(`socket message received`);
-      if (payload.type === "NEW_GROUP") {
-        await this.$store.dispatch(GET_MESSAGES);
-        // вывод оповещения о новом оповещении
-        this.$notification["info"]({
-          message: messages[payload.type],
-          description: `Новое оповещение в ленте`,
-          placement: "topLeft"
-        });
-      }
+      // if (payload.type === "NEW_GROUP") {
+      //   await this.$store.dispatch(GET_MESSAGES);
+      //   // вывод оповещения о новом оповещении
+      //   this.$notification["info"]({
+      //     message: messages[payload.type],
+      //     description: `Новое оповещение в ленте`,
+      //     placement: "topLeft",
+      //   });
+      // }
       if (payload.type === "NEW_EMPL") {
         await this.$store.dispatch(GET_MESSAGES);
         // вывод оповещения о новом оповещении
         this.$notification["info"]({
           message: messages[payload.type],
           description: `Новый сотрудник: <router-link to='/user/${payload.val.id}'>${payload.val.fio}</router-link>`,
-          placement: "topLeft"
+          placement: "topLeft",
         });
       }
-    }
+      if (payload.type === "FOR_ALL") {
+        this.$notification["info"]({
+          message: messages[payload.type],
+          description: `ТЕСТОВОЕ СООБЩЕНИЕ НА ВСЕХ СОТРУДНИКОВ`,
+          placement: "topLeft",
+        });
+      }
+      // if (payload.type === "UPDATE_FEED") {
+      //   this.$notification["info"]({
+      //     message: messages[payload.type],
+      //     description: payload.area,
+      //     placement: "topLeft",
+      //   });
+      // }
+      if (payload.type === "LOGOUT_NOW") {
+        //this.$router.push("/logout");
+      }
+    },
   },
   methods: {
     // datauser() {
@@ -167,11 +195,11 @@ export default {
       this.$router.push({ name: "login" });
     },
     fillNotificationFeed() {
-      this.notifs = this.messages.map(msg => ({
+      this.notifs = this.messages.map((msg) => ({
         title: "Новая группа", // TODO: подстроить под разные типы сообщений
-        html: msg.text
+        html: msg.text,
       }));
-    }
+    },
   },
   async created() {
     const user = this.userData.result;
@@ -179,12 +207,15 @@ export default {
     if (!this.currentClient) {
       if (!user.roles.includes("superadmin")) {
         await this.$store.dispatch(ENTER_CLIENT, user.client_id);
+        this.$socket.client.nsp = "/" + user.client_id;
       } else {
         const currentClient = JSON.parse(localStorage.getItem("currentClient"));
         await this.$store.commit(SET_CURRENT_CLIENT, currentClient);
+        this.$socket.client.nsp = "/" + currentClient.workspace;
       }
+      this.$socket.client.connect();
     }
-  }
+  },
 };
 </script>
 

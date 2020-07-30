@@ -65,10 +65,9 @@ export default {
   computed: {
     ...mapGetters(["users"]),
     dataList() {
-      if (!this.users) return [];
-      return this.users.filter(
-        (u) => !u.deletion_mark && u._id != this.group.creator
-      );
+      if (!this.users || !this.group) return [];
+      const creator = this.group.creator;
+      return this.users.filter((u) => !u.deletion_mark && u._id != creator);
     },
   },
   methods: {
