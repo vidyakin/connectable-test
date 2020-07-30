@@ -163,7 +163,7 @@ const mutations = {
   [REMOVE_LIKE_FOR_POST](state: State, like: any) {
     const postIndex = state.posts.findIndex((post) => post._id === like.parent.id);
     const post = { ...state.posts[postIndex] }
-    post.likes = post.likes.filter(l => l.author._id != like.author._id)
+    post.likes = post.likes.filter((l: any) => l.author._id != like.author._id)
     state.posts = [...state.posts.slice(0, postIndex), post, ...state.posts.slice(postIndex + 1)]
   },
 

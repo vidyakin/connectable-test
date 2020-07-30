@@ -26,12 +26,19 @@ pipeline {
         }
         stage("Build Frontend") {
             steps {
-                    sh "docker-compose build connfrontend"
+                    sh "docker-compose build --force-rm --no-cache connfrontend"
             }
         }
         stage("Build Backend") {
             steps {
-                    sh "docker-compose build connbackend"
+                    sh "docker-compose build --force-rm --no-cache connbackend"
+            }
+        }
+    }
+    post {
+        always {
+            script {
+                sh "docker system prune -f && docker volume prune -f"
             }
         }
     }

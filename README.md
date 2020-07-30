@@ -60,48 +60,36 @@ $ docker ps
 $ docker logs <container_name>
 ```
 
-## CI/CD with GitHub & Jenkins
+## CI/CD with GitHub Actions
 
-Jenkins server is available at: http://34.66.39.81:8080  
-
-#### 1.Each Pull Request to  ***Master*** branch is checked by this job: http://34.66.39.81:8080/blue/organizations/jenkins/connectable/pr
-Jenkins checks that:  
+#### 1.Each Pull Request to  ***Master*** branch is checked by this job: https://github.com/connectable-project/connectable/blob/master/.github/workflows/pr-master.yml
+GitHub Actions checks that:  
 * it is possible to build Frontend with NPM
 * it is possible to build Backend with NPM
 * it is possible to build Frontend and Backend containers with Docker
 * More to be done (tests, other checks...)
 
-Pull Requests will have Green/Red status from Jenkins in GitHub on PullRequest page:
+Pull Requests will have Green/Red status on PullRequest page:
 
-![PR-status](jenkins/misc/pr-status.png)
+![PR-status](.github/images/pr-status.png)
 
 #### 2.Each merge to ***Master*** branch triggers ***DEPLOY TO PRODUCTION***.
-Jenkins will run this Job: http://34.66.39.81:8080/blue/organizations/jenkins/connectable-MERGE-MASTER/branches
+GitHub Actions will run this Job: https://github.com/connectable-project/connectable/blob/master/.github/workflows/merge-master.yml
 
 The job is doing the following:
 - pull master changes to local server (prod)
-- re-build docker containers for Front and Back (mongo remains the same)
-You can see the job status on the main page after merge:
+- re-build docker containers for Front and Back (mongo remains the same)  
+You can see the job status in the commit tree after merge:
 
-![Merged-status](jenkins/misc/merged-status.png)
-
-
-***If the status of any Job is RED - click on 'Details' and inspect the logs of the Jenkins Job to understand the problem***
+![Merged-status](.github/images/merged-status.png)
 
 
-#### 3.How to start Job manually
-If you need to manually deploy prod, or you want to restart any job:
-* login to Jenkins here: http://34.66.39.81:8080/
-* user = conndev, pass = (ask Jenkins admin)
-* Open 'Jobs' page http://34.66.39.81:8080/blue/organizations/jenkins/pipelines
-* Choose a job you want to start/re-start
+***If the status of any Job is RED - go to Actions > Open red build > click on 'build' and inspect the logs to understand the problem***
 
-
-For example, to manually re-deploy prod:
-- login to Jenkins
-- go to the Job Page http://34.66.39.81:8080/blue/organizations/jenkins/connectable-MERGE-MASTER/branches
-- click on 'Run' button
-- the latest updates will be uploaded and deployed to prod
-
-![PR-status](jenkins/misc/manual-run.png)
-
+## How to download backups from Google Bucket
+Google Cloud Bucket contains ZIP archive with DB backup and Git repository backup:
+- open 'connectable-prod' project
+- go to Storage > Browser
+- open 'connectable-backups' bucket
+- click on the archive name, example: '2020_06_06_00_00.zip'
+- click 'Download' button on the top
