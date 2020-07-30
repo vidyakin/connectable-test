@@ -137,7 +137,7 @@
           >Запись в группе</div>
           <div v-else>Тип записи с комментарием не определен</div>
           <div class="comment-head">
-            <span class="comment-head-name">{{comment.author.firstName}} {{comment.author.lastName}}</span>&nbsp;добавил комментарий:
+            <span class="comment-head-name">{{getFIO(comment)}}</span>&nbsp;добавил комментарий:
           </div>
           <div class="comment-body">{{comment.message}}</div>
         </div>
@@ -188,13 +188,13 @@ import {
   GET_POSTS,
   GET_POSTS_OF_GROUPS,
   GET_COMMENTS,
-  GET_MENTIONS
+  GET_MENTIONS,
 } from "@/store/post/actions.type";
 import { GET_EVENTS, GET_USERS } from "@/store/user/actions.type";
 import {
   GET_REQUESTS_TO_MY_GROUPS,
   APPROVE_PARTICIPANTS_REQUEST,
-  DELETE_PARTICIPANT
+  DELETE_PARTICIPANT,
 } from "@/store/group/actions.type";
 import AppCommentInput from "@/components/common/CommentInput";
 import NotificationList from "@/components/Company/NotificationList";
@@ -218,14 +218,14 @@ export default Vue.extend({
       notifCount: 0,
       subsrcCount: 0,
       groupMsgCount: 0,
-      eventsCount: 0
+      eventsCount: 0,
     };
   },
   components: {
     AppCommentInput,
     AppPost,
     NotificationList,
-    SubscriptionList
+    SubscriptionList,
   },
   computed: {
     ...mapGetters([
@@ -242,7 +242,7 @@ export default Vue.extend({
       "group_requests",
       "currentClient",
       "userIsAdmin",
-      "userIsSuperAdmin"
+      "userIsSuperAdmin",
     ]),
     wsp() {
       return this.userIsSuperAdmin
@@ -250,6 +250,7 @@ export default Vue.extend({
         : this.userData.result.client_id;
     },
     sortedPosts() {
+      // посты компании создаются в
       return this.posts_company.sort(compare);
     },
     sortedGroupsPosts() {
@@ -261,11 +262,11 @@ export default Vue.extend({
     eventsWithMe() {
       const user = this.userData.result;
       return this.events.filter(
-        ev =>
+        (ev) =>
           ev.userId != user._id &&
-          ev.attendees.filter(att => att.email == user.email).length > 0
+          ev.attendees.filter((att) => att.email == user.email).length > 0
       );
-    }
+    },
   },
   filters: {
     asDate(d) {
@@ -276,7 +277,7 @@ export default Vue.extend({
     },
     asDateTime(d) {
       return new Date(d).toLocaleString();
-    }
+    },
   },
   methods: {
     sendCompanyMessage() {
@@ -296,12 +297,16 @@ export default Vue.extend({
       this.subsrcCount = n;
     },
     eventAuthorName(event) {
-      const user = this.users.find(u => u._id == event.userId);
+      const user = this.users.find((u) => u._id == event.userId);
       return user == undefined
         ? "Пользователь не найден"
         : user.firstName + " " + user.lastName;
     },
     getFIO(m) {
+      if (m.author == undefined) {
+        console.log(`У комментария нет поля author`);
+        return;
+      }
       const author = m.author ? m.author : m.author_ref;
       return author.firstName + " " + author.lastName;
     },
@@ -310,13 +315,13 @@ export default Vue.extend({
       this.$store
         .dispatch(APPROVE_PARTICIPANTS_REQUEST, {
           groupId,
-          participantId
+          participantId,
         })
         .then(() =>
           this.$notification["success"]({
             placement: "topRight",
             message: "Запрос одобрен",
-            description: "Вступление в группу одобрено"
+            description: "Вступление в группу одобрено",
           })
         )
         .then(() => this.checkParticipants());
@@ -325,13 +330,13 @@ export default Vue.extend({
       this.$store
         .dispatch(DELETE_PARTICIPANT, {
           groupId,
-          participantId
+          participantId,
         })
         .then(() =>
           this.$notification["info"]({
             placement: "topRight",
             message: "Запрос отклонен",
-            description: "Вступление в группу отклонено"
+            description: "Вступление в группу отклонено",
           })
         )
         .then(() => this.checkParticipants());
@@ -343,7 +348,11 @@ export default Vue.extend({
           this.userData.result._id
         );
       }
-    }
+    },
+  },
+  sockets: {
+    // async socketMessage(payload) {
+    // },
   },
   beforeMount() {
     const user = this.userData.result;
@@ -355,8 +364,8 @@ export default Vue.extend({
           //   type: "company",
           //   id: "0"
           // },
-          client_id: this.wsp
-        }
+          client_id: this.wsp,
+        },
       }),
       // this.$store.dispatch(GET_POSTS_OF_GROUPS, user._id).then(d => {
       //   console.log("DISP: Post of groups");
@@ -364,9 +373,29 @@ export default Vue.extend({
       this.$store.dispatch(GET_EVENTS, user.email),
       this.$store.dispatch(GET_REQUESTS_TO_MY_GROUPS, user._id),
       this.$store.dispatch(GET_COMMENTS, user._id),
-      this.$store.dispatch(GET_MENTIONS, user._id)
-    ]).finally(_ => {
+      this.$store.dispatch(GET_MENTIONS, user._id),
+    ]).finally((_) => {
       console.log("All dispatch ended");
+    });
+  },
+  mounted() {
+    this.$socket.client.on("socketMessage", async (payload) => {
+      const filter = { client_id: this.wsp };
+      if (payload.type === "FOR_ALL") {
+        if (payload.area == "POSTS") {
+          try {
+            console.log(`Company.vue: update posts handler`);
+            await this.$store.dispatch(GET_POSTS, { filter });
+            this.$notification["info"]({
+              message: "Новый пост, проверьте ленту",
+              description: payload.area,
+              placement: "topLeft",
+            });
+          } catch (error) {
+            console.log(`Ошибка при получении постов: ${error}`);
+          }
+        }
+      }
     });
   },
   watch: {
@@ -378,7 +407,7 @@ export default Vue.extend({
     //   );
     //   // 2. посты с другими условиями
     // }
-  }
+  },
 });
 </script>
 

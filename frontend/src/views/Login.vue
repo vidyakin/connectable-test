@@ -247,6 +247,17 @@ export default Vue.extend({
           if (!this.errorLogin) {
             const user = this.$store.getters.userData.result;
             const userIsSuperAdmin = user.roles.includes("superadmin");
+            const loginData = {
+              userName: this.user.email,
+              isSA: userIsSuperAdmin,
+              workspace: this.user.workspace,
+            };
+            this.$socket.client.nsp = "/" + this.user.workspace;
+            this.$socket.client.emit("LOGIN", loginData, (resp) => {
+              console.log(
+                `Server answer on login: ${resp.msg}. Connection ID ${resp.id}`
+              );
+            });
             // User is not SA
             if (!userIsSuperAdmin) {
               this.$store.dispatch(ENTER_CLIENT, this.user.workspace);

@@ -79,6 +79,12 @@
         <img src="@/assets/Icons/Structure.svg" alt />
         О нас
       </a-menu-item>
+      <!-- <a-menu-item key="/about2">
+        <a-button @click.stop="sendUpdate">Обновить ленту</a-button>
+      </a-menu-item>
+      <a-menu-item key="/about3">
+        <a-button @click.stop="sendToAll">Сообщение всем</a-button>
+      </a-menu-item>-->
     </a-menu>
 
     <a-menu
@@ -139,6 +145,8 @@
 <script>
 import { mapGetters } from "vuex";
 import store from "../../store";
+import { CREATE_MESSAGE } from "@/store/notification/actions.type";
+
 export default {
   name: "Navbar",
   mounted() {
@@ -150,7 +158,7 @@ export default {
       // datauser: store.getters.user
       //   ? store.getters.user
       //   : store.getters.userData,
-      isActive: this.$route.path.split("/")[1]
+      isActive: this.$route.path.split("/")[1],
     };
   },
   methods: {
@@ -159,7 +167,53 @@ export default {
         this.$router.push({ path: e.key });
       }
       this.isActive = e.key.split("/")[1];
-    }
+    },
+    async sendToAll() {
+      if (!this.currentClient) {
+        console.log(`Не установлен текущий воркспейс клиента`);
+        return;
+      }
+      const ws = this.currentClient.workspace;
+      this.$socket.client.emit("FOR_ALL", {
+        type: "FOR_ALL",
+        workspace: ws,
+        area: "всем всем всем",
+      });
+      console.log(
+        `Broadcast was sent to server from NSP ${this.$socket.client.nsp}`
+      );
+    },
+    async sendUpdate() {
+      if (this.currentClient) {
+        const ws = this.currentClient.workspace;
+        // тестируем на примере оповещений - создаем сообщение и говорим обновить ленту
+        const newMsg = {
+          msgType: "NEW_GROUP", // тип сообщения, для разделения бизнес-логики - "NEW_GROUP","YOU_ADDED_IN_GROUP", ""
+          dateCreated: Date.now(), // Дата создания сообщения
+          //text: `<b>${this.userinfo.firstName} ${this.userinfo.lastName}</b> создал новую группу <i><a href="#">${newGroup.name}</a></i>`, // текст сообщения
+          text: `Тестовое оповещение`,
+          senderId: this.userData.result._id, // id отправителя
+          listenerType: "all", // тип приемников сообщений - все, выборочно или еще как-то
+          linkedObjType: "group", // связанный объект - группа, проект, и т.д.
+          linkedObjId: "no id",
+          client_id: ws,
+        };
+        await this.$store.dispatch(CREATE_MESSAGE, newMsg);
+        // шлем всем оповещение по сокету
+        //this.$socket.client.nsp = "/" + ws;
+        this.$socket.client.emit("FOR_ALL", {
+          workspace: ws,
+          area: "MESSAGES",
+        });
+        console.log(`FOR_ALL was sent to server`);
+      } else {
+        this.$error({
+          title: "Ошибка определения клиента",
+          content: "Не определен клиент, возможно ошибка",
+          centered: true,
+        });
+      }
+    },
   },
   computed: {
     ...mapGetters([
@@ -167,7 +221,7 @@ export default {
       "userData",
       "currentClient",
       "userIsSuperAdmin",
-      "userIsAdmin"
+      "userIsAdmin",
     ]),
     /**
      * Определяет видимость клиенто-зависимых разделов типа сотрудников или адресной книги
@@ -196,15 +250,15 @@ export default {
     getClientInfo() {
       return this.client_defined() ? this.currentClient.name : "";
     },
-    userKey: function() {
+    userKey: function () {
       return (
         (this.userData &&
           this.userData.result &&
           `/profile/${this.userData.result._id}`) ||
         "nouser"
       );
-    }
-  }
+    },
+  },
 };
 </script>
 

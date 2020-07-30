@@ -47,37 +47,57 @@ import MessageGroupBody from "./NotificationBodies/MessageGroupBody";
 
 const msgTitles = {
   NEW_GROUP: "Новая группа",
-  NEW_EMPL: "Новый сотрудник"
+  NEW_EMPL: "Новый сотрудник",
 };
 
 export default {
   data() {
     return {
-      notifs: []
+      notifs: [],
     };
+  },
+  sockets: {
+    async socketMessage(payload) {
+      const filter = {
+        client_id: this.currentClient.workspace,
+      };
+      console.log("Notif list, message type:", payload.type);
+      if (payload.type === "FOR_ALL") {
+        if (payload.area == "MESSAGES") {
+          await this.$store.dispatch(GET_MESSAGES, { filter });
+          this.$notification["info"]({
+            message: "Новое оповещение, проверьте ленту",
+            description: payload.area,
+            placement: "topLeft",
+          });
+        } else {
+        }
+      } else {
+      }
+    },
   },
   components: {
     MsgEmplBody: MessageEmployeeBody,
-    MsgGroupBody: MessageGroupBody
+    MsgGroupBody: MessageGroupBody,
   },
   computed: {
-    ...mapGetters(["users", "messages", "currentClient"])
+    ...mapGetters(["users", "messages", "currentClient"]),
   },
   methods: {
     fillNotificationFeed() {
       this.$emit("count", this.messages.length);
-      const getCreatorName = msg => {
-        const user = this.users.find(u => u._id == msg.senderId);
+      const getCreatorName = (msg) => {
+        const user = this.users.find((u) => u._id == msg.senderId);
         return user ? user.firstName + " " + user.lastName : "not found";
       };
-      this.notifs = this.messages.map(msg => ({
+      this.notifs = this.messages.map((msg) => ({
         type: msg.msgType,
         creator: getCreatorName(msg),
         title: msgTitles[msg.msgType], // TODO: подстроить под разные типы сообщений
         text: msg.text,
-        id: msg.linkedObjId
+        id: msg.linkedObjId,
       }));
-    }
+    },
   },
   async beforeMount() {
     //console.log(`LoginBar: userdata is ${JSON.stringify(this.datauser,null,3)}`);
@@ -95,12 +115,12 @@ export default {
       if (val) {
         await this.$store.dispatch(GET_MESSAGES, {
           filter: {
-            client_id: val.workspace
-          }
+            client_id: val.workspace,
+          },
         }); // TODO: доработать для получения только персональных и только НЕпрочитанных сообщений
       }
-    }
-  }
+    },
+  },
 };
 </script>
 

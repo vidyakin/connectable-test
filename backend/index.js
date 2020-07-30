@@ -13,6 +13,7 @@ require('module-alias/register');
 const fs = require('fs')
 const express = require('express');
 const bodyParser = require('body-parser');
+const myutils = require('./utils')
 
 const {
   User,
@@ -39,24 +40,62 @@ const port = process.env.PORT || 4000;
 // HTTP :
 const server = require('http').createServer(app);
 
-const io = require('socket.io')(server, { 'transports': ['websocket', 'polling'] });
+const io = require('socket.io')(server, { 
+  'transports': ['websocket', 'polling'],
+  reconnection: true,
+  reconnectionAttempts: Infinity,
+  reconnectionDelay: 1000,
+  reconnectionDelayMax: 5000,
+  randomizationFactor: 0.5,
+  timeout: 20000,
+  autoConnect: true
+});
+const workspaces = io.of(/^\/\w+$/); // register all namespaces
+
 io.set('transports', ["websocket", "polling"]);
-io.on('connection', socket => {
-  console.log("-> socket.io user connected: ", socket.id);
+workspaces.on('connection', socket => {
+  
+  // ВСЕ emit ДОЛЖЕН ВЫЗЫВАТЬ ЧЕРЕЗ ЭТОТ ОБЪЕКТ
+  const client_nsp = socket.nsp
+
+  console.log("-> socket.io user connected: ", socket.id)
+  //console.log('NSP::: ',myutils.safeStringify(socket.nsp));// very long json!
+  
   socket.on('disconnect', () => {
     console.log("<- socket.io user disconnected: ", socket.id);
   })
-  // Универсальное событие для всех, что и как обрабатываетс - задается в data
-  socket.on("to all", data => {
-    console.log(`${new Date().toLocaleString()}: SERVER Message to all: ${data.type} `);
+  // USER CONNECTED, NEED TO GENERATE key OF CONNECTION
+  socket.on('LOGIN', (userData, cb) => {
+    console.log('User has been logged in workspace «'+client_nsp.name+'» as: ', userData);
+    return cb({
+      id: socket.id,
+      msg: `Server now watching you, ${userData.userName} from ${userData.workspace}`
+    })
+  })
+  // Для обновления ленты у всех сотрудников
+  // socket.on('UPDATE_FEED', data => {
+  //   console.log('UPDATE_FEED was recieved from',socket.id,', data area:',data.area);
+  //   socket.nsp.emit('socketMessage',{ 
+  //     type: 'UPDATE_FEED',
+  //     area: data.area,
+  //     nsp: socket.nsp.name
+  //   })
+  // })
+
+  // Универсальное событие для всех, что и как обрабатывается - задается в data
+  // Присланные данные транслируются на всех в том же виде
+  socket.on("FOR_ALL", data => {
+    console.log(`${new Date().toLocaleString('ru')}: From client to all: ${data} `);
     socket.broadcast.emit("socketMessage", data);
   });
   // Универсальное событие для одного, что и как обрабатываетс - задается в data
-  socket.on("to one", data => {
-    console.log(`${new Date().toLocaleString()}: SERVER Message to one: ${data.type}`);
-    socket.to(data.socket_id).emit("socketMessage", data);
+  socket.on("PRIVATE_MSG", data => {
+    console.log(`${new Date().toLocaleString('ru')}: Private msg from client: ${data}`);
+    io.to(data.socket_id).emit("socketMessage", data);
   });
 })
+
+
 
 app.use(cors());
 app.use(fileUpload({
@@ -326,14 +365,14 @@ app.post('/api/dislike', (req, res) => {
 // Поиск событий где пользователь и автор и участник
 app.get('/api/events/:email', async (req, res) => {
   const user = await User.findOne({ email: req.params.email }, '_id client_id')
-  console.log((new Date()).toLocaleString() + ' , user:' + user);
+  //console.log((new Date()).toLocaleString() + ' /api/events/:email, user:' + user);
   try {
     const docs = await Event.find({ client_id: user.client_id })
       .or([
         { "userId": user._id },
         { "attendees.email": { $eq: req.params.email } }
       ])
-    console.log('docs:', docs.length);
+    //console.log('docs:', docs.length);
     res.status(200).send(docs)
   } catch (err) {
     return res.status(500).send("Error while getting events as author: " + err.message)

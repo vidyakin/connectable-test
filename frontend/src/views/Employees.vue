@@ -279,7 +279,7 @@ export default {
           );
           // Создаем сообщение в БД и сторе
           this.$store.dispatch(CREATE_MESSAGE, newMsg).then((newMsgId) => {
-            this.$socket.client.emit("to all", {
+            this.$socket.client.emit("FOR_ALL", {
               type: "NEW_EMPL",
               val: newMsg,
             });
@@ -314,7 +314,7 @@ export default {
         "23412341235"
       );
       this.$store.dispatch(CREATE_MESSAGE, newMsg).then((newMsgId) => {
-        this.$socket.client.emit("to all", {
+        this.$socket.client.emit("FOR_ALL", {
           type: "NEW_EMPL",
           val: newMsg,
         });
