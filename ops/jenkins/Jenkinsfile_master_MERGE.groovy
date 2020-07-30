@@ -68,11 +68,13 @@ pipeline {
                                  )]) {
                 sh """ssh -i ${SSH_KEYFILE} -o StrictHostKeyChecking=no ${SSH_USERNAME}@${SSH_PROD_IP} \
                 '
+                test -d "\$HOME/${PROD_ROOT_DIR}-bak" && sudo rm -rf "\$HOME/${PROD_ROOT_DIR}-bak" &&
                 sudo cp -r "\$HOME/${PROD_ROOT_DIR}" "\$HOME/${PROD_ROOT_DIR}-bak" &&
                 cd \$HOME/${PROD_ROOT_DIR} &&
-                git checkout . &&
-                git pull origin master &&
-                cat \$HOME/${PROD_ENV_FILE} >> \$HOME/${PROD_ROOT_DIR}/${PROD_ENV_FILE}
+                sudo git checkout . &&
+                sudo git pull origin master &&
+                sudo chown -R tech:tech \$HOME/${PROD_ROOT_DIR} &&
+                sudo cat \$HOME/${PROD_ENV_FILE} >> \$HOME/${PROD_ROOT_DIR}/${PROD_ENV_FILE}
                 '
                 """
                 }
@@ -88,10 +90,11 @@ pipeline {
                 sh """ssh -i ${SSH_KEYFILE} -o StrictHostKeyChecking=no ${SSH_USERNAME}@${SSH_PROD_IP} \
                 '
                 cd \$HOME/${PROD_ROOT_DIR} &&
-                docker-compose -f docker-compose-prod.yaml build connfrontend &&
+                docker-compose -f docker-compose-prod.yaml build --force-rm connfrontend &&
                 docker-compose -f docker-compose-prod.yaml up --no-deps -d connfrontend &&
-                docker-compose -f docker-compose-prod.yaml build connbackend &&
-                docker-compose -f docker-compose-prod.yaml up --no-deps -d connbackend
+                docker-compose -f docker-compose-prod.yaml build --force-rm connbackend &&
+                docker-compose -f docker-compose-prod.yaml up --no-deps -d -V connbackend &&
+                docker system prune -f && docker volume prune -f
                 '
                 """
                 }
@@ -101,17 +104,7 @@ pipeline {
     post {
         success {
             script {
-                withCredentials([sshUserPrivateKey(
-                                   credentialsId: "${SSH_PROD_CREDENTIALS}",
-                                   keyFileVariable: 'SSH_KEYFILE',
-                                   usernameVariable: 'SSH_USERNAME'
-                                 ),
-                                 usernamePassword(
-                                    credentialsId: "${GIT_CREDENTIALS}",
-                                    passwordVariable: 'GIT_PASS',
-                                    usernameVariable: 'GIT_USER'
-                                 ),
-                                 string(
+                withCredentials([string(
                                    credentialsId: "${CLOUDFLARE_TOKEN}",
                                    variable: 'CF_TOKEN'
                                  )]) {
@@ -137,10 +130,12 @@ pipeline {
                                  )]) {
                 sh """ssh -i ${SSH_KEYFILE} -o StrictHostKeyChecking=no ${SSH_USERNAME}@${SSH_PROD_IP} \
                 '
+                test -d "\$HOME/${PROD_ROOT_DIR}" && sudo rm -rf "\$HOME/${PROD_ROOT_DIR}" &&
                 sudo cp -r "\$HOME/${PROD_ROOT_DIR}-bak" "\$HOME/${PROD_ROOT_DIR}" &&
                 cd \$HOME/${PROD_ROOT_DIR} &&
                 docker kill connbackend connfrontend &&
-                docker-compose -f docker-compose-prod.yaml up -d connfrontend connbackend
+                docker-compose -f docker-compose-prod.yaml up -d -V connfrontend connbackend &&
+                docker system prune -f && docker volume prune -f
                 '
                 """
                 }

@@ -5,7 +5,7 @@
     <a-row>
       <!-- <div class="col-sm-4 offset-sm-4"> -->
       <a-col :xs="{ span: 12, offset: 6 }" :lg="{ span: 6, offset: 9 }">
-        <div style="font-size: 2em; text-align: center; padding-bottom: 1rem">Авторизоваться</div>
+        <div style="font-size: 2em; text-align: center; padding-bottom: 1rem">АвторизоватьсЯ</div>
         <a-form-model
           ref="login_form"
           :model="form"
@@ -33,7 +33,7 @@
             <a-button @click="testValidate" type="link">TEST</a-button>
           </div>
           <!-- <fieldset>
-                    <legend>Авторизоваться</legend>
+                    <legend>АвторизоватьсЯ</legend>
                     <div class="form-group">
                         <label for="email">Email</label>
                         <input type="text" v-model="user.email" id="email" name="email" class="form-control" :class="{ 'is-invalid': submitted && !user.email }" />
