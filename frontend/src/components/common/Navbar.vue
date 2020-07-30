@@ -27,7 +27,7 @@
       </a-menu-item>
       <a-menu-item :key="this.userKey" :class="{active:isActive == 'profile'}">
         <img src="@/assets/Icons/user.svg" alt />
-        Пользователь
+        Мой блог
       </a-menu-item>
       <a-menu-item key="/groups" :class="{active:isActive == 'groups'}" v-if="client_defined">
         <img src="@/assets/Icons/Groups.svg" alt />
