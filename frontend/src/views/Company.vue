@@ -39,7 +39,7 @@
             title="Есть непрочитанные сообщения"
           >Блоги&nbsp;&nbsp;&nbsp;&nbsp;</a-badge>
         </span>
-        <SubscriptionList @count="setSubscrCounter" :user="userData.result._id" />
+        <SubscriptionList @count="setSubscrCounter" :user="user_id" />
       </a-tab-pane>
       <!-- Сообщения в группах -->
       <a-tab-pane key="4" force-render>
@@ -50,7 +50,7 @@
           >Сообщения в группах&nbsp;&nbsp;&nbsp;&nbsp;</a-badge>
         </span>
         <app-post v-for="(post, index) in sortedGroupsPosts" :post="post" :key="index" />
-        <!-- <SubscriptionList @count="setSubscrCounter" :user="userData.result._id" /> -->
+        <!-- <SubscriptionList @count="setSubscrCounter" :user="user_id" /> -->
       </a-tab-pane>
       <!-- Список событий -->
       <a-tab-pane key="5" force-render>
@@ -68,7 +68,7 @@
           <div>Создал: {{eventAuthorName(event)}}</div>
           <router-link to="/calendar">Перейти в календарь</router-link>
         </div>
-        <!-- <SubscriptionList @count="setSubscrCounter" :user="userData.result._id" /> -->
+        <!-- <SubscriptionList @count="setSubscrCounter" :user="user_id" /> -->
       </a-tab-pane>
       <!-- Заявки на вступление в группы -->
       <a-tab-pane key="7" force-render>
@@ -112,7 +112,7 @@
             </div>
           </div>
         </div>
-        <!-- <SubscriptionList @count="setSubscrCounter" :user="userData.result._id" /> -->
+        <!-- <SubscriptionList @count="setSubscrCounter" :user="user_id" /> -->
       </a-tab-pane>
       <a-tab-pane key="8" force-render>
         <span slot="tab">
@@ -189,6 +189,7 @@ import {
   GET_POSTS_OF_GROUPS,
   GET_COMMENTS,
   GET_MENTIONS,
+  GET_POSTS_OF_FLWS,
 } from "@/store/post/actions.type";
 import { GET_EVENTS, GET_USERS } from "@/store/user/actions.type";
 import {
@@ -244,6 +245,9 @@ export default Vue.extend({
       "userIsAdmin",
       "userIsSuperAdmin",
     ]),
+    user_id() {
+      return this.userData.result._id;
+    },
     wsp() {
       return this.userIsSuperAdmin
         ? this.currentClient.workspace
@@ -343,16 +347,41 @@ export default Vue.extend({
     },
     checkParticipants() {
       if (this.userData) {
-        this.$store.dispatch(
-          GET_REQUESTS_TO_MY_GROUPS,
-          this.userData.result._id
-        );
+        this.$store.dispatch(GET_REQUESTS_TO_MY_GROUPS, this.user_id);
       }
     },
   },
   sockets: {
-    // async socketMessage(payload) {
-    // },
+    async socketMessage(payload) {
+      const filter = { client_id: this.wsp };
+      const d = {
+        sid: this.$socket.client.id,
+        str_pl: JSON.stringify(payload, null, 3),
+      };
+      console.log(`Company socket msg 1: ${d.sid}: ${d.str_pl}`);
+      if (payload.area == "POSTS") {
+        let info_title = "";
+        try {
+          // посты компании и блогов
+          if (payload.parent.type == "user") {
+            await this.$store.dispatch(GET_POSTS_OF_FLWS, this.user_id);
+            info_title = "Новый пост в блоге";
+          }
+          // посты компании и блогов
+          if (payload.parent.type == "company") {
+            await this.$store.dispatch(GET_POSTS, { filter });
+            info_title = "Вышла новость по компании";
+          }
+          this.$notification["info"]({
+            message: info_title + ", проверьте ленту",
+            description: payload.area,
+            placement: "topLeft",
+          });
+        } catch (error) {
+          console.log(`Ошибка при получении постов: ${error}`);
+        }
+      }
+    },
   },
   beforeMount() {
     const user = this.userData.result;
@@ -379,24 +408,8 @@ export default Vue.extend({
     });
   },
   mounted() {
-    this.$socket.client.on("socketMessage", async (payload) => {
-      const filter = { client_id: this.wsp };
-      if (payload.type === "FOR_ALL") {
-        if (payload.area == "POSTS") {
-          try {
-            console.log(`Company.vue: update posts handler`);
-            await this.$store.dispatch(GET_POSTS, { filter });
-            this.$notification["info"]({
-              message: "Новый пост, проверьте ленту",
-              description: payload.area,
-              placement: "topLeft",
-            });
-          } catch (error) {
-            console.log(`Ошибка при получении постов: ${error}`);
-          }
-        }
-      }
-    });
+    // this.$socket.client.on("socketMessage", async (payload) => {
+    // });
   },
   watch: {
     // posts(val) {

@@ -41,7 +41,7 @@ const port = process.env.PORT || 4000;
 const server = require('http').createServer(app);
 
 const io = require('socket.io')(server, { 
-  'transports': ['websocket', 'polling'],
+  'transports': ['websocket'],
   reconnection: true,
   reconnectionAttempts: Infinity,
   reconnectionDelay: 1000,
@@ -52,7 +52,7 @@ const io = require('socket.io')(server, {
 });
 const workspaces = io.of(/^\/\w+$/); // register all namespaces
 
-io.set('transports', ["websocket", "polling"]);
+//io.set('transports', ["websocket"]);
 workspaces.on('connection', socket => {
   
   // ВСЕ emit ДОЛЖЕН ВЫЗЫВАТЬ ЧЕРЕЗ ЭТОТ ОБЪЕКТ
@@ -70,6 +70,13 @@ workspaces.on('connection', socket => {
     return cb({
       id: socket.id,
       msg: `Server now watching you, ${userData.userName} from ${userData.workspace}`
+    })
+  })
+  socket.on('PING', (_, cb) => {
+    console.log(`PING from «${socket.id}»`);
+    return cb({
+      id: socket.id,
+      msg: `PONG`
     })
   })
   // Для обновления ленты у всех сотрудников

@@ -2,8 +2,14 @@
   <div class="user-bar">
     <div class="user-info" v-if="userData">
       <div style="align-self: center;" class="client-name">
-        {{getClientInfo()}}
-        <!-- Socket: {{!$socket.client.connected ? 'not' : ''}} connected ({{getSocket_nsp}}) -->
+        <div>
+          {{getClientInfo()}}
+          Socket: {{!$socket.client.connected ? 'not' : ''}} connected ({{getSocket_nsp}})
+        </div>
+        <div style="display: flex; align-items: center;margin-left: 50px;">
+          <a-button size="small" @click="pingSocketServer">PING</a-button>
+          <a-alert :message="pong.msg" :type="pong.type" banner v-show="pong.show" />
+        </div>
       </div>
       <!-- Список сообщений -->
       <!-- <a-popover placement="bottom" trigger="click">
@@ -55,6 +61,7 @@ export default {
   data() {
     return {
       current: 1,
+      pong: { show: false, type: "success", msg: "" },
       /*************************************** 
        * Структура объекта "datauser":
        * "result": {
@@ -103,7 +110,7 @@ export default {
   },
   sockets: {
     connect() {
-      console.log("socket connected");
+      console.log("socket connected:", this.$socket.client.id);
     },
     disconnect() {
       console.log("socket disconnected");
@@ -164,6 +171,22 @@ export default {
     //   // TODO: переделать везде также. Может вообще отдельный геттер сделать с этой проверкой
     //   return this.userData ? this.userData.result : this.user;
     // },
+    pingSocketServer() {
+      try {
+        this.$socket.client.emit("PING", "HELLOO", (resp) => {
+          this.pong.show = true;
+          if (resp && resp.msg) {
+            this.pong.type = "success";
+            this.pong.msg = resp.msg;
+          } else {
+            this.pong.type = "error";
+            this.pong.msg = "Сервер не отвечает";
+          }
+        });
+      } catch (error) {
+        console.log("PING error:", error);
+      }
+    },
     loggedUserFullName() {
       return (
         this.userData.result.firstName + " " + this.userData.result.lastName
@@ -201,17 +224,19 @@ export default {
       }));
     },
   },
-  async created() {
+  created() {
     const user = this.userData.result;
     // Если клиент не определен и пользователь - не суперадмин , то разлогиниваемся
     if (!this.currentClient) {
       if (!user.roles.includes("superadmin")) {
-        await this.$store.dispatch(ENTER_CLIENT, user.client_id);
-        this.$socket.client.nsp = "/" + user.client_id;
+        this.$store.dispatch(ENTER_CLIENT, user.client_id).then((_) => {
+          this.$socket.client.nsp = "/" + user.client_id;
+        });
       } else {
         const currentClient = JSON.parse(localStorage.getItem("currentClient"));
-        await this.$store.commit(SET_CURRENT_CLIENT, currentClient);
-        this.$socket.client.nsp = "/" + currentClient.workspace;
+        this.$store.commit(SET_CURRENT_CLIENT, currentClient).then((_) => {
+          this.$socket.client.nsp = "/" + currentClient.workspace;
+        });
       }
       this.$socket.client.connect();
     }
@@ -292,6 +317,9 @@ export default {
     .client-name {
       font-size: 12pt;
       font-weight: bold;
+      flex-grow: 1;
+      display: flex;
+      align-items: center;
     }
 
     .ant-avatar {

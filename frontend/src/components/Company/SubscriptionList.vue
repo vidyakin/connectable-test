@@ -20,34 +20,36 @@ const compare = (a, b) => {
 export default {
   props: ["user"],
   components: {
-    AppPost
+    AppPost,
   },
   data() {
-    return {
-      sortedPosts: []
-    };
+    return {};
   },
   computed: {
-    ...mapGetters(["posts_of_follows"])
+    ...mapGetters(["posts_of_follows"]),
+    sortedPosts() {
+      this.$emit("count", this.posts_of_follows.length);
+      return this.posts_of_follows.sort(compare);
+    },
   },
   methods: {
-    fillSubscriptionPosts() {
-      this.$emit("count", this.posts_of_follows.length);
-      this.sortedPosts = this.posts_of_follows.sort(compare);
-    }
+    // fillSubscriptionPosts() {
+    //   this.$emit("count", this.posts_of_follows.length);
+    //   //this.sortedPosts = this.posts_of_follows.sort(compare);
+    // },
   },
   watch: {
-    // posts_of_follows(val) {
-    //   if (val) {
-    //     this.$emit("count", val.length);
-    //     this.sortedPosts = val.sort(compare);
-    //   }
-    // }
+    posts_of_follows(old, val) {
+      console.log(`posts_of_follows watched!`);
+      if (val & (val.length != old.length)) {
+        //this.sortedPosts = val.sort(compare);
+      }
+    },
   },
   async beforeMount() {
     await this.$store.dispatch(GET_POSTS_OF_FLWS, this.user);
-    this.fillSubscriptionPosts();
-  }
+    this.$emit("count", this.posts_of_follows.length);
+  },
 };
 </script>
 

@@ -134,6 +134,7 @@ export default {
         this.$socket.client.emit("FOR_ALL", {
           workspace: ws,
           area: "POSTS",
+          parent: this.parent
         });
         console.log(`Socket msg sent: ${this.$socket.client.nsp}`);
         //});
