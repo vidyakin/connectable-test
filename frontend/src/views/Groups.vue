@@ -66,6 +66,9 @@ export default {
       }
       return this.filterData.sort(compare);
     },
+    user_id() {
+      return this.userData.result._id;
+    },
     ...mapGetters(["groups", "userData", "currentClient", "userIsAdmin"]),
   },
   async beforeMount() {
@@ -76,13 +79,28 @@ export default {
           GET_GROUPS_BY_CLIENT,
           this.currentClient.workspace
         );
-      } else await this.$store.dispatch(GET_GROUPS, this.userData.result._id);
+      } else await this.$store.dispatch(GET_GROUPS, this.user_id);
       //console.log(`Число групп: ${this.groups.length}`);
     } catch (e) {
       console.log(`Ошибка при получении групп: ${e}`);
     }
   },
-
+  sockets: {
+    async socketMessage(payload) {
+      if (payload.area == "NEW_GROUP") {
+        //this.isLoaded = true;
+        if (this.userIsAdmin) {
+          await this.$store.dispatch(
+            GET_GROUPS_BY_CLIENT,
+            this.currentClient.workspace
+          );
+        } else {
+          await this.$store.dispatch(GET_GROUPS, this.user_id);
+        }
+        //this.isLoaded = false;
+      }
+    },
+  },
   watch: {
     groups(groups) {
       this.filterData = groups;

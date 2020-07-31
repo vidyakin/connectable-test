@@ -179,7 +179,9 @@ export default {
         // Посылаем сообщение для всех о появлении нового сообщения
         // с сервера придет бродкастом сообщение "socketMessage" с переданными данными
         this.$socket.client.emit("FOR_ALL", {
-          type: "NEW_GROUP",
+          area: "NEW_GROUP",
+          group_id: newGroupId,
+          name: formFields.name,
           // 1 вариант - создавать объект тут, второй - в момент приема этого сообщения в обработчике события "to all"
           // val: {
           //   title: "Новая группа",

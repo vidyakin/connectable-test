@@ -140,8 +140,26 @@ export default {
           info_title = "Новый пост в группе";
         }
         this.$notification["info"]({
-          message: info_title + ", проверьте ленту",
-          //description: payload.area,
+          message: info_title,
+          description: "Проверьте ленту новостей",
+          placement: "topLeft",
+        });
+      } else if (payload.area == "NEW_GROUP") {
+        this.$notification["info"]({
+          message: "Создана новая группа",
+          description: `«${payload.name}»`,
+          placement: "topLeft",
+        });
+      } else if (payload.area == "GROUP_DELETED") {
+        this.$notification["info"]({
+          message: "Группа была удалена",
+          description: `«${payload.name}»`,
+          placement: "topLeft",
+        });
+      } else if (payload.area === "NEW_EMPL") {
+        this.$notification["info"]({
+          message: "В компании новый сотрудник",
+          description: `<router-link to='/user/${payload.val.id}'>${payload.val.fio}</router-link>`,
           placement: "topLeft",
         });
       }
@@ -154,7 +172,7 @@ export default {
       //     placement: "topLeft",
       //   });
       // }
-      if (payload.type === "NEW_EMPL") {
+      if (payload.area === "NEW_EMPL") {
         await this.$store.dispatch(GET_MESSAGES);
         // вывод оповещения о новом оповещении
         this.$notification["info"]({
