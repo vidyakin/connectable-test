@@ -129,6 +129,22 @@ export default {
         FOR_ALL: "ВСЕМ ВСЕМ ВСЕМ",
       };
       console.log(`socket message received`);
+      // здесь только оповещения, обновления данных в самих компонентах
+      if (payload.area == "POSTS") {
+        let info_title = "";
+        if (payload.parent.type == "user") {
+          info_title = "Новый пост в блоге";
+        } else if (payload.parent.type == "company") {
+          info_title = "Вышла новость по компании";
+        } else if (payload.parent.type == "group") {
+          info_title = "Новый пост в группе";
+        }
+        this.$notification["info"]({
+          message: info_title + ", проверьте ленту",
+          //description: payload.area,
+          placement: "topLeft",
+        });
+      }
       // if (payload.type === "NEW_GROUP") {
       //   await this.$store.dispatch(GET_MESSAGES);
       //   // вывод оповещения о новом оповещении

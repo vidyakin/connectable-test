@@ -360,25 +360,42 @@ export default Vue.extend({
       };
       console.log(`Company socket msg 1: ${d.sid}: ${d.str_pl}`);
       if (payload.area == "POSTS") {
-        let info_title = "";
         try {
           // посты компании и блогов
           if (payload.parent.type == "user") {
             await this.$store.dispatch(GET_POSTS_OF_FLWS, this.user_id);
-            info_title = "Новый пост в блоге";
           }
           // посты компании и блогов
           if (payload.parent.type == "company") {
             await this.$store.dispatch(GET_POSTS, { filter });
-            info_title = "Вышла новость по компании";
           }
-          this.$notification["info"]({
-            message: info_title + ", проверьте ленту",
-            description: payload.area,
-            placement: "topLeft",
-          });
+          // посты в группах
+          if (payload.parent.type == "group") {
+            await this.$store.dispatch(GET_POSTS, { filter });
+          }
         } catch (error) {
           console.log(`Ошибка при получении постов: ${error}`);
+        }
+      } else if (payload.area == "EVENTS") {
+        try {
+          // события
+          this.$store.dispatch(GET_EVENTS, this.userData.result.email);
+        } catch (error) {
+          console.log(`Ошибка при получении постов: ${error}`);
+        }
+      } else if (payload.area == "COMMENTS") {
+        try {
+          // события
+          this.$store.dispatch(GET_COMMENTS, this.user_id);
+        } catch (error) {
+          console.log(`Ошибка при получении комментариев: ${error}`);
+        }
+      } else if (payload.area == "MENTIONS") {
+        try {
+          // события
+          this.$store.dispatch(GET_MENTIONS, this.user_id);
+        } catch (error) {
+          console.log(`Ошибка при получении комментариев: ${error}`);
         }
       }
     },
