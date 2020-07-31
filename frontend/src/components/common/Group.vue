@@ -136,8 +136,13 @@ export default {
   },
   methods: {
     deleteGroup() {
+      const name = this.group.name;
       this.$store.dispatch(DELETE_GROUP, this.group._id).then(() => {
         this.groupActionPopoverVisible = false;
+        this.$socket.client.emit("FOR_ALL", {
+          area: "GROUP_DELETED",
+          name,
+        });
         this.$notification["success"]({
           message: "Група удалена",
           placement: "topRight",

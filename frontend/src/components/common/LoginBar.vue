@@ -9,6 +9,8 @@
         <div style="display: flex; align-items: center;margin-left: 50px;">
           <a-button size="small" @click="pingSocketServer">PING</a-button>
           <a-alert :message="pong.msg" :type="pong.type" banner v-show="pong.show" />
+          <!-- <a-button size="small" @click.prevent="playSound">Beep</a-button> -->
+          <audio id="audio" src="@/assets/sounds/guess-what.mp3" />
         </div>
       </div>
       <!-- Список сообщений -->
@@ -61,6 +63,7 @@ export default {
   data() {
     return {
       current: 1,
+      audio: null,
       pong: { show: false, type: "success", msg: "" },
       /*************************************** 
        * Структура объекта "datauser":
@@ -162,7 +165,11 @@ export default {
           description: `<router-link to='/user/${payload.val.id}'>${payload.val.fio}</router-link>`,
           placement: "topLeft",
         });
+      } else {
+        return;
       }
+
+      this.audio.play();
       // if (payload.type === "NEW_GROUP") {
       //   await this.$store.dispatch(GET_MESSAGES);
       //   // вывод оповещения о новом оповещении
@@ -205,6 +212,10 @@ export default {
     //   // TODO: переделать везде также. Может вообще отдельный геттер сделать с этой проверкой
     //   return this.userData ? this.userData.result : this.user;
     // },
+    playSound() {
+      //const audio = new Audio("@/assets/sounds/guess-what.mp3");
+      this.audio.play();
+    },
     pingSocketServer() {
       try {
         this.$socket.client.emit("PING", "HELLOO", (resp) => {
@@ -273,6 +284,9 @@ export default {
       }
       this.$socket.client.connect();
     }
+  },
+  mounted() {
+    this.audio = document.getElementById("audio");
   },
 };
 </script>

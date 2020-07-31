@@ -87,7 +87,7 @@ export default {
   },
   sockets: {
     async socketMessage(payload) {
-      if (payload.area == "NEW_GROUP") {
+      if (payload.area == "NEW_GROUP" || payload.area == "GROUP_DELETED") {
         //this.isLoaded = true;
         if (this.userIsAdmin) {
           await this.$store.dispatch(
