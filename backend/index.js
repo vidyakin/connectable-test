@@ -41,14 +41,16 @@ const port = process.env.PORT || 4000;
 const server = require('http').createServer(app);
 
 const io = require('socket.io')(server, { 
-  'transports': ['websocket'],
+  transports: ['websocket'],
   reconnection: true,
   reconnectionAttempts: Infinity,
   reconnectionDelay: 1000,
-  reconnectionDelayMax: 5000,
-  randomizationFactor: 0.5,
-  timeout: 20000,
-  autoConnect: true
+  reconnectionDelayMax: 2000,
+  randomizationFactor: 0.2,
+  timeout: 5000,
+  autoConnect: true,
+  pingInterval: 2000, 
+  pingTimeout: 5000
 });
 const workspaces = io.of(/^\/\w+$/); // register all namespaces
 
