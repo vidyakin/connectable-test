@@ -1,23 +1,19 @@
 <template>
   <div class="comment-wrapper">
     <div class="comment-wrapper-avatar">
-      <a-avatar
-        :src="(comment && comment.author.googleImage ? comment.author.googleImage : require('../../assets/no_image.png'))"
-      ></a-avatar>
+      <a-avatar :src="getAvatar(comment)"></a-avatar>
     </div>
 
     <div class="comment-wrapper-content">
       <div class="comment-wrapper-content-text">
-        <div
-          class="comment-wrapper-content-text-author"
-        >{{ comment.author.firstName }} {{ comment.author.lastName }}</div>
+        <div class="comment-wrapper-content-text-author">{{ fullName(comment.author) }}</div>
         <DynamicLink :text="comment.message" :mentions="comment.mentions" />
         <!-- <div class="comment-wrapper-content-text-message">{{ comment.message }}</div> -->
       </div>
       <div class="comment-wrapper-content-time">
         <span
           @click="like(comment._id, 'comment')"
-          v-if="comment.likes.findIndex(e => e.author._id === datauser._id) ===  -1"
+          v-if="comment.likes.findIndex(e => e.author._id === user_id) ===  -1"
         >Нравится</span>
         <span @click="answering = true">Ответить</span>
         {{ getMomentTime(comment.created) }}
@@ -33,22 +29,18 @@
       <div v-if="showAnswer">
         <div class="comment-wrapper" v-for="answer in comment.answers" :key="answer._id">
           <div class="comment-wrapper-avatar">
-            <a-avatar
-              :src="(answer && answer.author.googleImage ? answer.author.googleImage : require('../../assets/no_image.png'))"
-            ></a-avatar>
+            <a-avatar :src="getAvatar(answer)"></a-avatar>
           </div>
           <div class="comment-wrapper-content">
             <div class="comment-wrapper-content-text">
-              <div
-                class="comment-wrapper-content-text-author"
-              >{{ answer.author.firstName }} {{ answer.author.lastName }}</div>
+              <div class="comment-wrapper-content-text-author">{{ fullName(answer.author) }}</div>
               <!-- <div class="comment-wrapper-content-text-message">{{ answer.message }}</div> -->
               <DynamicLink :text="answer.message" :mentions="answer.mentions" />
             </div>
             <div class="comment-wrapper-content-time">
               <span
                 @click="like(answer._id, 'answer')"
-                v-if="answer.likes.findIndex(e => e.author._id === datauser._id) ===  -1"
+                v-if="answer.likes.findIndex(e => e.author._id === user_id) ===  -1"
               >Нравится</span>
               {{getMomentTime(answer.created) }}
             </div>
@@ -63,7 +55,7 @@
             title="Действия с комментарием"
             trigger="click"
             overlayClassName="action-popup-content"
-            v-if="answer && answer.author._id === datauser._id"
+            v-if="answer && answer.author._id === user_id"
           >
             <template slot="content">
               <a-tooltip title="Удалить">
@@ -78,9 +70,7 @@
         </div>
       </div>
       <div class="post-comment-input" v-if="showAnswer || answering">
-        <a-avatar
-          :src="(this.datauser.googleImage ? this.datauser.googleImage : require('../../assets/no_image.png'))"
-        ></a-avatar>
+        <a-avatar :src="userAvatar"></a-avatar>
         <a-mentions
           v-model="commentContent"
           :prefix="['@',dblQuote]"
@@ -92,11 +82,11 @@
             <!--<a-icon type="link" @click="handleUpload"></a-icon>-->
           </div>
           <a-mentions-option
-            :value="user.firstName+' '+user.lastName"
+            :value="fullName(user)"
             :data-id="user._id"
             v-for="user in users.filter(u => !u.deletion_mark)"
             :key="user._id"
-          >{{user.firstName}} {{user.lastName}}</a-mentions-option>
+          >{{fullName(user)}}</a-mentions-option>
         </a-mentions>
         <!-- <a-input
           class="comment-input"
@@ -119,7 +109,7 @@
       title="Действия с комментарием"
       trigger="click"
       overlayClassName="action-popup-content"
-      v-if="comment && comment.author._id === datauser._id"
+      v-if="comment && comment.author._id === user_id"
     >
       <template slot="content">
         <a-tooltip title="Удалить">
@@ -145,12 +135,12 @@ import {
   DELETE_COMMENT,
   SEND_COMMENT,
   SEND_LIKE,
-  SEND_NEW_POST
+  SEND_NEW_POST,
 } from "../../store/post/actions.type";
 import {
   SET_EDIT_POST_VISIBLE,
   SET_COMMENT_FOR_EDITING,
-  SET_EDIT_COMMENT_VISIBLE
+  SET_EDIT_COMMENT_VISIBLE,
 } from "../../store/post/mutations.type";
 import moment from "moment";
 import store from "../../store";
@@ -159,7 +149,7 @@ export default {
   name: "AppCommentInput",
   components: {
     AppLoginBar,
-    DynamicLink
+    DynamicLink,
   },
   data() {
     return {
@@ -171,9 +161,6 @@ export default {
       visible: false,
       show: false,
       currPrefix: "",
-      datauser: store.getters.userData.result
-        ? store.getters.userData.result
-        : store.getters.currentUser
     };
   },
   computed: {
@@ -182,37 +169,53 @@ export default {
       "user",
       "users",
       "userData",
-      "currentUser"
+      "currentUser",
     ]),
+    user_id() {
+      return this.userData.result._id;
+    },
     dblQuote() {
       return '"';
+    },
+    userAvatar() {
+      return this.userData.result.googleImage
+        ? this.userData.result.googleImage
+        : require("../../assets/no_image.png");
     },
     mentionsFormat() {
       const f =
         (this.mentionsData.length ? "Упомянутые сотрудники: " : "") +
         this.mentionsData
           .map(
-            m => `<a class='user-link' href='/profile/${m.id}'>${m.name}</a>`
+            (m) => `<a class='user-link' href='/profile/${m.id}'>${m.name}</a>`
           )
           .join(", ");
       return f;
-    }
+    },
   },
   methods: {
+    fullName(user) {
+      return user ? user.firstName + " " + user.lastName : undefined;
+    },
     getMomentTime(time) {
       return moment(time).fromNow(true);
+    },
+    getAvatar(obj) {
+      return obj && obj.author && obj.author.googleImage
+        ? obj.author.googleImage
+        : require("../../assets/no_image.png");
     },
     onSearch(val, prefix) {
       this.currPrefix = prefix;
     },
     onSelect(option) {
       const selected_user = this.users.find(
-        u => u.firstName + " " + u.lastName == option.value
+        (u) => u.firstName + " " + u.lastName == option.value
       );
       const name = selected_user.firstName + " " + selected_user.lastName;
       this.mentionsData.push({
         id: selected_user._id,
-        name
+        name,
       });
       if (this.currPrefix == '"') {
         this.commentContent = this.commentContent.replace(
@@ -224,10 +227,10 @@ export default {
     sendComment(id, type) {
       const comment = {
         parent: { type: "comment", id },
-        author: this.datauser,
+        author: this.userData.result,
         created: moment(),
         message: this.commentContent,
-        mentions: this.mentionsData.map(m => m.id)
+        mentions: this.mentionsData.map((m) => m.id),
       };
       if (this.commentContent) {
         this.$store.dispatch(SEND_COMMENT, comment).then(() => {
@@ -239,7 +242,7 @@ export default {
     like(id, type) {
       const like = {
         parent: { type, id },
-        author: this.datauser
+        author: this.userData.result,
       };
       this.$store.dispatch(SEND_LIKE, like);
     },
@@ -247,7 +250,7 @@ export default {
       this.$store.dispatch(DELETE_COMMENT, comment).then(() => {
         this.$notification.success({
           message: "Комментарий удален",
-          placement: "topRight"
+          placement: "topRight",
         });
       });
     },
@@ -255,12 +258,12 @@ export default {
       const comment = {
         _id: answer._id,
         parent: answer.parent.id,
-        type: "answer"
+        type: "answer",
       };
       this.$store.dispatch(DELETE_COMMENT, comment).then(() => {
         this.$notification.success({
           message: "Комментарий удален",
-          placement: "topRight"
+          placement: "topRight",
         });
       });
     },
@@ -272,21 +275,21 @@ export default {
     editAnswer(answer) {
       const comment = {
         _id: answer._id,
-        author: this.datauser,
+        author: this.userData.result,
         message: answer.message,
-        status: "answer"
+        status: "answer",
       };
       this.$store.commit(SET_COMMENT_FOR_EDITING, comment);
       this.$store.commit(SET_EDIT_COMMENT_VISIBLE, true);
       this.visible = false;
       this.show = false;
-    }
+    },
   },
   props: {
     parent: Object,
     comment: Object,
-    post: Object
-  }
+    post: Object,
+  },
 };
 </script>
 

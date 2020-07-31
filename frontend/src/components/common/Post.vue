@@ -11,7 +11,7 @@
         <div>
           <div
             class="post-wrapper-header-author"
-          >{{ post.author == "system" ? "Системное оповещение" : post.author.firstName + ' ' + post.author.lastName }}</div>
+          >{{ post.author == "system" ? "Системное оповещение" : fullName(post.author) }}</div>
           <div class="post-wrapper-header-time">
             {{ post && getMomentTime(post.created) }}
             <span
@@ -100,11 +100,11 @@
             <!--<a-icon type="link" @click="handleUpload"></a-icon>-->
           </div>
           <a-mentions-option
-            :value="user.firstName+' '+user.lastName"
+            :value="fullName(user)"
             :data-id="user._id"
             v-for="user in users.filter(u => !u.deletion_mark)"
             :key="user._id"
-          >{{user.firstName}} {{user.lastName}}</a-mentions-option>
+          >{{fullName(user)}}</a-mentions-option>
         </a-mentions>
         <!-- <a-input
           class="comment-input"
@@ -135,7 +135,7 @@
                 :title="post && post.message"
                 :description="post && post.message"
                 :quote="post && post.message"
-                :twitter-user="post.author.firstName + ' ' + post.author.lastName"
+                :twitter-user="fullName(post.author)"
                 class="share-popup"
                 inline-template
                 @open="soc_open"
@@ -269,7 +269,7 @@ export default {
       } else {
         const user0 = this.post.likes[0].author;
         const user1 = this.post.likes[1].author;
-        return `${user0.firstName} ${user0.lastName}, ${user1.firstName} ${user1.lastName}`;
+        return `${this.fullName(user0)}, ${this.fullName(user1)}`;
       }
     },
   },
@@ -278,6 +278,9 @@ export default {
       if (this.visible) {
         this.visible = false;
       }
+    },
+    fullName(user) {
+      return user ? user.firstName + " " + user.lastName : undefined;
     },
     commented() {
       this.commenting = true;
