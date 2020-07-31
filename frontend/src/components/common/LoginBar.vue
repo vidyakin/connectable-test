@@ -268,9 +268,8 @@ export default {
         });
       } else {
         const currentClient = JSON.parse(localStorage.getItem("currentClient"));
-        this.$store.commit(SET_CURRENT_CLIENT, currentClient).then((_) => {
-          this.$socket.client.nsp = "/" + currentClient.workspace;
-        });
+        this.$store.commit(SET_CURRENT_CLIENT, currentClient);
+        this.$socket.client.nsp = "/" + currentClient.workspace;
       }
       this.$socket.client.connect();
     }
