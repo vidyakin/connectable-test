@@ -58,9 +58,12 @@
                   class="invalid-feedback"
                 >Пароль неверный</div>
               </div>
-              <div class="form-group">
+              <div class="form-group" style="text-align: center" v-if="!loading">
                 <button class="btn btn-primary">Авторизация</button>
                 <router-link to="/register" class="btn btn-link">Регистрация</router-link>
+              </div>
+              <div style="text-align: center" v-else>
+                <a-spin />
               </div>
             </fieldset>
           </form>
@@ -207,6 +210,7 @@ export default Vue.extend({
         email: "",
         password: "",
       },
+      loading: false,
       submitted: false,
       error: {
         workspace: false,
@@ -231,8 +235,9 @@ export default Vue.extend({
       this.error.password = false;
       const { email, password } = this.user;
       if (email && password) {
+        this.loading = true;
         try {
-          await this.$store.dispatch(CHECK_USER_INFO, {
+          const result = await this.$store.dispatch(CHECK_USER_INFO, {
             email: this.user.email,
             password: this.user.password,
             workspace: this.user.workspace,
@@ -244,6 +249,7 @@ export default Vue.extend({
             centered: true,
           });
         } finally {
+          this.loading = false;
           if (!this.errorLogin) {
             const user = this.$store.getters.userData.result;
             const userIsSuperAdmin = user.roles.includes("superadmin");
@@ -268,6 +274,9 @@ export default Vue.extend({
           } else {
             console.log("errorLogin:", this.errorLogin);
             this.submitted = true;
+            if (this.errorLogin.server) {
+              this.showServerError(this.errorLogin.server);
+            }
             if (this.errorLogin.email) {
               document.getElementById("email").classList.add("is-invalid");
               this.error.email = true;
@@ -292,6 +301,16 @@ export default Vue.extend({
     showErrorUserBlocked() {
       this.msgError = "Ошибка входа";
       this.fullErrorMsg = "Пользователь удален";
+      //this.showError = true;
+      this.msgStyle = "scale-in-vertical";
+      setTimeout(() => {
+        this.msgStyle = "scale-out-vertical";
+        this.showError = false;
+      }, 3000);
+    },
+    showServerError(err) {
+      this.msgError = "Ошибка на сервере";
+      this.fullErrorMsg = err;
       //this.showError = true;
       this.msgStyle = "scale-in-vertical";
       setTimeout(() => {

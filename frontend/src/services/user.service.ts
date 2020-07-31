@@ -22,8 +22,9 @@ import { setAuthToken } from '@/services/auth/setAuthToken';
 export const checkUserInfo = (context: any, dataUser: any) => {
   return Vue.axios
     .post(`api/loginPage`, dataUser).then((response: any) => {
-
-      if (response.data.status === 200) {
+      if (response == undefined) {
+        context.commit(ERROR_LOGIN, { status: 522, server: `Ошибка сервера: Нет ответа на запрос` });
+      } else if (response.data.status === 200) {
         context.commit(ERROR_LOGIN, '');
         context.commit(IS_LOGGED_IN, !!response.data.token);
         context.commit(SET_USER_DATA, response.data);
