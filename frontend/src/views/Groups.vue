@@ -23,6 +23,8 @@
     <a-spin size="large" v-else />
     <!-- Оповещение об отсутствии групп -->
     <a-empty description="Пока еще нет ни одной группы" v-if="groups.length == 0" />
+    <!-- Оповещение о пустом поиске -->
+    <a-empty description="Группы не найдены" v-if="groups.length != 0 && sortedGroup.length==0" />
   </div>
 </template>
 <script>
