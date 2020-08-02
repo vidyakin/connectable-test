@@ -19,8 +19,8 @@
         @search="search"
         :notFoundContent="'Пользователь не найден'"
       >
-        <!-- если поставить filteredData вместо data, выбранные позиции будут пропадать из списка выбора  -->
-        <a-select-option v-for="d in data" :key="d._id">{{d.firstName + ' ' + d.lastName}}</a-select-option>
+        <!-- если поставить filteredUserList вместо userList, выбранные позиции будут пропадать из списка выбора  -->
+        <a-select-option v-for="d in userList" :key="d._id">{{d.fullName}}</a-select-option>
       </a-select>
       <a-spin :spinning="buttonSpinning">
         <a-button type="primary" @click="sendInvite" :disabled="!selectedItems.length">Пригласить</a-button>
@@ -44,7 +44,7 @@ export default {
       current: "",
       buttonSpinning: false,
       type: 1,
-      data: [],
+      userList: [],
       selectedItems: [],
     };
   },
@@ -61,13 +61,21 @@ export default {
       "users",
       "currentClient",
     ]),
-    filteredData() {
-      return !this.data
-        ? []
-        : this.data.filter(
-            (user) => !this.selectedItems.map((s) => s.key).includes(user._id)
-          );
+    activeUsers() {
+      return this.users
+        .filter((user) => !user.deletion_mark)
+        .map((user) => ({
+          ...user,
+          fullName: user.firstName + " " + user.lastName,
+        }));
     },
+    // filteredUserList() {
+    //   return !this.userList
+    //     ? []
+    //     : this.userList.filter(
+    //         (user) => !this.selectedItems.map((s) => s.key).includes(user._id)
+    //       );
+    // },
   },
   methods: {
     onClose() {
@@ -86,10 +94,10 @@ export default {
           )
           .join("$")
           .toLowerCase();
-      this.data =
+      this.userList =
         searchText === ""
-          ? this.users
-          : this.users.filter(
+          ? this.activeUsers
+          : this.activeUsers.filter(
               (user) => allStr(user).indexOf(searchText) !== -1
             );
     },
@@ -128,7 +136,8 @@ export default {
     const group_perticipants_ids = this.group.participants_ref.map((p) =>
       p.user_ref._id.toString()
     );
-    this.data = this.users.filter(
+    // отсеиваем участников группы из общего списка
+    this.userList = this.activeUsers.filter(
       (u) => !group_perticipants_ids.includes(u._id)
     );
   },
