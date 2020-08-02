@@ -65,6 +65,9 @@
               <div style="text-align: center" v-else>
                 <a-spin />
               </div>
+              <div class="form-group" style="text-align: center">
+                <router-link to="/forgot-password" class="btn btn-link">Забыли пароль?</router-link>
+              </div>
             </fieldset>
           </form>
         </div>
@@ -163,13 +166,6 @@
           </a>
         </div>-->
 
-        <div class="col-sm-4 offset-sm-4">
-          <fieldset>
-            <div class="form-group">
-              <router-link to="/forgot-password" class="btn btn-link">Забыли пароль?</router-link>
-            </div>
-          </fieldset>
-        </div>
         <div class="col-sm-4 offset-sm-4">
           <a-alert
             :class="msgStyle"
