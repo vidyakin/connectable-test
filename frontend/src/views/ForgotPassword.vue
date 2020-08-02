@@ -5,7 +5,7 @@
       <a-row>
         <a-col :span="6" :offset="9">
           <a-form-model ref="forgotForm" :model="theform" :rules="rules">
-            <legend>Восстановление пароля fix #5</legend>
+            <legend>Восстановление пароля</legend>
             <a-form-model-item prop="email">
               <app-input v-model="theform.email" placeholder="Введите e-mail" label="E-mail" />
             </a-form-model-item>
@@ -46,25 +46,25 @@ export default {
   data() {
     return {
       theform: {
-        email: ""
+        email: "",
       },
       disabled: false,
       error: {
-        email: false
+        email: false,
       },
       rules: {
         email: [
           {
             required: true,
             message: "Это поле обязательно",
-            trigger: "blur"
-          }
-        ]
-      }
+            trigger: "blur",
+          },
+        ],
+      },
     };
   },
   computed: {
-    ...mapGetters(["forgotInfo", "userData"])
+    ...mapGetters(["forgotInfo", "userData"]),
   },
   methods: {
     async handleSubmit(e) {
@@ -73,7 +73,7 @@ export default {
         this.disabled = true;
         const valid = await this.$refs.forgotForm.validate();
         await this.$store.dispatch(FORGOT_PASSWORD, {
-          email: this.theform.email
+          email: this.theform.email,
         });
       } catch (error) {
         console.log("submit error:", error);
@@ -82,13 +82,14 @@ export default {
         if (this.forgotInfo && this.forgotInfo.status !== 404)
           this.theform.email = "";
       }
-    }
-  }
+    },
+  },
 };
 </script>
 
 <style lang="scss">
 .forgot-password {
-  padding-top: 5%;
+  min-height: 100vh;
+  padding-top: 30vh;
 }
 </style>
