@@ -4,7 +4,7 @@
       <div style="align-self: center;" class="client-name">
         <div>
           {{getClientInfo()}}
-          Socket: {{!$socket.client.connected ? 'not' : ''}} connected ({{getSocket_nsp}})
+          Socket {{!$socket.client.connected ? 'not connected' : 'connected: '+$socket.client.nsp}})
         </div>
         <div style="display: flex; align-items: center;margin-left: 50px;">
           <a-button size="small" @click="pingSocketServer">PING</a-button>
@@ -163,6 +163,12 @@ export default {
         this.$notification["info"]({
           message: "В компании новый сотрудник",
           description: `<router-link to='/user/${payload.val.id}'>${payload.val.fio}</router-link>`,
+          placement: "topLeft",
+        });
+      } else if (payload.area === "NEW_REQUEST_TO_GROUP") {
+        this.$notification["info"]({
+          message: "Новая заявка в группу",
+          description: ` ${payload.creatorName} подал заявку в группу ${payload.groupName}`,
           placement: "topLeft",
         });
       } else {

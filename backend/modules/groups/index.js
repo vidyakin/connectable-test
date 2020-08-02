@@ -5,7 +5,7 @@ const GroupInvite = require('../../models/groupInvite')
 const groupSerializer = require('../../serializers/groupSerializer').groupSerializer;
 
 const groupParticipantDAO = require('../../dao/group-participant-dao');
-const { Post } = require('../../models');
+
 const { reset_password } = require('../../email');
 
 /**
@@ -13,11 +13,6 @@ const { reset_password } = require('../../email');
  */
 const router = require('../../crud')(Group, groupSerializer)
 
-function compareByDate(a, b) {
-  if (a.created < b.created) return 1;
-  if (a.created > b.created) return -1;
-  return 0;
-}
 
 /**
  * Find groups of given client
@@ -247,24 +242,8 @@ router.put('/:group_id/client', async (req, res) => {
  * Get requests for user
  */
 router.get('/requests/:user_id', async (req, res) => {
-  // TODO: после рефакторинга через ссылки на объекты переделать на populate 
-  const groups = await Group.find({ creatorId: req.params.user_id })
-  const reqs = await GroupParticipant.find({ approved: false, groupId: { $in: groups.map(g => g._id.toString()) } })
   try {
-    const data = await Promise.all(reqs.map(async r => {
-      const group = await Group.findById(r.groupId).select('name');
-      const user = await User.findById(r.participantId).select('firstName lastName googleImage positions')
-      return {
-        groupId: r.groupId,
-        userId: r.participantId,
-        groupName: group.name,
-        userName: user.firstName + ' ' + user.lastName,
-        googleImage: user.googleImage || "",
-        positions: user.positions.join(','),
-        created: r.created
-      }
-    }))
-    res.send(data.sort(compareByDate))
+    res.send(await Group.getRequests(req.params.user_id))
   } catch (error) {
     res.status(522).send(error)
   }

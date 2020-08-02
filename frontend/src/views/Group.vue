@@ -110,9 +110,9 @@
         <!-- ЗАЯВКИ -->
         <div
           class="group-body-items"
-          v-if="currentGroup.requests_ref.length && (currentGroup.creatorId === userData.result._id || userIsAdmin)"
+          v-if="reqs.length && (currentGroup.creator === user_id || userIsAdmin)"
         >
-          <div class="header">Заявки ({{currentGroup.requests_ref.length}})</div>
+          <div class="header">Заявки ({{reqs.length}})</div>
           <div class="item" v-for="(req, index) in reqs" :key="index">
             <a-avatar
               :src="(req.googleImage ? req.googleImage : require('../assets/no_image.png'))"
@@ -306,14 +306,25 @@ export default {
         groupId: this.currentGroup._id,
         userId: this.user_id,
       });
-      //.then(() => this.checkParticipants());
     },
     createParticipantsRequest() {
-      this.$store.dispatch(CREATE_PARTICIPANT, {
-        groupId: this.currentGroup._id,
-        userId: this.user_id,
-      });
-      //.then(() => this.checkParticipants());
+      this.$store
+        .dispatch(CREATE_PARTICIPANT, {
+          groupId: this.currentGroup._id,
+          userId: this.user_id,
+        })
+        .then(() => {
+          this.$socket.client.emit("FOR_ALL", {
+            area: "NEW_REQUEST_TO_GROUP",
+            groupId: this.currentGroup._id,
+            groupName: this.currentGroup.name,
+            creator: this.user_id,
+            creatorName:
+              this.userData.result.firstName +
+              " " +
+              this.userData.result.lastName,
+          });
+        });
     },
     approveRequest(userId) {
       this.$store
@@ -328,7 +339,6 @@ export default {
         groupId: this.currentGroup._id,
         userId,
       });
-      //.then(() => this.checkParticipants());
     },
     deleteParticipant(userId) {
       this.$store.dispatch(DELETE_PARTICIPANT, {

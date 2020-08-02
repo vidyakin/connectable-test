@@ -93,7 +93,7 @@
             </div>
             <div class="post-wrapper-content">
               <div style="padding: 10px">
-                <router-link :to="'/profile/'+req.userId">{{req.userName}}</router-link>&nbsp;подал заявку на вступление в группу
+                <router-link :to="'/profile/'+req.userId">{{req.fullName}}</router-link>&nbsp;подал заявку на вступление в группу
                 <router-link :to="'/group/'+req.groupId">{{req.groupName}}</router-link>
               </div>
               <div class="req-buttons" style="padding: 0 10px">
@@ -396,6 +396,13 @@ export default Vue.extend({
           this.$store.dispatch(GET_MENTIONS, this.user_id);
         } catch (error) {
           console.log(`Ошибка при получении комментариев: ${error}`);
+        }
+      } else if (payload.area === "NEW_REQUEST_TO_GROUP") {
+        try {
+          // события
+          this.$store.dispatch(GET_REQUESTS_TO_MY_GROUPS, this.user_id);
+        } catch (error) {
+          console.log(`Ошибка при получении заявок: ${error}`);
         }
       }
     },

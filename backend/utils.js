@@ -58,4 +58,9 @@ module.exports.safeStringify = val => {
     cache = null;
     return strD;
   }
-  
+
+module.exports.compareByDate = (a, b) => {
+    if (a.created < b.created) return 1;
+    if (a.created > b.created) return -1;
+    return 0;
+}

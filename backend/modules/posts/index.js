@@ -8,17 +8,12 @@ const Comment = require('@models/comment')
 const GroupParticipant = require('@models/groupParticipant')
 
 const serializers = require('@/serializers');
+const utils = require('@/utils')
 
 /**
  * Common way for CRUD the model
  */
 const router = require('@/crud')(Post, serializers.postSerializer)
-
-function compareByDate(a, b) {
-  if (a.created < b.created) return 1;
-  if (a.created > b.created) return -1;
-  return 0;
-}
 
 /**
  * Подписчики пользователя
@@ -167,7 +162,7 @@ router.get('/comments_feed/:user_id', async (req, res) => {
       .lean()
     comments = comments.concat(comments_groups.map(c => ({ ...c, type: "USER.GROUP" })))
 
-    res.send(comments.sort(compareByDate))
+    res.send(comments.sort(utils.compareByDate))
   } catch (error) {
     res.status(522).send(error)
   }
@@ -214,7 +209,7 @@ router.get('/mentions_feed/:user_id', async (req, res) => {
     //     type: c.type += '.'+post.parent.type
     //   }
     // })
-    res.json([].concat(post_m).concat(comment_m).sort(compareByDate))
+    res.json([].concat(post_m).concat(comment_m).sort(utils.compareByDate))
   } catch (error) {
     console.log(error);
     res.status(522).send(error)

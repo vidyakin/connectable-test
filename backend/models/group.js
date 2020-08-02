@@ -2,6 +2,8 @@ const mongoose = require('mongoose');
 const User = require('./user');
 const Post = require('./post');
 
+const utils = require('../utils')
+
 // schema maps to a collection
 const Schema = mongoose.Schema;
 
@@ -202,6 +204,25 @@ groupSchema.statics.changeOwner = async function(group_id, user_id) {
   group.creator = user_id
   await group.save()
   return `New user was set as author of the group`
+}
+
+groupSchema.statics.getRequests = async function(user_id) {
+  const data = await this.find({ creator: user_id, type: 1 }).select('name requests_ref').lean()
+  const result = []
+  // composite data object
+  const getUserData = (req, group) => ({
+    ...req.user_ref,
+    created: req.created, 
+    groupName: group.name,
+    userId: req.user_ref._id,
+    groupId: group._id,
+    fullName: req.user_ref.firstName + ' ' + req.user_ref.lastName
+  })
+  data.map(group => {
+    group.requests_ref.forEach(req => result.push(getUserData(req, group)))
+  })
+  
+  return result.sort(utils.compareByDate)
 }
 
 module.exports = mongoose.model('Group', groupSchema);
