@@ -49,6 +49,7 @@ import { mapGetters } from "vuex";
 import { LOGOUT } from "@/store/user/actions.type";
 import { ENTER_CLIENT } from "@/store/client/actions.type";
 import { GET_MESSAGES } from "@/store/notification/actions.type";
+import { GET_GROUPS_USER_CAN_READ } from "@/store/group/actions.type";
 
 import { SET_SHOW_IMAGE_HEADER } from "@/store/shower/mutations.type";
 import { SET_CURRENT_CLIENT } from "@/store/client/mutations.type";
@@ -100,7 +101,13 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(["userData", "user", "users", "currentClient"]),
+    ...mapGetters([
+      "userData",
+      "user",
+      "users",
+      "currentClient",
+      "groups_available",
+    ]),
     getSocket_nsp() {
       return this.$socket.client.nsp;
     },
@@ -135,18 +142,28 @@ export default {
       // здесь только оповещения, обновления данных в самих компонентах
       if (payload.area == "POSTS") {
         let info_title = "";
+        let needShow = true; // для отмены показа, если польователь не должен видеть по каким-то критериям
         if (payload.parent.type == "user") {
           info_title = "Новый пост в блоге";
         } else if (payload.parent.type == "company") {
           info_title = "Вышла новость по компании";
         } else if (payload.parent.type == "group") {
           info_title = "Новый пост в группе";
+          await this.$store.dispatch(
+            GET_GROUPS_USER_CAN_READ,
+            this.userData.result._id
+          );
+          needShow = this.groups_available.some(
+            (g) => g._id == payload.parent.id
+          );
         }
-        this.$notification["info"]({
-          message: info_title,
-          description: "Проверьте ленту новостей",
-          placement: "topLeft",
-        });
+        if (needShow) {
+          this.$notification["info"]({
+            message: info_title,
+            description: "Проверьте ленту новостей",
+            placement: "topLeft",
+          });
+        }
       } else if (payload.area == "NEW_GROUP") {
         this.$notification["info"]({
           message: "Создана новая группа",

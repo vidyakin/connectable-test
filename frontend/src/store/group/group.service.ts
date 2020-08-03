@@ -7,6 +7,7 @@ import {
   SET_PARTICIPANTS_REQUEST,
   UPDATE_GROUP,
   SET_REQUESTS,
+  SET_GROUPS_USER_CAN_READ
 } from '@/store/group/mutations.type';
 import { GET_CURRENT_GROUP } from '@/store/group/actions.type';
 
@@ -135,5 +136,13 @@ export const getRequests = (context: any, userId: string) => {
     .get(`api/group/requests/${userId}`)
     .then((response: any) => {
       context.commit(SET_REQUESTS, response.data);
+    });
+}
+
+export const getGroupsThatUserCanRead = (context: any, userId: string) => {
+  return Vue.axios
+    .get(`api/group/can_read_by/${userId}`)
+    .then((response: any) => {
+      context.commit(SET_GROUPS_USER_CAN_READ, response.data);
     });
 }

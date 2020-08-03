@@ -8,7 +8,8 @@ import {
   GET_CURRENT_GROUP,
   GET_GROUPS, GET_GROUPS_BY_CLIENT, GET_INVITE, GET_PARTICIPANTS_REQUEST,
   REPLACE_GROUPS_OWNER, CHANGE_GROUP_OWNER,
-  GET_REQUESTS_TO_MY_GROUPS
+  GET_REQUESTS_TO_MY_GROUPS,
+  GET_GROUPS_USER_CAN_READ
 } from './actions.type';
 import {
   approveInvite,
@@ -20,7 +21,8 @@ import {
   getCurrentGroup,
   getGroups, getGroupsByClient, getInvite, getParticipantsRequest,
   replaceGroupsOwner, changeGroupOwner,
-  getRequests
+  getRequests,
+  getGroupsThatUserCanRead
 } from './group.service';
 import {
   ADD_GROUP,
@@ -29,7 +31,8 @@ import {
   SET_GROUPS, SET_INVITE,
   SET_PARTICIPANTS_REQUEST,
   UPDATE_GROUP,
-  SET_REQUESTS
+  SET_REQUESTS,
+  SET_GROUPS_USER_CAN_READ
 } from './mutations.type';
 
 interface State {
@@ -37,7 +40,8 @@ interface State {
   currentGroup: any;
   participantsRequest: boolean | null;
   invite: any | null;
-  requests: any[]
+  requests: any[],
+  groupsUserCanRead: string[]
 }
 
 const store: State = {
@@ -45,7 +49,8 @@ const store: State = {
   currentGroup: null,
   participantsRequest: null,
   invite: null,
-  requests: []
+  requests: [],
+  groupsUserCanRead: []
 };
 
 const getters = {
@@ -63,6 +68,9 @@ const getters = {
   },
   group_requests(state: State) {
     return state.requests
+  },
+  groups_available(state: State) {
+    return state.groupsUserCanRead
   }
 };
 
@@ -83,7 +91,8 @@ const actions = {
   [CANCEL_INVITE]: cancelInvite,
   [REPLACE_GROUPS_OWNER]: replaceGroupsOwner,
   [CHANGE_GROUP_OWNER]: changeGroupOwner,
-  [GET_REQUESTS_TO_MY_GROUPS]: getRequests
+  [GET_REQUESTS_TO_MY_GROUPS]: getRequests,
+  [GET_GROUPS_USER_CAN_READ]: getGroupsThatUserCanRead
 };
 
 const mutations = {
@@ -117,7 +126,10 @@ const mutations = {
   },
   [SET_REQUESTS](state: State, requests: any[]) {
     state.requests = requests
-  }
+  },
+  [SET_GROUPS_USER_CAN_READ](state: State, data: any[]) {
+    state.groupsUserCanRead = data
+  },
 };
 
 export default {

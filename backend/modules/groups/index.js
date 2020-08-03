@@ -249,4 +249,15 @@ router.get('/requests/:user_id', async (req, res) => {
   }
 })
 
+/**
+ * Get groups that user can read
+ */
+router.get('/can_read_by/:user_id', async (req, res) => {
+  try {
+    res.send(await Group.getAvailableForPosts(req.params.user_id))
+  } catch (error) {
+    res.status(522).send(error)
+  }
+})
+
 module.exports = router

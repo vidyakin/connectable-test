@@ -78,40 +78,7 @@
             title="Есть непросмотренные заявки"
           >Заявки в группы&nbsp;&nbsp;&nbsp;&nbsp;</a-badge>
         </span>
-        <div v-for="req in group_requests" :key="req.userId+req.groupId" class="post-wrapper">
-          <div class="post-wrapper-body">
-            <div class="post-wrapper-header">
-              <div class="post-wrapper-header-photo">
-                <a-avatar
-                  :src="(req.googleImage ? req.googleImage : require('../assets/no_image.png'))"
-                />
-              </div>
-              <div>
-                <div class="post-wrapper-header-author">Заявка на вступление в группу</div>
-                <div class="post-wrapper-header-time">{{req.created | asDateTime}}</div>
-              </div>
-            </div>
-            <div class="post-wrapper-content">
-              <div style="padding: 10px">
-                <router-link :to="'/profile/'+req.userId">{{req.fullName}}</router-link>&nbsp;подал заявку на вступление в группу
-                <router-link :to="'/group/'+req.groupId">{{req.groupName}}</router-link>
-              </div>
-              <div class="req-buttons" style="padding: 0 10px">
-                <a-button
-                  type="primary"
-                  icon="check"
-                  @click="approve(req.groupId, req.userId)"
-                  style="margin-right: 10px;"
-                >Одобрить</a-button>
-                <a-button
-                  type="danger"
-                  icon="close"
-                  @click="deleteParticipant(req.groupId, req.userId)"
-                >Отклонить</a-button>
-              </div>
-            </div>
-          </div>
-        </div>
+        <RequestToGroup v-for="req in group_requests" :key="req.userId+req.groupId" :req="req" />
         <!-- <SubscriptionList @count="setSubscrCounter" :user="user_id" /> -->
       </a-tab-pane>
       <a-tab-pane key="8" force-render>
@@ -194,12 +161,12 @@ import {
 import { GET_EVENTS, GET_USERS } from "@/store/user/actions.type";
 import {
   GET_REQUESTS_TO_MY_GROUPS,
-  APPROVE_PARTICIPANTS_REQUEST,
-  DELETE_PARTICIPANT,
+  GET_GROUPS_USER_CAN_READ,
 } from "@/store/group/actions.type";
 import AppCommentInput from "@/components/common/CommentInput";
 import NotificationList from "@/components/Company/NotificationList";
 import SubscriptionList from "@/components/Company/SubscriptionList";
+import RequestToGroup from "@/components/Company/RequestToGroup";
 import AppPost from "@/components/common/Post";
 
 function compare(a, b) {
@@ -227,6 +194,7 @@ export default Vue.extend({
     AppPost,
     NotificationList,
     SubscriptionList,
+    RequestToGroup,
   },
   computed: {
     ...mapGetters([
@@ -234,6 +202,7 @@ export default Vue.extend({
       "users",
       "posts_company",
       "posts_of_groups",
+      "groups_available",
       "posts_of_feed",
       "posts_of_system",
       "comments_feed",
@@ -258,7 +227,9 @@ export default Vue.extend({
       return this.posts_company.sort(compare);
     },
     sortedGroupsPosts() {
-      return this.posts_of_groups.sort(compare);
+      return this.posts_of_groups
+        .filter((p) => this.groups_available.some((g) => g._id == p.parent._id))
+        .sort(compare);
     },
     sortedFeed() {
       return this.posts_of_feed.concat(this.posts_of_system).sort(compare);
@@ -314,42 +285,6 @@ export default Vue.extend({
       const author = m.author ? m.author : m.author_ref;
       return author.firstName + " " + author.lastName;
     },
-    // для заявок
-    approve(groupId, participantId) {
-      this.$store
-        .dispatch(APPROVE_PARTICIPANTS_REQUEST, {
-          groupId,
-          participantId,
-        })
-        .then(() =>
-          this.$notification["success"]({
-            placement: "topRight",
-            message: "Запрос одобрен",
-            description: "Вступление в группу одобрено",
-          })
-        )
-        .then(() => this.checkParticipants());
-    },
-    deleteParticipant(groupId, participantId) {
-      this.$store
-        .dispatch(DELETE_PARTICIPANT, {
-          groupId,
-          participantId,
-        })
-        .then(() =>
-          this.$notification["info"]({
-            placement: "topRight",
-            message: "Запрос отклонен",
-            description: "Вступление в группу отклонено",
-          })
-        )
-        .then(() => this.checkParticipants());
-    },
-    checkParticipants() {
-      if (this.userData) {
-        this.$store.dispatch(GET_REQUESTS_TO_MY_GROUPS, this.user_id);
-      }
-    },
   },
   sockets: {
     async socketMessage(payload) {
@@ -371,7 +306,14 @@ export default Vue.extend({
           }
           // посты в группах
           if (payload.parent.type == "group") {
-            await this.$store.dispatch(GET_POSTS, { filter });
+            // надо выяснить можно ли для этой группы показывать сообщения или нет
+            await this.$store.dispatch(GET_GROUPS_USER_CAN_READ, this.user_id);
+            needShow = this.groupsUserCanRead.some(
+              (g) => g._id == payload.parent.id
+            );
+            if (needShow) {
+              await this.$store.dispatch(GET_POSTS, { filter });
+            }
           }
         } catch (error) {
           console.log(`Ошибка при получении постов: ${error}`);

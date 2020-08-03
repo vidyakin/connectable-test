@@ -225,4 +225,25 @@ groupSchema.statics.getRequests = async function(user_id) {
   return result.sort(utils.compareByDate)
 }
 
+/**
+ * Get groups where user can see messages in
+ * @param {string} user_id 
+ */
+groupSchema.statics.getAvailableForPosts = async function(user_id) {
+  const { client_id } = await User.findById(user_id).lean()
+  const user_ref = mongoose.Types.ObjectId(user_id) 
+  const groups_available = await this
+      .where({ client_id })
+      .where({
+        $or: [
+          { type: 0 }, // посты видно только в закрытых
+          { $and: [{ type: { $in: [1,2] } }, { 'participants_ref.user_ref': user_ref }] }, // закрытые и приватные где пользователь участник
+          { $and: [{ type: 2 }, { creator: user_ref }] } // свои приватные
+        ]
+      }).select('_id name')
+  //return groups_available.map(gr => gr._id) // only ids - not readible for human to control correctness
+  return groups_available.map(gr => ({_id: gr._id, name: gr.name}))
+  
+}
+
 module.exports = mongoose.model('Group', groupSchema);
