@@ -37,4 +37,8 @@ postSchema.post('save', function (doc, next) {
     })
 });
 
+postSchema.statics.getPostsFromBlogs = async function(user_id) {
+  return this.find({ "author.followers": user_id, "parent.type": "user" })
+}
+
 module.exports = mongoose.model('Post', postSchema);

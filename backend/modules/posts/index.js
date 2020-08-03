@@ -19,7 +19,7 @@ const router = require('@/crud')(Post, serializers.postSerializer)
  * Подписчики пользователя
  */
 router.get('/follows/:user_id', async (req, res) => {
-  const posts = await Post.find({ "author.followers": req.params.user_id })
+  const posts = await Post.getPostsFromBlogs(req.params.user_id)
   res.send(posts);
 })
 
