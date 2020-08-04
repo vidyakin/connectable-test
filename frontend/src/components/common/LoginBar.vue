@@ -331,21 +331,19 @@ export default {
     },
   },
   async created() {
-    this.connection = new WebSocket("wss://echo.websocket.org");
-
-    this.connection.onmessage = function (event) {
-      console.log(event);
-    };
-
-    this.connection.onopen = function (event) {
-      console.log(event);
-      console.log("Successfully connected to the echo websocket server...");
-    };
+    // this.connection = new WebSocket("ws://localhost:8080");
+    // this.connection.onmessage = function (event) {
+    //   console.log(event);
+    // };
+    // this.connection.onopen = function (event) {
+    //   console.log(event);
+    //   console.log("Successfully connected to the echo websocket server...");
+    // };
   },
   async mounted() {
-    this.$socket.client.on("socketMessage", (payload) => {
-      console.log(`socket send somthing`);
-    });
+    // this.$socket.client.on("socketMessage", (payload) => {
+    //   console.log(`socket send somthing`);
+    // });
     this.audio = document.getElementById("audio");
     const user = this.userData.result;
     let nsp;
@@ -363,7 +361,11 @@ export default {
       nsp = "/" + this.currentClient.workspace;
     }
     this.$socket.client.nsp = nsp;
-    this.$socket.client.connect();
+    this.$socket.client.connect({
+      reconnection: true,
+      reconnectionDelay: 100,
+      timeout: 1000 * 60 * 20,
+    });
   },
 };
 </script>

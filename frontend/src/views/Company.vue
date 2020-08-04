@@ -60,14 +60,7 @@
             title="Есть непросмотренные события"
           >События календаря&nbsp;&nbsp;&nbsp;&nbsp;</a-badge>
         </span>
-        <div v-for="event in eventsWithMe" :key="event._id" class="event-block">
-          <div class="title">{{event.name}}</div>
-          <div>Описание: {{event.description}}</div>
-          <div>Дата начала: {{(new Date(event.date)).toLocaleString()}}</div>
-          <div>Окончание: {{(new Date(event.end)).toLocaleString()}}</div>
-          <div>Создал: {{eventAuthorName(event)}}</div>
-          <router-link to="/calendar">Перейти в календарь</router-link>
-        </div>
+        <EventNotification v-for="event in eventsWithMe" :key="event._id" :event="event" />
         <!-- <SubscriptionList @count="setSubscrCounter" :user="user_id" /> -->
       </a-tab-pane>
       <!-- Заявки на вступление в группы -->
@@ -88,26 +81,11 @@
             title="Есть непросмотренные комментарии"
           >Комментарии&nbsp;&nbsp;&nbsp;&nbsp;</a-badge>
         </span>
-        <div v-for="comment in comments_feed" :key="comment._id" class="comment">
-          <div
-            v-if="comment.type == 'GROUPS.NEW_USER'"
-            class="comment-type new-user"
-          >Я - новый сотрудник</div>
-          <div v-else-if="comment.type == 'USER.BLOG'" class="comment-type user-blog">Запись в блоге</div>
-          <div
-            v-else-if="comment.type == 'USER.FEED'"
-            class="comment-type user-feed"
-          >Запись на стене</div>
-          <div
-            v-else-if="comment.type == 'USER.GROUP'"
-            class="comment-type user-group"
-          >Запись в группе</div>
-          <div v-else>Тип записи с комментарием не определен</div>
-          <div class="comment-head">
-            <span class="comment-head-name">{{getFIO(comment)}}</span>&nbsp;добавил комментарий:
-          </div>
-          <div class="comment-body">{{comment.message}}</div>
-        </div>
+        <MentionOrCommentFeedItem
+          v-for="comment in comments_feed"
+          :key="comment._id"
+          :item="comment"
+        />
       </a-tab-pane>
       <a-tab-pane key="9" force-render>
         <span slot="tab">
@@ -116,33 +94,12 @@
             title="Есть непросмотренные упоминания"
           >Упоминания&nbsp;&nbsp;&nbsp;&nbsp;</a-badge>
         </span>
-        <div class="comment" v-for="mention in mentions_feed" :key="mention._id">
-          <div
-            v-if="['post.feed','comment.feed','post.company','comment.company'].includes(mention.type)"
-            class="comment-type mention-feed"
-          >Упоминание в новостях</div>
-          <div
-            v-else-if="['post.group','comment.group'].includes(mention.type)"
-            class="comment-type mention-group"
-          >
-            Упоминание в
-            <router-link :to="'/group/'+mention.link">группе</router-link>
-          </div>
-          <div
-            v-else-if="['post.user','comment.user'].includes(mention.type)"
-            class="comment-type mention-blog"
-          >
-            Упоминание в
-            <router-link :to="'/profile/'+mention.link">блоге</router-link>
-          </div>
-          <div class="comment-type" v-else>Упоминание</div>
-          <div class="comment-head">
-            <b>{{ mention.created | asDate }}</b>
-            <br />
-            {{ getFIO(mention) }} в {{ mention.created | asTime }} упомянул вас в сообщении:
-          </div>
-          <div class="comment-body">{{mention.message}}</div>
-        </div>
+        <MentionOrCommentFeedItem
+          v-for="mention in mentions_feed"
+          :key="mention._id"
+          :item="mention"
+          :isMention="true"
+        />
       </a-tab-pane>
     </a-tabs>
   </div>
@@ -166,6 +123,8 @@ import {
 import AppCommentInput from "@/components/common/CommentInput";
 import NotificationList from "@/components/Company/NotificationList";
 import SubscriptionList from "@/components/Company/SubscriptionList";
+import EventNotification from "@/components/Company/NotificationBodies/EventNotification";
+import MentionOrCommentFeedItem from "@/components/Company/NotificationBodies/MentionOrCommentFeedItem";
 import RequestToGroup from "@/components/Company/RequestToGroup";
 import AppPost from "@/components/common/Post";
 
@@ -195,6 +154,8 @@ export default Vue.extend({
     NotificationList,
     SubscriptionList,
     RequestToGroup,
+    EventNotification,
+    MentionOrCommentFeedItem,
   },
   computed: {
     ...mapGetters([
@@ -243,17 +204,6 @@ export default Vue.extend({
       );
     },
   },
-  filters: {
-    asDate(d) {
-      return new Date(d).toLocaleDateString();
-    },
-    asTime(d) {
-      return new Date(d).toLocaleTimeString();
-    },
-    asDateTime(d) {
-      return new Date(d).toLocaleString();
-    },
-  },
   methods: {
     sendCompanyMessage() {
       //console.log(this.newPostMessage);
@@ -270,20 +220,6 @@ export default Vue.extend({
     },
     setSubscrCounter(n) {
       this.subsrcCount = n;
-    },
-    eventAuthorName(event) {
-      const user = this.users.find((u) => u._id == event.userId);
-      return user == undefined
-        ? "Пользователь не найден"
-        : user.firstName + " " + user.lastName;
-    },
-    getFIO(m) {
-      if (m.author == undefined) {
-        console.log(`У комментария нет поля author`);
-        return;
-      }
-      const author = m.author ? m.author : m.author_ref;
-      return author.firstName + " " + author.lastName;
     },
   },
   sockets: {
@@ -417,66 +353,6 @@ export default Vue.extend({
     color: #43425d;
     text-align: left;
     margin: 0 30px;
-  }
-}
-
-.event-block {
-  border: 1px solid darkgrey;
-  border-radius: 6px;
-  padding: 10px;
-  width: 400px;
-  .title {
-    font-size: 14pt;
-    font-weight: bold;
-  }
-}
-
-.comment {
-  box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.04);
-  background-color: white;
-  &-type {
-    font-size: 9pt;
-    font-weight: bold;
-    padding-left: 10px;
-    &.new-user {
-      background-color: lavender;
-    }
-    &.user-blog,
-    &.mention-blog {
-      background-color: lightpink;
-    }
-    &.user-feed,
-    &.mention-feed {
-      background-color: lightskyblue;
-    }
-    &.user-group,
-    &.mention-group {
-      background-color: lightgreen;
-    }
-  }
-  &-head {
-    margin: 5px 10px;
-
-    &-name {
-      font-weight: bold;
-    }
-  }
-  &-body {
-    font-size: 10pt;
-    font-style: italic;
-    margin: 5px 10px;
-    padding-bottom: 10px;
-  }
-}
-
-.mention {
-  border: 1px solid grey;
-  margin-bottom: 5px;
-  padding: 10px;
-
-  &-head {
-  }
-  &-message {
   }
 }
 </style>
