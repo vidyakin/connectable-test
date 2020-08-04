@@ -6,10 +6,11 @@
           {{getClientInfo()}}
           Socket {{!$socket.client.connected ? 'not connected' : 'connected: '+$socket.client.nsp}})
         </div>
-        <div style="display: flex; align-items: center;margin-left: 50px;">
+        <div class="test-panel">
           <a-button size="small" @click="testSocketServer">SEND TO ALL</a-button>
           <a-button size="small" @click="pingSocketServer">PING</a-button>
           <a-alert :message="pong.msg" :type="pong.type" banner v-if="pong.show" />
+          <a-spin style="max-height: 20px" v-else />
           <!-- <a-button size="small" @click.prevent="playSound">Beep</a-button> -->
           <audio id="audio" src="@/assets/sounds/guess-what.mp3" />
         </div>
@@ -110,6 +111,7 @@ export default {
       "users",
       "currentClient",
       "groups_available",
+      "getSocketMessage",
     ]),
     getSocket_nsp() {
       return this.$socket.client.nsp;
@@ -331,6 +333,7 @@ export default {
     },
   },
   async created() {
+    console.log("LoginBar created!");
     // this.connection = new WebSocket("ws://localhost:8080");
     // this.connection.onmessage = function (event) {
     //   console.log(event);
@@ -344,6 +347,7 @@ export default {
     // this.$socket.client.on("socketMessage", (payload) => {
     //   console.log(`socket send somthing`);
     // });
+    console.log("LoginBar mounted");
     this.audio = document.getElementById("audio");
     const user = this.userData.result;
     let nsp;
@@ -361,11 +365,19 @@ export default {
       nsp = "/" + this.currentClient.workspace;
     }
     this.$socket.client.nsp = nsp;
-    this.$socket.client.connect({
-      reconnection: true,
-      reconnectionDelay: 100,
-      timeout: 1000 * 60 * 20,
-    });
+    this.$socket.client.connect();
+    if (!this.$socket.client.connected) {
+      this.$error({
+        message: "Соединение с сервером не установлено",
+        description: `попробуйте обновить страницу`,
+        placement: "bottomLeft",
+      });
+    } else {
+      this.pong = { type: "success", msg: "Connected", show: true };
+    }
+  },
+  updated() {
+    console.log("LoginBar updated");
   },
 };
 </script>
@@ -388,6 +400,16 @@ export default {
 .user-info-popover-btn {
   &:hover {
     cursor: pointer;
+  }
+}
+
+.test-panel {
+  display: flex;
+  align-items: center;
+  margin-left: 50px;
+  & > div,
+  button {
+    margin-right: 10px;
   }
 }
 

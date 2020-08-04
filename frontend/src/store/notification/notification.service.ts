@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { SET_NOTIFICATION, SET_MESSAGES, ADD_MESSAGE, MARK_MESSAGE_READ } from '@/store/notification/mutations.type';
+import { SET_NOTIFICATION, SET_MESSAGES, ADD_MESSAGE, SOCKET_NEW_MESSAGE } from '@/store/notification/mutations.type';
 
 function compareByDate(a: any, b: any) {
     if (a.dateCreated < b.dateCreated) return 1;
@@ -41,6 +41,9 @@ export const getMessages = (context: any, params: any) => {
         });
 };
 
+export const newSocketMessage = (context: any, socket_message: any) => {
+    context.commit(SOCKET_NEW_MESSAGE, socket_message)
+}
 // пока непонятно надо ли будет это вообще
 // export const markMessagesAsRead = (context: any, msg_id: string) => {
 //     return Vue.axios

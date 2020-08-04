@@ -52,13 +52,12 @@ const io = require('socket.io')(server, {
   pingInterval: 1000, 
   pingTimeout: 3000
 });
-const workspaces = io.of(/^\/\w+$/); // register all namespaces
 
 //io.set('transports', ["websocket"]);
-workspaces.on('connection', socket => {
+io.of(/^\/\w+$/).on('connection', socket => {
   
   // ВСЕ emit ДОЛЖЕН ВЫЗЫВАТЬ ЧЕРЕЗ ЭТОТ ОБЪЕКТ
-  const client_nsp = socket.nsp
+  const workspace = socket.nsp
 
   console.log("-> socket.io user connected: ", socket.id)
   //console.log('NSP::: ',myutils.safeStringify(socket.nsp));// very long json!
@@ -68,7 +67,7 @@ workspaces.on('connection', socket => {
   })
   // USER CONNECTED, NEED TO GENERATE key OF CONNECTION
   socket.on('LOGIN', (userData, cb) => {
-    console.log('User has been logged in workspace «'+client_nsp.name+'» as: ', userData);
+    console.log('User has been logged in workspace «'+workspace.name+'» as: ', userData);
     return cb({
       id: socket.id,
       msg: `Server now watching you, ${userData.userName} from ${userData.workspace}`

@@ -25,7 +25,7 @@ const gauthOption = {
   prompt: 'select_account',
 };
 
-console.log(`ability: ${ability}`);
+//console.log(`ability: ${ability}`);
 
 Vue.use(GAuth, gauthOption);
 Vue.use(VuexAxios, axios);
@@ -36,7 +36,9 @@ const SocialSharing = require('vue-social-sharing');
 Vue.use(SocialSharing);
 
 const socket = io(process.env.VUE_APP_API_URL || 'http://localhost:8080', {
-  transports: ['websocket', 'polling']
+  reconnection: true,
+  reconnectionDelay: 100,
+  timeout: 1000 * 60 * 20
 });
 
 Vue.use(VueSocketIOExt, socket, { store });

@@ -20,17 +20,20 @@ import {
   getNotification,
   createMessage,
   getMessages,
+  newSocketMessage
   //markMessagesAsRead
-} from '@/services/notification.service';
+} from './notification.service';
 
 interface State {
   notification: any[];
   messages: any[];
+  socketMessage: any;
 }
 
 const store: State = {
   notification: [],
   messages: [],
+  socketMessage: null
 };
 
 const getters = {
@@ -39,6 +42,9 @@ const getters = {
   },
   messages(state: State) {
     return state.messages;
+  },
+  getSocketMessage(state: State) {
+    return state.socketMessage
   }
 };
 
@@ -58,7 +64,7 @@ const mutations = {
   },
   // Только изменение state для обновления UI
   [SOCKET_NEW_MESSAGE](state: State, msg: any) {
-    state.messages.push(msg);
+    state.socketMessage = msg;
   }
 };
 
@@ -68,7 +74,7 @@ const actions = {
   [CREATE_MESSAGE]: createMessage,
   [GET_MESSAGES]: getMessages,
   //[READ_MESSAGES]: markMessagesAsRead
-  //[socket_newMessage]: newMessage,    // помещение сообщения в БД и далее вызов SOCKET_NEW_MESSAGE
+  "socket_socketMessage": newSocketMessage,    // помещение сообщения в БД и далее вызов SOCKET_NEW_MESSAGE
 };
 
 export default {
