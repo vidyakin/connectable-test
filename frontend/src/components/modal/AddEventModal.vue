@@ -328,6 +328,36 @@ export default {
     getNow() {
       return moment();
     },
+    clearForm() {
+      this.day.hours(12).minutes(0).seconds(0);
+      this.theform = {
+        name: "",
+        dateEvent: this.day,
+        timeEvent: moment(this.day), // если просто this.day, то присваивает по ссылке
+        timeTo: moment(),
+        members: [],
+        comment: "",
+        color: this.colors[0],
+      };
+      this.theform.timeTo = moment(this.day).add(1, "hour");
+    },
+    getFormFieldsForEvent(event) {
+      return {
+        name: event.name,
+        dateEvent: moment(event.date),
+        timeEvent: moment(event.date),
+        timeTo: moment(event.end),
+        color: { color: event.color },
+        // ищем юзеров с емейлами из списка и создаем массив объектов {key,label}
+        members: this.users
+          .filter((u) => emails.includes(u.email))
+          .map((e) => ({
+            key: e._id,
+            label: `${e.firstName} ${e.lastName}`,
+          })),
+        comment: event.comment,
+      };
+    },
     /**
      * Создание события по кнопке "Создать"
      */
@@ -427,7 +457,7 @@ export default {
   created() {
     if (this.userData && this.userData.result) {
       this.$store.dispatch(GET_NOTIFICATION, this.userData.result._id);
-      console.log(`created: ${this.notification}`);
+      //console.log(`created: ${this.notification}`);
     } else {
       console.log(`AddEventModal.vue->created(): No userData.result here`);
     }
@@ -439,50 +469,21 @@ export default {
           ? notification.publications
           : false;
     },
-    visible() {
-      if (this.visible) {
-        this.isEdit = !!this.event; // признак редактирования события
-        console.log(`Форма открылась`);
-        if (this.isEdit) {
-          const emails = this.event.attendees.map((att) => att.email);
-          this.theform = {
-            name: this.event.name,
-            dateEvent: moment(this.event.date),
-            timeEvent: moment(this.event.date),
-            timeTo: moment(this.event.end),
-            color: { color: this.event.color },
-            // ищем юзеров с емейлами из списка и создаем массив объектов {key,label}
-            members: this.users
-              .filter((u) => emails.includes(u.email))
-              .map((e) => ({
-                key: e._id,
-                label: `${e.firstName} ${e.lastName}`,
-              })),
-            comment: this.event.comment,
-          };
-          this.selectedItems = this.theform.members;
-        } else {
-          this.day.hours(12).minutes(0).seconds(0);
-          this.theform = {
-            name: "",
-            dateEvent: this.day,
-            timeEvent: moment(this.day), // если просто this.day, то присваивает по ссылке
-            timeTo: moment(),
-            members: [],
-            comment: "",
-            color: this.colors[0],
-          };
-          this.theform.timeTo = moment(this.day).add(1, "hour");
-        }
-      }
-    },
-  },
-  watch: {
     async visible(val) {
       if (val) {
         await this.$store.dispatch(GET_USERS, this.currentClient.workspace);
         this.usersData = this.users.filter((u) => !u.deletion_mark);
-        //console.log('userData: ',JSON.stringify(this.usersData,null,2))
+        this.isEdit = !!this.event; // признак редактирования события
+        console.log(`Форма открылась`);
+        if (this.isEdit) {
+          const emails = this.event.attendees.map((att) => att.email);
+          this.theform = getFormFieldsForEvent(this.event);
+          this.selectedItems = this.theform.members;
+        } else {
+          this.clearForm();
+        }
+      } else {
+        this.clearForm();
       }
     },
   },
