@@ -236,8 +236,7 @@ groupSchema.statics.getAvailableForPosts = async function(user_id) {
       .where({ client_id })
       .where({
         $or: [
-          { type: 0 }, // посты видно только в закрытых
-          { $and: [{ type: { $in: [1,2] } }, { 'participants_ref.user_ref': user_ref }] }, // закрытые и приватные где пользователь участник
+          { 'participants_ref.user_ref': user_ref }, //  любые группы где пользователь участник
           { $and: [{ type: 2 }, { creator: user_ref }] } // свои приватные
         ]
       }).select('_id name')
