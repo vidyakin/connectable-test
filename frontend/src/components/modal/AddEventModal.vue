@@ -166,7 +166,7 @@ import locale from "ant-design-vue/es/date-picker/locale/ru_RU";
 import {
   CREATE_EVENT,
   UPDATE_EVENT,
-  GET_USERS
+  GET_USERS,
 } from "@/store/user/actions.type";
 import { GET_NOTIFICATION } from "@/store/notification/actions.type";
 
@@ -177,10 +177,10 @@ export default {
     visible: Boolean,
     close: Function,
     day: Object,
-    event: Object
+    event: Object,
   },
   components: {
-    AppInput
+    AppInput,
   },
 
   data() {
@@ -192,12 +192,12 @@ export default {
         timeTo: moment(),
         members: [],
         comment: "",
-        color: "#ff0000"
+        color: "#ff0000",
       },
       isEdit: false,
       modalStyle: {
         height: "auto",
-        padding: "5px"
+        padding: "5px",
       },
       colors: [
         { color: "#ff0000", name: "red" },
@@ -206,7 +206,7 @@ export default {
         { color: "#00d43f", name: "green" },
         { color: "#00dfc9", name: "cyan" },
         { color: "#3b86ff", name: "blue" },
-        { color: "#8e55d9", name: "purple" }
+        { color: "#8e55d9", name: "purple" },
       ],
       // currentColor: {
       //   color: '#ff0000',
@@ -222,38 +222,38 @@ export default {
             required: true,
             message: "Название не может быть пустым!",
             transform: this.tr,
-            trigger: "blur"
+            trigger: "blur",
           },
           {
             max: 100,
             message: "Максимальная длина заголовка - 100 символов",
             transform: this.tr,
-            trigger: "blur"
+            trigger: "blur",
           },
           {
             min: 5,
             message: "Слишком короткое название, введите больше 5 символов",
             transform: this.tr,
-            trigger: "blur"
-          }
+            trigger: "blur",
+          },
         ],
         dateEvent: [
           { required: true, message: "Нужно указать дату", trigger: "blur" },
-          { validator: this.validDate }
+          { validator: this.validDate },
         ],
         timeEvent: [
           { required: true, message: "Нужно указать время", trigger: "blur" },
-          { validator: this.validTime }
+          { validator: this.validTime },
         ],
         timeTo: [{ validator: this.validTimeTo }],
         members: [
           {
             required: true,
             message: "Нужно выбрать участников",
-            trigger: "blur"
-          }
-        ]
-      }
+            trigger: "blur",
+          },
+        ],
+      },
     };
   },
   /**
@@ -265,14 +265,14 @@ export default {
       "userData",
       "users",
       "notification",
-      "currentClient"
+      "currentClient",
     ]),
     locale() {
       let loc = { ...locale };
       loc.dateFormat = "D MMMM YYYY г.";
       loc.lang.monthFormat = "MMMM";
       return loc;
-    }
+    },
   },
   /**
    * МЕТОДЫ КОМПОНЕНТА
@@ -334,39 +334,28 @@ export default {
     async createEvent(e) {
       e.preventDefault();
       const usersData = this.usersData; // чтоб не потерять this
-      const blancDate = moment()
-        .hours(12)
-        .minutes(0)
-        .seconds(0);
+      const blancDate = moment().hours(12).minutes(0).seconds(0);
 
       // формируем правильные границы события на основе полей формы
       let start = moment(this.theform.dateEvent);
       let end = moment(this.theform.dateEvent);
       const t1 = this.theform.timeEvent;
       const t2 = this.theform.timeTo;
-      start
-        .hour(t1.hour())
-        .minute(t1.minutes())
-        .seconds(0)
-        .utcOffset(3); // set H&m&s from time field to date field
-      end
-        .hour(t2.hour())
-        .minutes(t2.minutes())
-        .seconds(0)
-        .utcOffset(3);
+      start.hour(t1.hour()).minute(t1.minutes()).seconds(0).utcOffset(3); // set H&m&s from time field to date field
+      end.hour(t2.hour()).minutes(t2.minutes()).seconds(0).utcOffset(3);
       const duration = end.diff(start, "minutes") + " minutes";
       console.log(`event starts at: ${start.format()}`);
 
-      this.$refs.eventForm.validate(async valid => {
+      this.$refs.eventForm.validate(async (valid) => {
         if (!valid) {
           console.log(`Form not valid`);
           return;
         }
-        const keys = this.selectedItems.map(e => e.key);
+        const keys = this.selectedItems.map((e) => e.key);
         // Выбираем емейлы указанных в списке лиц
         const attendees = usersData
-          .filter(ud => keys.includes(ud._id))
-          .map(e => ({ email: e.email }));
+          .filter((ud) => keys.includes(ud._id))
+          .map((e) => ({ email: e.email }));
         //this.createButtonSpinning = true;
         // Объект для передачи в Монго
         const event = {
@@ -381,7 +370,7 @@ export default {
           userEmail: this.userData.result.email,
           emailSend: this.statusEmailSend,
           attendees: this.selectedItems ? attendees : "",
-          client_id: this.currentClient.workspace
+          client_id: this.currentClient.workspace,
         };
         if (this.isEdit) {
           event._id = this.event._id;
@@ -392,6 +381,10 @@ export default {
           this.isEdit ? UPDATE_EVENT : CREATE_EVENT,
           event
         );
+        this.$socket.client.emit("FOR_ALL", {
+          area: this.isEdit ? "CHANGED_EVENT" : "NEW_EVENT",
+          event,
+        });
         //.finally(() => {
         // this.form.setFieldsValue({
         //   name: '',
@@ -413,7 +406,7 @@ export default {
     },
     search(text) {
       text = text.toLowerCase();
-      this.usersData = this.users.filter(el => {
+      this.usersData = this.users.filter((el) => {
         return (
           (!el.deletion_mark &&
             el.firstName.toLowerCase().indexOf(text) !== -1) ||
@@ -423,7 +416,7 @@ export default {
           (el.lastName + " " + el.firstName).toLowerCase().indexOf(text) !== -1
         );
       });
-    }
+    },
   },
   /**
    * ХУКИ ЖИЗНЕННОГО ЦИКЛА
@@ -451,7 +444,7 @@ export default {
         this.isEdit = !!this.event; // признак редактирования события
         console.log(`Форма открылась`);
         if (this.isEdit) {
-          const emails = this.event.attendees.map(att => att.email);
+          const emails = this.event.attendees.map((att) => att.email);
           this.theform = {
             name: this.event.name,
             dateEvent: moment(this.event.date),
@@ -460,19 +453,16 @@ export default {
             color: { color: this.event.color },
             // ищем юзеров с емейлами из списка и создаем массив объектов {key,label}
             members: this.users
-              .filter(u => emails.includes(u.email))
-              .map(e => ({
+              .filter((u) => emails.includes(u.email))
+              .map((e) => ({
                 key: e._id,
-                label: `${e.firstName} ${e.lastName}`
+                label: `${e.firstName} ${e.lastName}`,
               })),
-            comment: this.event.comment
+            comment: this.event.comment,
           };
           this.selectedItems = this.theform.members;
         } else {
-          this.day
-            .hours(12)
-            .minutes(0)
-            .seconds(0);
+          this.day.hours(12).minutes(0).seconds(0);
           this.theform = {
             name: "",
             dateEvent: this.day,
@@ -480,18 +470,22 @@ export default {
             timeTo: moment(),
             members: [],
             comment: "",
-            color: this.colors[0]
+            color: this.colors[0],
           };
           this.theform.timeTo = moment(this.day).add(1, "hour");
         }
       }
-    }
+    },
   },
-  async mounted() {
-    await this.$store.dispatch(GET_USERS, this.currentClient.workspace);
-    this.usersData = this.users.filter(u => !u.deletion_mark);
-    //console.log('userData: ',JSON.stringify(this.usersData,null,2))
-  }
+  watch: {
+    async visible(val) {
+      if (val) {
+        await this.$store.dispatch(GET_USERS, this.currentClient.workspace);
+        this.usersData = this.users.filter((u) => !u.deletion_mark);
+        //console.log('userData: ',JSON.stringify(this.usersData,null,2))
+      }
+    },
+  },
 };
 </script>
 

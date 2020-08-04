@@ -7,8 +7,9 @@
           Socket {{!$socket.client.connected ? 'not connected' : 'connected: '+$socket.client.nsp}})
         </div>
         <div style="display: flex; align-items: center;margin-left: 50px;">
+          <a-button size="small" @click="testSocketServer">SEND TO ALL</a-button>
           <a-button size="small" @click="pingSocketServer">PING</a-button>
-          <a-alert :message="pong.msg" :type="pong.type" banner v-show="pong.show" />
+          <a-alert :message="pong.msg" :type="pong.type" banner v-if="pong.show" />
           <!-- <a-button size="small" @click.prevent="playSound">Beep</a-button> -->
           <audio id="audio" src="@/assets/sounds/guess-what.mp3" />
         </div>
@@ -66,6 +67,8 @@ export default {
       current: 1,
       audio: null,
       pong: { show: false, type: "success", msg: "" },
+      connection: null,
+      waiter: null,
       /*************************************** 
        * Структура объекта "datauser":
        * "result": {
@@ -121,9 +124,11 @@ export default {
   sockets: {
     connect() {
       console.log("socket connected:", this.$socket.client.id);
+      this.pong = { show: true, msg: "Connected", type: "success" };
     },
     disconnect() {
       console.log("socket disconnected");
+      this.$socket.client.connect();
     },
     /**
      * Событие на прием сообщения с кодом "socketMessage"
@@ -188,6 +193,30 @@ export default {
           description: ` ${payload.creatorName} подал заявку в группу ${payload.groupName}`,
           placement: "topLeft",
         });
+      } else if (payload.area == "NEW_EVENT") {
+        this.$notification["info"]({
+          message: "Новое событие в календаре",
+          description: `проверьте календарь`,
+          placement: "topLeft",
+        });
+      } else if (payload.area == "CHANGED_EVENT") {
+        this.$notification["info"]({
+          message: "Изменилось событие",
+          description: `проверьте календарь`,
+          placement: "topLeft",
+        });
+      } else if (payload.area == "DELETE_EVENT") {
+        this.$notification["info"]({
+          message: "Событие удалено",
+          description: `проверьте календарь`,
+          placement: "topLeft",
+        });
+      } else if (payload.area == "ALL") {
+        this.$notification["info"]({
+          message: "Тестовое оповещение",
+          description: `${payload.msg}`,
+          placement: "topLeft",
+        });
       } else {
         return;
       }
@@ -211,13 +240,6 @@ export default {
           placement: "topLeft",
         });
       }
-      if (payload.type === "FOR_ALL") {
-        this.$notification["info"]({
-          message: messages[payload.type],
-          description: `ТЕСТОВОЕ СООБЩЕНИЕ НА ВСЕХ СОТРУДНИКОВ`,
-          placement: "topLeft",
-        });
-      }
       // if (payload.type === "UPDATE_FEED") {
       //   this.$notification["info"]({
       //     message: messages[payload.type],
@@ -225,9 +247,9 @@ export default {
       //     placement: "topLeft",
       //   });
       // }
-      if (payload.type === "LOGOUT_NOW") {
-        //this.$router.push("/logout");
-      }
+      // if (payload.type === "LOGOUT_NOW") {
+      //   //this.$router.push("/logout");
+      // }
     },
   },
   methods: {
@@ -240,20 +262,36 @@ export default {
       this.audio.play();
     },
     pingSocketServer() {
+      const showPong = (type, msg) => {
+        this.pong = { type, msg, show: true };
+      };
+      clearTimeout(this.waiter);
+      this.pong.show = false;
+      this.waiter = setTimeout(() => {
+        if (!this.pong.show) {
+          showPong("error", "Сервер не отвечает");
+          this.$socket.client.connect();
+        }
+      }, 1000);
       try {
         this.$socket.client.emit("PING", "HELLOO", (resp) => {
           this.pong.show = true;
           if (resp && resp.msg) {
-            this.pong.type = "success";
-            this.pong.msg = resp.msg;
+            showPong("success", resp.msg);
+            clearTimeout(this.waiter);
           } else {
-            this.pong.type = "error";
-            this.pong.msg = "Сервер не отвечает";
+            showPong("error", "Сервер не отвечает");
           }
         });
       } catch (error) {
         console.log("PING error:", error);
       }
+    },
+    testSocketServer() {
+      this.$socket.client.emit("FOR_ALL", {
+        area: "ALL",
+        msg: "Тестовое оповещение на всех сотрудников",
+      });
     },
     loggedUserFullName() {
       return (
@@ -292,24 +330,40 @@ export default {
       }));
     },
   },
-  created() {
+  async created() {
+    this.connection = new WebSocket("wss://echo.websocket.org");
+
+    this.connection.onmessage = function (event) {
+      console.log(event);
+    };
+
+    this.connection.onopen = function (event) {
+      console.log(event);
+      console.log("Successfully connected to the echo websocket server...");
+    };
+  },
+  async mounted() {
+    this.$socket.client.on("socketMessage", (payload) => {
+      console.log(`socket send somthing`);
+    });
+    this.audio = document.getElementById("audio");
     const user = this.userData.result;
+    let nsp;
     // Если клиент не определен и пользователь - не суперадмин , то разлогиниваемся
     if (!this.currentClient) {
       if (!user.roles.includes("superadmin")) {
-        this.$store.dispatch(ENTER_CLIENT, user.client_id).then((_) => {
-          this.$socket.client.nsp = "/" + user.client_id;
-        });
+        await this.$store.dispatch(ENTER_CLIENT, user.client_id);
+        nsp = "/" + user.client_id;
       } else {
         const currentClient = JSON.parse(localStorage.getItem("currentClient"));
         this.$store.commit(SET_CURRENT_CLIENT, currentClient);
-        this.$socket.client.nsp = "/" + currentClient.workspace;
+        nsp = "/" + currentClient.workspace;
       }
-      this.$socket.client.connect();
+    } else {
+      nsp = "/" + this.currentClient.workspace;
     }
-  },
-  mounted() {
-    this.audio = document.getElementById("audio");
+    this.$socket.client.nsp = nsp;
+    this.$socket.client.connect();
   },
 };
 </script>

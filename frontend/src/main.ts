@@ -36,7 +36,7 @@ const SocialSharing = require('vue-social-sharing');
 Vue.use(SocialSharing);
 
 const socket = io(process.env.VUE_APP_API_URL || 'http://localhost:8080', {
-  transports: ['websocket']
+  transports: ['websocket', 'polling']
 });
 
 Vue.use(VueSocketIOExt, socket, { store });

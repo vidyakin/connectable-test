@@ -123,7 +123,7 @@ import { mapGetters } from "vuex";
 import {
   DELETE_EVENT,
   GET_EVENTS,
-  GET_EVENTS_BY_CLIENT
+  GET_EVENTS_BY_CLIENT,
 } from "../store/user/actions.type";
 
 import moment from "moment";
@@ -140,32 +140,23 @@ export default Vue.extend({
       selectedEvent: null,
       createVisible: false,
       locale: locale,
-      deleting: false // хак для подавления срабатывания @select на ячейке датыы
+      deleting: false, // хак для подавления срабатывания @select на ячейке датыы
     };
   },
   // was - beforeCreate
   async created() {
     moment.locale("ru");
-
-    if (this.userIsAdmin) {
-      await this.$store.dispatch(
-        GET_EVENTS_BY_CLIENT,
-        this.currentClient.workspace
-      );
-    } else {
-      await this.$store.dispatch(GET_EVENTS, this.userData.result.email);
-    }
+    await this.updateEvents();
 
     //let april_events = this.getEventsForMonth(moment().subtract(1, "M"));
-
     if (this.userData.result.outlookId) {
       console.log("beforeCreate get events");
       const a = Vue.axios
         .get("/api/outlook/event")
-        .then(response => {
+        .then((response) => {
           console.log("beforeCreate resp:", response);
         })
-        .catch(e => {
+        .catch((e) => {
           console.log("beforeCreate error:", e);
         });
       return a;
@@ -174,7 +165,7 @@ export default Vue.extend({
     }
   },
   components: {
-    AppAddEventModal
+    AppAddEventModal,
   },
   computed: {
     ...mapGetters([
@@ -182,7 +173,7 @@ export default Vue.extend({
       "events",
       "userData",
       "currentClient",
-      "userIsAdmin"
+      "userIsAdmin",
     ]),
     // userInfo() {
     //   return this.userData.result ? this.userData.result : this.user.result;
@@ -194,16 +185,26 @@ export default Vue.extend({
     },
     weekday() {
       return "ПН.ВТ.СР.ЧТ.ПТ.СБ.ВС".split(".");
-    }
+    },
   },
   watch: {
     user(user) {
       if (user) {
         this.$store.dispatch(GET_EVENTS, user.email);
       }
-    }
+    },
   },
   methods: {
+    async updateEvents() {
+      if (this.userIsAdmin) {
+        await this.$store.dispatch(
+          GET_EVENTS_BY_CLIENT,
+          this.currentClient.workspace
+        );
+      } else {
+        await this.$store.dispatch(GET_EVENTS, this.userData.result.email);
+      }
+    },
     createClose() {
       this.createVisible = false;
     },
@@ -216,7 +217,7 @@ export default Vue.extend({
     createOpen(event) {
       if (this.deleting) return;
 
-      const dayEvents = this.events.filter(e =>
+      const dayEvents = this.events.filter((e) =>
         moment(e.date).isSame(this.currentDay, "day")
       );
       this.editMode = !!event;
@@ -233,7 +234,7 @@ export default Vue.extend({
         } else {
           this.$notification["error"]({
             message: "Ошибка",
-            description: "Нельзя создать событие в прошедшую дату"
+            description: "Нельзя создать событие в прошедшую дату",
           });
         }
       } else {
@@ -247,7 +248,7 @@ export default Vue.extend({
     getEventsForDay(currDate) {
       const events = !this.events
         ? []
-        : this.events.filter(ev =>
+        : this.events.filter((ev) =>
             moment(currDate).isSame(moment(ev.date), "day")
           );
       return events;
@@ -255,7 +256,7 @@ export default Vue.extend({
     getEventsForMonth(month) {
       return (
         this.events &&
-        this.events.find(event => {
+        this.events.find((event) => {
           return moment(event.date).isSame(month, "month");
         })
       );
@@ -267,8 +268,12 @@ export default Vue.extend({
       return !this.events
         ? []
         : this.events &&
-            this.events.filter(event => {
-              if (event && event.userId === this.userData.result._id) {
+            this.events.filter((event) => {
+              if (
+                event &&
+                this.userData &&
+                event.userId === this.userData.result._id
+              ) {
                 return moment(event.date).isSame(moment(), "month");
               }
             });
@@ -283,7 +288,7 @@ export default Vue.extend({
     getEventsForNextMonth() {
       return (
         (this.events &&
-          this.events.filter(event => {
+          this.events.filter((event) => {
             if (event && event.userId === this.userData.result._id) {
               return moment(event.date).isSame(moment().add(1, "M"), "month");
             }
@@ -294,7 +299,7 @@ export default Vue.extend({
     getEventsForPrevMonth() {
       return (
         (this.events &&
-          this.events.filter(event => {
+          this.events.filter((event) => {
             return moment(event.date).isSame(
               moment().subtract(1, "M"),
               "month"
@@ -306,7 +311,7 @@ export default Vue.extend({
     getDayFromDate(date) {
       return {
         weekday: this.weekday[moment(date).isoWeekday() - 1],
-        day: moment(date).date()
+        day: moment(date).date(),
       };
     },
     getTime(v) {
@@ -318,11 +323,26 @@ export default Vue.extend({
       this.$store.dispatch(DELETE_EVENT, id).then(() => {
         this.$notification["success"]({
           message: "Событие удалено",
-          placement: "topRight"
+          placement: "topRight",
+        });
+        this.$socket.client.emit("FOR_ALL", {
+          area: "DELETE_EVENT",
+          event: { id },
         });
       });
-    }
-  }
+    },
+  },
+  sockets: {
+    async socketMessage(payload) {
+      if (
+        payload.area == "NEW_EVENT" ||
+        payload.area == "CHANGED_EVENT" ||
+        payload.area == "DELETE_EVENT"
+      ) {
+        await this.updateEvents();
+      }
+    },
+  },
 });
 </script>
 
