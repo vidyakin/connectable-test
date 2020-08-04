@@ -88,8 +88,8 @@ import { mapGetters } from "vuex";
 import { CHECK_USER_INFO } from "../store/user/actions.type";
 import { SUCCESS_REGISTER } from "@/store/user/mutations.type";
 
-import LoginButtonGoogle from "../components/common/LoginButtonGoogle.vue";
-import AppLoginMicrosoft from "../components/common/LoginBarMicrosoft.vue";
+import LoginButtonGoogle from "../components/Login/LoginButtonGoogle.vue";
+import AppLoginMicrosoft from "../components/Login/LoginBarMicrosoft.vue";
 import AppSuccessRegister from "../components/notification/SuccessRegister.vue";
 
 export default Vue.extend({

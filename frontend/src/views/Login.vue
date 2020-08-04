@@ -189,8 +189,8 @@ import { CHECK_USER_INFO } from "../store/user/actions.type";
 import { SUCCESS_REGISTER } from "@/store/user/mutations.type";
 import { ENTER_CLIENT } from "../store/client/actions.type";
 
-import AppLoginGoogle from "../components/common/LoginBarGoogle.vue";
-import AppLoginMicrosoft from "../components/common/LoginBarMicrosoft.vue";
+import AppLoginGoogle from "../components/Login/LoginBarGoogle.vue";
+import AppLoginMicrosoft from "../components/Login/LoginBarMicrosoft.vue";
 import AppSuccessRegister from "../components/notification/SuccessRegister.vue";
 
 export default Vue.extend({
