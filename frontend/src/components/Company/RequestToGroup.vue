@@ -19,14 +19,10 @@
           <a-button
             type="primary"
             icon="check"
-            @click="approve(req.groupId, req.userId)"
+            @click="approve(req)"
             style="margin-right: 10px;"
           >Одобрить</a-button>
-          <a-button
-            type="danger"
-            icon="close"
-            @click="deleteParticipant(req.groupId, req.userId)"
-          >Отклонить</a-button>
+          <a-button type="danger" icon="close" @click="deleteParticipant(req)">Отклонить</a-button>
         </div>
       </div>
     </div>
@@ -34,6 +30,11 @@
 </template>
 
 <script>
+import {
+  DELETE_PARTICIPANT,
+  APPROVE_PARTICIPANTS_REQUEST,
+  GET_REQUESTS_TO_MY_GROUPS,
+} from "@/store/group/actions.type";
 export default {
   props: ["req"],
   data() {
@@ -46,12 +47,9 @@ export default {
   },
   methods: {
     // для заявок
-    approve(groupId, participantId) {
+    approve({ groupId, userId }) {
       this.$store
-        .dispatch(APPROVE_PARTICIPANTS_REQUEST, {
-          groupId,
-          participantId,
-        })
+        .dispatch(APPROVE_PARTICIPANTS_REQUEST, { groupId, userId })
         .then(() =>
           this.$notification["success"]({
             placement: "topRight",
@@ -59,14 +57,20 @@ export default {
             description: "Вступление в группу одобрено",
           })
         )
-        .then(() => this.checkParticipants());
-    },
-    deleteParticipant(groupId, participantId) {
-      this.$store
-        .dispatch(DELETE_PARTICIPANT, {
-          groupId,
-          participantId,
+        .then((res) => {
+          this.$store.dispatch(GET_REQUESTS_TO_MY_GROUPS, userId);
         })
+        .catch((error) => {
+          this.$notification["info"]({
+            placement: "topRight",
+            message: "Ошибка при одобрении заявки",
+            description: error,
+          });
+        });
+    },
+    deleteParticipant({ groupId, userId }) {
+      this.$store
+        .dispatch(DELETE_PARTICIPANT, { groupId, userId })
         .then(() =>
           this.$notification["info"]({
             placement: "topRight",
@@ -74,7 +78,16 @@ export default {
             description: "Вступление в группу отклонено",
           })
         )
-        .then(() => this.checkParticipants());
+        .then((res) => {
+          this.$store.dispatch(GET_REQUESTS_TO_MY_GROUPS, userId);
+        })
+        .catch((error) => {
+          this.$notification["info"]({
+            placement: "topRight",
+            message: "Ошибка при отклонении заявки",
+            description: error,
+          });
+        });
     },
   },
 };

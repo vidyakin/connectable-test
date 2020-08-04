@@ -93,7 +93,7 @@ groupSchema.statics.findGroupsByUserId = async function (user_id) {
           { $and: [{ type: 2 }, { creator: user_ref }] } // свои приватные
         ]
       })
-    console.log(`groups: ${JSON.stringify(groups.map(g => ({ type: g.type, name: g.name })), null, 3)}`);
+    //console.log(`groups: ${JSON.stringify(groups.map(g => ({ type: g.type, name: g.name })), null, 3)}`);
     return groups
   }
 }

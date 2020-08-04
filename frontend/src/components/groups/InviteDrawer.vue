@@ -32,10 +32,7 @@
 <script>
 import { mapGetters } from "vuex";
 import { GET_USERS } from "../../store/user/actions.type";
-import {
-  APPROVE_PARTICIPANTS_REQUEST,
-  CREATE_INVITE,
-} from "../../store/group/actions.type";
+import { CREATE_INVITE } from "../../store/group/actions.type";
 
 export default {
   name: "AppInviteDrawer",
