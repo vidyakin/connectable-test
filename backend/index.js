@@ -49,8 +49,7 @@ const io = require('socket.io')(server, {
   randomizationFactor: 0.2,
   timeout: 1000,
   autoConnect: true,
-  pingInterval: 1000, 
-  pingTimeout: 3000
+  pingInterval: 500
 });
 
 //io.set('transports', ["websocket"]);

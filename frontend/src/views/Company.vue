@@ -189,7 +189,7 @@ export default Vue.extend({
     },
     sortedGroupsPosts() {
       return this.posts_of_groups
-        .filter((p) => this.groups_available.some((g) => g._id == p.parent._id))
+        .filter((p) => this.groups_available.some((g) => g._id == p.parent.id))
         .sort(compare);
     },
     sortedFeed() {
@@ -289,6 +289,7 @@ export default Vue.extend({
     const user = this.userData.result;
     Promise.all([
       this.$store.dispatch(GET_USERS, this.wsp),
+      this.$store.dispatch(GET_GROUPS_USER_CAN_READ, this.user_id),
       this.$store.dispatch(GET_POSTS, {
         filter: {
           // parent: {
@@ -306,7 +307,7 @@ export default Vue.extend({
       this.$store.dispatch(GET_COMMENTS, user._id),
       this.$store.dispatch(GET_MENTIONS, user._id),
     ]).finally((_) => {
-      console.log("All dispatch ended");
+      //console.log("All dispatch ended");
     });
   },
   mounted() {

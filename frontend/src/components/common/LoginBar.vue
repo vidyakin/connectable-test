@@ -127,6 +127,11 @@ export default {
     connect() {
       console.log("socket connected:", this.$socket.client.id);
       this.pong = { show: true, msg: "Connected", type: "success" };
+      this.$notification["info"]({
+        message: "Соединение восстановлено",
+        description: `сервер доступен`,
+        placement: "topLeft",
+      });
     },
     disconnect() {
       console.log("socket disconnected");
