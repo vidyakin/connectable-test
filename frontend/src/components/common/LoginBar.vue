@@ -132,6 +132,7 @@ export default {
         description: `сервер доступен`,
         placement: "topLeft",
       });
+      this.audio.play();
     },
     disconnect() {
       console.log("socket disconnected");
@@ -277,6 +278,7 @@ export default {
       this.waiter = setTimeout(() => {
         if (!this.pong.show) {
           showPong("error", "Сервер не отвечает");
+          this.$socket.client.disconnect();
           this.$socket.client.connect();
         }
       }, 1000);
@@ -383,6 +385,7 @@ export default {
   },
   updated() {
     console.log("LoginBar updated");
+    this.$socket.client.connect();
   },
 };
 </script>
