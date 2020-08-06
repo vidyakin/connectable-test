@@ -136,7 +136,7 @@ export default {
     },
     disconnect() {
       console.log("socket disconnected");
-      this.$socket.client.connect();
+      this.$socket.client.connect(`${process.env.VUE_APP_API_URL}`);
     },
     /**
      * Событие на прием сообщения с кодом "socketMessage"
@@ -279,7 +279,7 @@ export default {
         if (!this.pong.show) {
           showPong("error", "Сервер не отвечает");
           this.$socket.client.disconnect();
-          this.$socket.client.connect();
+          this.$socket.client.connect(`${process.env.VUE_APP_API_URL}`);
         }
       }, 1000);
       try {
@@ -372,7 +372,10 @@ export default {
       nsp = "/" + this.currentClient.workspace;
     }
     this.$socket.client.nsp = nsp;
-    this.$socket.client.connect();
+    this.$socket.client.connect(`${process.env.VUE_APP_API_URL}`);
+    console.log(
+      `LoginBar mounted and socket has connected to ${process.env.VUE_APP_API_URL}`
+    );
     if (!this.$socket.client.connected) {
       this.$error({
         message: "Соединение с сервером не установлено",
@@ -385,7 +388,7 @@ export default {
   },
   updated() {
     console.log("LoginBar updated");
-    this.$socket.client.connect();
+    this.$socket.client.connect(`${process.env.VUE_APP_API_URL}`);
   },
 };
 </script>
