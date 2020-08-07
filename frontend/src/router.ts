@@ -103,6 +103,11 @@ export const router = new Router({
           name: 'about',
           component: view('About'),
         },
+        {
+          path: '/*',
+          name: 'NotFound',
+          component: view('404'),
+        },
       ],
     },
     /*{
@@ -142,7 +147,7 @@ export const router = new Router({
       path: '/reset-password/:token',
       name: 'ResetPassword',
       component: view('ResetPassword'),
-    },
+    }
   ],
 });
 router.beforeEach((to, from, next) => {

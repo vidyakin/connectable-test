@@ -16,6 +16,7 @@
           <div class="system-text">last 'pong': {{lastPong && lastPong.toLocaleTimeString()}}</div>
           <!-- <a-button size="small" @click.prevent="playSound">Beep</a-button> -->
           <audio id="audio" src="@/assets/sounds/guess-what.mp3" />
+          <router-link to="/no-such-page">404 here ->></router-link>
         </div>
       </div>
       <!-- Список сообщений -->
