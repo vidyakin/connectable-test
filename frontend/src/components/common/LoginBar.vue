@@ -380,7 +380,7 @@ export default {
         this.lastPong = new Date();
         console.log(`pong!`);
       });
-    }, 5000);
+    }, 2000);
     // this.connection = new WebSocket("ws://localhost:8080");
     // this.connection.onmessage = function (event) {
     //   console.log(event);
@@ -404,10 +404,9 @@ export default {
       );
       if (this.lastPong == undefined || new Date() - this.lastPong >= 5000) {
         this.pingSocketServer();
-        this.lastPong = new Date();
         console.log(`Соединение ${this.apiURL} должно перезапуститься...`);
       }
-    }, 10000);
+    }, 5000);
 
     console.log(`LoginBar mounted and socket has connected to ${this.apiURL}`);
     // if (!this.$socket.client.connected) {
