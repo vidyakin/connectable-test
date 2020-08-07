@@ -164,5 +164,9 @@ router.beforeEach((to, from, next) => {
   if (authRequired && (!isLoggedIn || !loggedIn) && !resetPas.includes('reset-password')) {
     return next({ name: 'login' });
   }
+  if (!authRequired && isLoggedIn) {
+    console.log(`you was redirected to company wall`);
+    return next({ name: 'company' });
+  }
   next();
 });
