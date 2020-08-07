@@ -43,9 +43,9 @@ const server = require('http').createServer(app);
 const io = require('socket.io')(server, { 
   reconnection: true,
   reconnectionAttempts: Infinity,
-  randomizationFactor: 0.2,
+  randomizationFactor: 0.5,
   autoConnect: true,
-  pingInterval: 500
+  pingInterval: 2000
 });
 
 //io.set('transports', ["websocket"]);
@@ -69,7 +69,7 @@ io.of(/^\/\w+$/).on('connection', socket => {
     })
   })
   socket.on('PING', (_, cb) => {
-    console.log(`PING from «${socket.id}»`);
+    //console.log(`PING from «${socket.id}»`); // чтоб не засерать логи
     return cb({
       id: socket.id,
       msg: `PONG`
@@ -87,9 +87,10 @@ io.of(/^\/\w+$/).on('connection', socket => {
 
   // Универсальное событие для всех, что и как обрабатывается - задается в data
   // Присланные данные транслируются на всех в том же виде
-  socket.on("FOR_ALL", data => {
-    console.log(`${new Date().toLocaleString('ru')}: From client to all: ${data} `);
+  socket.on("FOR_ALL", (data, cb) => {
+    console.log(`${new Date().toLocaleString('ru')}: From client ${socket.id} to all: ${data} `);
     socket.broadcast.emit("socketMessage", data);
+    return cb({msg: "OK"});
   });
   // Универсальное событие для одного, что и как обрабатываетс - задается в data
   socket.on("PRIVATE_MSG", data => {

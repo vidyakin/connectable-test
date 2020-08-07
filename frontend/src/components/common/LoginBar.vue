@@ -4,13 +4,16 @@
       <div style="align-self: center;" class="client-name">
         <div>
           {{getClientInfo()}}
-          Socket {{!$socket.client.connected ? 'not connected' : 'connected: '+$socket.client.nsp}})
+          <span
+            class="system-text"
+          >Socket {{!$socket.client.connected ? 'not connected' : 'connected: '+$socket.client.nsp}}</span>
         </div>
         <div class="test-panel">
           <a-button size="small" @click="testSocketServer">SEND TO ALL</a-button>
           <a-button size="small" @click="pingSocketServer">PING</a-button>
           <a-alert :message="pong.msg" :type="pong.type" banner v-if="pong.show" />
           <a-spin style="max-height: 20px" v-else />
+          <div class="system-text">last 'pong': {{lastPong && lastPong.toLocaleTimeString()}}</div>
           <!-- <a-button size="small" @click.prevent="playSound">Beep</a-button> -->
           <audio id="audio" src="@/assets/sounds/guess-what.mp3" />
         </div>
@@ -70,6 +73,9 @@ export default {
       pong: { show: false, type: "success", msg: "" },
       connection: null,
       waiter: null,
+      lastPong: null,
+      pingTimer: null,
+      checkTimer: null,
       /*************************************** 
        * Структура объекта "datauser":
        * "result": {
@@ -89,19 +95,6 @@ export default {
         "iat": 1586995323,
         "exp": 1587081723
        */
-      // datauser: store.getters.user
-      //   ? store.getters.user
-      //   : store.getters.userData,
-      /***************************************
-       * Список уведомлений в выпадающем меню
-       * Привязываться напрямую к геттеру messages из стейта нельзя т.к. для разных событий возможно надо формировать разный вид сообщений
-       * Образец данных:
-       * {
-          title: "Новая группа",
-          text: "<b>Александр Пушкин</b>создал новую группу: <i>Стрелковый клуб</i>"
-        }
-       * 
-       */
     };
   },
   computed: {
@@ -116,6 +109,9 @@ export default {
     getSocket_nsp() {
       return this.$socket.client.nsp;
     },
+    apiURL() {
+      return process.env.VUE_APP_API_URL;
+    },
     // isSuperAdmin() {
     //   return this.$can("manage", {
     //     accessEmail: this.userData.result.email,
@@ -124,6 +120,9 @@ export default {
     // }
   },
   sockets: {
+    // pong() {
+    //   this.lastPong = new Date();
+    // },
     connect() {
       console.log("socket connected:", this.$socket.client.id);
       this.pong = { show: true, msg: "Connected", type: "success" };
@@ -136,7 +135,7 @@ export default {
     },
     disconnect() {
       console.log("socket disconnected");
-      this.$socket.client.connect(`${process.env.VUE_APP_API_URL}`);
+      this.$socket.client.connect(`${this.apiURL}`);
     },
     /**
      * Событие на прием сообщения с кодом "socketMessage"
@@ -270,26 +269,32 @@ export default {
       this.audio.play();
     },
     pingSocketServer() {
-      const showPong = (type, msg) => {
+      // функция показа ответа
+      const showPong = (type = "success", msg = "PONG") => {
         this.pong = { type, msg, show: true };
       };
+      // очищаем если запущен таймер
       clearTimeout(this.waiter);
+      // скрываем ответ
       this.pong.show = false;
+      // запускаем таймер для проверки ответа
       this.waiter = setTimeout(() => {
         if (!this.pong.show) {
           showPong("error", "Сервер не отвечает");
           this.$socket.client.disconnect();
-          this.$socket.client.connect(`${process.env.VUE_APP_API_URL}`);
+          this.$socket.client.connect(`${this.apiURL}`);
         }
-      }, 1000);
+      }, 1500);
+      // запускаем само пингование
       try {
         this.$socket.client.emit("PING", "HELLOO", (resp) => {
-          this.pong.show = true;
           if (resp && resp.msg) {
+            // если все ОК, показываем ответ и убираем таймер
             showPong("success", resp.msg);
             clearTimeout(this.waiter);
           } else {
-            showPong("error", "Сервер не отвечает");
+            // нет ответа
+            showPong("error", "Нет ответа");
           }
         });
       } catch (error) {
@@ -297,10 +302,16 @@ export default {
       }
     },
     testSocketServer() {
-      this.$socket.client.emit("FOR_ALL", {
-        area: "ALL",
-        msg: "Тестовое оповещение на всех сотрудников",
-      });
+      this.$socket.client.emit(
+        "FOR_ALL",
+        {
+          area: "ALL",
+          msg: "Тестовое оповещение на всех сотрудников",
+        },
+        (resp) => {
+          console.log(`Server responsed on FOR_ALL: ${resp.msg}`);
+        }
+      );
     },
     loggedUserFullName() {
       return (
@@ -341,21 +352,9 @@ export default {
   },
   async created() {
     console.log("LoginBar created!");
-    // this.connection = new WebSocket("ws://localhost:8080");
-    // this.connection.onmessage = function (event) {
-    //   console.log(event);
-    // };
-    // this.connection.onopen = function (event) {
-    //   console.log(event);
-    //   console.log("Successfully connected to the echo websocket server...");
-    // };
-  },
-  async mounted() {
-    // this.$socket.client.on("socketMessage", (payload) => {
-    //   console.log(`socket send somthing`);
-    // });
-    console.log("LoginBar mounted");
-    this.audio = document.getElementById("audio");
+    this.lastPong = new Date();
+
+    // определяем неймспейс
     const user = this.userData.result;
     let nsp;
     // Если клиент не определен и пользователь - не суперадмин , то разлогиниваемся
@@ -371,24 +370,55 @@ export default {
     } else {
       nsp = "/" + this.currentClient.workspace;
     }
+    console.log(`nsp ${nsp}`);
     this.$socket.client.nsp = nsp;
-    this.$socket.client.connect(`${process.env.VUE_APP_API_URL}`);
-    console.log(
-      `LoginBar mounted and socket has connected to ${process.env.VUE_APP_API_URL}`
-    );
-    if (!this.$socket.client.connected) {
-      this.$error({
-        message: "Соединение с сервером не установлено",
-        description: `попробуйте обновить страницу`,
-        placement: "bottomLeft",
+    this.$socket.client.connect(`${this.apiURL}`);
+
+    // запускаем свой пингер
+    this.pingTimer = setInterval(() => {
+      this.$socket.client.emit("PING", { beat: 1 }, (resp) => {
+        this.lastPong = new Date();
+        console.log(`pong!`);
       });
-    } else {
-      this.pong = { type: "success", msg: "Connected", show: true };
-    }
+    }, 5000);
+    // this.connection = new WebSocket("ws://localhost:8080");
+    // this.connection.onmessage = function (event) {
+    //   console.log(event);
+    // };
+    // this.connection.onopen = function (event) {
+    //   console.log(event);
+    //   console.log("Successfully connected to the echo websocket server...");
+    // };
   },
-  updated() {
-    console.log("LoginBar updated");
-    this.$socket.client.connect(`${process.env.VUE_APP_API_URL}`);
+  async mounted() {
+    // this.$socket.client.on("socketMessage", (payload) => {
+    //   console.log(`socket send somthing`);
+    // });
+    console.log("LoginBar mounted");
+    this.audio = document.getElementById("audio");
+
+    // таймер для отслеживания последнего отклика от сервера
+    this.checkTimer = setInterval(() => {
+      console.log(
+        `Server connection checker ${new Date().toLocaleTimeString()}`
+      );
+      if (this.lastPong == undefined || new Date() - this.lastPong >= 5000) {
+        this.pingSocketServer();
+        this.lastPong = new Date();
+        console.log(`Соединение ${this.apiURL} должно перезапуститься...`);
+      }
+    }, 10000);
+
+    console.log(`LoginBar mounted and socket has connected to ${this.apiURL}`);
+    // if (!this.$socket.client.connected) {
+    //   this.$error({
+    //     message: "Соединение с сервером не установлено",
+    //     description: `попробуйте обновить страницу`,
+    //     placement: "bottomLeft",
+    //   });
+    // } else {
+    //   this.pong = { type: "success", msg: "Connected", show: true };
+    // }
   },
 };
 </script>
@@ -479,6 +509,10 @@ export default {
       flex-grow: 1;
       display: flex;
       align-items: center;
+      .system-text {
+        font-size: 10pt;
+        font-weight: normal;
+      }
     }
 
     .ant-avatar {
