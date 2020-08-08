@@ -14,7 +14,13 @@
     <div slot="title">
       <h3>Новый сотрудник</h3>
     </div>
-    <a-form-model ref="emplForm" :model="theform" :rules="rules" layout="vertical">
+    <a-form-model
+      ref="emplForm"
+      :model="theform"
+      :rules="rules"
+      layout="vertical"
+      @validate="validate"
+    >
       <a-row :gutter="10">
         <a-col span="12">
           <a-form-model-item prop="name">
@@ -34,7 +40,12 @@
       <a-row :gutter="10">
         <a-col span="14">
           <a-form-model-item prop="email">
-            <app-input v-model="theform.email" placeholder="Введите e-mail" label="E-mail" />
+            <app-input
+              v-model="theform.email"
+              placeholder="Введите e-mail"
+              label="E-mail"
+              autocomplete="off"
+            />
           </a-form-model-item>
         </a-col>
         <a-col span="10">
@@ -56,6 +67,7 @@
               v-model="theform.password"
               placeholder="Введите пароль"
               label="Пароль"
+              autocomplete="off"
             />
           </a-form-model-item>
         </a-col>
@@ -65,6 +77,7 @@
             has-feedback
             prop="passwordRepeat"
             :validate-status="validStatusPwdRepeat"
+            autocomplete="off"
           >
             <a-input-password
               v-model="theform.passwordRepeat"
@@ -86,7 +99,7 @@ export default {
   components: { AppInput },
   props: {
     visible: Boolean,
-    close: Function
+    close: Function,
   },
   data() {
     return {
@@ -96,7 +109,7 @@ export default {
         surname: "",
         password: "",
         passwordRepeat: "",
-        email: ""
+        email: "",
       },
       ws_disabled: false,
       confirmLoading: false,
@@ -107,77 +120,83 @@ export default {
             required: true,
             message: "Необходимо указать имя",
             transform: this.tr,
-            trigger: "blur"
-          }
+            trigger: "blur",
+          },
         ],
         surname: [
           {
             required: true,
             message: "Необходимо указать фамилию",
             transform: this.tr,
-            trigger: "blur"
-          }
+            trigger: "blur",
+          },
         ],
         email: [
           {
             required: true,
             message: "Необходимо указать e-mail",
             transform: this.tr,
-            trigger: "blur"
+            trigger: "blur",
           },
           {
             type: "email",
             message: "Укажите корректный e-mail",
             transform: this.tr,
-            trigger: "blur"
-          }
+            trigger: "blur",
+          },
         ],
         password: [
           {
             required: true,
             message: "Укажите пароль",
             transform: this.tr,
-            trigger: "blur"
+            trigger: "blur",
           },
           {
             validator: this.validRepeatPassword,
             message: "Пароли не совпадают",
-            trigger: "change"
-          }
+            trigger: "change",
+          },
         ],
         passwordRepeat: [
           {
             validator: this.validRepeatPassword,
             message: "Пароли не совпадают",
-            trigger: "change"
-          }
+            trigger: "change",
+          },
         ],
         workspace: [
           {
             max: 20,
             message: "Максимум 20 символов",
-            trigger: "change"
-          }
-        ]
-      }
+            trigger: "change",
+          },
+        ],
+      },
     };
   },
   methods: {
+    validate(prop) {
+      console.log(`form was validated: ${prop}`);
+    },
     validRepeatPassword(rule, value, callback) {
-      if (this.theform.passwordRepeat.trim() != "") {
-        if (this.theform.password != this.theform.passwordRepeat) {
+      const { password, passwordRepeat } = this.theform;
+      if (passwordRepeat.trim() != "") {
+        if (password != passwordRepeat) {
           this.validStatusPwdRepeat = "error";
           callback(new Error());
         } else {
           this.validStatusPwdRepeat = "success";
           if (rule.field == "password") {
             this.$refs.emplForm.validateField("passwordRepeat");
+          } else {
+            this.$refs.emplForm.validateField("password");
           }
           callback();
         }
       } else {
-        this.validStatusPwdRepeat = "success";
-        callback();
+        this.validStatusPwdRepeat = "error";
+        callback(new Error());
       }
     },
     validRepeat(rule, value, callback) {
@@ -185,36 +204,45 @@ export default {
       validRepeatPassword(rule, value, callback);
     },
     sendEmployeeData() {
-      if (this.$refs.emplForm.validate()) {
-        this.$emit("create", this.theform);
-      } else {
-        this.$error({
-          title: "Ошибка в данных",
-          content: "При проверке данных обнаружены ошибки"
-        });
-      }
+      this.$refs.emplForm.validate((valid) => {
+        if (!valid) {
+          this.$error({
+            centered: true,
+            title: "Ошибка в данных",
+            content: "При проверке данных обнаружены ошибки",
+          });
+        } else {
+          this.$emit("create", this.theform);
+        }
+      });
     },
     tr(v) {
       return v === undefined ? "" : v.trim();
-    }
+    },
   },
   watch: {
     visible(val) {
       if (val) {
-        console.log(`AddEmployeeModal is now visible`);
         if (this.$store.getters.currentClient) {
-          this.theform.workspace = this.$store.getters.currentClient.workspace;
+          this.theform = {
+            workspace: this.$store.getters.currentClient.workspace,
+            name: "",
+            surname: "",
+            password: "",
+            passwordRepeat: "",
+            email: "",
+          };
           this.ws_disabled = true;
         }
       }
-    }
+    },
   },
   /**
    * Lifecycle hooks
    */
   mounted() {
     //console.log(`AddEmployeeModal is mounted`);
-  }
+  },
 };
 </script>
 
