@@ -71,6 +71,7 @@ export default {
     return {
       current: 1,
       audio: null,
+      showPong: false,
       pong: { show: false, type: "success", msg: "" },
       connection: null,
       waiter: null,
@@ -112,6 +113,9 @@ export default {
     },
     apiURL() {
       return process.env.VUE_APP_API_URL;
+    },
+    user_id() {
+      return this.userData.result._id;
     },
     // isSuperAdmin() {
     //   return this.$can("manage", {
@@ -162,10 +166,7 @@ export default {
           info_title = "Вышла новость по компании";
         } else if (payload.parent.type == "group") {
           info_title = "Новый пост в группе";
-          await this.$store.dispatch(
-            GET_GROUPS_USER_CAN_READ,
-            this.userData.result._id
-          );
+          await this.$store.dispatch(GET_GROUPS_USER_CAN_READ, this.user_id);
           needShow = this.groups_available.some(
             (g) => g._id == payload.parent.id
           );
@@ -214,11 +215,16 @@ export default {
           placement: "topLeft",
         });
       } else if (payload.area == "DELETE_EVENT") {
+        // добавить в тело список участников и определять есть ли в них текущий пользователь
         this.$notification["info"]({
           message: "Событие удалено",
           description: `проверьте календарь`,
           placement: "topLeft",
         });
+      } else if (payload.area == "FORCE_LOGOUT") {
+        if (payload.user_id == this.user_id) {
+          this.logout();
+        }
       } else if (payload.area == "ALL") {
         this.$notification["info"]({
           message: "Тестовое оповещение",
@@ -254,9 +260,6 @@ export default {
       //     description: payload.area,
       //     placement: "topLeft",
       //   });
-      // }
-      // if (payload.type === "LOGOUT_NOW") {
-      //   //this.$router.push("/logout");
       // }
     },
   },
@@ -379,7 +382,9 @@ export default {
     this.pingTimer = setInterval(() => {
       this.$socket.client.emit("PING", { beat: 1 }, (resp) => {
         this.lastPong = new Date();
-        console.log(`pong!`);
+        if (this.showPong) {
+          console.log(`pong!`);
+        }
       });
     }, 2000);
     // this.connection = new WebSocket("ws://localhost:8080");

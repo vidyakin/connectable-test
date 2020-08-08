@@ -13,6 +13,44 @@ export const router = new Router({
   mode: 'history',
   base: process.env.BASE_URL,
   routes: [
+    /*{
+      path: '/about',
+      name: 'about',
+      // route level code-splitting
+      // this generates a separate chunk (about.[hash].js) for this route
+      // which is lazy-loaded when the route is visited.
+      component: () => import(/!* webpackChunkName: "about" *!/ './views/About.vue'),
+    },*/
+    {
+      path: '/login/',
+      name: 'login',
+      component: view('Login'),
+    },
+    {
+      path: '/login_new/',
+      name: 'login_new',
+      component: view('LoginNew'),
+    },
+    {
+      name: 'authorize',
+      path: '/authorize',
+      component: view('Authorize'),
+    },
+    {
+      path: '/register/',
+      name: 'register',
+      component: view('Register'),
+    },
+    {
+      path: '/forgot-password/',
+      name: 'ForgotPassword',
+      component: view('ForgotPassword'),
+    },
+    {
+      path: '/reset-password/:token',
+      name: 'ResetPassword',
+      component: view('ResetPassword'),
+    },
     {
       path: '/',
       name: '',
@@ -110,44 +148,7 @@ export const router = new Router({
         },
       ],
     },
-    /*{
-      path: '/about',
-      name: 'about',
-      // route level code-splitting
-      // this generates a separate chunk (about.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import(/!* webpackChunkName: "about" *!/ './views/About.vue'),
-    },*/
-    {
-      path: '/login/',
-      name: 'login',
-      component: view('Login'),
-    },
-    {
-      path: '/login_new/',
-      name: 'login_new',
-      component: view('LoginNew'),
-    },
-    {
-      name: 'authorize',
-      path: '/authorize',
-      component: view('Authorize'),
-    },
-    {
-      path: '/register/',
-      name: 'register',
-      component: view('Register'),
-    },
-    {
-      path: '/forgot-password/',
-      name: 'ForgotPassword',
-      component: view('ForgotPassword'),
-    },
-    {
-      path: '/reset-password/:token',
-      name: 'ResetPassword',
-      component: view('ResetPassword'),
-    }
+
   ],
 });
 router.beforeEach((to, from, next) => {

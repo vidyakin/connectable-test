@@ -389,6 +389,13 @@ export default {
           title: "Сотруник " + del_type,
           content: `Сотрудник ${fio} был ${del_type}`,
         });
+        // инициируем принудительный логаут
+        if (dispatch_name == MARK_USER_DELETED) {
+          this.$socket.client.emit("FOR_ALL", {
+            area: "FORCE_LOGOUT",
+            user_id: key,
+          });
+        }
       } catch (error) {
         this.$error({
           title: "Ошибка при удалении сотрудника",
