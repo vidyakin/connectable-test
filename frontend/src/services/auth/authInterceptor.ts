@@ -23,6 +23,8 @@ export const setAuthInterceptor = () => {
       console.error('Вход заблокирован')
       store.commit(ERROR_LOGIN, 'Вход заблокирован')
       return Promise.resolve(error)
+    } else if (error.response.status === 404) {
+      console.error('Что-то не найдено:', error.response.data.error)
     } else if (errData && errData.message) {
       console.error((errData.name ? errData.name + ': ' : '') + errData.message);
     } else if (error instanceof Error) {

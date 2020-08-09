@@ -4,6 +4,7 @@ const mailer = require('../email/index');
 const { safeStringify, validateToken} = require('@/utils');
 
 const User = require('../models').User;
+const Client = require('../models').Client;
 
 router.post('/login', require('./login')); // router = /api/login  (общая точка логина для всех способов)
 
@@ -36,39 +37,58 @@ router.post('/upload', (req, res, next) => {
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 
-router.post('/register', function(req,res){
-  let { firstName, lastName, email, password, emailSend } = req.body;
-      data = {
-          firstName,
-          lastName,
-          email,
-          password,
-          client_id: req.body.workspace
-      };
+router.post('/register', async (req,res) => {
+  let { client_id, firstName, lastName, email, positions, password, emailSend } = req.body;
   let result = {};
   let status = 200;
-  
+
+  try {
+    const client = await Client.findOne({workspace: client_id}).lean()
+    if (client === null) {
+      result = {
+        status: 202,
+        error: "Клиент с таким кодом не найден"
+      }
+      return res.status(result.status).send(result);
+    }
+  } catch (error) {
+    result = {
+      status: 522,
+      error
+    }
+    return res.status(result.status).send(result);
+  }
+    
   User.findOne({email}, async (err, user) => {
       if (!err && user) {
-          bcrypt.compare(password, user.password).then(match => {
-            if (match) {
-              status = 202;
-              result.status = status;
-              result.error = `Authentication error. This email is already registered`;
-            } else {
-              status = 202;
-              result.status = status;
-              result.error = `Authentication error. This email is already registered`;
-            }
-
-            res.status(status).send(result);
-          });
+          // bcrypt.compare(password, user.password).then(match => {
+          //   if (match) {
+          //     status = 202;
+          //     result.status = status;
+          //     result.error = `Registration error. This email is already registered`;
+          //   } else {
+          //     status = 202;
+          //     result.status = status;
+          //     result.error = `Registration error. This email is already registered`;
+          //   }
+          //   res.status(status).send(result);
+          // });
+          result.status = 202;
+          result.error = `Registration error. User with given email has already been registered`;
+          res.status(result.status).send(result);
       } else {
         status = 200;
         
         try {
               
-          new_data = await User.create(data)  // hashing realized in User schema 
+          new_data = await User.create({
+            client_id,
+            firstName,
+            lastName,
+            email,
+            positions,
+            password,
+          })  // hashing realized in User schema 
           result.id = new_data._id
           // prepare token
           const payload = { user: email };

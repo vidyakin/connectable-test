@@ -87,11 +87,14 @@ export const insertNewUser = (context: any, dataUser: any) => {
         context.commit(ERROR_REGISTER, '');
         context.commit(SUCCESS_REGISTER, 'Регистрация прошла успешно');
         return response.data
-      } else if (response.data.status === 202) {
+      } else {
         context.commit(ERROR_REGISTER, response.data.error);
       }
     }).catch(err => {
-      console.log(err);
+      //console.log(err);
+      if (err.response.status == 404) {
+        context.commit(ERROR_REGISTER, err.response.data.error);
+      }
       localStorage.removeItem('authorization');
       localStorage.removeItem('token');
       localStorage.removeItem('CurrentUserData');

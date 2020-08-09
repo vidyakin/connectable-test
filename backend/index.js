@@ -90,7 +90,9 @@ io.of(/^\/\w+$/).on('connection', socket => {
   socket.on("FOR_ALL", (data, cb) => {
     console.log(`${new Date().toLocaleString('ru')}: From client ${socket.id} to all: ${data} `);
     socket.broadcast.emit("socketMessage", data);
-    return cb({msg: "OK"});
+    if (cb) {
+      return cb({msg: "OK"});
+    }
   });
   // Универсальное событие для одного, что и как обрабатываетс - задается в data
   socket.on("PRIVATE_MSG", data => {
