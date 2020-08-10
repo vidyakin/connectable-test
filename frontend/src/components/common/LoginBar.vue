@@ -192,6 +192,9 @@ export default {
       this.audio.play();
     },
     disconnect() {
+      this.pong.type = "error";
+      this.pong.msg = "Connection lost";
+      this.connModal = { visible: true, connected: false };
       console.log("socket disconnected");
       this.$socket.client.connect(`${this.apiURL}`);
     },

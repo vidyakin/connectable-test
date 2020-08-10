@@ -54,15 +54,8 @@ export default Vue.extend({
     AppUserInfo,
   },
   async beforeMount() {
-    await this.$store.dispatch(GET_USER, this.$route.params._id);
-    await this.$store.dispatch(GET_POSTS, {
-      filter: {
-        parent: {
-          type: "user",
-          id: this.$route.params._id,
-        },
-      },
-    });
+    await this.$store.dispatch(GET_USER, this.user_id);
+    await this.$store.dispatch(GET_POSTS, this.userFilter);
     this.isLoaded = true;
   },
   mounted() {
@@ -79,8 +72,21 @@ export default Vue.extend({
       "userIsAdmin",
       "userIsSuperAdmin",
     ]),
+    user_id() {
+      return this.$route.params._id;
+    },
+    userFilter() {
+      return {
+        filter: {
+          parent: {
+            type: "user",
+            id: this.user_id,
+          },
+        },
+      };
+    },
     preparedPosts() {
-      const user_id = this.$route.params._id;
+      const user_id = this.user_id;
       return this.posts.filter((p) => p.author_ref == user_id).sort(compare);
     },
   },
@@ -88,15 +94,63 @@ export default Vue.extend({
   watch: {
     $route(val) {
       this.$store.dispatch(GET_USER, val.params._id).then(() => {
-        this.$store.dispatch(GET_POSTS, {
-          filter: {
-            parent: {
-              type: "user",
-              id: this.$route.params._id,
-            },
-          },
-        });
+        this.$store.dispatch(GET_POSTS, this.userFilter);
       });
+    },
+  },
+  sockets: {
+    async socketMessage(payload) {
+      console.log(`profile received a msg: ${payload.area}`);
+      if (payload.area == "POSTS") {
+        if (payload.parent.type == "user") {
+          await this.$store.dispatch(GET_POSTS, this.userFilter);
+          this.$notification["info"]({
+            message: {
+              created: "Новый пост",
+              changed: "Изменение поста",
+              deleted: "Пост удален",
+            }[payload.action],
+            description: "",
+            placement: "bottomLeft",
+          });
+        }
+      }
+      // если лайкнули/дизлайкнули что-то, то проверяем что это был пост и пост именно в блоге текущего юзера
+      if (payload.area == "LIKE" || payload.area == "DISLIKE") {
+        const { type, id } = payload.postParent;
+        if (
+          payload.parent.type == "post" &&
+          type == "user" &&
+          id == this.user_id
+        ) {
+          const likeInfo =
+            payload.area == "LIKE"
+              ? {
+                  message: "Новый лайк",
+                  type: "like",
+                  color: "green",
+                }
+              : {
+                  message: "Новый дизлайк",
+                  type: "dislike",
+                  color: "salmon",
+                };
+          await this.$store.dispatch(GET_POSTS, this.userFilter);
+          this.$notification["info"]({
+            message: likeInfo.message,
+            description: "",
+            placement: "bottomLeft",
+            icon: (h) =>
+              h("a-icon", {
+                props: {
+                  type: likeInfo.type,
+                  theme: "twoTone",
+                  twoToneColor: likeInfo.color,
+                },
+              }),
+          });
+        }
+      }
     },
   },
 });

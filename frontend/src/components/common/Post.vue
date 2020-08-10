@@ -317,7 +317,13 @@ export default {
         user_id: this.user_id,
         parent: { type: "post", id: post_id }, // дублируется код поста т.к. лайкаем пост но в общем случае тут разные типы
       };
-      this.$store.dispatch(SEND_LIKE, like);
+      this.$store.dispatch(SEND_LIKE, like).then((_) => {
+        this.$socket.client.emit("FOR_ALL", {
+          area: "LIKE",
+          parent: like.parent,
+          postParent: this.post.parent,
+        });
+      });
     },
     dislike(post_id) {
       const like = {
@@ -325,7 +331,13 @@ export default {
         user_id: this.user_id,
         parent: { type: "post", id: post_id },
       };
-      this.$store.dispatch(DELETE_LIKE, like);
+      this.$store.dispatch(DELETE_LIKE, like).then((_) => {
+        this.$socket.client.emit("FOR_ALL", {
+          area: "DISLIKE",
+          parent: like.parent,
+          postParent: this.post.parent,
+        });
+      });
       // .finally(() => {
       //   let parentVal = "";
       //   let idUrl = "0";
@@ -368,12 +380,18 @@ export default {
       }
     },
     deletePost() {
-      this.$store.dispatch(DELETE_POST, this.post._id).then(() => {
+      const { _id, parent } = this.post;
+      this.$store.dispatch(DELETE_POST, _id).then(() => {
         this.$notification["success"]({
           message: "Пост удален",
           placement: "topRight",
         });
         this.visible = false;
+        this.$socket.client.emit("FOR_ALL", {
+          area: "POST",
+          parent,
+          action: "deleted",
+        });
       });
     },
     editPost() {
