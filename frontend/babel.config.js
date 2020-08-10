@@ -2,6 +2,7 @@ module.exports = {
   presets: [
     "@babel/env",
     '@vue/app',
+    "@vue/babel-preset-jsx"
   ]
   // ,
   // plugins: [

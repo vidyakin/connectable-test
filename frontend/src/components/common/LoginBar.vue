@@ -13,6 +13,10 @@
           <a-button size="small" @click="pingSocketServer">PING</a-button>
           <a-alert :message="pong.msg" :type="pong.type" banner v-if="pong.show" />
           <a-spin style="max-height: 20px" v-else />
+          <div class="system-text">
+            Показывать сообщения в консоли:
+            <a-switch size="small" @change="chkd=>{this.showPong = chkd}" />
+          </div>
           <div class="system-text">last 'pong': {{lastPong && lastPong.toLocaleTimeString()}}</div>
           <!-- <a-button size="small" @click.prevent="playSound">Beep</a-button> -->
           <audio id="audio" src="@/assets/sounds/guess-what.mp3" />
@@ -45,10 +49,13 @@
         <a-avatar :src="loggedUserAvatar()" />
       </div>
     </div>
+    <!-- Окно  -->
+    <ConnectionInfoModal :connected="connModal.connected" :visible="connModal.visible" />
   </div>
 </template>
 
 <script>
+import Vue from "vue";
 import store from "../../store";
 import { mapGetters } from "vuex";
 
@@ -62,10 +69,48 @@ import { SET_CURRENT_CLIENT } from "@/store/client/mutations.type";
 
 //import NotificationList from "@/components/Company/NotificationList";
 
+const ConnectionInfoModal = Vue.component("ConnectionInfoModal", {
+  name: "ConnectionInfoModal",
+  props: ["connected", "visible"],
+  render: function (h) {
+    const info = this.connected
+      ? {
+          message: "Соединение восстановлено",
+          color: "green",
+          icon: "check-circle",
+        }
+      : {
+          message: "Соединение отстутствует",
+          color: "salmon",
+          icon: "exclamation-circle",
+        };
+    return (
+      <a-modal
+        vModel={this.visible}
+        title="Соединение с сервером"
+        centered={true}
+        closable={false}
+        maskClosable={false}
+        footer={null}
+      >
+        <div style="display: flex; align-items: center">
+          <a-icon
+            type={info.icon}
+            style={`color: ${info.color}; font-size: 32px; margin-right: 15px`}
+          />
+          <span style={`font-size: 12pt; color: ${info.color}`}>
+            {info.message}!
+          </span>
+        </div>
+      </a-modal>
+    );
+  },
+});
+
 export default {
   name: "AppLoginBar",
   components: {
-    //NotificationList
+    ConnectionInfoModal,
   },
   data() {
     return {
@@ -76,6 +121,7 @@ export default {
       connection: null,
       waiter: null,
       lastPong: null,
+      connModal: { connected: true, visible: false },
       pingTimer: null,
       checkTimer: null,
       /*************************************** 
@@ -131,11 +177,15 @@ export default {
     connect() {
       console.log("socket connected:", this.$socket.client.id);
       this.pong = { show: true, msg: "Connected", type: "success" };
-      this.$notification["info"]({
-        message: "Соединение восстановлено",
-        description: `сервер доступен`,
-        placement: "topLeft",
-      });
+      this.connModal = { connected: true, visible: true };
+      setTimeout(() => {
+        this.connModal.visible = false;
+      }, 2000);
+      // this.$notification["info"]({
+      //   message: "Соединение восстановлено",
+      //   description: `сервер доступен`,
+      //   placement: "topLeft",
+      // });
       this.audio.play();
     },
     disconnect() {
@@ -405,12 +455,17 @@ export default {
 
     // таймер для отслеживания последнего отклика от сервера
     this.checkTimer = setInterval(() => {
-      console.log(
-        `Server connection checker ${new Date().toLocaleTimeString()}`
-      );
+      if (this.showPong) {
+        console.log(
+          `Server connection checker ${new Date().toLocaleTimeString()}`
+        );
+      }
       if (this.lastPong == undefined || new Date() - this.lastPong >= 5000) {
+        this.connModal = { connected: false, visible: true };
         this.pingSocketServer();
-        console.log(`Соединение ${this.apiURL} должно перезапуститься...`);
+        if (this.showPong) {
+          console.log(`Соединение ${this.apiURL} должно перезапуститься...`);
+        }
       }
     }, 5000);
 
