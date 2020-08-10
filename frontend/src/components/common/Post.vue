@@ -377,6 +377,11 @@ export default {
           this.commentContent = "";
           this.mentionsData = [];
         });
+        this.$socket.client.emit("FOR_ALL", {
+          area: "COMMENT",
+          parent: comment.parent,
+          postParent: this.post.parent,
+        });
       }
     },
     deletePost() {
@@ -391,6 +396,7 @@ export default {
           area: "POST",
           parent,
           action: "deleted",
+          post_id: _id,
         });
       });
     },

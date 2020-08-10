@@ -90,7 +90,51 @@ export default Vue.extend({
       return this.posts.filter((p) => p.author_ref == user_id).sort(compare);
     },
   },
-  methods: {},
+  methods: {
+    async updateLikes(payload) {
+      const { type, id } = payload.postParent;
+      if (
+        payload.parent.type == "post" &&
+        type == "user" &&
+        id == this.user_id
+      ) {
+        const likeInfo = {
+          LIKE: {
+            message: "Новый лайк",
+            type: "like",
+            color: "green",
+          },
+          DISLIKE: {
+            message: "Новый дизлайк",
+            type: "dislike",
+            color: "salmon",
+          },
+          COMMENT: {
+            message: "Новый комментарий",
+            type: "message",
+            color: "blue",
+          },
+        }[payload.area];
+        await this.$store.dispatch(GET_POSTS, this.userFilter);
+        this.$notification["info"]({
+          message: likeInfo.message,
+          description: "",
+          placement: "bottomLeft",
+          icon: (h) =>
+            h("a-icon", {
+              props: {
+                type: likeInfo.type,
+                theme: "twoTone",
+                twoToneColor: likeInfo.color,
+              },
+            }),
+        });
+      }
+    },
+    updateComments(payload) {
+      const { type, id } = payload.postParent;
+    },
+  },
   watch: {
     $route(val) {
       this.$store.dispatch(GET_USER, val.params._id).then(() => {
@@ -117,39 +161,9 @@ export default Vue.extend({
       }
       // если лайкнули/дизлайкнули что-то, то проверяем что это был пост и пост именно в блоге текущего юзера
       if (payload.area == "LIKE" || payload.area == "DISLIKE") {
-        const { type, id } = payload.postParent;
-        if (
-          payload.parent.type == "post" &&
-          type == "user" &&
-          id == this.user_id
-        ) {
-          const likeInfo =
-            payload.area == "LIKE"
-              ? {
-                  message: "Новый лайк",
-                  type: "like",
-                  color: "green",
-                }
-              : {
-                  message: "Новый дизлайк",
-                  type: "dislike",
-                  color: "salmon",
-                };
-          await this.$store.dispatch(GET_POSTS, this.userFilter);
-          this.$notification["info"]({
-            message: likeInfo.message,
-            description: "",
-            placement: "bottomLeft",
-            icon: (h) =>
-              h("a-icon", {
-                props: {
-                  type: likeInfo.type,
-                  theme: "twoTone",
-                  twoToneColor: likeInfo.color,
-                },
-              }),
-          });
-        }
+        this.updateLikes(payload);
+      } else if (payload.area == "COMMENT") {
+        this.updateLikes(payload);
       }
     },
   },

@@ -5,7 +5,7 @@ const Schema = mongoose.Schema;
 
 const commentSchema = new Schema({
     parent: Object,
-    author: Object,
+    author: { type: Schema.Types.ObjectId, ref: 'User' },
     message: String,
     created: {
         type: Date,
@@ -18,11 +18,12 @@ const commentSchema = new Schema({
 
 
 commentSchema.pre('find', function () {
-    this.populate('mentions', 'firstName lastName');
+    this.populate('mentions', 'firstName lastName').populate('author', 'firstName lastName');
 });
 
 commentSchema.post('save', function (doc, next) {
-    doc.populate('mentions', 'firstName lastName').execPopulate().then( () => {
+    doc.populate('mentions', 'firstName lastName')
+        .populate('author', 'firstName lastName').execPopulate().then( () => {
         next();
     })
 });
