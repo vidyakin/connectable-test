@@ -222,6 +222,7 @@ export default {
           JSON.stringify(this.currentClient)
         );
         this.$socket.client.nsp = "/" + rec.workspace;
+        this.$socket.client.connect(`${process.env.VUE_APP_API_URL}`);
         // для контроля
         // this.currentClientStr = JSON.stringify(
         //   JSON.parse(localStorage.getItem("currentClient")),

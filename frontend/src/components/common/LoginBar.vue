@@ -117,7 +117,7 @@ export default {
       current: 1,
       audio: null,
       showPong: false,
-      pong: { show: false, type: "success", msg: "" },
+      pong: { show: true, type: "success", msg: "..." },
       connection: null,
       waiter: null,
       lastPong: null,
@@ -177,10 +177,13 @@ export default {
     connect() {
       console.log("socket connected:", this.$socket.client.id);
       this.pong = { show: true, msg: "Connected", type: "success" };
-      this.connModal = { connected: true, visible: true };
-      setTimeout(() => {
-        this.connModal.visible = false;
-      }, 2000);
+      if (this.connModal.visible && !this.connModal.connected) {
+        this.connModal = { connected: true, visible: true };
+        this.pong.type = "success";
+        setTimeout(() => {
+          this.connModal.visible = false;
+        }, 2000);
+      }
       // this.$notification["info"]({
       //   message: "Соединение восстановлено",
       //   description: `сервер доступен`,
@@ -406,11 +409,10 @@ export default {
   },
   async created() {
     console.log("LoginBar created!");
-    this.lastPong = new Date();
 
     // определяем неймспейс
     const user = this.userData.result;
-    let nsp;
+    let nsp = "/";
     // Если клиент не определен и пользователь - не суперадмин , то разлогиниваемся
     if (!this.currentClient) {
       if (!user.roles.includes("superadmin")) {
@@ -418,25 +420,16 @@ export default {
         nsp = "/" + user.client_id;
       } else {
         const currentClient = JSON.parse(localStorage.getItem("currentClient"));
-        this.$store.commit(SET_CURRENT_CLIENT, currentClient);
-        nsp = "/" + currentClient.workspace;
+        if (currentClient) {
+          this.$store.commit(SET_CURRENT_CLIENT, currentClient);
+          nsp = "/" + currentClient.workspace;
+        }
       }
     } else {
       nsp = "/" + this.currentClient.workspace;
     }
     console.log(`nsp ${nsp}`);
-    this.$socket.client.nsp = nsp;
-    this.$socket.client.connect(`${this.apiURL}`);
 
-    // запускаем свой пингер
-    this.pingTimer = setInterval(() => {
-      this.$socket.client.emit("PING", { beat: 1 }, (resp) => {
-        this.lastPong = new Date();
-        if (this.showPong) {
-          console.log(`pong!`);
-        }
-      });
-    }, 2000);
     // this.connection = new WebSocket("ws://localhost:8080");
     // this.connection.onmessage = function (event) {
     //   console.log(event);
@@ -453,22 +446,6 @@ export default {
     console.log("LoginBar mounted");
     this.audio = document.getElementById("audio");
 
-    // таймер для отслеживания последнего отклика от сервера
-    this.checkTimer = setInterval(() => {
-      if (this.showPong) {
-        console.log(
-          `Server connection checker ${new Date().toLocaleTimeString()}`
-        );
-      }
-      if (this.lastPong == undefined || new Date() - this.lastPong >= 5000) {
-        this.connModal = { connected: false, visible: true };
-        this.pingSocketServer();
-        if (this.showPong) {
-          console.log(`Соединение ${this.apiURL} должно перезапуститься...`);
-        }
-      }
-    }, 5000);
-
     console.log(`LoginBar mounted and socket has connected to ${this.apiURL}`);
     // if (!this.$socket.client.connected) {
     //   this.$error({
@@ -479,6 +456,47 @@ export default {
     // } else {
     //   this.pong = { type: "success", msg: "Connected", show: true };
     // }
+  },
+  watch: {
+    currentClient(val) {
+      if (!val) return;
+
+      this.$socket.client.nsp = "/" + val.workspace;
+      this.$socket.client.connect(`${this.apiURL}`);
+
+      this.lastPong = new Date();
+      // запускаем свой пингер
+      this.pingTimer = setInterval(() => {
+        this.$socket.client.emit("PING", { beat: 1 }, (resp) => {
+          this.lastPong = new Date();
+          if (this.showPong) {
+            console.log(`pong! ${this.lastPong.toLocaleString()}`);
+          }
+        });
+      }, 2000);
+
+      // таймер для отслеживания последнего отклика от сервера
+      this.checkTimer = setInterval(() => {
+        const now = new Date();
+        const diff = now - this.lastPong;
+        this.pong.msg = `last pong: ${diff}ms`;
+        if (this.showPong) {
+          console.log(
+            `Server connection checker ${new Date().toLocaleTimeString()}, diff is ${diff}ms`
+          );
+        }
+        if (diff >= 5000) {
+          this.pong.type = "error";
+          this.connModal = { connected: false, visible: true };
+          //this.pingSocketServer();
+          this.$socket.client.disconnect();
+          this.$socket.client.connect(`${this.apiURL}`);
+          if (this.showPong) {
+            console.log(`Соединение ${this.apiURL} должно перезапуститься...`);
+          }
+        }
+      }, 5000);
+    },
   },
 };
 </script>
